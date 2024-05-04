@@ -8,53 +8,27 @@ import "leaflet.markercluster";
 import zebraIcon from "@/assets/zebra.png";
 import cameraIcon from "@/assets/camera.png";
 import crossRoadIcon from "@/assets/crossroad.png";
-
+import mockdata from "./mock";
 const MonitoringMap = () => {
   const mapRef = useRef(null);
   const markerClusterGroupRef = useRef(null);
   const markerRefs = useRef([]);
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [markersData, setMarkersData] = useState(mockdata);
-  useEffect(() => {
-    const storedMarkersData = localStorage.getItem("markersData");
-    if (storedMarkersData) {
-      setMarkersData(JSON.parse(storedMarkersData));
-    } else {
-      setMarkersData(mockdata);
-    }
-  }, []);
-  useEffect(() => {
-    const map = L.map(mapRef.current);
+  const [filterType, setFilterType] = useState(1);
+  const [filteredMarkersData, setFilteredMarkersData] = useState(markersData);
 
-    // Restore map center and zoom from localStorage if available
-    const storedCenter = localStorage.getItem("mapCenter");
-    const storedZoom = localStorage.getItem("mapZoom");
-    if (storedCenter && storedZoom) {
-      const [lat, lng] = JSON.parse(storedCenter);
-      const zoom = JSON.parse(storedZoom);
-      map.setView([lat, lng], zoom);
-    } else {
-      map.setView([51.505, -0.09], 13);
-    }
+  const createMarkers = (data) => {
+    markerClusterGroupRef.current.clearLayers();
+    markerRefs.current = [];
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "Map data © OpenStreetMap contributors",
-    }).addTo(map);
-
-    markerClusterGroupRef.current = L.markerClusterGroup({
-      spiderfyOnMaxZoom: false,
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      disableClusteringAtZoom: 28, // Adjust this value based on your needs
-    }).addTo(map);
-
-    markersData.forEach((markerData) => {
+    data.forEach((markerData) => {
       const marker = L.marker([markerData.lat, markerData.lng], {
         icon: L.icon({
           iconUrl:
-            Number(markerData.type) == 1
+            Number(markerData.type) === 1
               ? zebraIcon
-              : Number(markerData.type) == 2
+              : Number(markerData.type) === 2
               ? cameraIcon
               : crossRoadIcon,
           iconSize: [32, 32],
@@ -66,53 +40,8 @@ const MonitoringMap = () => {
 
       marker.on("click", () => {
         setSelectedMarker(marker);
-
-        //       marker.bindPopup(`
-        //   <div>
-        //     <div class="popup-header">Selected Marker</div>
-        //     <div class="popup-body">
-        //       <input
-        //         type="range"
-        //         min="0"
-        //         max="360"
-        //         value="${marker.options.rotationAngle}"
-        //         onchange="handlePopupSlide(${markerData.id})"
-        //       />
-        //       <p>${marker.options.rotationAngle} degrees</p>
-        //       <div class="marker-icon">
-        //         <img
-        //           src="${marker.options.icon.options.iconUrl}"
-        //           alt="Marker"
-        //           style="transform: rotate(${marker.options.rotationAngle}deg)"
-        //         />
-        //       </div>
-        //     </div>
-        //   </div>
-        // `);
-        const handlePopupSlide = (event, markerId) => {
-          const rotation = Number(event.target.value);
-          const updatedMarkersData = markersData.map((markerData) =>
-            markerData.id === markerId
-              ? { ...markerData, rotated: rotation }
-              : markerData
-          );
-          setMarkersData(updatedMarkersData);
-          const marker = markerRefs.current.find(
-            (marker) => marker.options.id === markerId
-          );
-          if (marker) {
-            marker.options.rotationAngle = rotation;
-            marker.setIcon(
-              L.icon({
-                iconUrl: marker.options.icon.options.iconUrl,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16],
-                rotationAngle: rotation,
-              })
-            );
-          }
-        };
       });
+
       marker.on("dragstart", () => {
         setMarkersData((prevMarkersData) =>
           prevMarkersData.map((prevMarkerData) =>
@@ -150,6 +79,105 @@ const MonitoringMap = () => {
       markerRefs.current.push(marker);
       markerClusterGroupRef.current.addLayer(marker);
     });
+  };
+
+  const handleFilter = (event) => {
+    const type = event.target.value;
+    setFilterType(type);
+
+    setFilteredMarkersData(
+      markersData.filter((marker) => {
+        if (type == 0) {
+          return true; // No filter applied, show all markers
+        }
+        return marker.type === Number(type);
+      })
+    );
+  };
+
+  useEffect(() => {
+    const storedMarkersData = localStorage.getItem("markersData");
+    if (storedMarkersData) {
+      setMarkersData(JSON.parse(storedMarkersData));
+    } else {
+      setMarkersData(mockdata);
+    }
+  }, []);
+
+  useEffect(() => {
+    const map = L.map(mapRef.current);
+    // Restore map center and zoom from localStorage if available
+    const storedCenter = localStorage.getItem("mapCenter");
+    const storedZoom = localStorage.getItem("mapZoom");
+    if (storedCenter && storedZoom) {
+      const [lat, lng] = JSON.parse(storedCenter);
+      const zoom = JSON.parse(storedZoom);
+      map.setView([lat, lng], zoom);
+    } else {
+      map.setView([51.505, -0.09], 13);
+    }
+    const OpenStreeMap = L.tileLayer(
+      "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      { attribution: "Burgut Soft" }
+    );
+
+    const Transport = L.tileLayer(
+      "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714",
+      { attribution: "Burgut Soft" }
+    );
+
+    const Transport_Dark = L.tileLayer(
+      "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714",
+      { attribution: "Burgut Soft" }
+    );
+
+    OpenStreeMap.addTo(map); // Add the OpenStreeMap layer by default
+
+    const tileLayers = {
+      OpenStreetMap: OpenStreeMap,
+      Transport: Transport,
+      "Transport Dark": Transport_Dark,
+    };
+    L.control.layers(tileLayers).addTo(map);
+
+    markerClusterGroupRef.current = L.markerClusterGroup({
+      spiderfyOnMaxZoom: false,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      disableClusteringAtZoom: 28, // Adjust this value based on your needs
+    }).addTo(map);
+    //   setMarkersData((prevMarkersData) =>
+    //     prevMarkersData.map((prevMarkerData) =>
+    //       prevMarkerData.id === markerData.id
+    //         ? { ...prevMarkerData, dragged: true }
+    //         : prevMarkerData
+    //     )
+    //   );
+    // });
+
+    // marker.on("dragend", () => {
+    //   setMarkersData((prevMarkersData) => {
+    //     const updatedMarkersData = prevMarkersData.map((prevMarkerData) => {
+    //       if (prevMarkerData.id === markerData.id) {
+    //         // Update the dragged and rotated properties
+    //         return {
+    //           ...prevMarkerData,
+    //           dragged: false,
+    //           rotated: marker.options.rotationAngle || 0,
+    //         };
+    //       }
+    //       return prevMarkerData;
+    //     });
+
+    //     // Save the updated markers data to localStorage
+    //     localStorage.setItem("markersData", JSON.stringify(updatedMarkersData));
+
+    //     return updatedMarkersData;
+    //   });
+    // });
+
+    // markerRefs.current.push(marker);
+    // markerClusterGroupRef.current.addLayer(marker);
 
     // Save map center and zoom to localStorage on change
     map.on("moveend", () => {
@@ -167,6 +195,10 @@ const MonitoringMap = () => {
     };
   }, []);
 
+  useEffect(() => {
+    createMarkers(filteredMarkersData);
+  }, [filteredMarkersData]);
+
   const handlePopoverSlide = (event) => {
     const rotation = Number(event.target.value);
 
@@ -181,10 +213,21 @@ const MonitoringMap = () => {
       );
     }
   };
-
   return (
     <div>
-      <div ref={mapRef} className="h-[70vh]"></div>
+      <div>
+        <select value={filterType} onChange={handleFilter}>
+          <option value={0}>All</option>
+          <option value={1}>Zebra</option>
+          <option value={2}>Camera</option>
+          <option value={3}>Crossroad</option>
+        </select>
+      </div>
+      <div
+        id="map"
+        style={{ width: "100%", height: "500px" }}
+        ref={mapRef}
+      ></div>
       {selectedMarker && (
         <div className="popover">
           <div className="popover-content">
@@ -218,43 +261,3 @@ const MonitoringMap = () => {
 };
 
 export default MonitoringMap;
-const mockdata = [
-  { id: 1, lat: 51.5, lng: -0.1, dragged: false, rotated: 0, type: 1 },
-  { id: 2, lat: 51.51, lng: -0.12, dragged: false, rotated: 45, type: 1 },
-  { id: 3, lat: 51.52, lng: -0.09, dragged: false, rotated: 90, type: 2 },
-  {
-    id: 4,
-    lat: 51.53,
-    lng: -0.11,
-    dragged: false,
-    rotated: 135,
-    type: 2,
-  },
-  { id: 5, lat: 51.54, lng: -0.1, dragged: false, rotated: 180, type: 3 },
-  {
-    id: 6,
-    lat: 51.55,
-    lng: -0.12,
-    dragged: false,
-    rotated: 225,
-    type: 3,
-  },
-  {
-    id: 7,
-    lat: 51.56,
-    lng: -0.08,
-    dragged: false,
-    rotated: 270,
-    type: 1,
-  },
-  {
-    id: 8,
-    lat: 51.57,
-    lng: -0.11,
-    dragged: false,
-    rotated: 315,
-    type: 2,
-  },
-  { id: 9, lat: 51.58, lng: -0.09, dragged: false, rotated: 0, type: 3 },
-  { id: 10, lat: 51.59, lng: -0.1, dragged: false, rotated: 45, type: 1 },
-];

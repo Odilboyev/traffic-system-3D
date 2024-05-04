@@ -1,0 +1,41 @@
+const mockdata = [
+  { id: 1, lat: 51.5, lng: -0.1, dragged: false, rotated: 0, type: 1 },
+  { id: 2, lat: 51.51, lng: -0.12, dragged: false, rotated: 45, type: 1 },
+  { id: 3, lat: 51.52, lng: -0.09, dragged: false, rotated: 90, type: 2 },
+  {
+    id: 4,
+    lat: 51.53,
+    lng: -0.11,
+    dragged: false,
+    rotated: 135,
+    type: 2,
+  },
+  { id: 5, lat: 51.54, lng: -0.1, dragged: false, rotated: 180, type: 3 },
+  {
+    id: 6,
+    lat: 51.55,
+    lng: -0.12,
+    dragged: false,
+    rotated: 225,
+    type: 3,
+  },
+  {
+    id: 7,
+    lat: 51.56,
+    lng: -0.08,
+    dragged: false,
+    rotated: 270,
+    type: 1,
+  },
+  {
+    id: 8,
+    lat: 51.57,
+    lng: -0.11,
+    dragged: false,
+    rotated: 315,
+    type: 2,
+  },
+  { id: 9, lat: 51.58, lng: -0.09, dragged: false, rotated: 0, type: 3 },
+  { id: 10, lat: 51.59, lng: -0.1, dragged: false, rotated: 45, type: 1 },
+];
+export default mockdata;
