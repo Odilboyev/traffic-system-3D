@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom/client";
 import {
   MapContainer,
   TileLayer,
@@ -7,15 +8,14 @@ import {
   LayersControl,
   useMapEvents,
 } from "react-leaflet";
-import MarkerClusterGroup from "react-leaflet-cluster";
-import "@kalisio/leaflet.donutcluster/src/Leaflet.DonutCluster";
+import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet-rotatedmarker";
 import zebraIcon from "@/assets/zebra.png";
 import cameraIcon from "@/assets/camera.png";
 import crossRoadIcon from "@/assets/crossroad.png";
 import mockdata from "../map/mock";
-
+import MarkerClusterGroup from "react-leaflet-cluster";
 import {
   Button,
   Checkbox,
@@ -28,6 +28,9 @@ import {
 import Control from "react-leaflet-custom-control";
 import { Cog8ToothIcon, ListBulletIcon } from "@heroicons/react/16/solid";
 import "./styles.css";
+import { PieChart } from "react-minimal-pie-chart";
+import { renderToString } from "react-dom/server";
+import Test from "./test";
 const MapComponent = () => {
   const [center, setCenter] = useState(
     JSON.parse(localStorage.getItem("mapCenter"))
@@ -62,10 +65,6 @@ const MapComponent = () => {
   };
 
   // const [openedPopupMarkerId, setOpenedPopupMarkerId] = useState(null);
-
-  useEffect(() => {
-    setMarkers(mockdata);
-  }, []);
 
   const handleMarkerDragEnd = (id, event) => {
     const { lat, lng } = event.target.getLatLng();
@@ -110,6 +109,21 @@ const MapComponent = () => {
     return null;
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 1:
+        return "#FF6363"; // Red
+      case 2:
+        return "#FFD700"; // Gold
+      case 3:
+        return "#1c2d2d"; // Teal
+      default:
+        return "#33cf67"; // Light Pink
+    }
+  };
+  const getRotationAngle = (percentage) => {
+    return (360 * percentage) / 100;
+  };
   return (
     <MapContainer
       attributionControl={false}
@@ -251,6 +265,61 @@ const MapComponent = () => {
           weight: 0,
           opacity: 0,
         }}
+        iconCreateFunction={(cluster) => {
+          const childMarkers = cluster.getAllChildMarkers();
+
+          const statusCounts = {};
+
+          childMarkers.forEach((marker) => {
+            const status = marker.options.status;
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+          });
+
+          const pieChartData = Object.entries(statusCounts).map(
+            ([status, count]) => ({
+              status: parseInt(status),
+              count,
+            })
+          );
+
+          const totalMarkers = childMarkers.length;
+
+          const pieChartIcon = L.divIcon({
+            className: "cluster",
+            iconSize: L.point(40, 40),
+            html: renderToString(
+              <div className="w-20 h-16">
+                <PieChart
+                  data={pieChartData.map((datam) => ({
+                    value: datam.count,
+                    title: datam.status,
+                    color: getStatusColor(datam.status),
+                  }))}
+                  labelStyle={{
+                    fill: "white",
+                    fontWeight: "bold",
+                  }}
+                  label={(props) => {
+                    return props.dataEntry.value;
+                  }}
+                />
+              </div>
+            ),
+            //           html: `<div class="pie-chart" style="width: 40px; height: 40px;" style="background-image: conic-gradient()">
+            //   ${pieChartData
+            //     .map((data) => {
+            //       const statusColor = getStatusColor(data.status);
+            //       const percentage = (data.count / totalMarkers) * 100;
+            //       const rotationAngle = getRotationAngle(percentage);
+            //       return `<div class="slice ${statusColor} w-[${percentage}%] h-[40px]" ><div class="label">${data.count}</div></div>
+            //               `;
+            //     })
+            //     .join("")}
+            // </div>`,
+          });
+
+          return pieChartIcon;
+        }}
       >
         {markers?.map((marker, i) => {
           if (
@@ -270,6 +339,7 @@ const MapComponent = () => {
                 dragend: (event) => handleMarkerDragEnd(marker.id, event),
                 popupopen: () => handlePopupOpen(marker.id),
               }}
+              status={marker.status}
               icon={
                 marker.type === 1
                   ? L.icon({

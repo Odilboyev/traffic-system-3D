@@ -118,6 +118,7 @@ const MonitoringMap = () => {
     const map = L.map(mapRef.current);
     // Restore map center and zoom from localStorage if available
     const storedCenter = localStorage.getItem("mapCenter");
+    console.log(storedCenter);
     const storedZoom = localStorage.getItem("mapZoom");
     if (storedCenter && storedZoom) {
       const [lat, lng] = JSON.parse(storedCenter);
