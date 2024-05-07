@@ -112,13 +112,13 @@ const MapComponent = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 1:
-        return "#FF6363"; // Red
+        return "#FF0000"; // Red
       case 2:
         return "#FFD700"; // Gold
       case 3:
-        return "#1c2d2d"; // Teal
+        return "#FFC0CB"; // Teal
       default:
-        return "#33cf67"; // Light Pink
+        return "#019191"; // Light Pink
     }
   };
   const getRotationAngle = (percentage) => {
@@ -288,20 +288,23 @@ const MapComponent = () => {
             className: "cluster",
             iconSize: L.point(40, 40),
             html: renderToString(
-              <div className="w-20 h-16">
+              <div className="w-20 h-20">
                 <PieChart
                   data={pieChartData.map((datam) => ({
                     value: datam.count,
                     title: datam.status,
                     color: getStatusColor(datam.status),
                   }))}
+                  radius={42}
                   labelStyle={{
-                    fill: "white",
+                    fill: "#fff",
+                    fontSize: "1rem",
                     fontWeight: "bold",
                   }}
                   label={(props) => {
                     return props.dataEntry.value;
                   }}
+                  // labelPosition={30}
                 />
               </div>
             ),

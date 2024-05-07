@@ -43,3 +43,7 @@
   text-align: center;
   line-height: 40px;
 }
+
+.chart-container {
+  background: #fff !important;
+}
