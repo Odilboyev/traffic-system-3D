@@ -5,8 +5,8 @@ import MonitoringMapReact from "./components/mapReact";
 const App = () => {
   return (
     <div>
-      <MonitoringMap />
-      {/* <MonitoringMapReact /> */}
+      {/* <MonitoringMap /> */}
+      <MonitoringMapReact />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-rotatedmarker";
@@ -9,12 +9,16 @@ import zebraIcon from "@/assets/zebra.png";
 import cameraIcon from "@/assets/camera.png";
 import crossRoadIcon from "@/assets/crossroad.png";
 import mockdata from "./mock";
+
+const savedData = localStorage.getItem("markersData");
 const MonitoringMap = () => {
   const mapRef = useRef(null);
   const markerClusterGroupRef = useRef(null);
   const markerRefs = useRef([]);
   const [selectedMarker, setSelectedMarker] = useState(null);
-  const [markersData, setMarkersData] = useState(mockdata);
+  const [markersData, setMarkersData] = useState(
+    savedData ? JSON.parse(savedData) : mockdata
+  );
   const [filterType, setFilterType] = useState(1);
   const [filteredMarkersData, setFilteredMarkersData] = useState(markersData);
 
@@ -24,15 +28,17 @@ const MonitoringMap = () => {
 
     data.forEach((markerData) => {
       const marker = L.marker([markerData.lat, markerData.lng], {
-        icon: L.icon({
-          iconUrl:
-            Number(markerData.type) === 1
+        icon: L.divIcon({
+          className: "rounded-full p-1 bg-white shadow-lg shadow-black", // CSS class for the rounded div
+          html: `<div><img src="${
+            markerData.type === 1
               ? zebraIcon
-              : Number(markerData.type) === 2
+              : markerData.type === 2
               ? cameraIcon
-              : crossRoadIcon,
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
+              : crossRoadIcon
+          }" style="width:100%"/></div>`, // HTML for the smaller icon
+          iconSize: [32, 32], // Size of the rounded div
+          iconAnchor: [16, 16], // Anchor position of the rounded div
         }),
         rotationAngle: markerData.rotated,
         draggable: true,
@@ -52,7 +58,8 @@ const MonitoringMap = () => {
         );
       });
 
-      marker.on("dragend", () => {
+      marker.on("dragend", (e) => {
+        console.log(e.target.getLatLng());
         setMarkersData((prevMarkersData) => {
           const updatedMarkersData = prevMarkersData.map((prevMarkerData) => {
             if (prevMarkerData.id === markerData.id) {
@@ -60,6 +67,8 @@ const MonitoringMap = () => {
               return {
                 ...prevMarkerData,
                 dragged: false,
+                lat: e.target.getLatLng().lat,
+                lng: e.target.getLatLng().lng,
                 rotated: marker.options.rotationAngle || 0,
               };
             }
@@ -71,6 +80,7 @@ const MonitoringMap = () => {
             "markersData",
             JSON.stringify(updatedMarkersData)
           );
+          console.log(updatedMarkersData, "updatedMarkersData");
 
           return updatedMarkersData;
         });
@@ -144,8 +154,9 @@ const MonitoringMap = () => {
       spiderfyOnMaxZoom: false,
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true,
-      disableClusteringAtZoom: 28, // Adjust this value based on your needs
+      disableClusteringAtZoom: 10, // Adjust this value based on your needs
     }).addTo(map);
+
     //   setMarkersData((prevMarkersData) =>
     //     prevMarkersData.map((prevMarkerData) =>
     //       prevMarkerData.id === markerData.id
@@ -204,15 +215,18 @@ const MonitoringMap = () => {
 
     if (selectedMarker) {
       selectedMarker.setRotationAngle(rotation);
-      setMarkersData((prevMarkersData) =>
-        prevMarkersData.map((prevMarkerData) =>
+      setMarkersData((prevMarkersData) => {
+        const updatedData = prevMarkersData.map((prevMarkerData) =>
           prevMarkerData.id === selectedMarker.options.id
             ? { ...prevMarkerData, rotated: rotation }
             : prevMarkerData
-        )
-      );
+        );
+        localStorage.setItem("markersData", JSON.stringify(updatedData));
+        return updatedData;
+      });
     }
   };
+
   return (
     <div>
       <div>

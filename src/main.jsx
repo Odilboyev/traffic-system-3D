@@ -7,6 +7,8 @@ import "../public/tailwind.css";
 import { HashRouter, Navigate, Route, Router, Routes } from "react-router-dom";
 import PrivateRoutes from "./private.router.jsx";
 import SignIn from "./Pages/Login/index.jsx";
+
+import "leaflet/dist/leaflet.css";
 // import { Route, Routes } from "react-router-dom";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
