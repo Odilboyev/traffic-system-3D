@@ -1,18 +1,19 @@
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-// const auth =
-//   localStorage.getItem("jwt_token") !== null
-//     ? localStorage.getItem("jwt_token")
+// import { jwtDecode } from "jwt-decode";
+
+// const token_expire =
+//   localStorage.getItem("big_monitoring_token_expire") !== null
+//     ? localStorage.getItem("big_monitoring_token_expire")
 //     : null;
+const token_monitoring = localStorage.getItem("big_monitoring_token");
 // let token;
-// if (auth !== null && auth !== undefined) {
-//   var decoded = jwtDecode(auth);
-//   if (+new Date(decoded.exp * 1000) < +new Date()) {
+// if (token_expire !== null && token_expire !== undefined) {
+//   if (+new Date(token_expire * 1000) < +new Date()) {
 //     localStorage.clear();
 //     window.location.reload();
 //     token = "";
 //   } else {
-//     token = auth;
+//     token = token_monitoring;
 //   }
 // } else {
 //   token = "";
@@ -21,8 +22,13 @@ import { jwtDecode } from "jwt-decode";
 
 const config = axios.create({
   baseURL: import.meta.env.VITE_MAIN_URL,
+  // withCredentials: true,
 });
+console.log(token_monitoring);
+
+// config.defaults.withCredentials = false;
 
 // console.log(token, config);
-// if (auth) config.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+config.defaults.headers.common["Authorization"] = `Bearer ${token_monitoring}`;
 export default config;

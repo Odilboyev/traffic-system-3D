@@ -1,8 +1,9 @@
-let token = localStorage.getItem("bino_id");
+let token = localStorage.getItem("big_monitoring_token");
 
 class Auth {
   constructor() {
     this.authenticated = token ? true : false;
+    // this.authenticated = true;
   }
 
   login() {

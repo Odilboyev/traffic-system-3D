@@ -1,20 +1,13 @@
-import { jwtDecode } from "jwt-decode";
-
-import {
-  Card,
-  Input,
-  Checkbox,
-  Button,
-  Typography,
-} from "@material-tailwind/react";
+import { Input, Button, Typography } from "@material-tailwind/react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { signIn } from "../../apiHandlers";
 import login from "../../Auth";
-
+import PasswordInput from "../../components/PasswordInput";
 export function SignIn() {
   const navigate = useNavigate();
   const [loginName, setLoginName] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // Added state for error message
   const [loading, setLoading] = useState(false); // Added state for loading
 
@@ -33,12 +26,14 @@ export function SignIn() {
       // req.append("bino_id", loginName);
       //   req.append("password", password);
 
-      // const res = await signIn(loginName);
-      //   localStorage.setItem("jwt_token", res.access_token);
+      const res = await signIn({ login: loginName, password: password });
+      console.log(res);
       setLoading(false); // Set loading state back to false
-      localStorage.setItem("bino_id", loginName);
+      localStorage.setItem("big_monitoring_token", res.token);
+      localStorage.setItem("big_monitoring_token_expire", res.tokenexpire);
       login.login();
       navigate("/", { replace: true });
+      window.location.reload();
     } catch (error) {
       setLoading(false); // Set loading state back to false
       console.log(error);
@@ -60,7 +55,7 @@ export function SignIn() {
               color="blue-gray"
               className="mb-3 font-medium text-2xl "
             >
-              ID raqamni kiriting
+              Login
             </Typography>
             {error && (
               <div className="mb-4 text-red-500 text-center">{error}</div>
@@ -69,28 +64,29 @@ export function SignIn() {
               labelProps={{
                 className: "hidden",
               }}
-              type="number"
               value={loginName}
+              name="login"
               placeholder="12345..."
               onChange={(e) => setLoginName(e.target.value)}
-              onKeyDown={(evt) =>
-                ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
-              }
+              // onKeyDown={(evt) =>
+              //   ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
+              // }
               className={` !border-t-blue-gray-200 focus:!border-t-gray-900`}
             />
-            {/* <Typography color="blue-gray" className="-mb-3 font-medium">
+            <Typography color="blue-gray" className="-mb-3 font-medium">
               Password
             </Typography>
             <PasswordInput
               labelProps={{
                 className: "hidden",
               }}
+              name="password"
               type="password"
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={` !border-t-blue-gray-200 focus:!border-t-gray-900 `}
-            /> */}
+            />
           </div>
 
           <Button

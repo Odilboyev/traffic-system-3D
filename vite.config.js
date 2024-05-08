@@ -11,14 +11,11 @@ export default defineConfig({
   //     cert: "./cert.pem",
   //   },
   // },
-  // server: { https: true },
+  server: { https: true },
   define: {
     "process.env": {},
   },
-  plugins: [
-    react(),
-    // mkcert(),
-  ],
+  plugins: [react(), mkcert()],
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
   },

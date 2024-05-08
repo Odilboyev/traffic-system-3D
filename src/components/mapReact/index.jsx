@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Draggable } from "leaflet";
 import ReactDOM from "react-dom/client";
 import {
   MapContainer,
@@ -30,31 +31,80 @@ import { Cog8ToothIcon, ListBulletIcon } from "@heroicons/react/16/solid";
 import "./styles.css";
 import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
-import Test from "./test";
+import getCookie from "../../tools/getCookie";
+import { getData, markerHandler } from "../../apiHandlers";
+import Legend from "./components/fullScreen";
+import login from "../../Auth";
+import { useNavigate } from "react-router-dom";
+import SingleRecord from "./components/singleRecord";
+import Crossroad from "./components/crossroad";
+const home = [41.2995, 69.2401];
 const MapComponent = () => {
+  const navigate = useNavigate();
+  const [map, setMap] = useState(null);
+  const [isLoading, setIsloading] = useState(false);
+  const getDataHandler = async () => {
+    setIsloading(true);
+    try {
+      setIsloading(false);
+      const myData = await getData();
+      console.log(myData);
+      if (myData?.status == 0) {
+        console.log(myData);
+        localStorage.clear();
+        login.logout();
+        navigate("/", { replace: true });
+        localStorage.setItem("data", JSON.stringify(myData));
+        window.location.reload();
+      } else {
+        setMarkers(myData.data);
+      }
+    } catch (error) {
+      setIsloading(false);
+
+      throw new Error(error);
+    }
+  };
+  useEffect(() => {
+    // setInterval(() => {
+    //   getDataHandler();
+    // }, 1000);
+    getDataHandler();
+    return () => {
+      setMarkers([]);
+    };
+  }, []);
+
+  console.log(getCookie("name"));
   const [center, setCenter] = useState(
     JSON.parse(localStorage.getItem("mapCenter"))
       ? JSON.parse(localStorage.getItem("mapCenter"))
-      : [51.505, -0.09]
+      : home
   );
   const [zoom, setZoom] = useState(
     localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
   );
-  const [markers, setMarkers] = useState(mockdata);
+  const [markers, setMarkers] = useState([]);
   const [rotated, setrotated] = useState(0);
   const [isDraggable, setiIsDraggable] = useState(false);
   // const [types, setTypes] = useState(0);
   const [filter, setFilter] = useState({
-    crosswalk: true,
+    box: true,
     camera: true,
     crossroad: true,
   });
+  const checkboxConfigurations = [
+    { type: "all", label: "All" },
+    { type: "box", label: "Box" },
+    { type: "camera", label: "Cameras" },
+    { type: "crossroad", label: "Crossroads" },
+  ];
   const handleFilterChange = (name, checked) => {
     console.log(name, checked);
     if (name === "all") {
       // If the "All" checkbox is clicked, update all filter options
       setFilter({
-        crosswalk: checked,
+        box: checked,
         camera: checked,
         crossroad: checked,
       });
@@ -66,13 +116,18 @@ const MapComponent = () => {
 
   // const [openedPopupMarkerId, setOpenedPopupMarkerId] = useState(null);
 
-  const handleMarkerDragEnd = (id, event) => {
+  const handleMarkerDragEnd = (id, type, event) => {
     const { lat, lng } = event.target.getLatLng();
-    setMarkers((prevMarkers) =>
-      prevMarkers.map((marker) =>
-        marker.id === id ? { ...marker, lat, lng } : marker
-      )
-    );
+
+    console.log(id, "dragEnd");
+    console.log(lng);
+
+    try {
+      markerHandler({ lat: lat + "", lng: lng + "", id, type });
+      // getData();
+    } catch (error) {
+      getData();
+    }
   };
   const handlePopupOpen = (id) => {
     const marker = markers.find((marker) => marker.id === id);
@@ -121,8 +176,8 @@ const MapComponent = () => {
         return "#019191"; // Light Pink
     }
   };
-  const getRotationAngle = (percentage) => {
-    return (360 * percentage) / 100;
+  const markerHanler = (marker) => {
+    console.log(marker);
   };
   return (
     <MapContainer
@@ -130,8 +185,11 @@ const MapComponent = () => {
       center={center}
       zoom={zoom}
       style={{ height: "100vh" }}
+      whenCreated={setMap}
     >
       <MapEvents />
+
+      <Legend map={map} />
       <LayersControl position="bottomleft">
         <LayersControl.BaseLayer name="OpenStreetMap" checked>
           <TileLayer
@@ -162,68 +220,21 @@ const MapComponent = () => {
           {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
           <SpeedDialContent>
             {" "}
-            <div className="filter-panel p-2 flex flex-col  bg-white me-2">
-              <Checkbox
-                label={<Typography color="blue-gray">All</Typography>}
-                ripple={false}
-                className="m-0 p-0"
-                checked={filter.crosswalk && filter.camera && filter.crossroad}
-                onChange={(e) => handleFilterChange("all", e.target.checked)}
-              />
-              <Checkbox
-                label={<Typography color="blue-gray">Corsswalks</Typography>}
-                ripple={false}
-                className="m-0 p-0"
-                checked={filter.crosswalk}
-                onChange={(e) =>
-                  handleFilterChange("crosswalk", e.target.checked)
-                }
-              />
-              <Checkbox
-                label={<Typography color="blue-gray">Cameras</Typography>}
-                ripple={false}
-                className="m-0 p-0"
-                checked={filter.camera}
-                onChange={(e) => handleFilterChange("camera", e.target.checked)}
-              />
-              <Checkbox
-                label={<Typography color="blue-gray">Crossroads</Typography>}
-                ripple={false}
-                className="m-0 p-0"
-                checked={filter.crossroad}
-                onChange={(e) =>
-                  handleFilterChange("crossroad", e.target.checked)
-                }
-              />
-              {/* <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="crosswalk"
-                    checked={filter.crosswalk}
-                    onChange={(e) => handleFilterChange(e)}
-                  />
-                  Type 1
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="camera"
-                    checked={filter.camera}
-                    onChange={(e) => handleFilterChange(e)}
-                  />
-                  Type 2
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="crossroad"
-                    checked={filter.crossroad}
-                    onChange={(e) => handleFilterChange(e)}
-                  />
-                  Type 3
-                </label>
-              </div> */}
+            <div className="filter-panel p-2 flex flex-col bg-white me-2">
+              {checkboxConfigurations.map(({ type, label }) => (
+                <Checkbox
+                  key={type}
+                  label={<Typography color="blue-gray">{label}</Typography>}
+                  ripple={false}
+                  className="m-0 p-0"
+                  checked={
+                    label == "all"
+                      ? filter.box && filter.camera && filter.crossroad
+                      : filter[type]
+                  }
+                  onChange={(e) => handleFilterChange(type, e.target.checked)}
+                />
+              ))}
             </div>
           </SpeedDialContent>
         </SpeedDial>
@@ -271,7 +282,7 @@ const MapComponent = () => {
           const statusCounts = {};
 
           childMarkers.forEach((marker) => {
-            const status = marker.options.status;
+            const status = marker.options.statuserror;
             statusCounts[status] = (statusCounts[status] || 0) + 1;
           });
 
@@ -288,13 +299,14 @@ const MapComponent = () => {
             className: "cluster",
             iconSize: L.point(40, 40),
             html: renderToString(
-              <div className="w-20 h-20">
+              <div className="w-16 h-16">
                 <PieChart
                   data={pieChartData.map((datam) => ({
                     value: datam.count,
                     title: datam.status,
                     color: getStatusColor(datam.status),
                   }))}
+                  style={{ filter: `drop-shadow(0 0 0.75rem #0101018d)` }}
                   radius={42}
                   labelStyle={{
                     fill: "#fff",
@@ -326,12 +338,18 @@ const MapComponent = () => {
       >
         {markers?.map((marker, i) => {
           if (
-            (marker.type == 1 && !filter.crosswalk) ||
-            (marker.type == 2 && !filter.camera) ||
-            (marker.type == 3 && !filter.crossroad)
+            (marker.type === 1 && !filter.camera) ||
+            (marker.type === 2 && !filter.crossroad) ||
+            (marker.type === 3 && !filter.box)
           ) {
             return null;
           }
+
+          // Skip mapping the marker if lat or lng is undefined
+          if (isNaN(Number(marker.lat)) || isNaN(Number(marker.lng))) {
+            return null;
+          }
+
           return (
             <Marker
               key={i}
@@ -339,80 +357,39 @@ const MapComponent = () => {
               draggable={isDraggable}
               rotationAngle={marker.rotated}
               eventHandlers={{
-                dragend: (event) => handleMarkerDragEnd(marker.id, event),
+                click: () => markerHanler(marker),
+                dragend: (event) =>
+                  handleMarkerDragEnd(marker.cid, marker.type, event),
                 popupopen: () => handlePopupOpen(marker.id),
               }}
-              status={marker.status}
-              icon={
-                marker.type === 1
-                  ? L.icon({
-                      iconUrl: zebraIcon,
-                      iconSize: [32, 32],
-                    })
-                  : marker.type === 2
-                  ? L.icon({
-                      iconUrl: cameraIcon,
-                      iconSize: [32, 32],
-                    })
-                  : L.icon({
-                      iconUrl: crossRoadIcon,
-                      iconSize: [32, 32],
-                    })
-              }
+              statuserror={marker.statuserror}
+              icon={L.icon({
+                iconUrl: `icons/${marker.icon}`,
+                iconSize: [32, 32],
+              })}
+              markerType={marker.type}
               rotatedAngle={marker.type === 3 ? marker.rotated : 0}
             >
-              <Popup className="p-0">
-                <div>
-                  <h3>
-                    {marker.type === 1
-                      ? "Zebra"
-                      : marker.type === 2
-                      ? "Camera"
-                      : "Crossroad"}
-                    <span className="ml-2"> {marker.id}</span>
-                  </h3>
-                  {/* <p>Latitude: {marker.lat}</p>
-              <p>Longitude: {marker.lng}</p> */}
-                  {marker.type === 1 && (
-                    <div>
-                      <div className="w-10 border p-1">
-                        <img
-                          src={
-                            marker.type == 1
-                              ? zebraIcon
-                              : marker.type == 2
-                              ? cameraIcon
-                              : crossRoadIcon
-                          }
-                          alt="Marker"
-                          style={{
-                            transform: `rotate(${rotated}deg)`,
-                          }}
-                        />
-                      </div>
-                      <div className="flex justify-center items-center w-full p-0">
-                        {" "}
-                        <input
-                          type="range"
-                          min="0"
-                          max="360"
-                          value={rotated}
-                          onChange={(event) =>
-                            setrotated(Number(event.target.value))
-                          }
-                        />
-                        <Button
-                          size={"sm"}
-                          variant="outlined"
-                          className="rounded-lg py-0 px-3 ml-0.5"
-                          onClick={() => handleMarkerRotate(marker)}
-                        >
-                          {rotated}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+              <Popup
+                interactive
+                minWidth={"600px"}
+                closeOnClick={false}
+                className="p-0"
+                eventHandlers={{
+                  mouseover: (e) => {
+                    const element = e.target.getElement();
+                    const draggable = new L.Draggable(element);
+                    draggable.enable();
+                  },
+                }}
+              >
+                {marker.type === 1 ? (
+                  <SingleRecord {...marker} />
+                ) : marker.type === 2 ? (
+                  <Crossroad />
+                ) : (
+                  <div>default</div>
+                )}
               </Popup>
             </Marker>
           );

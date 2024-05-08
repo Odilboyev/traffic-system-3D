@@ -11,18 +11,18 @@ import SignIn from "./Pages/Login/index.jsx";
 import "leaflet/dist/leaflet.css";
 // import { Route, Routes } from "react-router-dom";
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <HashRouter>
-        <Routes>
-          <Route element={<PrivateRoutes />}>
-            <Route path="/" element={<App />} />
-            <Route path="*" element={<Navigate to={"/login"} replace />} />
-          </Route>
-          <Route element={<SignIn />} path="/login" />
-        </Routes>
-      </HashRouter>
-      {/* <App /> */}
-    </ThemeProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <ThemeProvider>
+    <HashRouter>
+      <Routes>
+        <Route element={<PrivateRoutes />}>
+          <Route path="/" element={<App />} />
+          <Route path="*" element={<Navigate to={"/login"} replace />} />
+        </Route>
+        <Route element={<SignIn />} path="/login" />
+      </Routes>
+    </HashRouter>
+    {/* <App /> */}
+  </ThemeProvider>
+  // </React.StrictMode>
 );
