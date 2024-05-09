@@ -374,6 +374,7 @@ const MapComponent = () => {
                 interactive
                 minWidth={"600px"}
                 closeOnClick={false}
+                autoClose={false}
                 className="p-0"
                 eventHandlers={{
                   mouseover: (e) => {

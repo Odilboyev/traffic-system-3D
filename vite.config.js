@@ -11,7 +11,7 @@ export default defineConfig({
   //     cert: "./cert.pem",
   //   },
   // },
-  server: { https: true },
+  server: { https: true, hmr: { overlay: false } },
   define: {
     "process.env": {},
   },
@@ -19,6 +19,7 @@ export default defineConfig({
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
   },
+
   optimizeDeps: {
     exclude: ["js-big-decimal"],
   },
