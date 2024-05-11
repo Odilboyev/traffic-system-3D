@@ -1,10 +1,10 @@
 import { Button } from "@material-tailwind/react";
 import React from "react";
 
-const Crossroad = ({ marker, rotated, setrotated, handleMarkerRotate }) => {
+const Box = ({ marker, rotated, setrotated, handleMarkerRotate }) => {
   return (
     <div>
-      this is a crossroad
+      this is a box
       {/* <div>
         <h3>
           {marker.type === 1
@@ -43,4 +43,4 @@ const Crossroad = ({ marker, rotated, setrotated, handleMarkerRotate }) => {
   );
 };
 
-export default Crossroad;
+export default Box;

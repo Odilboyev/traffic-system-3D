@@ -11,3 +11,9 @@
 .leaflet-popup-content > iframe {
   height: 100%;
 } */
+.chart-container {
+  height: 400px !important; /* Adjust the value as per your requirement */
+}
+.chart-container .apexcharts-canvas {
+  width: 100%;
+}
