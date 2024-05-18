@@ -15,6 +15,8 @@ import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 import "leaflet-rotatedmarker";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import {
+  Badge,
+  Button,
   Checkbox,
   IconButton,
   SpeedDial,
@@ -24,11 +26,7 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import Control from "react-leaflet-custom-control";
-import {
-  BellIcon,
-  Cog8ToothIcon,
-  ListBulletIcon,
-} from "@heroicons/react/16/solid";
+import { Cog8ToothIcon, ListBulletIcon } from "@heroicons/react/16/solid";
 import "./styles.css";
 import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
@@ -50,8 +48,9 @@ import DeviceModal from "../deviceModal";
 import { singleBox } from "../../mock/data";
 import CurrentAlarms from "./components/alarm";
 import HistoryTable from "./components/alarm/history";
+import { BellIcon } from "@heroicons/react/24/outline";
 const home = [41.2995, 69.2401];
-const MapComponent = ({ isSidebarOpen, handleSidebar }) => {
+const MapComponent = ({ isSidebarOpen, handleSidebar, alarmCount }) => {
   const navigate = useNavigate();
   const layersRef = useRef(localStorage.getItem("selectedLayer"));
   const [map, setMap] = useState(null);
@@ -285,21 +284,20 @@ const MapComponent = ({ isSidebarOpen, handleSidebar }) => {
             </div>
           </SpeedDialContent>
         </SpeedDial>
-      </Control>
+      </Control>{" "}
       <Control position="topleft">
-        <SpeedDial placement="bottom">
-          <SpeedDialHandler
-            className="shadow shadow-gray-600 rounded bg-white w-10 h-10 cursor-pointer"
+        <Badge content={alarmCount} size="sm">
+          <div
+            // variant="outlined"
+            className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
             onClick={() => handleSidebar()}
           >
             {/* <IconButton ripple={false} color="red"> */}
-            <BellIcon className="w-5 h-5 p-2" />
-
+            <BellIcon className="w-8 h-8 p-1" />
             {/* </IconButton> */}
-          </SpeedDialHandler>
-          {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
-        </SpeedDial>
-      </Control>
+          </div>
+        </Badge>
+      </Control>{" "}
       <MarkerClusterGroup
         spiderfyOnMaxZoom={false}
         showCoverageOnHover={false}

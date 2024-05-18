@@ -4,9 +4,7 @@ import { IconButton, Typography } from "@material-tailwind/react";
 import { GetCurrentAlarms, getErrorHistory } from "../../../../apiHandlers";
 import HistoryTable from "./history";
 
-const CurrentAlarms = ({ isSidebar }) => {
-  const [data, setCurrentAlarms] = useState(null);
-
+const CurrentAlarms = ({ isSidebar, data }) => {
   const itemsPerPage = 10; // Number of items to display per page
   const [historyData, setHistoryData] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false); // New state
@@ -19,19 +17,6 @@ const CurrentAlarms = ({ isSidebar }) => {
     setHistoryOpen(!historyOpen);
   };
 
-  useEffect(() => {
-    getCurrentAlarmsData();
-  }, [isSidebar]);
-
-  const getCurrentAlarmsData = async () => {
-    try {
-      const res = await GetCurrentAlarms();
-      console.log(res);
-      setCurrentAlarms(res.data);
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
   const fetchErrorHistory = async (current) => {
     setHistoryLoading(true);
     try {
