@@ -8,7 +8,6 @@ import Loader from "../../../../Loader";
 import { getBoxSensorChart } from "../../../../../apiHandlers";
 
 const SensorSection = ({ device, isLoading }) => {
-  console.log(device, "from an open modal");
   const { device_data, sensor_data } = device;
 
   const [chartData, setChartData] = useState(null);
@@ -37,7 +36,7 @@ const SensorSection = ({ device, isLoading }) => {
       sensor_data.length > 0 &&
       getChartData(sensor_data[0].sensor_id);
     return () => {};
-  }, [open]);
+  }, [open, sensor_data]);
 
   return (
     <>

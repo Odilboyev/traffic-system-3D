@@ -53,7 +53,6 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   const [interval, setInterval] = useState(60);
   const handleDate = (date) => {
     const formattedDate = format(date, "yyyy-MM-dd");
-    console.log(formattedDate);
     setChartDate(formattedDate);
   };
   const getData = async (id) => {
@@ -66,7 +65,7 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   };
   const getSensorData = async (id) => {
     try {
-      const res = await getBoxData(id ? id : 10);
+      const res = await getBoxData(id);
       setDevice({
         device_data: res?.device_data,
         sensor_data: res?.sensor_data,
@@ -94,21 +93,31 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     }
   };
   useEffect(() => {
+    console.log(marker?.cid);
+    console.log(data);
     if (open && marker && data === null) {
-      getData(marker.cid);
+      getData(marker?.cid);
       getChartData();
     }
     if (data && device === null) getSensorData(data?.box_device?.id);
     return () => {};
-  }, [open, data]);
+  }, [open, data, marker]);
+  useEffect(() => {
+    getData(marker?.cid);
+    return () => {};
+  }, [marker]);
+
   useEffect(() => {
     getChartData();
-
     return () => {};
   }, [chartDate, interval]);
 
+  const handleClose = () => {
+    setData(null);
+    handleOpen();
+  };
   return (
-    <Dialog size="xxl" open={open} handler={handleOpen}>
+    <Dialog size="xxl" open={open} handler={handleClose}>
       <DialogHeader className="justify-between p-2">
         <div>{marker?.cname}</div>
         <IconButton

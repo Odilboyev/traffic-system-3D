@@ -20,13 +20,12 @@ import { useEffect, useState } from "react";
 import { getBoxSensorChart } from "../apiHandlers";
 
 const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
-  console.log(device, "from an open modal");
-  const { device_data, sensor_data } = device;
+  const { device_data, sensor_data } = device | {};
 
   const [chartData, setChartData] = useState(null);
   const getChartData = async (sensor) => {
     try {
-      const res = await getBoxSensorChart(device_data.id, sensor);
+      const res = await getBoxSensorChart(device_data?.id, sensor);
       const seriesData = res.data.map((item) => ({
         x: item.datetime,
         y: parseFloat(item.sensor_value),
@@ -83,7 +82,7 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
       </DialogHeader>
 
       <DialogBody className="overflow-y-scroll grid  grid-cols-5 grid-rows-2   gap-2 max-h-[90vh]">
-        {!isLoading ? (
+        {!isLoading && device_data ? (
           <>
             <Card className="border basis-1/4 row-span-2 col-span-1 rounded-none border-none ">
               <CardBody className="flex w-full flex-col justify-between gap-2">
@@ -91,6 +90,12 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
                   <span>ID</span>
                   <Typography color="blue-gray" className="font-bold">
                     {device_data?.name}
+                  </Typography>
+                </div>
+                <div className="flex flex-col">
+                  <span>Seriya raqami</span>
+                  <Typography color="blue-gray" className="font-bold">
+                    {device_data?.sn}
                   </Typography>
                 </div>
                 <div className="flex flex-col">
@@ -174,7 +179,7 @@ const chartOptions = {
   },
   colors: ["#0bd500"],
   stroke: {
-    curve: "monotoneCubic",
+    // curve: "monotoneCubic",
     width: 0.8,
   },
   dataLabels: {

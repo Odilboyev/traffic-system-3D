@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { signIn } from "../../apiHandlers";
 import login from "../../Auth";
 import PasswordInput from "../../components/PasswordInput";
+import bg from "../../../public/images/back.jpg";
 export function SignIn() {
   const navigate = useNavigate();
   const [loginName, setLoginName] = useState("");
@@ -46,8 +47,17 @@ export function SignIn() {
   };
 
   return (
-    <section className="m-8 flex gap-4">
-      <div className="w-full lg:w-2/5 mt-24 mx-auto bg-blue-gray-50/50 p-[5%]">
+    <section
+      className="m-8 flex gap-4"
+      // style={{
+      //   backgroundImage: `url(${bg})`,
+      //   backgroundPosition: "center",
+      //   backgroundRepeat: "no-repeat",
+      // }}
+    >
+      <div
+        className={`w-full lg:w-2/5 mt-24 mx-auto p-[5%] bg-white shadow rounded`}
+      >
         <div className="text-center"></div>
         <form onSubmit={(e) => submitHandler(e)} className="my-8  mx-auto ">
           <div className="m flex flex-col gap-6 text-center">

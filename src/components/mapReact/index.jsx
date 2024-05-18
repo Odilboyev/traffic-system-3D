@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -16,6 +16,7 @@ import "leaflet-rotatedmarker";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import {
   Checkbox,
+  IconButton,
   SpeedDial,
   SpeedDialContent,
   SpeedDialHandler,
@@ -23,12 +24,22 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import Control from "react-leaflet-custom-control";
-import { Cog8ToothIcon, ListBulletIcon } from "@heroicons/react/16/solid";
+import {
+  BellIcon,
+  Cog8ToothIcon,
+  ListBulletIcon,
+} from "@heroicons/react/16/solid";
 import "./styles.css";
 import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
 import getCookie from "../../tools/getCookie";
-import { getBoxData, getMarkerData, markerHandler } from "../../apiHandlers";
+import {
+  GetCurrentAlarms,
+  getBoxData,
+  getErrorHistory,
+  getMarkerData,
+  markerHandler,
+} from "../../apiHandlers";
 import Legend from "./components/message";
 import login from "../../Auth";
 import { useNavigate } from "react-router-dom";
@@ -37,16 +48,19 @@ import Box from "./components/box";
 import MonitoringModal from "./components/monitoringModal";
 import DeviceModal from "../deviceModal";
 import { singleBox } from "../../mock/data";
+import CurrentAlarms from "./components/alarm";
+import HistoryTable from "./components/alarm/history";
 const home = [41.2995, 69.2401];
-const MapComponent = () => {
+const MapComponent = ({ isSidebarOpen, handleSidebar }) => {
   const navigate = useNavigate();
+  const layersRef = useRef(localStorage.getItem("selectedLayer"));
   const [map, setMap] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
 
   const [isBoxModalOpen, setIsBoxModalOpen] = useState(false);
-  const [activeBox, setActiveBox] = useState(singleBox);
+  const [activeBox, setActiveBox] = useState(null);
   const [center] = useState(
     JSON.parse(localStorage.getItem("mapCenter"))
       ? JSON.parse(localStorage.getItem("mapCenter"))
@@ -77,7 +91,7 @@ const MapComponent = () => {
       setIsloading(false);
       const myData = await getMarkerData();
       console.log(myData);
-      if (myData?.status == 0) {
+      if (myData?.status == 999) {
         console.log(myData);
         localStorage.clear();
         login.logout();
@@ -130,7 +144,7 @@ const MapComponent = () => {
       markerHandler({ lat: lat + "", lng: lng + "", id, type });
       // getData();
     } catch (error) {
-      getData();
+      getDataHandler();
     }
   };
   const handlePopupOpen = (id) => {
@@ -148,7 +162,7 @@ const MapComponent = () => {
   //   );
   // };
   const handleMonitorCrossroad = (marker) => {
-    setActiveMarker(marker ? marker : null);
+    setActiveMarker(marker);
     setIsbigMonitorOpen(!isbigMonitorOpen);
   };
   const handleBoxModalOpen = async (box) => {
@@ -180,64 +194,44 @@ const MapComponent = () => {
     return null;
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 1:
-        return "#FFD700"; // Red
-      case 2:
-        return "#FF0000"; // Gold
-      case 3:
-        return "#FFC0CB"; // Teal
-      default:
-        return "#019191"; // Light Pink
-    }
-  };
-  const markerHanler = (marker) => {
-    console.log(marker);
-    console.log(
-      `https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`
-    );
+  const layerSave = (e) => {
+    const selectedLayer = e.target.options.name;
+    console.log(selectedLayer);
+    localStorage.setItem("selectedLayer", selectedLayer);
   };
 
   return (
     <MapContainer
+      key={isSidebarOpen}
       attributionControl={false}
       fullscreenControl={true}
       center={center}
       zoom={zoom}
-      style={{ height: "100vh" }}
+      maxZoom={18}
+      style={{ height: "100vh", width: isSidebarOpen ? "70vw" : "100%" }}
       whenCreated={setMap}
     >
       <MapEvents />
       <Legend map={map} />
       <LayersControl position="bottomleft">
-        <LayersControl.BaseLayer name="OpenStreetMap" checked>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="OpenStreetMap"
-          />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="Transport">
-          <TileLayer
-            url="https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714"
-            attribution="Transport"
-          />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="Transport Dark">
-          <TileLayer
-            url="https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714"
-            attribution="Transport Dark"
-          />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="2GIS">
-          <TileLayer url="http://tile2.maps.2gis.com/tiles?x={x}&y={y}&z={z}" />
-        </LayersControl.BaseLayer>
-        <LayersControl.BaseLayer name="Dark">
-          <TileLayer
-            attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-            url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
-          />
-        </LayersControl.BaseLayer>
+        {baseLayers.map((layer) => (
+          <LayersControl.BaseLayer
+            key={layer.name}
+            name={layer.name}
+            checked={
+              localStorage.getItem("selectedLayer")
+                ? localStorage.getItem("selectedLayer") == layer.name
+                : layer.checked
+            }
+          >
+            <TileLayer
+              name={layer.name}
+              url={layer.url}
+              eventHandlers={{ add: (e) => layerSave(e) }}
+              attribution={layer.attribution}
+            />
+          </LayersControl.BaseLayer>
+        ))}
       </LayersControl>
       <Control position="top">
         <SpeedDial placement="right">
@@ -290,6 +284,20 @@ const MapComponent = () => {
               />
             </div>
           </SpeedDialContent>
+        </SpeedDial>
+      </Control>
+      <Control position="topleft">
+        <SpeedDial placement="bottom">
+          <SpeedDialHandler
+            className="shadow shadow-gray-600 rounded bg-white w-10 h-10 cursor-pointer"
+            onClick={() => handleSidebar()}
+          >
+            {/* <IconButton ripple={false} color="red"> */}
+            <BellIcon className="w-5 h-5 p-2" />
+
+            {/* </IconButton> */}
+          </SpeedDialHandler>
+          {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
         </SpeedDial>
       </Control>
       <MarkerClusterGroup
@@ -345,21 +353,9 @@ const MapComponent = () => {
                   label={(props) => {
                     return props.dataEntry.value;
                   }}
-                  // labelPosition={30}
                 />
               </div>
             ),
-            //           html: `<div class="pie-chart" style="width: 40px; height: 40px;" style="background-image: conic-gradient()">
-            //   ${pieChartData
-            //     .map((data) => {
-            //       const statusColor = getStatusColor(data.status);
-            //       const percentage = (data.count / totalMarkers) * 100;
-            //       const rotationAngle = getRotationAngle(percentage);
-            //       return `<div class="slice ${statusColor} w-[${percentage}%] h-[40px]" ><div class="label">${data.count}</div></div>
-            //               `;
-            //     })
-            //     .join("")}
-            // </div>`,
           });
 
           return pieChartIcon;
@@ -443,7 +439,10 @@ const MapComponent = () => {
         <MonitoringModal
           marker={activeMarker}
           open={isbigMonitorOpen}
-          handleOpen={() => setIsbigMonitorOpen(false)}
+          handleOpen={() => {
+            setIsbigMonitorOpen(false);
+            setActiveMarker(null);
+          }}
         />
         <DeviceModal
           device={activeBox}
@@ -456,4 +455,55 @@ const MapComponent = () => {
   );
 };
 
+const getStatusColor = (status) => {
+  switch (status) {
+    case 1:
+      return "#FFD700"; // Red
+    case 2:
+      return "#FF0000"; // Gold
+    case 3:
+      return "#FFC0CB"; // Teal
+    default:
+      return "#019191"; // Light Pink
+  }
+};
+const markerHanler = (marker) => {
+  console.log(marker);
+  console.log(
+    `https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`
+  );
+};
+
 export default MapComponent;
+const baseLayers = [
+  {
+    name: "OpenStreetMap",
+    checked: true,
+    url: "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: "OpenStreetMap",
+  },
+  {
+    name: "Transport",
+    checked: false,
+    url: "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714",
+    attribution: "Transport",
+  },
+  {
+    name: "Transport Dark",
+    checked: false,
+    url: "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714",
+    attribution: "Transport Dark",
+  },
+  {
+    name: "2GIS",
+    checked: false,
+    url: "http://tile2.maps.2gis.com/tiles?x={x}&y={y}&z={z}",
+  },
+  {
+    name: "Dark",
+    checked: false,
+    url: "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+  },
+];

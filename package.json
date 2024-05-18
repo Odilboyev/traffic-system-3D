@@ -35,7 +35,8 @@
     "react-leaflet-custom-control": "^1.4.0",
     "react-leaflet-markercluster": "^3.0.0-rc1",
     "react-minimal-pie-chart": "^8.4.0",
-    "react-router-dom": "^6.23.0"
+    "react-router-dom": "^6.23.0",
+    "react-toastify": "^10.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
