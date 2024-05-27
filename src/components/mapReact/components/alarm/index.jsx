@@ -11,7 +11,6 @@ const CurrentAlarms = ({ isSidebar, data }) => {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyTotalPages, setHistoryTotalPages] = useState(null);
   const [casesSinceMidnight, setCasesSinceMidnight] = useState(0);
-  console.log(data, "currentdata");
   const [historyOpen, setHistoryOpen] = useState(false);
   const handleHistoryopen = () => {
     setHistoryOpen(!historyOpen);

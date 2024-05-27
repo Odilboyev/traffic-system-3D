@@ -13,7 +13,6 @@ import moment from "moment";
 import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import Pagination from "@/components/pagination";
 import { getErrorHistory } from "@/apiHandlers";
-import { toast } from "react-toastify";
 import Loader from "../../../Loader";
 
 const TABLE_HEADER = [
@@ -41,7 +40,7 @@ const HistoryTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState(data);
   useEffect(() => {
-    fetchErrorHistory(currentPage);
+    open && fetchErrorHistory(currentPage);
   }, [currentPage]);
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -198,10 +197,7 @@ const HistoryTable = ({
                     </td>
                     <td className={tdClassName}>
                       <Typography className="font-bold text-blue-gray-800">
-                        {moment(item.start_date).format("hh:mm:ss")}
-                      </Typography>
-                      <Typography>
-                        {moment(item.start_date).format("YYYY-MM-DD")}
+                        {item.start_date}
                       </Typography>
                     </td>
                     {/* <td
@@ -220,10 +216,7 @@ const HistoryTable = ({
                       ) : (
                         <>
                           <Typography className="font-bold text-blue-gray-800">
-                            {moment(item.end_date).format("hh:mm:ss")}
-                          </Typography>
-                          <Typography>
-                            {moment(item.end_date).format("YYYY-MM-DD")}
+                            {item.end_date}
                           </Typography>
                         </>
                       )}

@@ -48,15 +48,16 @@ export function SignIn() {
 
   return (
     <section
-      className="m-8 flex gap-4"
-      // style={{
-      //   backgroundImage: `url(${bg})`,
-      //   backgroundPosition: "center",
-      //   backgroundRepeat: "no-repeat",
-      // }}
+      className="h-screen flex justify-center items-center gap-4"
+      style={{
+        backgroundImage: `url(${bg})`,
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+      }}
     >
       <div
-        className={`w-full lg:w-2/5 mt-24 mx-auto p-[5%] bg-white shadow rounded`}
+        className={`w-full h-[60vh] lg:w-2/5  mx-auto p-[5%] bg-white shadow rounded`}
       >
         <div className="text-center"></div>
         <form onSubmit={(e) => submitHandler(e)} className="my-8  mx-auto ">

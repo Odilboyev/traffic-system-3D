@@ -17,3 +17,13 @@
 .chart-container .apexcharts-canvas {
   width: 100%;
 }
+
+/* .custom-popup-open {
+  z-index: 1000;
+  display: block;
+}
+
+.custom-popup-closed {
+  z-index: -1;
+  display: none;
+} */

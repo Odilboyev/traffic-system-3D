@@ -82,84 +82,88 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
       </DialogHeader>
 
       <DialogBody className="overflow-y-scroll grid  grid-cols-5 grid-rows-2   gap-2 max-h-[90vh]">
-        {!isLoading && device_data ? (
-          <>
-            <Card className="border basis-1/4 row-span-2 col-span-1 rounded-none border-none ">
-              <CardBody className="flex w-full flex-col justify-between gap-2">
-                <div className="flex flex-col">
-                  <span>ID</span>
-                  <Typography color="blue-gray" className="font-bold">
-                    {device_data?.name}
-                  </Typography>
-                </div>
-                <div className="flex flex-col">
-                  <span>Seriya raqami</span>
-                  <Typography color="blue-gray" className="font-bold">
-                    {device_data?.sn}
-                  </Typography>
-                </div>
-                <div className="flex flex-col">
-                  <span>Obyekt nomi</span>
-                  <Typography color="blue-gray" className="font-bold">
-                    {device_data?.adres}
-                  </Typography>
-                </div>
-                <div className="flex flex-col">
-                  <span>Mas'ul xodim</span>
-                  <Typography color="blue-gray" className="font-bold">
-                    {device_data?.masul_hodim}
-                  </Typography>
-                </div>
-                <div className="flex flex-col">
-                  <span>Xodim telefon raqami</span>
-                  <Typography color="blue-gray" className="font-bold">
-                    {device_data?.phone
-                      ? device_data.phone
-                      : "Raqam mavjud emas"}
-                  </Typography>
-                </div>
-              </CardBody>
-            </Card>
-            <Card
-              className={`border-none basis-3/4 col-span-4 shadow-none overflow-y-auto text-center ${
-                (device && sensor_data && sensor_data.length === 0) ||
-                chartData?.length === 0 ||
-                (chartData == null && "row-span-2")
-              }`}
-            >
-              <CardBody className={`w-full h-full col-span-4`}>
-                <div
-                  className={`grid grid-cols-[repeat(auto-fill,10rem)] gap-4 justify-around text-center w-full`}
-                >
-                  {device && sensor_data && sensor_data.length > 0 ? (
-                    sensor_data.map((v, i) => (
-                      <SensorCard {...v} key={i} handler={getChartData} />
-                    ))
-                  ) : (
-                    <Card className="border-none basis-3/4 shadow-none overflow-y-auto">
-                      <Typography>No sensors</Typography>
-                    </Card>
-                  )}
-                </div>
-              </CardBody>
-            </Card>
-            {device &&
-              sensor_data &&
-              sensor_data.length > 0 &&
-              chartData &&
-              chartData.length > 0 && (
-                <Card className="border-none col-span-2 shadow-none overflow-y-auto border-top border border-red-50">
-                  <div className="w-full">
-                    <Chart
-                      options={chartOptions}
-                      series={chartData}
-                      width={"80%"}
-                      type="area"
-                    />
+        {!isLoading ? (
+          device_data ? (
+            <>
+              <Card className="border basis-1/4 row-span-2 col-span-1 rounded-none border-none ">
+                <CardBody className="flex w-full flex-col justify-between gap-2">
+                  <div className="flex flex-col">
+                    <span>ID</span>
+                    <Typography color="blue-gray" className="font-bold">
+                      {device_data?.name}
+                    </Typography>
                   </div>
-                </Card>
-              )}
-          </>
+                  <div className="flex flex-col">
+                    <span>Seriya raqami</span>
+                    <Typography color="blue-gray" className="font-bold">
+                      {device_data?.sn}
+                    </Typography>
+                  </div>
+                  <div className="flex flex-col">
+                    <span>Obyekt nomi</span>
+                    <Typography color="blue-gray" className="font-bold">
+                      {device_data?.adres}
+                    </Typography>
+                  </div>
+                  <div className="flex flex-col">
+                    <span>Mas'ul xodim</span>
+                    <Typography color="blue-gray" className="font-bold">
+                      {device_data?.masul_hodim}
+                    </Typography>
+                  </div>
+                  <div className="flex flex-col">
+                    <span>Xodim telefon raqami</span>
+                    <Typography color="blue-gray" className="font-bold">
+                      {device_data?.phone
+                        ? device_data.phone
+                        : "Raqam mavjud emas"}
+                    </Typography>
+                  </div>
+                </CardBody>
+              </Card>
+              <Card
+                className={`border-none basis-3/4 col-span-4 shadow-none overflow-y-auto text-center ${
+                  (device && sensor_data && sensor_data.length === 0) ||
+                  chartData?.length === 0 ||
+                  (chartData == null && "row-span-2")
+                }`}
+              >
+                <CardBody className={`w-full h-full col-span-4`}>
+                  <div
+                    className={`grid grid-cols-[repeat(auto-fill,10rem)] gap-4 justify-around text-center w-full`}
+                  >
+                    {device && sensor_data && sensor_data.length > 0 ? (
+                      sensor_data.map((v, i) => (
+                        <SensorCard {...v} key={i} handler={getChartData} />
+                      ))
+                    ) : (
+                      <Card className="border-none basis-3/4 shadow-none overflow-y-auto">
+                        <Typography>No sensors</Typography>
+                      </Card>
+                    )}
+                  </div>
+                </CardBody>
+              </Card>
+              {device &&
+                sensor_data &&
+                sensor_data.length > 0 &&
+                chartData &&
+                chartData.length > 0 && (
+                  <Card className="border-none col-span-2 shadow-none overflow-y-auto border-top border border-red-50">
+                    <div className="w-full">
+                      <Chart
+                        options={chartOptions}
+                        series={chartData}
+                        width={"80%"}
+                        type="area"
+                      />
+                    </div>
+                  </Card>
+                )}
+            </>
+          ) : (
+            <Typography>No data</Typography>
+          )
         ) : (
           <div className="flex justify-center items-center w-full h-full">
             <Loader />

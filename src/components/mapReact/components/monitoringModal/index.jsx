@@ -103,12 +103,12 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     return () => {};
   }, [open, data, marker]);
   useEffect(() => {
-    getData(marker?.cid);
+    open && getData(marker?.cid);
     return () => {};
   }, [marker]);
 
   useEffect(() => {
-    getChartData();
+    open && getChartData();
     return () => {};
   }, [chartDate, interval]);
 
