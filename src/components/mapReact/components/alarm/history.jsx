@@ -28,9 +28,8 @@ const TABLE_HEADER = [
 const HistoryTable = ({
   open,
   handleOpen,
-  data,
+  data = [],
   isLoading,
-
   historyTotalPages,
   isHistoryDataLoaded,
   fetchErrorHistory,
@@ -40,8 +39,9 @@ const HistoryTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState(data);
   useEffect(() => {
+    console.log(open, "open data");
     open && fetchErrorHistory(currentPage);
-  }, [currentPage]);
+  }, [currentPage, open]);
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -145,16 +145,6 @@ const HistoryTable = ({
                     <th className={`${thClassName} `} key={i}>
                       <div className=" flex justify-between items-center">
                         <Typography className="font-bold">{v.name}</Typography>
-                        {/* <IconButton
-                          variant="text"
-                          className="m-0 "
-                          onClick={() => handleHeader(v.keyName)}
-                        >
-                          <ChevronUpDownIcon
-                            strokeWidth={2}
-                            className="h-4 w-4"
-                          />
-                        </IconButton> */}
                       </div>
                     </th>
                   ))}
@@ -168,21 +158,11 @@ const HistoryTable = ({
                         {item.alarm_id}
                       </Typography>
                     </td>
-                    {/* <td className={tdClassName}>
-                    <Typography className="text-black">
-                      {item.device_id}
-                    </Typography>
-                  </td> */}
                     <td className={tdClassName}>
                       <Typography className="text-black">
                         {item.device_name}
                       </Typography>
                     </td>
-                    {/* <td className={tdClassName}>
-                    <Typography className="text-black">
-                      {item.sensor_id}
-                    </Typography>
-                  </td> */}
                     <td className={tdClassName}>
                       <Typography className="text-black">
                         {item.sensor_name}
@@ -200,13 +180,6 @@ const HistoryTable = ({
                         {item.start_date}
                       </Typography>
                     </td>
-                    {/* <td
-                      className={`${tdClassName} !text-center ${getRowColor(
-                        item.end_status
-                      )}`}
-                    >
-                      <Typography>{item.end_status}</Typography>
-                    </td> */}
                     <td className={tdClassName}>
                       {item.end_date === null ? (
                         <Typography className="font-bold text-blue-gray-800">
@@ -214,11 +187,9 @@ const HistoryTable = ({
                           No end time available
                         </Typography>
                       ) : (
-                        <>
-                          <Typography className="font-bold text-blue-gray-800">
-                            {item.end_date}
-                          </Typography>
-                        </>
+                        <Typography className="font-bold text-blue-gray-800">
+                          {item.end_date}
+                        </Typography>
                       )}
                     </td>
                     <td className={tdClassName} title="DD:HH:MM:SS">
@@ -232,11 +203,9 @@ const HistoryTable = ({
                 ))}
               </tbody>
             </table>
-          ) : (
-            <>
-              <Typography>No data</Typography>
-            </>
-          )}
+          ) : !isLoading && data?.length === 0 ? (
+            <Typography>No data</Typography>
+          ) : null}
         </DialogBody>
         <DialogFooter className="flex justify-center items-center mt-auto">
           {historyTotalPages != null && (
