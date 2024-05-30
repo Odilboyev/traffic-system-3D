@@ -109,7 +109,9 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
 
   useEffect(() => {
     open && getChartData();
-    return () => {};
+    return () => {
+      setChartData;
+    };
   }, [chartDate, interval]);
 
   const handleClose = () => {

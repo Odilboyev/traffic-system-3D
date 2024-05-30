@@ -55,7 +55,7 @@ import { useNavigate } from "react-router-dom";
 import SingleRecord from "./components/singleRecord";
 import Box from "./components/box";
 import MonitoringModal from "./components/monitoringModal";
-import DeviceModal from "../deviceModal";
+import DeviceModal from "./components/box/deviceModal";
 import { singleBox } from "../../mock/data";
 import CurrentAlarms from "./components/alarm";
 import HistoryTable from "./components/alarm/history";
@@ -78,6 +78,7 @@ const MapComponent = ({
   const [clusterMarkers, setClusterMarkers] = useState([]);
 
   const [isBoxModalOpen, setIsBoxModalOpen] = useState(false);
+  const [isBoxLoading, setIsBoxLoading] = useState(false);
   const [activeBox, setActiveBox] = useState(null);
   const [center] = useState(
     JSON.parse(localStorage.getItem("mapCenter"))
@@ -261,14 +262,17 @@ const MapComponent = ({
   };
   const handleBoxModalOpen = async (box) => {
     if (box) {
+      setIsBoxLoading(true);
       try {
         const res = await getBoxData(box.cid);
+        setIsBoxLoading(false);
         setActiveBox(res);
+        setIsBoxModalOpen(!isBoxModalOpen);
       } catch (error) {
+        setIsBoxLoading(false);
         throw new Error(error);
       }
       // setActiveBox(box ? box : null);
-      setIsBoxModalOpen(!isBoxModalOpen);
     }
   };
   const handleMapMove = (event) => {
@@ -525,8 +529,8 @@ const MapComponent = ({
                       setOpenPopupData={setOpenPopupIds}
                     />
                   )}
-                  {marker.type == 1 && (
-                    <Tooltip direction="top">
+                  <Tooltip direction="top">
+                    {marker.type == 1 ? (
                       <div className="w-[30vw]">
                         <img
                           src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
@@ -534,8 +538,10 @@ const MapComponent = ({
                           alt=""
                         />
                       </div>
-                    </Tooltip>
-                  )}
+                    ) : (
+                      <Typography>{marker.cname}</Typography>
+                    )}
+                  </Tooltip>
                 </Marker>
               </>
             );
@@ -555,8 +561,11 @@ const MapComponent = ({
       <DeviceModal
         device={activeBox}
         isDialogOpen={isBoxModalOpen}
-        handler={() => setIsBoxModalOpen(false)}
-        isLoading={isLoading}
+        handler={() => {
+          setIsBoxModalOpen(false);
+          setActiveBox(null);
+        }}
+        isLoading={isBoxLoading}
       />
     </>
   );
