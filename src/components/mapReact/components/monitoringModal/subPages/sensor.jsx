@@ -7,7 +7,7 @@ import SensorTable from "../components/sensortable";
 import Loader from "../../../../Loader";
 import { getBoxSensorChart } from "../../../../../apiHandlers";
 
-const SensorSection = ({ device, isLoading }) => {
+const SensorSection = ({ device, isLoading, markerId = {} }) => {
   const { device_data, sensor_data } = device;
 
   const [chartData, setChartData] = useState(null);
@@ -31,17 +31,19 @@ const SensorSection = ({ device, isLoading }) => {
     }
   };
   useEffect(() => {
-    open &&
-      sensor_data &&
+    sensor_data &&
       sensor_data.length > 0 &&
       getChartData(sensor_data[0].sensor_id);
     return () => {};
-  }, [open, sensor_data]);
-
+  }, [markerId]);
   return (
     <>
-      <div className=" grid  grid-cols-5 grid-rows-2 h-full">
-        {!isLoading ? (
+      {isLoading ? (
+        <div className="flex justify-center items-center w-full h-full">
+          <Loader />
+        </div>
+      ) : device_data ? (
+        <div className=" grid  grid-cols-5 grid-rows-2 h-full">
           <>
             <div className="border col-span-1 rounded-none border-none ">
               <CardBody className="flex w-full flex-col justify-between gap-2 max-h-full overflow-y-auto">
@@ -106,12 +108,10 @@ const SensorSection = ({ device, isLoading }) => {
                 </Card>
               )}
           </>
-        ) : (
-          <div className="flex justify-center items-center w-full h-full">
-            <Loader />
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <Typography>No Sensor data</Typography>
+      )}
     </>
   );
 };

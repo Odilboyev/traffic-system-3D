@@ -56,21 +56,32 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     setChartDate(formattedDate);
   };
   const getData = async (id) => {
+    setIsLoading(true);
     try {
       const res = await getCrossRoadData(id);
+      setIsLoading(false);
+
       setData(res?.data);
     } catch (error) {
+      setIsLoading(false);
+
       throw new Error(error);
     }
   };
   const getSensorData = async (id) => {
+    setIsLoading(true);
+
     try {
       const res = await getBoxData(id);
+      setIsLoading(false);
+
       setDevice({
         device_data: res?.device_data,
         sensor_data: res?.sensor_data,
       });
     } catch (error) {
+      setIsLoading(false);
+
       throw new Error(error);
     }
   };
@@ -93,13 +104,13 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     }
   };
   useEffect(() => {
-    console.log(marker?.cid);
-    console.log(data);
     if (open && marker && data === null) {
       getData(marker?.cid);
       getChartData();
     }
-    if (data && device === null) getSensorData(data?.box_device?.id);
+    if (data && device === null) {
+      getSensorData(data?.box_device?.id);
+    }
     return () => {};
   }, [open, data, marker]);
   useEffect(() => {
@@ -116,6 +127,8 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
 
   const handleClose = () => {
     setData(null);
+    setDevice(null);
+    setChartData(null);
     handleOpen();
   };
   return (
@@ -139,7 +152,14 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
           </div>
 
           <FullscreenBox>
-            {device && <SensorSection device={device} isLoading={isLoading} />}
+            {device && (
+              <SensorSection
+                key={marker?.cid}
+                device={device}
+                isLoading={isLoading}
+                markerId={marker?.cid}
+              />
+            )}
           </FullscreenBox>
           <FullscreenBox>
             {chartData && chartData?.length > 0 && (

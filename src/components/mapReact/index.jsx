@@ -530,7 +530,7 @@ const MapComponent = ({
                     />
                   )}
                   <Tooltip direction="top">
-                    {marker.type == 1 ? (
+                    {marker.type == 1 && (
                       <div className="w-[30vw]">
                         <img
                           src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
@@ -538,9 +538,8 @@ const MapComponent = ({
                           alt=""
                         />
                       </div>
-                    ) : (
-                      <Typography>{marker.cname}</Typography>
                     )}
+                    <Typography>{marker.cname}</Typography>
                   </Tooltip>
                 </Marker>
               </>
