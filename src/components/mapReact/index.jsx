@@ -1,20 +1,11 @@
-import {
-  Fragment,
-  memo,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
   Marker,
-  Popup,
   LayersControl,
   useMapEvents,
   Tooltip,
-  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -22,9 +13,7 @@ import "leaflet-rotatedmarker";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import {
   Badge,
-  Button,
   Checkbox,
-  IconButton,
   SpeedDial,
   SpeedDialContent,
   SpeedDialHandler,
@@ -41,29 +30,30 @@ import {
 import "./styles.css";
 import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
-import getCookie from "../../tools/getCookie";
-import {
-  GetCurrentAlarms,
-  getBoxData,
-  getErrorHistory,
-  getMarkerData,
-  markerHandler,
-} from "../../apiHandlers";
-import Legend from "./components/message";
+import { getBoxData, getMarkerData, markerHandler } from "../../apiHandlers";
 import login from "../../Auth";
 import { useNavigate } from "react-router-dom";
-import SingleRecord from "./components/singleRecord";
-import Box from "./components/box";
 import MonitoringModal from "./components/monitoringModal";
 import DeviceModal from "./components/box/deviceModal";
-import { singleBox } from "../../mock/data";
-import CurrentAlarms from "./components/alarm";
-import HistoryTable from "./components/alarm/history";
 import { BellIcon } from "@heroicons/react/24/outline";
 import CustomPopUp from "./components/customPopup";
-import CustomMarker from "./components/customMarker";
-import { isObject } from "lodash";
+
 const home = [41.2995, 69.2401];
+
+const layerSave = (e) => {
+  const selectedLayer = e.target.options.name;
+  localStorage.setItem("selectedLayer", selectedLayer);
+};
+
+const handleMapMove = (event) => {
+  // Save center and zoom values to localStorage
+  const newCenter = event.target.getCenter();
+  const newZoom = event.target.getZoom();
+
+  localStorage.setItem("mapCenter", JSON.stringify(newCenter));
+  localStorage.setItem("mapZoom", newZoom);
+};
+
 const MapComponent = ({
   isSidebarOpen,
   handleSidebar,
@@ -142,7 +132,16 @@ const MapComponent = ({
 
     return () => {};
   }, [markers]);
+  const handleMarkerDragEnd = (id, type, event) => {
+    const { lat, lng } = event.target.getLatLng();
 
+    try {
+      markerHandler({ lat: lat + "", lng: lng + "", id, type });
+      // getData();
+    } catch (error) {
+      getDataHandler();
+    }
+  };
   // const onMarkerChange = (changedMarker) => {
   //   const updatedMarkers = markers.map((m) => {
   //     if (m.id === changedMarker.cid && m.type === changedMarker.type) {
@@ -231,16 +230,6 @@ const MapComponent = ({
     }
   };
 
-  const handleMarkerDragEnd = (id, type, event) => {
-    const { lat, lng } = event.target.getLatLng();
-
-    try {
-      markerHandler({ lat: lat + "", lng: lng + "", id, type });
-      // getData();
-    } catch (error) {
-      getDataHandler();
-    }
-  };
   const handlePopupOpen = (marker) => {
     setMarkers((prevMarkers) =>
       prevMarkers.map((m) => {
@@ -275,25 +264,12 @@ const MapComponent = ({
       // setActiveBox(box ? box : null);
     }
   };
-  const handleMapMove = (event) => {
-    // Save center and zoom values to localStorage
-    const newCenter = event.target.getCenter();
-    const newZoom = event.target.getZoom();
-
-    localStorage.setItem("mapCenter", JSON.stringify(newCenter));
-    localStorage.setItem("mapZoom", newZoom);
-  };
 
   const MapEvents = () => {
     useMapEvents({
       moveend: handleMapMove,
     });
     return null;
-  };
-
-  const layerSave = (e) => {
-    const selectedLayer = e.target.options.name;
-    localStorage.setItem("selectedLayer", selectedLayer);
   };
 
   const [fulscreen, setFullscreen] = useState(false);
@@ -549,14 +525,16 @@ const MapComponent = ({
         {/* <Popup position={["41.2995", "69.2401"]}>something </Popup> */}
         {/* <CustomPopUps markers={markers} handleOpen={handlePopupOpen} /> */}
       </MapContainer>{" "}
-      <MonitoringModal
-        marker={activeMarker}
-        open={isbigMonitorOpen}
-        handleOpen={() => {
-          setIsbigMonitorOpen(false);
-          setActiveMarker(null);
-        }}
-      />
+      {isbigMonitorOpen && (
+        <MonitoringModal
+          marker={activeMarker}
+          open={isbigMonitorOpen}
+          handleOpen={() => {
+            setIsbigMonitorOpen(false);
+            setActiveMarker(null);
+          }}
+        />
+      )}
       <DeviceModal
         device={activeBox}
         isDialogOpen={isBoxModalOpen}

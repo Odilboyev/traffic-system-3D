@@ -104,19 +104,14 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     }
   };
   useEffect(() => {
-    if (open && marker && data === null) {
+    if (open && data === null) {
       getData(marker?.cid);
-      getChartData();
     }
-    if (data && device === null) {
-      getSensorData(data?.box_device?.id);
+    if (data && device === null && data?.box_device) {
+      getSensorData(data.box_device?.id);
     }
     return () => {};
-  }, [open, data, marker]);
-  useEffect(() => {
-    open && getData(marker?.cid);
-    return () => {};
-  }, [marker]);
+  }, [open, data]);
 
   useEffect(() => {
     open && getChartData();
@@ -146,23 +141,25 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
         </IconButton>
       </DialogHeader>
       <DialogBody className="h-[90vh] overflow-auto py-0">
-        <div className="grid grid-cols-2 grid-rows-2 gap-3 h-full">
-          <div className={"row-span-2 max-h-full overflow-y-scroll"}>
+        <div className="grid grid-cols-2 grid-rows-2 h-full">
+          <div className={"row-span-2 max-h-full overflow-y-scroll border p-2"}>
             <Videos videos={data?.camera} />
           </div>
 
           <FullscreenBox>
-            {device && (
+            {device ? (
               <SensorSection
                 key={marker?.cid}
                 device={device}
                 isLoading={isLoading}
                 markerId={marker?.cid}
               />
+            ) : (
+              <Typography>No Sensor data</Typography>
             )}
           </FullscreenBox>
           <FullscreenBox>
-            {chartData && chartData?.length > 0 && (
+            {chartData && chartData?.length > 0 ? (
               <ModalCharts
                 directions={chartData}
                 interval={interval}
@@ -170,6 +167,8 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
                 time={chartDate}
                 handleTime={handleDate}
               />
+            ) : (
+              <Typography> No Chart Data</Typography>
             )}
           </FullscreenBox>
         </div>
