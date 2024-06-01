@@ -119,11 +119,11 @@ const CurrentAlarms = ({ isSidebar, data }) => {
                     <td className=" whitespace-nowrap text-sm font-medium  border-collapse border">
                       {index + 1}
                     </td>
-                    <td className="text-sm font-light  whitespace-nowrap border-collapse border">
-                      <div className="font-bold">
+                    <td className="text-sm font-light  whitespace-nowrap border-collapse border flex">
+                      <div className="font-bold mr-2">
                         {moment(item.datetime).format("HH:mm:ss")}
                       </div>
-                      <div>{moment(item.datetime).format("YYYY-MM-DD")}</div>
+                      <div>{moment(item.datetime).format("DD-MM-YYYY")}</div>
                     </td>
                     <td className="text-sm font-light  whitespace-nowrap  border-collapse border">
                       {item.device_name}
