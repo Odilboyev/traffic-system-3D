@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, memo, useRef } from "react";
 import MonitoringMap from "./components/map";
 import MonitoringMapReact from "./components/mapReact";
 import { PieChart } from "react-minimal-pie-chart";
@@ -6,7 +6,7 @@ import { renderToString } from "react-dom/server";
 import { ToastContainer, toast } from "react-toastify";
 import CurrentAlarms from "./components/mapReact/components/alarm";
 import { GetCurrentAlarms, subscribeToCurrentAlarms } from "./apiHandlers";
-
+import ResizePanel from "react-resize-panel";
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [data, setCurrentAlarms] = useState(null);
@@ -36,23 +36,59 @@ const App = () => {
       throw new Error(error);
     }
   };
+  // const [width, setWidth] = useState(450);
+  // const isResized = useRef(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [initialX, setInitialX] = useState(0);
+  const [initialWidth, setInitialWidth] = useState(0);
+  const sidebarRef = useRef(null);
 
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return;
+      const dx = e.clientX - initialX;
+      const newWidth = initialWidth + dx;
+      sidebarRef.current.style.width = `${newWidth}px`;
+      setSidebarOpen(newWidth > 0);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isResizing, initialX, initialWidth]);
+
+  const handleMouseDown = (e) => {
+    if (e.target.classList.contains("resize-handle")) {
+      setIsResizing(true);
+      setInitialX(e.clientX);
+      setInitialWidth(sidebarRef.current.offsetWidth);
+    }
+  };
   return (
     <div>
-      <div className=" flex ">
-        {/* toaster */} <ToastContainer />
-        {/* Sidebar */}
+      <div className="flex">
+        <ToastContainer />
         <div
-          className={` ${
-            sidebarOpen ? "w-[30vw]  py-2 px-1" : " w-0"
-          }  backdrop-blur-md  bg-gray-100/80 h-screen border border-blue-gray-100`}
+          ref={sidebarRef}
+          onMouseDown={handleMouseDown}
+          className={`${
+            sidebarOpen ? "w-[30vw] py-2 px-1 pr-2" : "w-0"
+          } bg-gray-100 max-h-screen overflow-auto  relative`}
         >
-          <div className="w-full h-full relative">
+          <div className="w-full h-full">
             <CurrentAlarms isSidebar={sidebarOpen} data={data} />
           </div>
+          <div className="resize-handle absolute top-0 right-0 h-full w-1 cursor-ew-resize bg-gray-300 hover:bg-gray-400" />
         </div>
-        {/* leaflet map */}
-        <div className={` ${sidebarOpen ? "w-[70vw]" : "w-[100vw]"} `}>
+        <div className={`${sidebarOpen ? "w-[70vw]" : "w-[100vw]"}`}>
           <MonitoringMapReact
             isSidebarOpen={sidebarOpen}
             alarmCount={data?.length}

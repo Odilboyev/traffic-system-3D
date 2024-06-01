@@ -66,37 +66,37 @@ const CurrentAlarms = ({ isSidebar, data }) => {
                 <tr>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 px-6 py-4"
+                    className="text-sm font-medium text-gray-900 "
                   >
                     #
                   </th>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 px-6 py-4"
+                    className="text-sm font-medium text-gray-900 "
                   >
                     Vaqt
                   </th>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 px-6 py-4"
+                    className="text-sm font-medium text-gray-900 "
                   >
                     Device Name
                   </th>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 px-6 py-4"
+                    className="text-sm font-medium text-gray-900 "
                   >
                     Sensor Name
                   </th>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 px-6 py-4"
+                    className="text-sm font-medium text-gray-900 "
                   >
                     Status
                   </th>
                   {/* <th
                       scope="col"
-                      className="text-sm font-medium text-gray-900 px-6 py-4"
+                      className="text-sm font-medium text-gray-900 "
                     >
                       Status
                     </th> */}
@@ -116,25 +116,25 @@ const CurrentAlarms = ({ isSidebar, data }) => {
                         : ""
                     }`}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium  border-collapse border">
+                    <td className=" whitespace-nowrap text-sm font-medium  border-collapse border">
                       {index + 1}
                     </td>
-                    <td className="text-sm font-light px-6 py-4 whitespace-nowrap border-collapse border">
+                    <td className="text-sm font-light  whitespace-nowrap border-collapse border">
                       <div className="font-bold">
                         {moment(item.datetime).format("HH:mm:ss")}
                       </div>
                       <div>{moment(item.datetime).format("YYYY-MM-DD")}</div>
                     </td>
-                    <td className="text-sm font-light px-6 py-4 whitespace-nowrap  border-collapse border">
+                    <td className="text-sm font-light  whitespace-nowrap  border-collapse border">
                       {item.device_name}
                     </td>
-                    <td className="text-sm font-light px-6 py-4 whitespace-nowrap  border-collapse border">
+                    <td className="text-sm font-light  whitespace-nowrap  border-collapse border">
                       {item.sensor_name}
                     </td>
-                    <td className="text-sm font-light px-6 py-4 whitespace-nowrap  border-collapse border">
+                    <td className="text-sm font-light  whitespace-nowrap  border-collapse border">
                       {item.statuserror_name}
                     </td>
-                    {/* <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
+                    {/* <td className="text-sm font-light  whitespace-nowrap">
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             item.status == 3
