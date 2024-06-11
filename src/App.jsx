@@ -7,27 +7,36 @@ import { ToastContainer, toast } from "react-toastify";
 import CurrentAlarms from "./components/mapReact/components/alarm";
 import { GetCurrentAlarms, subscribeToCurrentAlarms } from "./apiHandlers";
 import ResizePanel from "react-resize-panel";
+import toaster from "./tools/toastconfig";
+import dangerSound from "../src/assets/audio/danger.mp3";
+import { Resizable } from "re-resizable";
+// eslint-disable-next-line react-refresh/only-export-components
 const App = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [data, setCurrentAlarms] = useState(null);
   const [changedMarker, setChangedMarker] = useState(null);
-  console.log(changedMarker, "changed marker");
+  // console.log(changedMarker, "changed marker");
   useEffect(() => {
     getCurrentAlarmsData();
     subscribeToCurrentAlarms(onWSDataReceived);
   }, []);
   const onWSDataReceived = (data) => {
-    // console.log(data, "ws data received");
-
-    if (data["marker"] !== undefined || data["marker"] !== null) {
+    if (data["marker"] !== undefined && data["marker"] !== null) {
       setChangedMarker(data.marker);
     }
-    if (data.status == "update") {
-      toaster(data.data);
+
+    if (data.status === "update") {
+      toaster(data.data, toastConfig);
       getCurrentAlarmsData();
+      const sound = new Audio();
+      // Play sound based on data.data.statuserror
+      if (data.data.statuserror === 1) {
+        sound.src = dangerSound;
+      } else if (data.data.statuserror === 2) {
+        sound.src = dangerSound;
+      }
+      sound.play();
     }
   };
-
   const getCurrentAlarmsData = async () => {
     try {
       const res = await GetCurrentAlarms();
@@ -36,63 +45,62 @@ const App = () => {
       throw new Error(error);
     }
   };
-  // const [width, setWidth] = useState(450);
-  // const isResized = useRef(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [initialX, setInitialX] = useState(0);
-  const [initialWidth, setInitialWidth] = useState(0);
-  const sidebarRef = useRef(null);
+  //styles
+
+  const currentSidebarOpen = JSON.parse(localStorage.getItem("sidebarOpen"));
+  const currentSidebarWidth = localStorage.getItem("sidebarWidth");
+  const [sidebarOpen, setSidebarOpen] = useState(
+    currentSidebarOpen ? currentSidebarOpen : false
+  );
+  const [sidebarWidth, setSidebarWidth] = useState(
+    currentSidebarWidth ? currentSidebarWidth : 300
+  );
+  const mapComponentRef = useRef(null);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!isResizing) return;
-      const dx = e.clientX - initialX;
-      const newWidth = initialWidth + dx;
-      sidebarRef.current.style.width = `${newWidth}px`;
-      setSidebarOpen(newWidth > 0);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isResizing, initialX, initialWidth]);
-
-  const handleMouseDown = (e) => {
-    if (e.target.classList.contains("resize-handle")) {
-      setIsResizing(true);
-      setInitialX(e.clientX);
-      setInitialWidth(sidebarRef.current.offsetWidth);
+    if (mapComponentRef.current) {
+      if (sidebarOpen)
+        mapComponentRef.current.style.width =
+          "calc(100%-" + sidebarWidth + "px)";
+      else mapComponentRef.current.style.width = "100%";
     }
+    console.log(mapComponentRef.current.style.width);
+    return () => {};
+  }, [sidebarOpen, sidebarWidth]);
+
+  const handleSidebar = () => {
+    localStorage.setItem("sidebarOpen", !sidebarOpen);
+    setSidebarOpen(!sidebarOpen);
   };
+  const handleSidebarWidth = (e) => {
+    localStorage.setItem("sidebarWidth", e.clientX);
+    setSidebarWidth(e.clientX);
+  };
+
   return (
     <div>
       <div className="flex">
         <ToastContainer />
-        <div
-          ref={sidebarRef}
-          onMouseDown={handleMouseDown}
-          className={`${
-            sidebarOpen ? "w-[30vw] py-2 px-1 pr-2" : "w-0"
-          } bg-gray-100 max-h-screen overflow-auto  relative`}
+        <Resizable
+          onResize={(e) => handleSidebarWidth(e)}
+          size={{
+            width: sidebarOpen ? sidebarWidth : 0,
+            height: "100%",
+          }}
+          className={` bg-gray-100 max-h-screen overflow-auto  relative `}
+          // className={`bg-gray-100 max-h-screen overflow-auto  relative`}
         >
           <div className="w-full h-full">
             <CurrentAlarms isSidebar={sidebarOpen} data={data} />
           </div>
-          <div className="resize-handle absolute top-0 right-0 h-full w-1 cursor-ew-resize bg-gray-300 hover:bg-gray-400" />
-        </div>
-        <div className={`${sidebarOpen ? "w-[70vw]" : "w-[100vw]"}`}>
+          {/* <div className="resize-handle absolute top-0 right-[-5px] z-50 h-full w-2 cursor-ew-resize bg-gray-300 hover:bg-gray-400" /> */}
+        </Resizable>
+
+        <div ref={mapComponentRef}>
           <MonitoringMapReact
             isSidebarOpen={sidebarOpen}
             alarmCount={data?.length}
-            handleSidebar={() => setSidebarOpen(!sidebarOpen)}
+            handleSidebar={handleSidebar}
             changedMarker={changedMarker}
           />
         </div>
@@ -101,7 +109,7 @@ const App = () => {
   );
 };
 
-export default memo(App);
+export default App;
 const toastConfig = {
   position: "top-right",
   autoClose: 5000,
@@ -111,32 +119,4 @@ const toastConfig = {
   draggable: true,
   progress: undefined,
   theme: "colored",
-};
-const toaster = (sensorData) => {
-  console.log(sensorData, "toaster");
-  switch (sensorData.statuserror) {
-    case 0:
-      toast.success(
-        `Sensor ${sensorData.sensor_id} updated: ${sensorData.sensor_value}`,
-        toastConfig
-      );
-      break;
-    case 1:
-      toast.warn(
-        `Sensor ${sensorData.sensor_id} updated with warning: ${sensorData.sensor_value}`,
-        toastConfig
-      );
-      break;
-    case 2:
-      toast.error(
-        `Sensor ${sensorData.sensor_id} updated with error: ${sensorData.sensor_value}`,
-        toastConfig
-      );
-      break;
-    default:
-      toast.info(
-        `Sensor ${sensorData.sensor_id} updated: ${sensorData.sensor_value}`,
-        toastConfig
-      );
-  }
 };

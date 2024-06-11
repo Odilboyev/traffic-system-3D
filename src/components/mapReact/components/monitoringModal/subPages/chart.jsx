@@ -60,7 +60,7 @@ const ModalCharts = ({
       />
 
       <div className="mt-16">
-        {directions.map((direction, i) => (
+        {directions?.map((direction, i) => (
           <div className={` min-h-[50vh] overflow-visible`} key={i}>
             {" "}
             <div className="text-left px-3 flex">

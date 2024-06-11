@@ -173,7 +173,7 @@ const HistoryTable = ({
                         item.statuserror
                       )}`}
                     >
-                      <Typography>{item.statuserror_name}</Typography>
+                      <Typography>{item?.statuserror_name}</Typography>
                     </td>
                     <td className={tdClassName}>
                       <Typography className="font-bold text-blue-gray-800">

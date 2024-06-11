@@ -35,8 +35,9 @@ import login from "../../Auth";
 import { useNavigate } from "react-router-dom";
 import MonitoringModal from "./components/monitoringModal";
 import DeviceModal from "./components/box/deviceModal";
-import { BellIcon } from "@heroicons/react/24/outline";
 import CustomPopUp from "./components/customPopup";
+import { BellAlertIcon } from "@heroicons/react/24/outline";
+import { BellIcon } from "@heroicons/react/24/solid";
 
 const home = [41.2995, 69.2401];
 
@@ -60,6 +61,14 @@ const MapComponent = ({
   alarmCount,
   changedMarker,
 }) => {
+  const [map, setMap] = useState(null);
+
+  useEffect(() => {
+    if (map) {
+      map.invalidateSize();
+    }
+  }, [isSidebarOpen, map]);
+
   const navigate = useNavigate();
   const layersRef = useRef(localStorage.getItem("selectedLayer"));
   const [isLoading, setIsloading] = useState(false);
@@ -294,7 +303,7 @@ const MapComponent = ({
         center={center}
         zoom={zoom}
         maxZoom={18}
-        style={{ height: "100vh", width: isSidebarOpen ? "70vw" : "100%" }}
+        style={{ height: "100vh", width: "100%" }}
         // whenCreated={(mapw) => {
         //   console.log(mapw, "mapw");
         //   map.current = mapw;
@@ -377,9 +386,9 @@ const MapComponent = ({
         </Control>{" "}
         <Control position="topleft">
           <div
+            onClick={toggleFullSceen}
             // variant="outlined"
             className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
-            onClick={toggleFullSceen}
           >
             {/* <IconButton ripple={false} color="red"> */}
 
@@ -392,18 +401,25 @@ const MapComponent = ({
           </div>
         </Control>
         <Control position="topleft">
-          <Badge content={alarmCount} size="sm">
-            <div
-              // variant="outlined"
-              className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
-              onClick={() => handleSidebar()}
-            >
-              {/* <IconButton ripple={false} color="red"> */}
-              <BellIcon className="w-8 h-8 p-1" />
-              {/* </IconButton> */}
-            </div>
-          </Badge>
-        </Control>{" "}
+          <div onClick={handleSidebar} className="z-[9999999]">
+            {" "}
+            <Badge content={alarmCount} size="sm">
+              <div
+                // variant="outlined"
+                className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
+              >
+                {/* <IconButton ripple={false} color="red"> */}
+                {isSidebarOpen ? (
+                  <BellIcon className="w-8 h-8 p-1" />
+                ) : (
+                  <BellAlertIcon className="w-8 h-8 p-1" />
+                )}
+
+                {/* </IconButton> */}
+              </div>
+            </Badge>
+          </div>
+        </Control>
         <MarkerClusterGroup
           key={markerUpdate}
           ref={clusterRef}
@@ -515,7 +531,7 @@ const MapComponent = ({
                         />
                       </div>
                     )}
-                    <Typography>{marker.cname}</Typography>
+                    <Typography>{marker?.cname}</Typography>
                   </Tooltip>
                 </Marker>
               </>

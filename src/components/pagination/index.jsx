@@ -1,10 +1,13 @@
 import React from "react";
 import { IconButton, ButtonGroup } from "@material-tailwind/react";
-import { ArrowRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+} from "@heroicons/react/24/solid";
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  console.log(totalPages);
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
 
@@ -12,6 +15,43 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     className: currentPage === index ? "bg-blue-gray-900 text-white" : "",
     onClick: () => onPageChange(index),
   });
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 7;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      pageNumbers.push(
+        <IconButton key="start-ellipsis" disabled>
+          ...
+        </IconButton>
+      );
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <IconButton key={i} {...getItemProps(i)}>
+          {i}
+        </IconButton>
+      );
+    }
+
+    if (endPage < totalPages) {
+      pageNumbers.push(
+        <IconButton key="end-ellipsis" disabled>
+          ...
+        </IconButton>
+      );
+    }
+
+    return pageNumbers;
+  };
 
   const next = () => {
     if (currentPage === totalPages) return;
@@ -23,28 +63,31 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     onPageChange(currentPage - 1);
   };
 
-  const renderPaginationButtons = () => {
-    const buttons = [];
-    for (let i = 1; i <= totalPages; i++) {
-      buttons.push(
-        <IconButton key={i} {...getItemProps(i)}>
-          {i}
-        </IconButton>
-      );
-    }
-    return buttons;
+  const goToFirstPage = () => {
+    onPageChange(1);
+  };
+
+  const goToLastPage = () => {
+    onPageChange(totalPages);
   };
 
   return (
     <ButtonGroup variant="outlined">
-      <IconButton onClick={prev}>
+      <IconButton onClick={goToFirstPage} disabled={isFirstPage}>
+        <ArrowLeftIcon strokeWidth={2} className="h-4 w-4" />
+      </IconButton>
+      <IconButton onClick={prev} disabled={isFirstPage}>
         <ChevronLeftIcon strokeWidth={2} className="h-4 w-4" />
       </IconButton>
-      {renderPaginationButtons()}
-      <IconButton onClick={next}>
+      {getPageNumbers()}
+      <IconButton onClick={next} disabled={isLastPage}>
         <ChevronRightIcon strokeWidth={2} className="h-4 w-4" />
+      </IconButton>
+      <IconButton onClick={goToLastPage} disabled={isLastPage}>
+        <ArrowRightIcon strokeWidth={2} className="h-4 w-4" />
       </IconButton>
     </ButtonGroup>
   );
 };
+
 export default Pagination;

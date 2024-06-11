@@ -21,7 +21,6 @@ import { getBoxSensorChart } from "../../../../apiHandlers";
 
 const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
   const { device_data = {}, sensor_data = {} } = device || {};
-  console.log(device_data);
   const [chartData, setChartData] = useState(null);
   const getChartData = async (sensor) => {
     try {

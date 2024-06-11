@@ -57,19 +57,16 @@ export function SignIn() {
       }}
     >
       <div
-        className={`w-full h-[60vh] lg:w-2/5  mx-auto p-[5%] bg-white shadow rounded`}
+        className={`w-full  lg:w-2/5  mx-auto p-[3%] bg-white shadow-lg rounded`}
       >
         <div className="text-center"></div>
-        <form onSubmit={(e) => submitHandler(e)} className="my-8  mx-auto ">
-          <div className="m flex flex-col gap-6 text-center">
-            <Typography
-              color="blue-gray"
-              className="mb-3 font-medium text-2xl "
-            >
+        <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
+          <div className="m flex flex-col gap-1 text-left">
+            <Typography color="blue-gray" className="font-medium text-xl ">
               Login
             </Typography>
             {error && (
-              <div className="mb-4 text-red-500 text-center">{error}</div>
+              <div className="mb-2 text-red-500 text-center">{error}</div>
             )}
             <Input
               labelProps={{
@@ -82,9 +79,9 @@ export function SignIn() {
               // onKeyDown={(evt) =>
               //   ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
               // }
-              className={` !border-t-blue-gray-200 focus:!border-t-gray-900`}
+              className={` !border-t-blue-gray-200 focus:!border-t-gray-900 mt-2`}
             />
-            <Typography color="blue-gray" className="-mb-3 font-medium">
+            <Typography color="blue-gray" className="mt-[5%] font-medium">
               Password
             </Typography>
             <PasswordInput
@@ -96,7 +93,7 @@ export function SignIn() {
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={` !border-t-blue-gray-200 focus:!border-t-gray-900 `}
+              className={` !border-t-blue-gray-200 focus:!border-t-gray-900 mt-2`}
             />
           </div>
 
