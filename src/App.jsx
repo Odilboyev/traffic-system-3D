@@ -55,18 +55,16 @@ const App = () => {
   const [sidebarWidth, setSidebarWidth] = useState(
     currentSidebarWidth ? currentSidebarWidth : 300
   );
-  const mapComponentRef = useRef(null);
+  // const mapComponentRef = useRef(null);
 
-  useEffect(() => {
-    if (mapComponentRef.current) {
-      if (sidebarOpen)
-        mapComponentRef.current.style.width =
-          "calc(100%-" + sidebarWidth + "px)";
-      else mapComponentRef.current.style.width = "100%";
-    }
-    console.log(mapComponentRef.current.style.width);
-    return () => {};
-  }, [sidebarOpen, sidebarWidth]);
+  // // useEffect(() => {
+  // //   if (sidebarOpen)
+  // //     mapComponentRef.current.style.width = "calc(100%-" + sidebarWidth + "px)";
+  // //   else mapComponentRef.current.style.width = "100%";
+
+  // //   console.log(mapComponentRef.current.style.width);
+  // //   return () => {};
+  // // }, [sidebarOpen, sidebarWidth]);
 
   const handleSidebar = () => {
     localStorage.setItem("sidebarOpen", !sidebarOpen);
@@ -96,7 +94,7 @@ const App = () => {
           {/* <div className="resize-handle absolute top-0 right-[-5px] z-50 h-full w-2 cursor-ew-resize bg-gray-300 hover:bg-gray-400" /> */}
         </Resizable>
 
-        <div ref={mapComponentRef}>
+        <div style={{ width: "100%" }}>
           <MonitoringMapReact
             isSidebarOpen={sidebarOpen}
             alarmCount={data?.length}
