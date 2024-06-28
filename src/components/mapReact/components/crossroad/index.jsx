@@ -1,4 +1,4 @@
-import { XCircleIcon, XMarkIcon } from "@heroicons/react/16/solid";
+import { XMarkIcon } from "@heroicons/react/16/solid";
 import {
   Dialog,
   DialogBody,
@@ -6,6 +6,7 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
+import PropTypes from "prop-types";
 import ModalCharts from "./subPages/chart";
 import Videos from "./subPages/videos";
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ import {
 import FullscreenBox from "./components/fullscreen";
 import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";
+import LightsOnMap from "./subPages/lightsOnMap";
 function transformDataForCharts(data) {
   const transformed = data.map((direction) => {
     const series = [
@@ -142,10 +144,10 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
       </DialogHeader>
       <DialogBody className="h-[90vh] overflow-auto py-0">
         <div className="grid grid-cols-2 grid-rows-2 h-full">
-          <div className={"row-span-2 max-h-full overflow-y-scroll border p-2"}>
+          <div className={"max-h-full overflow-y-scroll border p-2"}>
             <Videos videos={data?.camera} />
           </div>
-
+          {/* sensors */}
           <FullscreenBox>
             {device ? (
               <SensorSection
@@ -157,7 +159,15 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
             ) : (
               <Typography>No Sensor data</Typography>
             )}
+          </FullscreenBox>{" "}
+          {/* traffic lights */}
+          <FullscreenBox>
+            <LightsOnMap center={[marker?.lat, marker?.lng]} />
+            {/* ) : (
+              <Typography>No traffic lights here</Typography>
+           */}
           </FullscreenBox>
+          {/* chart data for the number of cars */}
           <FullscreenBox>
             {chartData && chartData?.length > 0 ? (
               <ModalCharts
@@ -175,5 +185,11 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
       </DialogBody>
     </Dialog>
   );
+};
+
+MonitoringModal.propTypes = {
+  open: PropTypes.bool,
+  handleOpen: PropTypes.func,
+  marker: PropTypes.any,
 };
 export default MonitoringModal;
