@@ -14,6 +14,7 @@ import {
   getBoxData,
   getCrossRoadChart,
   getCrossRoadData,
+  getTrafficLightsData,
 } from "../../../../apiHandlers";
 import FullscreenBox from "./components/fullscreen";
 import SensorSection from "./subPages/sensor";
@@ -47,12 +48,19 @@ function transformDataForCharts(data) {
 }
 
 const MonitoringModal = ({ open, handleOpen, marker }) => {
-  const [data, setData] = useState(null);
-  const [chartData, setChartData] = useState(null);
-  const [device, setDevice] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [data, setData] = useState(null);
+
+  const [trafficLights, setTrafficLights] = useState(null);
+  const [trafficSocketData, setTrafficSocketData] = useState(null);
+
+  const [chartData, setChartData] = useState(null);
   const [chartDate, setChartDate] = useState(new Date().toJSON().split("T")[0]);
   const [interval, setInterval] = useState(60);
+
+  const [device, setDevice] = useState(null);
+
   const handleDate = (date) => {
     const formattedDate = format(date, "yyyy-MM-dd");
     setChartDate(formattedDate);
@@ -64,12 +72,61 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
       setIsLoading(false);
 
       setData(res?.data);
+      getTrafficLights(res?.data.svetofor.svetofor_id);
     } catch (error) {
       setIsLoading(false);
 
       throw new Error(error);
     }
   };
+  const getTrafficLights = async (id) => {
+    setIsLoading(true);
+    try {
+      const res = await getTrafficLightsData(id);
+      setIsLoading(false);
+      console.log(res, "traffic");
+      setTrafficLights(res);
+    } catch (error) {
+      setIsLoading(false);
+
+      throw new Error(error);
+    }
+  };
+
+  const onTrafficLightsDataReceived = (data) => {
+    console.log(data, "traffic with socket");
+    // setTrafficSocketData(data?.channel);
+    const newData = data?.channel.map((v) => {
+      return {
+        ...v,
+        lat: trafficLights.find((light) => v.id === light.link_id).lat,
+        lng: trafficLights.find((light) => v.id === light.link_id).lng,
+        rotate: trafficLights.find((light) => v.id === light.link_id).rotate,
+      };
+    });
+    setTrafficSocketData(newData);
+    console.log(newData, "newData");
+  };
+  useEffect(() => {
+    let trafficSocket;
+    if (open && trafficLights) {
+      trafficSocket = new WebSocket(
+        import.meta.env.VITE_TRAFFIC_SOCKET + data?.svetofor.svetofor_id
+      );
+      trafficSocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        onTrafficLightsDataReceived(data);
+      };
+    }
+
+    return () => {
+      // Clean up the socket connection when the dialog is closed
+      if (trafficSocket) {
+        trafficSocket.close();
+      }
+    };
+  }, [open, trafficLights]);
+
   const getSensorData = async (id) => {
     setIsLoading(true);
 
@@ -87,11 +144,13 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
       throw new Error(error);
     }
   };
+
   const req = {
     crossroad_id: marker?.cid,
     date: chartDate,
     interval: interval,
   };
+
   const getChartData = async () => {
     try {
       const res = await getCrossRoadChart(req);
@@ -118,7 +177,7 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   useEffect(() => {
     open && getChartData();
     return () => {
-      setChartData;
+      setChartData(null);
     };
   }, [chartDate, interval]);
 
@@ -126,6 +185,7 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     setData(null);
     setDevice(null);
     setChartData(null);
+    setTrafficLights(null);
     handleOpen();
   };
   return (
@@ -162,7 +222,12 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
           </FullscreenBox>{" "}
           {/* traffic lights */}
           <FullscreenBox>
-            <LightsOnMap center={[marker?.lat, marker?.lng]} />
+            <LightsOnMap
+              lightsId={data?.svetofor.svetofor_id}
+              lights={trafficLights}
+              lightsSocketData={trafficSocketData}
+              center={[marker?.lat, marker?.lng]}
+            />
             {/* ) : (
               <Typography>No traffic lights here</Typography>
            */}

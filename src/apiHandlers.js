@@ -36,14 +36,20 @@ const getBoxSensorChart = async (device_id, sensor_id) => {
 };
 const getCrossRoadData = async (id) => {
   const res = await config.get(import.meta.env.VITE_CROSSROAD_DATA + id);
-
   if (res && res.data.status == 999) {
     localStorage.clear();
     login.logout();
     window.location.reload();
   } else return res.data;
 };
-
+const getTrafficLightsData = async (id) => {
+  const res = await config.get(import.meta.env.VITE_TRAFFICLIGHTS_DATA + id);
+  if (res && res.data.status == 999) {
+    localStorage.clear();
+    login.logout();
+    window.location.reload();
+  } else return res.data;
+};
 const getCrossRoadChart = async (body) => {
   const res = await config.post(import.meta.env.VITE_CROSSROAD_CHART, body);
 
@@ -83,10 +89,10 @@ const getErrorHistory = async (current) => {
     window.location.reload();
   } else return res.data;
 };
-let webSocketClient;
+let alarmSocket;
 const subscribeToCurrentAlarms = (onDataReceived) => {
-  webSocketClient = new WebSocket(import.meta.env.VITE_ALARM_WS);
-  webSocketClient.onmessage = (event) => {
+  alarmSocket = new WebSocket(import.meta.env.VITE_ALARM_WS);
+  alarmSocket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     onDataReceived(data);
   };
@@ -97,6 +103,7 @@ export {
   signIn,
   getMarkerData,
   getCrossRoadData,
+  getTrafficLightsData,
   getBoxData,
   getBoxSensorChart,
   getCrossRoadChart,

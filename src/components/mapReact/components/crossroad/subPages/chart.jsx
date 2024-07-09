@@ -4,7 +4,7 @@ import { useState } from "react";
 import ChartFilters from "../components/chartFilters";
 
 const ModalCharts = ({
-  directions,
+  directions = [],
   time,
   handleTime,
   interval,
