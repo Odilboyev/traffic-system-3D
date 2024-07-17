@@ -5,4 +5,5 @@ module.exports = withMT({
   theme: {
     color: "black",
   },
+  darkMode: ["selector", "[data-theme*='dark']"],
 });

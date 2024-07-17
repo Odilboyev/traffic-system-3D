@@ -94,18 +94,19 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   };
 
   const onTrafficLightsDataReceived = (data) => {
-    console.log(data, "traffic with socket");
-    // setTrafficSocketData(data?.channel);
-    const newData = data?.channel.map((v) => {
-      return {
-        ...v,
-        lat: trafficLights.find((light) => v.id === light.link_id).lat,
-        lng: trafficLights.find((light) => v.id === light.link_id).lng,
-        rotate: trafficLights.find((light) => v.id === light.link_id).rotate,
-      };
+    // console.log(data, "traffic with socket");
+    // console.log(trafficSocketData, "old traffic data");
+    setTrafficSocketData((light) => {
+      return data?.channel.map((v) => {
+        return {
+          ...v,
+          lat: trafficLights.find((light) => v.id === light.link_id).lat,
+          lng: trafficLights.find((light) => v.id === light.link_id).lng,
+          rotate: trafficLights.find((light) => v.id === light.link_id).rotate,
+          type: trafficLights.find((light) => v.id === light.link_id).type,
+        };
+      });
     });
-    setTrafficSocketData(newData);
-    console.log(newData, "newData");
   };
   useEffect(() => {
     let trafficSocket;
@@ -117,6 +118,9 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
         const data = JSON.parse(event.data);
         onTrafficLightsDataReceived(data);
       };
+      setTimeout(() => {
+        trafficSocket.close();
+      }, 5000);
     }
 
     return () => {
@@ -189,7 +193,12 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     handleOpen();
   };
   return (
-    <Dialog size="xxl" open={open} handler={handleClose}>
+    <Dialog
+      size="xxl"
+      className="!dark:bg-blue-gray-800 bg-white "
+      open={open}
+      handler={handleClose}
+    >
       <DialogHeader className="justify-between p-2">
         <div>{marker?.cname}</div>
         <IconButton
