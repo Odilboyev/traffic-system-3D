@@ -39,6 +39,7 @@ import CustomPopUp from "./components/customPopup";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
 import { BellIcon } from "@heroicons/react/24/solid";
 import baseLayers, { layerSave } from "../../configurations/mapLayers";
+import TrafficLightsModal from "./components/trafficLights/modal";
 
 const home = [41.2995, 69.2401];
 
@@ -75,6 +76,11 @@ const MapComponent = ({
   const [isBoxModalOpen, setIsBoxModalOpen] = useState(false);
   const [isBoxLoading, setIsBoxLoading] = useState(false);
   const [activeBox, setActiveBox] = useState(null);
+
+  const [isLightsModalOpen, setIsLightsModalOpen] = useState(false);
+  const [isLightsLoading, setIsLightsLoading] = useState(false);
+  const [activeLight, setActiveLight] = useState(26);
+
   const [center] = useState(
     JSON.parse(localStorage.getItem("mapCenter"))
       ? JSON.parse(localStorage.getItem("mapCenter"))
@@ -267,6 +273,13 @@ const MapComponent = ({
         throw new Error(error);
       }
       // setActiveBox(box ? box : null);
+    }
+  };
+  const handleLightsModalOpen = async (light) => {
+    console.log(light, "lights");
+    if (light) {
+      setActiveLight(light);
+      setIsLightsModalOpen(true);
     }
   };
 
@@ -472,6 +485,8 @@ const MapComponent = ({
                         ? () => handleMonitorCrossroad(marker)
                         : marker.type == 3
                         ? () => handleBoxModalOpen(marker)
+                        : marker.type == 4
+                        ? () => handleLightsModalOpen(marker)
                         : () => handlePopupOpen(marker),
                     dragend: (event) =>
                       handleMarkerDragEnd(marker.cid, marker.type, event),
@@ -550,11 +565,20 @@ const MapComponent = ({
       <DeviceModal
         device={activeBox}
         isDialogOpen={isBoxModalOpen}
+        isLoading={isBoxLoading}
         handler={() => {
           setIsBoxModalOpen(false);
           setActiveBox(null);
         }}
-        isLoading={isBoxLoading}
+      />
+      <TrafficLightsModal
+        light={activeLight}
+        isDialogOpen={isLightsModalOpen}
+        isLoading={isLightsLoading}
+        handler={() => {
+          setIsLightsModalOpen(false);
+          setActiveLight(null);
+        }}
       />
     </>
   );

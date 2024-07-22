@@ -3,16 +3,15 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { memo, useEffect, useState } from "react";
 import { LayersControl, MapContainer, Marker, TileLayer } from "react-leaflet";
-import baseLayers, { layerSave } from "../../../../../configurations/mapLayers";
-import rightIcon from "../../../../../assets/icons/right.png";
-import leftIcon from "../../../../../assets/icons/left.png";
 import { renderToString } from "react-dom/server";
 import { TbArrowRampLeft, TbArrowRampRight } from "react-icons/tb";
 import { MdStraight } from "react-icons/md";
 import { IoIosWalk, IoMdMan } from "react-icons/io";
+import baseLayers, { layerSave } from "../../../../configurations/mapLayers";
 
-const LightsOnMap = ({ open, center, lights = [], lightsSocketData = [] }) => {
+const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
   const zoom = localStorage.getItem("mapZoom");
+  // const center = localStorage.getItem("mapCenter");
   const lightsToRender = lightsSocketData ? lightsSocketData : lights || [];
   console.log(lightsToRender, "lightsonmap");
   // const currentState = lights?.map((v) => {
@@ -23,7 +22,6 @@ const LightsOnMap = ({ open, center, lights = [], lightsSocketData = [] }) => {
   //       ?.countdown,
   //   };
   // });
-  useEffect(() => console.log(open), [open]);
   const iconSelector = (type, status) => {
     switch (type) {
       case 1:
@@ -40,8 +38,10 @@ const LightsOnMap = ({ open, center, lights = [], lightsSocketData = [] }) => {
       <MapContainer
         attributionControl={false}
         center={center}
-        zoom={zoom || 13}
-        maxZoom={19}
+        zoom={19}
+        zoomDelta={0.5}
+        zoomSnap={0}
+        maxZoom={22}
         style={{ height: "100%", width: "100%" }}
       >
         {" "}
@@ -61,17 +61,20 @@ const LightsOnMap = ({ open, center, lights = [], lightsSocketData = [] }) => {
                 url={layer.url}
                 eventHandlers={{ add: (e) => layerSave(e) }}
                 attribution={layer.attribution}
+                maxNativeZoom={18}
+                maxZoom={22}
               />
             </LayersControl.BaseLayer>
           ))}
         </LayersControl>
-        {lightsToRender?.map((v, i) => (
-          <Marker
-            key={i}
-            position={[v.lat, v.lng]}
-            icon={L.divIcon({
-              className: "custom-marker-icon",
-              html: `
+        {lightsToRender.length > 0 &&
+          lightsToRender?.map((v, i) => (
+            <Marker
+              key={i}
+              position={[v.lat, v.lng]}
+              icon={L.divIcon({
+                className: "custom-marker-icon",
+                html: `
             <div class="flex items-center justify-center w-[50px] p-1 max-h-20 rounded-lg ${
               v.status === 1
                 ? "bg-green-400"
@@ -87,9 +90,9 @@ const LightsOnMap = ({ open, center, lights = [], lightsSocketData = [] }) => {
             <span class="font-bold mx-1 text-white">${v.countdown || 0}</span>
             </div>
           `,
-            })}
-          ></Marker>
-        ))}
+              })}
+            ></Marker>
+          ))}
         {/* <Marker
           position={center}
           icon={L.divIcon({
@@ -119,4 +122,4 @@ const LightsOnMap = ({ open, center, lights = [], lightsSocketData = [] }) => {
   );
 };
 
-export default memo(LightsOnMap);
+export default memo(TrafficLights);

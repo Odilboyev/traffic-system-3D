@@ -20,6 +20,7 @@ import FullscreenBox from "./components/fullscreen";
 import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";
 import LightsOnMap from "./subPages/lightsOnMap";
+import TrafficLights from "../trafficLights";
 function transformDataForCharts(data) {
   const transformed = data.map((direction) => {
     const series = [
@@ -231,12 +232,14 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
           </FullscreenBox>{" "}
           {/* traffic lights */}
           <FullscreenBox>
-            <LightsOnMap
+            <TrafficLights
+              open={open}
               lightsId={data?.svetofor.svetofor_id}
               lights={trafficLights}
               lightsSocketData={trafficSocketData}
               center={[marker?.lat, marker?.lng]}
             />
+            {/* <TrafficLights /> */}
             {/* ) : (
               <Typography>No traffic lights here</Typography>
            */}
