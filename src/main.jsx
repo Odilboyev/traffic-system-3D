@@ -1,10 +1,9 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { ThemeProvider } from "@material-tailwind/react";
 import "../public/tailwind.css";
-import { HashRouter, Navigate, Route, Router, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import PrivateRoutes from "./private.router.jsx";
 import SignIn from "./Pages/Login/index.jsx";
 import "react-toastify/dist/ReactToastify.css";

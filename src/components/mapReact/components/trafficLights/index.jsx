@@ -1,19 +1,30 @@
-import { Typography, CardBody, Card } from "@material-tailwind/react";
+import { Typography, CardBody, Card, Slider } from "@material-tailwind/react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { memo, useEffect, useState } from "react";
-import { LayersControl, MapContainer, Marker, TileLayer } from "react-leaflet";
+import {
+  LayersControl,
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+} from "react-leaflet";
 import { renderToString } from "react-dom/server";
 import { TbArrowRampLeft, TbArrowRampRight } from "react-icons/tb";
 import { MdStraight } from "react-icons/md";
 import { IoIosWalk, IoMdMan } from "react-icons/io";
 import baseLayers, { layerSave } from "../../../../configurations/mapLayers";
-
+import "leaflet-rotatedmarker";
 const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
   const zoom = localStorage.getItem("mapZoom");
-  // const center = localStorage.getItem("mapCenter");
   const lightsToRender = lightsSocketData ? lightsSocketData : lights || [];
   console.log(lightsToRender, "lightsonmap");
+  const [rotated, setrotated] = useState(0);
+  const handleRotate = (id) => {
+    const marker = lightsToRender.find((marker) => marker.link_id === id);
+    setrotated(marker.rotated);
+    // setOpenedPopupMarkerId(id);
+  };
   // const currentState = lights?.map((v) => {
   //   return {
   //     ...v,
@@ -71,6 +82,7 @@ const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
           lightsToRender?.map((v, i) => (
             <Marker
               key={i}
+              eventHandlers={{ popupopen: () => handleRotate(v.link_id) }}
               position={[v.lat, v.lng]}
               icon={L.divIcon({
                 className: "custom-marker-icon",
@@ -91,7 +103,19 @@ const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
             </div>
           `,
               })}
-            ></Marker>
+            >
+              <Popup className="p-4 text-blue-gray-900">
+                <input type="range" max={360} />
+                <div className="flex items-center justify-center w-full p-1 max-h-20 rounded-lg">
+                  <div className="text-xl rounded-lg font-bolder mr-2">
+                    <div style={{ transform: `rotate(${v.rotate}deg)` }}>
+                      {iconSelector(v.type, v.status)}
+                    </div>
+                  </div>
+                  <span className="font-bold mx-1 ">{v.rotate} Deg</span>
+                </div>
+              </Popup>
+            </Marker>
           ))}
         {/* <Marker
           position={center}
