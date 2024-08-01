@@ -5,13 +5,13 @@ const Dropright = ({ isOpen, content, setIsOpen }) => {
     <div className="relative inline-block text-left">
       {isOpen && (
         <div
-          className="origin-top-right absolute left-full ml-2 max-h-[70vh] overflow-y-scroll w-[70vw] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          className="no-scrollbar origin-top-right -top-44 absolute left-full ml-5 max-h-[80vh] overflow-y-scroll w-[50vw] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
           {" "}
-          <div className="flex justify-end p-2">
+          <div className="flex justify-end p-2 absolute right-0 top-0 ">
             <button
               onClick={() => setIsOpen(false)}
               className="text-gray-600 hover:text-gray-800"

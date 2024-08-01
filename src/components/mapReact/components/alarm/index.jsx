@@ -66,43 +66,43 @@ const CurrentAlarms = ({ data }) => {
                 <tr>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     No
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Date & Time
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Device Name
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Crossroad Name
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Type Name
+                  </th>{" "}
+                  <th
+                    scope="col"
+                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Device Name
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Sensor Name
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Status Error
                   </th>
@@ -114,36 +114,32 @@ const CurrentAlarms = ({ data }) => {
                     key={index}
                     className={`border-b font-bold ${
                       item.statuserror === 2
-                        ? "bg-red-200 text-red-800"
+                        ? "bg-red-200  text-red-900"
                         : item.statuserror === 1
-                        ? "bg-yellow-200 text-yellow-800"
+                        ? "bg-yellow-200  text-yellow-900"
                         : item.statuserror === 3
-                        ? "bg-gray-200 text-gray-800"
+                        ? "bg-gray-200  text-gray-900"
                         : ""
-                    } hover:bg-gray-100 transition-colors duration-200`}
+                    } hover:bg-gray-100 hover:text-blue-gray-800 transition-colors duration-200`}
                   >
-                    <td className="px-3 py-2 text-sm font-medium text-gray-900">
-                      {index + 1}
-                    </td>
-                    <td className="px-3 py-2 text-sm text-gray-900 flex flex-wrap items-center justify-center">
-                      <div className="font-bold mr-2">
+                    <td className="text-sm w-[5%] text-center">{index + 1}</td>
+                    <td className="text-sm p-2 w-[14%]">
+                      <div className="font-bold">
                         {moment(item.datetime).format("HH:mm:ss")}
                       </div>
                       <div>{moment(item.datetime).format("DD-MM-YYYY")}</div>
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-900">
-                      {item.device_name}
-                    </td>
-                    <td className="px-3 py-2 text-sm text-gray-900">
+                    <td className="text-sm p-2 w-[14%]  ">
                       {item.crossroad_name}
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-900">
-                      {item.type_name}
+                    <td className="text-sm p-2 w-[14%]  ">{item.type_name}</td>{" "}
+                    <td className="text-sm p-2 w-[14%]  ">
+                      {item.device_name}
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-900">
+                    <td className="text-sm p-2 w-[14%]  ">
                       {item.sensor_name}
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-900">
+                    <td className="text-sm p-2 w-[14%]  ">
                       {item.statuserror_name}
                     </td>
                   </tr>
