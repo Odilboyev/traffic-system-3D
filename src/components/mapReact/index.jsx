@@ -13,7 +13,13 @@ import "leaflet-rotatedmarker";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import {
   Badge,
+  Button,
   Checkbox,
+  IconButton,
+  Menu,
+  MenuHandler,
+  MenuItem,
+  MenuList,
   SpeedDial,
   SpeedDialContent,
   SpeedDialHandler,
@@ -30,7 +36,13 @@ import {
 import "./styles.css";
 import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
-import { getBoxData, getMarkerData, markerHandler } from "../../apiHandlers";
+import {
+  getBoxData,
+  GetCurrentAlarms,
+  getMarkerData,
+  markerHandler,
+  subscribeToCurrentAlarms,
+} from "../../apiHandlers";
 import login from "../../Auth";
 import { useNavigate } from "react-router-dom";
 import MonitoringModal from "./components/crossroad";
@@ -40,6 +52,10 @@ import { BellAlertIcon } from "@heroicons/react/24/outline";
 import { BellIcon } from "@heroicons/react/24/solid";
 import baseLayers, { layerSave } from "../../configurations/mapLayers";
 import TrafficLightsModal from "./components/trafficLights/modal";
+import dangerSound from "../../assets/audio/danger.mp3";
+import toaster, { toastConfig } from "../../tools/toastconfig";
+import CurrentAlarms from "./components/alarm";
+import Dropright from "../Dropright";
 
 const home = [41.2995, 69.2401];
 
@@ -153,28 +169,8 @@ const MapComponent = ({
       getDataHandler();
     }
   };
-  // const onMarkerChange = (changedMarker) => {
-  //   const updatedMarkers = markers.map((m) => {
-  //     if (m.id === changedMarker.cid && m.type === changedMarker.type) {
-  //       return changedMarker;
-  //     }
-  //     return m;
-  //   });
-
-  // };
-  // useEffect(() => {
-  //   onMarkerChange(changedMarker);
-  //   return () => {};
-  // }, [changedMarker]);
   const [markerUpdate, setMarkerUpdate] = useState(0);
   const clusterRef = useRef(null);
-  // const [clusterGroup, setClusterGroup] = useState(null);
-
-  // useEffect(() => {
-  //   if (clusterRef.current) {
-  //     setClusterGroup(clusterRef.current.leafletElement);
-  //   }
-  // }, [clusterRef.current]);
 
   const updateMarker = (updatedMarker) => {
     setMarkers((prevMarkers) =>
@@ -191,34 +187,6 @@ const MapComponent = ({
     if (clusterRef.current) {
       console.log(clusterMarkers);
     }
-
-    // Get the cluster from the MarkerClusterGroup
-    // const clusterGroup = clusterRef.current;
-    // console.log(clusterGroup, "clusterGroup");
-    // const cluster = clusterGroup.getVisibleParent(updatedMarker);
-    // Get the MarkerClusterGroup
-    // const clusterGroup = clusterRef.current?.leafletElement;
-    // if (clusterGroup) {
-    //   // Find the cluster that contains the updated marker
-    //   const cluster = clusterGroup.getVisibleParent(
-    //     clusterGroup.getAllChildMarkers().find((layer) => {
-    //       return (
-    //         layer.options.cid === updatedMarker.cid &&
-    //         layer.options.type === updatedMarker.type
-    //       );
-    //     })
-    //   );
-
-    //   if (cluster) {
-    //     // Update the cluster's icon
-    //     const newIcon = ClusterIcon(cluster);
-    //     cluster.setIcon(newIcon);
-    //   }
-    // }
-    // Call ClusterIcon with the cluster object
-    // if (cluster) {
-    //   ClusterIcon(cluster);
-    // }
   };
 
   useEffect(() => {
@@ -304,6 +272,46 @@ const MapComponent = ({
     }
   };
   const [openPopupIds, setOpenPopupIds] = useState([]);
+  // ----------------------------------------------------------------
+  /// alarms
+  const [currentAlarms, setCurrentAlarms] = useState(null);
+  const [changedMarkerForAlarm, setChangedMarker] = useState(null);
+  const [isAlarmsOpen, setIsAlarmsOpen] = useState(false);
+  useEffect(() => {
+    console.log(isAlarmsOpen, "alarms open");
+  }, [isAlarmsOpen]);
+
+  useEffect(() => {
+    getCurrentAlarmsData();
+    subscribeToCurrentAlarms(onWSDataReceived);
+  }, []);
+
+  const onWSDataReceived = (data) => {
+    if (data.marker !== undefined && data.marker !== null) {
+      setChangedMarker(data.marker);
+    }
+
+    if (data.status === "update") {
+      toaster(data.data, toastConfig);
+      getCurrentAlarmsData();
+      const sound = new Audio();
+      if (data.data.statuserror === 1) {
+        sound.src = dangerSound;
+      } else if (data.data.statuserror === 2) {
+        sound.src = dangerSound;
+      }
+      sound.play();
+    }
+  };
+
+  const getCurrentAlarmsData = async () => {
+    try {
+      const res = await GetCurrentAlarms();
+      setCurrentAlarms(res.data);
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
   return (
     <>
       {" "}
@@ -340,7 +348,7 @@ const MapComponent = ({
             </LayersControl.BaseLayer>
           ))}
         </LayersControl>
-        <Control position="top">
+        <Control position="bottomleft">
           <SpeedDial placement="right">
             <SpeedDialHandler className="shadow shadow-gray-600 rounded bg-white w-10 h-10 cursor-pointer">
               {/* <IconButton ripple={false} color="red"> */}
@@ -369,8 +377,8 @@ const MapComponent = ({
             </SpeedDialContent>
           </SpeedDial>
         </Control>
-        <Control position="top">
-          <SpeedDial placement="bottom">
+        <Control position="bottomleft">
+          <SpeedDial placement="right">
             <SpeedDialHandler className="shadow shadow-gray-600 rounded bg-white w-10 h-10 cursor-pointer">
               {/* <IconButton ripple={false} color="red"> */}
               <Cog8ToothIcon className="w-5 h-5 p-2" />
@@ -411,9 +419,8 @@ const MapComponent = ({
         </Control>
         <Control position="topleft">
           <div onClick={handleSidebar} className="z-[9999999]">
-            {" "}
             <Badge content={alarmCount} size="sm">
-              <div
+              <IconButton
                 // variant="outlined"
                 className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
               >
@@ -425,9 +432,49 @@ const MapComponent = ({
                 )}
 
                 {/* </IconButton> */}
-              </div>
+              </IconButton>
             </Badge>
           </div>
+
+          {/* // <Menu placement="right" open={isAlarmsOpen} handler={setIsAlarmsOpen}>
+          //   <MenuHandler className="shadow shadow-gray-600 rounded w-9 h-9 cursor-pointer my-4">
+          //     <IconButton
+          //       ripple={false}
+          //       color="red"
+          //       onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
+          //     >
+          //       {isAlarmsOpen ? (
+          //         <BellIcon className="w-8 h-8 p-1" />
+          //       ) : (
+          //         <BellAlertIcon className="w-8 h-8 p-1" />
+          //       )}
+          //     </IconButton>
+          //   </MenuHandler>
+
+          //   <MenuList className="max-h-72">
+          //     <MenuItem>
+              
+          //     </MenuItem>
+          //   </MenuList>
+          // </Menu> */}
+        </Control>
+        <Control position="topleft">
+          <IconButton
+            ripple={false}
+            color="red"
+            onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
+          >
+            {isAlarmsOpen ? (
+              <BellIcon className="w-8 h-8 p-1" />
+            ) : (
+              <BellAlertIcon className="w-8 h-8 p-1" />
+            )}
+          </IconButton>
+          <Dropright
+            isOpen={isAlarmsOpen}
+            setIsOpen={setIsAlarmsOpen}
+            content={<CurrentAlarms data={currentAlarms} />}
+          />
         </Control>
         <MarkerClusterGroup
           key={markerUpdate}

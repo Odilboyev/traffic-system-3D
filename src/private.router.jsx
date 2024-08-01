@@ -1,5 +1,5 @@
 // PrivateRoutes.js
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import login from "./Auth";
 
 const PrivateRoutes = () => {

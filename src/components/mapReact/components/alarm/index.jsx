@@ -4,7 +4,7 @@ import { IconButton, Typography } from "@material-tailwind/react";
 import { GetCurrentAlarms, getErrorHistory } from "../../../../apiHandlers";
 import HistoryTable from "./history";
 
-const CurrentAlarms = ({ isSidebar, data }) => {
+const CurrentAlarms = ({ data }) => {
   const itemsPerPage = 10; // Number of items to display per page
   const [historyData, setHistoryData] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false); // New state
@@ -39,8 +39,8 @@ const CurrentAlarms = ({ isSidebar, data }) => {
     }
   };
   return (
-    <>
-      <div className="flex items-center px-1 pb-2">
+    <div className="bg-white">
+      <div className="flex items-center pb-2">
         <IconButton onClick={handleHistoryopen} variant="text">
           <i className="fa-solid fa-clock-rotate-left"></i>{" "}
         </IconButton>
@@ -61,92 +61,91 @@ const CurrentAlarms = ({ isSidebar, data }) => {
       <div className="flex flex-col w-full">
         {data?.length > 0 ? (
           <div className="overflow-x-auto ">
-            <table className="min-w-full text-center table-fixed">
+            <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 "
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    #
+                    No
                   </th>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 "
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Vaqt
+                    Date & Time
                   </th>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 "
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Device Name
                   </th>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 "
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Crossroad Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Type Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Sensor Name
                   </th>
                   <th
                     scope="col"
-                    className="text-sm font-medium text-gray-900 "
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Status
+                    Status Error
                   </th>
-                  {/* <th
-                      scope="col"
-                      className="text-sm font-medium text-gray-900 "
-                    >
-                      Status
-                    </th> */}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="bg-white divide-y divide-gray-200">
                 {data?.map((item, index) => (
                   <tr
                     key={index}
-                    className={`border-b ${
-                      item.statuserror == "2"
-                        ? "bg-red-600 text-white"
-                        : item.statuserror == "1"
-                        ? "bg-orange-600 text-white"
-                        : item.statuserror == "3"
-                        ? "bg-gray-600 text-white"
+                    className={`border-b font-bold ${
+                      item.statuserror === 2
+                        ? "bg-red-200 text-red-800"
+                        : item.statuserror === 1
+                        ? "bg-yellow-200 text-yellow-800"
+                        : item.statuserror === 3
+                        ? "bg-gray-200 text-gray-800"
                         : ""
-                    }`}
+                    } hover:bg-gray-100 transition-colors duration-200`}
                   >
-                    <td className=" whitespace-nowrap text-sm font-medium  border-collapse border">
+                    <td className="px-3 py-2 text-sm font-medium text-gray-900">
                       {index + 1}
                     </td>
-                    <td className="text-sm font-light  whitespace-nowrap border-collapse border flex">
+                    <td className="px-3 py-2 text-sm text-gray-900 flex flex-wrap items-center justify-center">
                       <div className="font-bold mr-2">
                         {moment(item.datetime).format("HH:mm:ss")}
                       </div>
                       <div>{moment(item.datetime).format("DD-MM-YYYY")}</div>
                     </td>
-                    <td className="text-sm font-light  whitespace-nowrap  border-collapse border">
+                    <td className="px-3 py-2 text-sm text-gray-900">
                       {item.device_name}
                     </td>
-                    <td className="text-sm font-light  whitespace-nowrap  border-collapse border">
+                    <td className="px-3 py-2 text-sm text-gray-900">
+                      {item.crossroad_name}
+                    </td>
+                    <td className="px-3 py-2 text-sm text-gray-900">
+                      {item.type_name}
+                    </td>
+                    <td className="px-3 py-2 text-sm text-gray-900">
                       {item.sensor_name}
                     </td>
-                    <td className="text-sm font-light  whitespace-nowrap  border-collapse border">
+                    <td className="px-3 py-2 text-sm text-gray-900">
                       {item.statuserror_name}
                     </td>
-                    {/* <td className="text-sm font-light  whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            item.status == 3
-                              ? "bg-red-100 text-red-800"
-                              : item.status == 2
-                              ? "bg-orange-100 text-orange-800"
-                              : "bg-green-100 text-green-800"
-                          }`}
-                        >
-                          {item.status}
-                        </span>
-                      </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -158,7 +157,7 @@ const CurrentAlarms = ({ isSidebar, data }) => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

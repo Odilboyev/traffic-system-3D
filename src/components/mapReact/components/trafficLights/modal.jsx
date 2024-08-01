@@ -52,6 +52,7 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
       );
       trafficSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        console.log(data, "raw data");
         onTrafficLightsDataReceived(data);
       };
       setTimeout(() => {
