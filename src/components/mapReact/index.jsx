@@ -404,77 +404,53 @@ const MapComponent = ({
         <Control position="topleft">
           <div
             onClick={toggleFullSceen}
-            // variant="outlined"
             className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
           >
-            {/* <IconButton ripple={false} color="red"> */}
-
             {fulscreen ? (
               <ArrowsPointingInIcon className="w-8 h-8 p-1" />
             ) : (
               <ArrowsPointingOutIcon className="w-8  h-8 p-1" />
             )}
-            {/* </IconButton> */}
           </div>
         </Control>
-        <Control position="topleft">
+        {/* <Control position="topleft">
           <div onClick={handleSidebar} className="z-[9999999]">
             <Badge content={alarmCount} size="sm">
               <IconButton
-                // variant="outlined"
                 className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
               >
-                {/* <IconButton ripple={false} color="red"> */}
                 {isSidebarOpen ? (
                   <BellIcon className="w-8 h-8 p-1" />
                 ) : (
                   <BellAlertIcon className="w-8 h-8 p-1" />
                 )}
 
-                {/* </IconButton> */}
               </IconButton>
             </Badge>
           </div>
 
-          {/* // <Menu placement="right" open={isAlarmsOpen} handler={setIsAlarmsOpen}>
-          //   <MenuHandler className="shadow shadow-gray-600 rounded w-9 h-9 cursor-pointer my-4">
-          //     <IconButton
-          //       ripple={false}
-          //       color="red"
-          //       onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
-          //     >
-          //       {isAlarmsOpen ? (
-          //         <BellIcon className="w-8 h-8 p-1" />
-          //       ) : (
-          //         <BellAlertIcon className="w-8 h-8 p-1" />
-          //       )}
-          //     </IconButton>
-          //   </MenuHandler>
-
-          //   <MenuList className="max-h-72">
-          //     <MenuItem>
-              
-          //     </MenuItem>
-          //   </MenuList>
-          // </Menu> */}
-        </Control>
+        </Control> */}
         <Control position="topleft">
-          <IconButton
-            ripple={false}
-            color="red"
-            onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
-          >
-            {isAlarmsOpen ? (
-              <BellIcon className="w-8 h-8 p-1" />
-            ) : (
-              <BellAlertIcon className="w-8 h-8 p-1" />
-            )}
-          </IconButton>
-          <Dropright
-            isOpen={isAlarmsOpen}
-            setIsOpen={setIsAlarmsOpen}
-            content={<CurrentAlarms data={currentAlarms} />}
-          />
+          <div className="z-[9999999]">
+            <Badge content={alarmCount} size="sm" color="white">
+              <IconButton
+                ripple={false}
+                color="red"
+                onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
+              >
+                {isAlarmsOpen ? (
+                  <BellIcon className="w-8 h-8 p-1" />
+                ) : (
+                  <BellAlertIcon className="w-8 h-8 p-1" />
+                )}
+              </IconButton>
+              <Dropright
+                isOpen={isAlarmsOpen}
+                setIsOpen={setIsAlarmsOpen}
+                content={<CurrentAlarms data={currentAlarms} />}
+              />
+            </Badge>
+          </div>{" "}
         </Control>
         <MarkerClusterGroup
           key={markerUpdate}
