@@ -4,14 +4,13 @@ import { IconButton, Typography } from "@material-tailwind/react";
 import { GetCurrentAlarms, getErrorHistory } from "../../../../apiHandlers";
 import HistoryTable from "./history";
 
-const CurrentAlarms = ({ data }) => {
+const CurrentAlarms = ({ data, historyOpen, setHistoryOpen }) => {
   const itemsPerPage = 10; // Number of items to display per page
   const [historyData, setHistoryData] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false); // New state
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyTotalPages, setHistoryTotalPages] = useState(null);
   const [casesSinceMidnight, setCasesSinceMidnight] = useState(0);
-  const [historyOpen, setHistoryOpen] = useState(false);
   const handleHistoryopen = () => {
     setHistoryOpen(!historyOpen);
   };
@@ -40,14 +39,6 @@ const CurrentAlarms = ({ data }) => {
   };
   return (
     <div className="bg-white">
-      <div className="flex items-center pb-2">
-        <IconButton onClick={handleHistoryopen} variant="text">
-          <i className="fa-solid fa-clock-rotate-left"></i>{" "}
-        </IconButton>
-        <div className="pl-4 ">
-          <Typography variant="h5">Hozirgi holat</Typography>
-        </div>
-      </div>
       <HistoryTable
         open={historyOpen}
         handleOpen={handleHistoryopen}
@@ -114,9 +105,9 @@ const CurrentAlarms = ({ data }) => {
                     key={index}
                     className={`border-b font-bold ${
                       item.statuserror === 2
-                        ? "bg-red-200  text-red-900"
+                        ? "bg-red-200  text-blue-gray-900"
                         : item.statuserror === 1
-                        ? "bg-yellow-200  text-yellow-900"
+                        ? "bg-yellow-200  text-blue-gray-900"
                         : item.statuserror === 3
                         ? "bg-gray-200  text-gray-900"
                         : ""

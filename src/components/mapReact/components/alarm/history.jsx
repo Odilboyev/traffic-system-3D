@@ -89,13 +89,13 @@ const HistoryTable = ({
   const getRowColor = (status) => {
     switch (Number(status)) {
       case 0:
-        return "bg-green-100  textgreen-800 text-center";
+        return "bg-green-200  text-center";
       case 1:
-        return "bg-orange-100 text-yellow-800 text-center";
+        return "bg-orange-200 text-center";
       case 2:
-        return "bg-red-100 text-red-800 text-center";
+        return "bg-red-200 text-center";
       case 3:
-        return "bg-blue-gray-100 text-gray-900 text-center";
+        return "bg-blue-gray-200 text-gray-900 text-center";
       default:
         break;
     }
@@ -152,7 +152,12 @@ const HistoryTable = ({
               </thead>
               <tbody className="overflow-x-scrol font-bold">
                 {data.map((item, i) => (
-                  <tr key={i}>
+                  <tr
+                    key={i}
+                    className={` ${getRowColor(
+                      item.statuserror
+                    )} text-blue-gray-900`}
+                  >
                     <td className={tdClassName}>
                       <Typography className="text-black">
                         {item.alarm_id}
@@ -168,11 +173,7 @@ const HistoryTable = ({
                         {item.sensor_name}
                       </Typography>
                     </td>
-                    <td
-                      className={`${tdClassName} !text-center ${getRowColor(
-                        item.statuserror
-                      )}`}
-                    >
+                    <td className={`${tdClassName} !text-center`}>
                       <Typography>{item?.statuserror_name}</Typography>
                     </td>
                     <td className={tdClassName}>

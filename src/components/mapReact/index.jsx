@@ -39,6 +39,7 @@ import { renderToString } from "react-dom/server";
 import {
   getBoxData,
   GetCurrentAlarms,
+  getErrorHistory,
   getMarkerData,
   markerHandler,
   subscribeToCurrentAlarms,
@@ -56,6 +57,8 @@ import dangerSound from "../../assets/audio/danger.mp3";
 import toaster, { toastConfig } from "../../tools/toastconfig";
 import CurrentAlarms from "./components/alarm";
 import Dropright from "../Dropright";
+import { FaClockRotateLeft } from "react-icons/fa6";
+import HistoryTable from "./components/alarm/history";
 
 const home = [41.2995, 69.2401];
 
@@ -312,6 +315,37 @@ const MapComponent = ({
       throw new Error(error);
     }
   };
+
+  // history of alarms
+  const [isAlarmHistoryOpen, setIsAlarmHistoryOpen] = useState(false);
+  const itemsPerPage = 10; // Number of items to display per page
+  const [historyData, setHistoryData] = useState([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false); // New state
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyTotalPages, setHistoryTotalPages] = useState(null);
+
+  const fetchErrorHistory = async (current) => {
+    setHistoryLoading(true);
+    try {
+      const all = await getErrorHistory(current);
+
+      setHistoryData(all.data);
+      setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
+      historyData.length === 0 && setIsDataLoaded(true);
+
+      // const today = moment().startOf("day");
+      // const cases = all.value.filter((item) => {
+      //   const startDate = moment.unix(item.start_date);
+      //   return startDate.isAfter(today) || startDate.isSame(today);
+      // }).length;
+      // setCasesSinceMidnight(cases);
+
+      setHistoryLoading(false);
+    } catch (err) {
+      setHistoryLoading(false);
+      console.log("Error fetching error history. Please try again.");
+    }
+  };
   return (
     <>
       {" "}
@@ -413,23 +447,6 @@ const MapComponent = ({
             )}
           </div>
         </Control>
-        {/* <Control position="topleft">
-          <div onClick={handleSidebar} className="z-[9999999]">
-            <Badge content={alarmCount} size="sm">
-              <IconButton
-                className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
-              >
-                {isSidebarOpen ? (
-                  <BellIcon className="w-8 h-8 p-1" />
-                ) : (
-                  <BellAlertIcon className="w-8 h-8 p-1" />
-                )}
-
-              </IconButton>
-            </Badge>
-          </div>
-
-        </Control> */}
         <Control position="topleft">
           <div className="z-[9999999]">
             <Badge content={alarmCount} size="sm" color="white">
@@ -447,10 +464,33 @@ const MapComponent = ({
               <Dropright
                 isOpen={isAlarmsOpen}
                 setIsOpen={setIsAlarmsOpen}
-                content={<CurrentAlarms data={currentAlarms} />}
+                content={
+                  <CurrentAlarms
+                    data={currentAlarms}
+                    historyOpen={isAlarmHistoryOpen}
+                    setHistoryOpen={setIsAlarmHistoryOpen}
+                  />
+                }
               />
             </Badge>
           </div>{" "}
+        </Control>
+        <Control position="topleft">
+          <IconButton
+            color="white"
+            onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
+          >
+            <FaClockRotateLeft />
+          </IconButton>
+          <HistoryTable
+            open={isAlarmHistoryOpen}
+            handleOpen={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
+            data={historyData}
+            isLoading={historyLoading}
+            itemsPerPage={itemsPerPage}
+            historyTotalPages={historyTotalPages}
+            fetchErrorHistory={fetchErrorHistory}
+          />
         </Control>
         <MarkerClusterGroup
           key={markerUpdate}
