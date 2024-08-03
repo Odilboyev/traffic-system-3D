@@ -1,72 +1,51 @@
-import React, { memo } from "react";
+// MarkerComponent.jsx
 import { Marker, Tooltip } from "react-leaflet";
 import L from "leaflet";
+import { Typography } from "@material-tailwind/react";
 import CustomPopUp from "./customPopup";
-import { isEqual } from "lodash";
-const CustomMarker = memo(function CustomMarker({
-  marker = {},
+import { memo } from "react";
+
+const MarkerComponent = ({
+  marker,
   isDraggable,
+  handleMarkerDragEnd,
+  handlePopupOpen,
   handleMonitorCrossroad,
   handleBoxModalOpen,
-  handlePopupOpen,
-  handleMarkerDragEnd,
-}) {
+  handleLightsModalOpen,
+}) => {
+  const markerIcon = L.icon({
+    iconUrl: `icons/${marker.icon}`,
+    iconSize: [32, 32],
+  });
+
+  const handleClick = () => {
+    if (marker.type == 2) {
+      handleMonitorCrossroad(marker);
+    } else if (marker.type == 3) {
+      handleBoxModalOpen(marker);
+    } else if (marker.type == 4) {
+      handleLightsModalOpen(marker);
+    } else {
+      handlePopupOpen(marker);
+    }
+  };
+
   return (
     <Marker
-      // ref={(ref) =>
-      //   (markerRefs[`${marker.cid}-${marker.type}`] = ref)
-      // }
-      markerId={marker.cid}
-      markerType={marker.type}
       position={[marker.lat, marker.lng]}
       draggable={isDraggable}
       rotationAngle={marker.rotated}
       eventHandlers={{
-        click:
-          marker.type == 2
-            ? () => handleMonitorCrossroad(marker)
-            : marker.type == 3
-            ? () => handleBoxModalOpen(marker)
-            : () => handlePopupOpen(marker),
+        click: handleClick,
         dragend: (event) => handleMarkerDragEnd(marker.cid, marker.type, event),
-        // popupopen: () => handleRotate(marker.id),
       }}
-      statuserror={marker.statuserror}
-      icon={L.icon({
-        iconUrl: `icons/${marker.icon}`,
-        iconSize: [32, 32],
-      })}
+      icon={markerIcon}
       rotatedAngle={marker.type === 3 ? marker.rotated : 0}
     >
-      {" "}
-      {/* <Fragment key={i}>
-                  {marker.type !== 2 && marker.type !== 3 && (
-                    <Popup
-                      interactive
-                      minWidth={"600px"}
-                      closeOnClick={false}
-                      autoClose={false}
-                      keepInView
-                      className="p-0"
-                      eventHandlers={{
-                        mouseover: (e) => {
-                          const element = e.target.getElement();
-                          const draggable = new L.Draggable(element);
-                          draggable.enable();
-                        },
-                      }}
-                    >
-                      {marker.type === 1 ? (
-                        <SingleRecord {...marker} />
-                      ) : (
-                        <div>default</div>
-                      )}
-                    </Popup>
-                  )}
-                </Fragment> */}
       {marker.type === 1 && <CustomPopUp marker={marker} />}
-      {marker.type == 1 && (
-        <Tooltip direction="top">
+      <Tooltip direction="top">
+        {marker.type == 1 && (
           <div className="w-[30vw]">
             <img
               src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
@@ -74,13 +53,11 @@ const CustomMarker = memo(function CustomMarker({
               alt=""
             />
           </div>
-        </Tooltip>
-      )}
+        )}
+        <Typography>{marker?.cname}</Typography>
+      </Tooltip>
     </Marker>
   );
-});
-// function checkTheValue(prevValue, newValue) {
-//   prevValue.marker.statuserror == newValue.marker.statuserror ? true : false;
-// }
+};
 
-export default CustomMarker;
+export default memo(MarkerComponent);

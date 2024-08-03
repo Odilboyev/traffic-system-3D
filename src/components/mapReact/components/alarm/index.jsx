@@ -5,113 +5,72 @@ import { GetCurrentAlarms, getErrorHistory } from "../../../../apiHandlers";
 import HistoryTable from "./history";
 
 const CurrentAlarms = ({ data, historyOpen, setHistoryOpen }) => {
-  const itemsPerPage = 10; // Number of items to display per page
-  const [historyData, setHistoryData] = useState([]);
-  const [isDataLoaded, setIsDataLoaded] = useState(false); // New state
-  const [historyLoading, setHistoryLoading] = useState(false);
-  const [historyTotalPages, setHistoryTotalPages] = useState(null);
-  const [casesSinceMidnight, setCasesSinceMidnight] = useState(0);
-  const handleHistoryopen = () => {
-    setHistoryOpen(!historyOpen);
-  };
-
-  const fetchErrorHistory = async (current) => {
-    setHistoryLoading(true);
-    try {
-      const all = await getErrorHistory(current);
-
-      setHistoryData(all.data);
-      setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
-      historyData.length === 0 && setIsDataLoaded(true);
-
-      // const today = moment().startOf("day");
-      // const cases = all.value.filter((item) => {
-      //   const startDate = moment.unix(item.start_date);
-      //   return startDate.isAfter(today) || startDate.isSame(today);
-      // }).length;
-      // setCasesSinceMidnight(cases);
-
-      setHistoryLoading(false);
-    } catch (err) {
-      setHistoryLoading(false);
-      console.log("Error fetching error history. Please try again.");
-    }
-  };
   return (
-    <div className="bg-white">
-      <HistoryTable
-        open={historyOpen}
-        handleOpen={handleHistoryopen}
-        data={historyData}
-        isLoading={historyLoading}
-        itemsPerPage={itemsPerPage}
-        historyTotalPages={historyTotalPages}
-        fetchErrorHistory={fetchErrorHistory}
-      />
+    <div className=" dark:bg-gray-900">
       {/* lol */}
       <div className="flex flex-col w-full">
         {data?.length > 0 ? (
           <div className="overflow-x-auto ">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="">
                 <tr>
                   <th
                     scope="col"
-                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium  uppercase tracking-wider"
                   >
                     No
                   </th>
                   <th
                     scope="col"
-                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium  uppercase tracking-wider"
                   >
                     Date & Time
                   </th>
                   <th
                     scope="col"
-                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium  uppercase tracking-wider"
                   >
                     Crossroad Name
                   </th>
                   <th
                     scope="col"
-                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium  uppercase tracking-wider"
                   >
                     Type Name
                   </th>{" "}
                   <th
                     scope="col"
-                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium  uppercase tracking-wider"
                   >
                     Device Name
                   </th>
                   <th
                     scope="col"
-                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium  uppercase tracking-wider"
                   >
                     Sensor Name
                   </th>
                   <th
                     scope="col"
-                    className="p-2   text-left  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="p-2   text-left  text-xs font-medium  uppercase tracking-wider"
                   >
                     Status Error
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200">
                 {data?.map((item, index) => (
                   <tr
                     key={index}
                     className={`border-b font-bold ${
                       item.statuserror === 2
-                        ? "bg-red-200  text-blue-gray-900"
+                        ? "bg-red-200  "
                         : item.statuserror === 1
-                        ? "bg-yellow-200  text-blue-gray-900"
+                        ? "bg-yellow-200 "
                         : item.statuserror === 3
-                        ? "bg-gray-200  text-gray-900"
+                        ? "bg-gray-200 "
                         : ""
-                    } hover:bg-gray-100 hover:text-blue-gray-800 transition-colors duration-200`}
+                    } hover:bg-transparent transition-colors duration-200`}
                   >
                     <td className="text-sm w-[5%] text-center">{index + 1}</td>
                     <td className="text-sm p-2 w-[14%]">

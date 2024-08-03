@@ -56,9 +56,7 @@ export function SignIn() {
         backgroundSize: "cover",
       }}
     >
-      <div
-        className={`w-full  lg:w-2/5  mx-auto p-[3%] bg-white shadow-lg rounded`}
-      >
+      <div className={`w-full  lg:w-2/5  mx-auto p-[3%]  shadow-lg rounded`}>
         <div className="text-center"></div>
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">

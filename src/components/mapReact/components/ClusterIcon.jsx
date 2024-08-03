@@ -1,61 +1,54 @@
 import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
 import L from "leaflet";
-
 import "leaflet/dist/leaflet.css";
-
-const ClusterIcon = ({ cluster }) => {
-  console.log("cluster icon changed");
-  const childMarkers = cluster.getAllChildMarkers();
-  const statusCounts = {};
-  childMarkers.forEach((marker) => {
-    const status = marker.options.statuserror;
-    statusCounts[status] = (statusCounts[status] || 0) + 1;
-  });
-  const pieChartData = Object.entries(statusCounts).map(([status, count]) => ({
-    status: parseInt(status),
-    count,
-  }));
-  const totalMarkers = childMarkers.length;
-  const pieChartIcon = L.divIcon({
-    className: "cluster",
-    iconSize: L.point(40, 40),
-    html: renderToString(
-      <div className="w-16 h-16">
-        <PieChart
-          data={pieChartData.map((datam) => ({
-            value: datam.count,
-            title: datam.status,
-            color: getStatusColor(datam.status),
-          }))}
-          style={{ filter: `drop-shadow(0 0 0.75rem #0101018d)` }}
-          radius={42}
-          labelStyle={{
-            fill: "#fff",
-            fontSize: "1rem",
-            fontWeight: "bold",
-          }}
-          label={(props) => {
-            return props.dataEntry.value;
-          }}
-        />
-      </div>
-    ),
-  });
-  return pieChartIcon;
-};
-
-export default ClusterIcon;
+import { memo } from "react";
 
 const getStatusColor = (status) => {
   switch (status) {
     case 1:
-      return "#FFD700"; // Red
+      return "#FFD700"; // gold
     case 2:
-      return "#FF0000"; // Gold
+      return "#FF4500"; // red
     case 3:
-      return "#FFC0CB"; // Teal
+      return "#FFC0CB"; // pink
     default:
-      return "#019191"; // Light Pink
+      return "#4682B4"; // steel blue
   }
 };
+
+// eslint-disable-next-line react/display-name
+const ClusterIcon = (pieChartData) => {
+  return L.divIcon({
+    className: "cluster !bg-transparent",
+    iconSize: L.point(50, 50),
+    html: renderToString(
+      <div className="w-20 h-20 !bg-transparent group-has-[div]:!bg-transparent">
+        <PieChart
+          data={pieChartData.map((data) => ({
+            value: data.count,
+            title: data.status,
+            color: getStatusColor(data.status),
+          }))}
+          style={{
+            filter: `drop-shadow(0 0 0.75rem #0101018d)`,
+            background: "transparent !important",
+          }}
+          segmentsStyle={{ transition: "stroke .3s", cursor: "pointer" }}
+          segmentsShift={1}
+          radius={42}
+          labelStyle={{
+            fill: "#fff",
+            fontSize: "0.9rem",
+            fontWeight: "bold",
+            pointerEvents: "none",
+          }}
+          tooltip={({ dataEntry }) => `${dataEntry.title}: ${dataEntry.value}`}
+          label={({ dataEntry }) => dataEntry.value}
+        />
+      </div>
+    ),
+  });
+};
+
+export default ClusterIcon;

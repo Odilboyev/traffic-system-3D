@@ -4,7 +4,7 @@ import { Option, Select } from "@material-tailwind/react";
 
 const ChartFilters = ({ time, timeHandler, interval, intervalHandler }) => {
   return (
-    <div className="max-w-full flex gap-2 p-2 rounded-b fixed !bg-white z-50">
+    <div className="max-w-full flex gap-2 p-2 rounded-b fixed ! z-50">
       <DatePicker date={time} dateHandler={timeHandler} label={"Sana"} />
       <Select
         label="Interval"

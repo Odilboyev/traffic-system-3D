@@ -89,13 +89,13 @@ const HistoryTable = ({
   const getRowColor = (status) => {
     switch (Number(status)) {
       case 0:
-        return "bg-green-200  text-center";
+        return "bg-green-100  text-center";
       case 1:
-        return "bg-orange-200 text-center";
+        return "bg-orange-100 text-center";
       case 2:
-        return "bg-red-200 text-center";
+        return "bg-red-100 text-center";
       case 3:
-        return "bg-blue-gray-200 text-gray-900 text-center";
+        return "bg-blue-gray-100 text-gray-900 text-center";
       default:
         break;
     }
@@ -140,7 +140,7 @@ const HistoryTable = ({
           ) : data?.length > 0 ? (
             <table className="w-full table-fixed overflow-x-scroll border-seperate border border-slate-400">
               <thead className="text-left">
-                <tr className="bg-gray-50 text-blue-gray-900 font-bold">
+                <tr className=" text-blue-gray-900 font-bold">
                   {TABLE_HEADER.map((v, i) => (
                     <th className={`${thClassName} `} key={i}>
                       <div className=" flex justify-between items-center">
@@ -182,16 +182,12 @@ const HistoryTable = ({
                       </Typography>
                     </td>
                     <td className={tdClassName}>
-                      {item.end_date === null ? (
-                        <Typography className="font-bold text-blue-gray-800">
-                          {" "}
-                          No end time available
-                        </Typography>
-                      ) : (
-                        <Typography className="font-bold text-blue-gray-800">
-                          {item.end_date}
-                        </Typography>
-                      )}
+                      <Typography className="font-bold text-blue-gray-800">
+                        {" "}
+                        {item.end_date === null
+                          ? "No end time available"
+                          : item.end_date}
+                      </Typography>
                     </td>
                     <td className={tdClassName} title="DD:HH:MM:SS">
                       <Typography className="font-bold text-blue-gray-800">

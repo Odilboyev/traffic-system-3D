@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -59,6 +59,10 @@ import CurrentAlarms from "./components/alarm";
 import Dropright from "../Dropright";
 import { FaClockRotateLeft } from "react-icons/fa6";
 import HistoryTable from "./components/alarm/history";
+import { ThemeContext } from "../../context/themeContext";
+import { GiCrescentBlade, GiSun } from "react-icons/gi";
+import { WiMoonWaningCrescent1 } from "react-icons/wi";
+import CustomMarker from "./components/customMarker";
 
 const home = [41.2995, 69.2401];
 
@@ -84,7 +88,7 @@ const MapComponent = ({
       map.invalidateSize();
     }
   }, [isSidebarOpen, map]);
-
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const layersRef = useRef(localStorage.getItem("selectedLayer"));
   const [isLoading, setIsloading] = useState(false);
@@ -384,7 +388,7 @@ const MapComponent = ({
         </LayersControl>
         <Control position="bottomleft">
           <SpeedDial placement="right">
-            <SpeedDialHandler className="shadow shadow-gray-600 rounded bg-white w-10 h-10 cursor-pointer">
+            <SpeedDialHandler className="shadow shadow-gray-600 rounded  w-10 h-10 cursor-pointer">
               {/* <IconButton ripple={false} color="red"> */}
               <ListBulletIcon className="w-5 h-5 p-2" />
               {/* </IconButton> */}
@@ -392,7 +396,7 @@ const MapComponent = ({
             {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
             <SpeedDialContent>
               {" "}
-              <div className="filter-panel p-2 flex flex-col bg-white me-2">
+              <div className="filter-panel p-2 flex flex-col  me-2">
                 {checkboxConfigurations.map(({ type, label }) => (
                   <Checkbox
                     key={type}
@@ -413,7 +417,7 @@ const MapComponent = ({
         </Control>
         <Control position="bottomleft">
           <SpeedDial placement="right">
-            <SpeedDialHandler className="shadow shadow-gray-600 rounded bg-white w-10 h-10 cursor-pointer">
+            <SpeedDialHandler className="shadow shadow-gray-600 rounded  w-10 h-10 cursor-pointer">
               {/* <IconButton ripple={false} color="red"> */}
               <Cog8ToothIcon className="w-5 h-5 p-2" />
 
@@ -421,7 +425,7 @@ const MapComponent = ({
             </SpeedDialHandler>
             {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
             <SpeedDialContent>
-              <div className="bg-white p-4 rounded flex flex-col justify-center items-center ">
+              <div className=" p-4 rounded flex flex-col justify-center items-center ">
                 {" "}
                 <Typography className="mb-2 select-none">
                   {isDraggable ? "Editable" : "Not Editable"}
@@ -438,7 +442,7 @@ const MapComponent = ({
         <Control position="topleft">
           <div
             onClick={toggleFullSceen}
-            className="p-0 bg-white hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
+            className="p-0  hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
           >
             {fulscreen ? (
               <ArrowsPointingInIcon className="w-8 h-8 p-1" />
@@ -492,6 +496,14 @@ const MapComponent = ({
             fetchErrorHistory={fetchErrorHistory}
           />
         </Control>
+        <Control position="topleft">
+          <IconButton
+            color={theme == "light" ? "white" : "white"}
+            onClick={() => toggleTheme()}
+          >
+            {theme == "light" ? <WiMoonWaningCrescent1 /> : <GiSun />}
+          </IconButton>
+        </Control>
         <MarkerClusterGroup
           key={markerUpdate}
           ref={clusterRef}
@@ -524,6 +536,18 @@ const MapComponent = ({
 
             return (
               <>
+                {/* {markers.map((marker, i) => (
+                  <CustomMarker
+                    key={i}
+                    marker={marker}
+                    handleMarkerDragEnd={handleMarkerDragEnd}
+                    handlePopupOpen={handlePopupOpen}
+                    isDraggable={isDraggable}
+                    setActiveMarker={setActiveMarker}
+                    handleBoxModalOpen={handleBoxModalOpen}
+                    handleLightsModalOpen={handleLightsModalOpen}
+                  />
+                ))} */}
                 {/* <CustomMarker
                   key={i}
                   marker={marker}
@@ -533,9 +557,6 @@ const MapComponent = ({
                   handlePopupOpen={handlePopupOpen}
                 /> */}
                 <Marker
-                  // ref={(ref) =>
-                  //   (markerRefs[`${marker.cid}-${marker.type}`] = ref)
-                  // }
                   key={i}
                   markerId={marker.cid}
                   markerType={marker.type}
@@ -553,7 +574,6 @@ const MapComponent = ({
                         : () => handlePopupOpen(marker),
                     dragend: (event) =>
                       handleMarkerDragEnd(marker.cid, marker.type, event),
-                    // popupopen: () => handleRotate(marker.id),
                   }}
                   statuserror={marker.statuserror}
                   icon={L.icon({
@@ -562,32 +582,6 @@ const MapComponent = ({
                   })}
                   rotatedAngle={marker.type === 3 ? marker.rotated : 0}
                 >
-                  {" "}
-                  {/* <Fragment key={i}>
-                  {marker.type !== 2 && marker.type !== 3 && (
-                    <Popup
-                      interactive
-                      minWidth={"600px"}
-                      closeOnClick={false}
-                      autoClose={false}
-                      keepInView
-                      className="p-0"
-                      eventHandlers={{
-                        mouseover: (e) => {
-                          const element = e.target.getElement();
-                          const draggable = new L.Draggable(element);
-                          draggable.enable();
-                        },
-                      }}
-                    >
-                      {marker.type === 1 ? (
-                        <SingleRecord {...marker} />
-                      ) : (
-                        <div>default</div>
-                      )}
-                    </Popup>
-                  )}
-                </Fragment> */}
                   {marker.type === 1 && (
                     <CustomPopUp
                       marker={marker}
@@ -659,25 +653,31 @@ const ClusterIcon = (cluster) => {
     status: parseInt(status),
     count,
   }));
-  const totalMarkers = childMarkers.length;
   const pieChartIcon = L.divIcon({
-    className: "cluster",
-    iconSize: L.point(40, 40),
+    className: "cluster !bg-transparent",
+    iconSize: L.point(50, 50),
     html: renderToString(
-      <div className="w-16 h-16">
+      <div className="w-20 h-20 !bg-transparent group-has-[div]:!bg-transparent">
         <PieChart
           data={pieChartData.map((datam) => ({
             value: datam.count,
             title: datam.status,
             color: getStatusColor(datam.status),
           }))}
-          style={{ filter: `drop-shadow(0 0 0.75rem #0101018d)` }}
+          style={{
+            filter: `drop-shadow(0 0 0.75rem #0101018d)`,
+            background: "transparent !important",
+          }}
+          segmentsStyle={{ transition: "stroke .3s", cursor: "pointer" }}
+          segmentsShift={1}
           radius={42}
           labelStyle={{
             fill: "#fff",
-            fontSize: "1rem",
+            fontSize: "0.9rem",
             fontWeight: "bold",
+            pointerEvents: "none",
           }}
+          tooltip={({ dataEntry }) => `${dataEntry.title}: ${dataEntry.value}`}
           label={(props) => {
             return props.dataEntry.value;
           }}
@@ -691,12 +691,12 @@ const ClusterIcon = (cluster) => {
 const getStatusColor = (status) => {
   switch (status) {
     case 1:
-      return "#FFD700"; // Red
+      return "#FFD700"; // orange
     case 2:
-      return "#FF0000"; // Gold
+      return "#FF4500"; // red
     case 3:
-      return "#FFC0CB"; // Teal
+      return "#FFC0CB"; // pink
     default:
-      return "#019191"; // Light Pink
+      return "#4682B4"; // green
   }
 };

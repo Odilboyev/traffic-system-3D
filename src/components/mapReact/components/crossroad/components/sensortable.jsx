@@ -5,7 +5,7 @@ const SensorTable = ({ data, handler }) => {
   return (
     <>
       {data !== undefined && data !== null && data.length > 0 ? (
-        <table className="min-w-full table-fixed text-left bg-white border-gray-300">
+        <table className="min-w-full table-fixed text-left  border-gray-300">
           <thead>
             <tr>
               <th className="py-1 px-2 border-b">#</th>

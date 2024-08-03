@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MonitoringMapReact from "./components/mapReact";
 import { ToastContainer } from "react-toastify";
 import CurrentAlarms from "./components/mapReact/components/alarm";
@@ -8,8 +8,10 @@ import dangerSound from "../src/assets/audio/danger.mp3";
 import { Resizable } from "re-resizable";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css"; // Assuming you have some global styles
+import { ThemeContext } from "./context/themeContext.jsx";
 
 const App = () => {
+  const { theme } = useContext(ThemeContext);
   const [data, setCurrentAlarms] = useState(null);
   const [changedMarker, setChangedMarker] = useState(null);
 
@@ -62,7 +64,11 @@ const App = () => {
   };
 
   return (
-    <div className="app-container">
+    <div
+      className={`min-h-screen app-container ${
+        theme === "dark" ? "bg-gray-900 text-white" : " text-black"
+      }`}
+    >
       <ToastContainer />
       <div className="flex">
         <Resizable
@@ -78,7 +84,7 @@ const App = () => {
           </div>
         </Resizable>
 
-        <div style={{ width: "100%" }}>
+        <div style={{ width: "100%" }} className="dark dark:text-white">
           <MonitoringMapReact
             isSidebarOpen={sidebarOpen}
             alarmCount={data?.length}
