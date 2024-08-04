@@ -4,7 +4,7 @@ import { FaMinus, FaPlus } from "react-icons/fa6";
 import { useMap } from "react-leaflet";
 import Control from "react-leaflet-custom-control";
 
-const ZoomControl = () => {
+const ZoomControl = ({ theme }) => {
   const map = useMap();
 
   const handleZoomIn = () => {
@@ -18,13 +18,19 @@ const ZoomControl = () => {
   return (
     <Control position="topleft">
       <div className="flex flex-col">
-        <IconButton onClick={handleZoomIn} size="lg" className="rounded-b-none">
+        <IconButton
+          onClick={handleZoomIn}
+          size="lg"
+          className="rounded-b-none"
+          color={theme === "light" ? "black" : "white"}
+        >
           <FaPlus />
         </IconButton>
         <IconButton
           onClick={handleZoomOut}
           size="lg"
           className="rounded-t-none "
+          color={theme === "light" ? "black" : "white"}
         >
           <FaMinus />
         </IconButton>

@@ -67,6 +67,7 @@ import { WiMoonWaningCrescent1, WiMoonWaningCrescent3 } from "react-icons/wi";
 import CustomMarker from "./components/customMarker";
 import ZoomControl from "./components/CustomZoomControl";
 import { TbBell, TbBellRinging } from "react-icons/tb";
+import DropdownControl from "../DropDownControl";
 
 const home = [41.2995, 69.2401];
 
@@ -366,7 +367,6 @@ const MapComponent = ({
   const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
   return (
     <>
-      {" "}
       <MapContainer
         attributionControl={false}
         center={center}
@@ -374,82 +374,25 @@ const MapComponent = ({
         maxZoom={18}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
-        // whenCreated={(mapw) => {
-        //   console.log(mapw, "mapw");
-        //   map.current = mapw;
-        // }}
       >
         <MapEvents />
-        {/* <Legend map={map} /> */}
-        {/* <LayersControl position="bottomleft">
-          {baseLayers.map((layer) => (
-            <LayersControl.BaseLayer
-              key={layer.name}
-              name={layer.name}
-              checked={
-                localStorage.getItem("selectedLayer")
-                  ? localStorage.getItem("selectedLayer") == layer.name
-                  : layer.checked
-              }
-            >
-              <TileLayer
-                name={layer.name}
-                url={layer.url}
-                eventHandlers={{ add: (e) => layerSave(e) }}
-                attribution={layer.attribution}
-              />
-            </LayersControl.BaseLayer>
-          ))}
-        </LayersControl> */}
         {currentLayer && (
           <TileLayer
             url={currentLayer.url}
             attribution={currentLayer.attribution}
           />
         )}
-        <Control position="bottomleft">
+        <ZoomControl theme={theme} />
+        {/* layerchanger */}
+        <Control position="topleft">
           <SpeedDial placement="right">
-            <IconButton size="lg">
-              <SpeedDialHandler className=" w-10 h-10 cursor-pointer">
-                {/* <IconButton size="lg" ripple={false} color="red"> */}
-                <MapIcon className="w-5 h-5 p-2" />
-                {/* </IconButton> */}
-              </SpeedDialHandler>
-            </IconButton>
-
-            {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
-            <SpeedDialContent className="ml-4">
-              <div className="p-2 flex flex-col me-2 dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
-                {baseLayers.map((layer, i) => {
-                  const checked = selectedLayer == layer.name;
-                  return (
-                    <Radio
-                      key={i}
-                      checked={checked}
-                      variant={checked ? "filled" : "outlined"}
-                      onChange={() => handleLayerChange(layer.name)}
-                      label={layer.name}
-                    />
-                  );
-                })}
-              </div>
-            </SpeedDialContent>
-          </SpeedDial>
-        </Control>
-        <ZoomControl />
-        <Control position="bottomleft">
-          <SpeedDial placement="right">
-            <IconButton size="lg">
-              <SpeedDialHandler className=" w-10 h-10 cursor-pointer">
-                {/* <IconButton size="lg" ripple={false} color="red"> */}
+            <IconButton color={theme === "light" ? "black" : "white"} size="lg">
+              <SpeedDialHandler className="w-10 h-10 cursor-pointer">
                 <ListBulletIcon className="w-5 h-5 p-2" />
-                {/* </IconButton> */}
               </SpeedDialHandler>
             </IconButton>
-
-            {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
             <SpeedDialContent className="ml-4">
-              <div className="filter-panel p-2 flex flex-col me-2 dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
+              <div className="filter-panel p-2 flex flex-col dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
                 {checkboxConfigurations.map(({ type, label }) => (
                   <Checkbox
                     key={type}
@@ -461,7 +404,7 @@ const MapComponent = ({
                     ripple={false}
                     className="m-0 p-0"
                     checked={
-                      type == "all"
+                      type === "all"
                         ? filter.box && filter.camera && filter.crossroad
                         : filter[type]
                     }
@@ -472,22 +415,15 @@ const MapComponent = ({
             </SpeedDialContent>
           </SpeedDial>
         </Control>
-        <Control position="bottomleft">
+        <Control position="topleft">
           <SpeedDial placement="right">
-            <IconButton size="lg">
-              <SpeedDialHandler className=" rounded  w-10 h-10 cursor-pointer">
-                {/* <IconButton size="lg" ripple={false} color="red"> */}
-
+            <IconButton color={theme === "light" ? "black" : "white"} size="lg">
+              <SpeedDialHandler className="rounded w-10 h-10 cursor-pointer">
                 <Cog8ToothIcon className="w-5 h-5 p-2" />
-
-                {/* </IconButton> */}
               </SpeedDialHandler>
             </IconButton>
-
-            {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
-            <SpeedDialContent className="ml-4  dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
-              <div className="p-4 rounded flex flex-col justify-center items-center ">
-                {" "}
+            <SpeedDialContent className="ml-4 dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
+              <div className="p-4 rounded flex flex-col justify-center items-center">
                 <Typography className="mb-2 select-none">
                   {isDraggable ? "Editable" : "Not Editable"}
                 </Typography>
@@ -499,19 +435,54 @@ const MapComponent = ({
               </div>
             </SpeedDialContent>
           </SpeedDial>
-        </Control>{" "}
-        <Control position="topleft">
-          <IconButton size="lg" onClick={toggleFullSceen}>
+        </Control>
+        <Control position="topright">
+          <IconButton
+            color={theme === "light" ? "black" : "white"}
+            size="lg"
+            onClick={toggleFullSceen}
+          >
             {fulscreen ? (
               <ArrowsPointingInIcon className="w-8 h-8 p-1" />
             ) : (
-              <ArrowsPointingOutIcon className="w-8  h-8 p-1" />
+              <ArrowsPointingOutIcon className="w-8 h-8 p-1" />
             )}
           </IconButton>
         </Control>
-        <Control position="topleft">
-          {/* <Badge content={alarmCount} size="lg"> */}
-          <IconButton size="lg" onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}>
+        <Control position="bottomleft">
+          <SpeedDial placement="left">
+            <IconButton color={theme === "light" ? "black" : "white"} size="lg">
+              <SpeedDialHandler className="w-10 h-10 cursor-pointer">
+                <MapIcon className="w-5 h-5 p-2" />
+              </SpeedDialHandler>
+            </IconButton>
+            <SpeedDialContent className="m-4">
+              <div className="flex flex-col p-3 mb-10 rounded-md dark:bg-gray-900/80  bg-white/80 backdrop-blur-md">
+                {baseLayers.map((layer, i) => (
+                  <Radio
+                    key={i}
+                    checked={selectedLayer === layer.name}
+                    variant={
+                      selectedLayer === layer.name ? "filled" : "outlined"
+                    }
+                    onChange={() => handleLayerChange(layer.name)}
+                    label={
+                      <Typography className="mr-3 text-white">
+                        {layer.name}
+                      </Typography>
+                    }
+                  />
+                ))}
+              </div>
+            </SpeedDialContent>
+          </SpeedDial>
+        </Control>
+        <Control position="bottomright">
+          <IconButton
+            color={theme === "light" ? "black" : "white"}
+            size="lg"
+            onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
+          >
             {isAlarmsOpen ? <TbBell /> : <TbBellRinging />}
           </IconButton>
           <Dropright
@@ -525,10 +496,10 @@ const MapComponent = ({
               />
             }
           />
-          {/* </Badge> */}
         </Control>
-        <Control position="topleft">
+        <Control position="bottomright">
           <IconButton
+            color={theme === "light" ? "black" : "white"}
             size="lg"
             onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
           >
@@ -544,9 +515,17 @@ const MapComponent = ({
             fetchErrorHistory={fetchErrorHistory}
           />
         </Control>
-        <Control position="topleft">
-          <IconButton size="lg" onClick={() => toggleTheme()}>
-            {theme == "light" ? <WiMoonWaningCrescent3 /> : <GiSun />}
+        <Control position="topright">
+          <IconButton
+            color={theme === "light" ? "black" : "white"}
+            size="lg"
+            onClick={() => {
+              toggleTheme();
+              if (theme === "light") handleLayerChange("Transport Dark");
+              else handleLayerChange("2GIS");
+            }}
+          >
+            {theme === "light" ? <WiMoonWaningCrescent3 /> : <GiSun />}
           </IconButton>
         </Control>
         <MarkerClusterGroup
@@ -581,26 +560,6 @@ const MapComponent = ({
 
             return (
               <>
-                {/* {markers.map((marker, i) => (
-                  <CustomMarker
-                    key={i}
-                    marker={marker}
-                    handleMarkerDragEnd={handleMarkerDragEnd}
-                    handlePopupOpen={handlePopupOpen}
-                    isDraggable={isDraggable}
-                    setActiveMarker={setActiveMarker}
-                    handleBoxModalOpen={handleBoxModalOpen}
-                    handleLightsModalOpen={handleLightsModalOpen}
-                  />
-                ))} */}
-                {/* <CustomMarker
-                  key={i}
-                  marker={marker}
-                  handleBoxModalOpen={handleBoxModalOpen}
-                  handleMarkerDragEnd={handleMarkerDragEnd}
-                  handleMonitorCrossroad={handleMonitorCrossroad}
-                  handlePopupOpen={handlePopupOpen}
-                /> */}
                 <Marker
                   key={i}
                   markerId={marker.cid}

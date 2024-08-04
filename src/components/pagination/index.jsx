@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { IconButton, ButtonGroup } from "@material-tailwind/react";
 import {
   ChevronLeftIcon,
@@ -6,13 +6,17 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
 } from "@heroicons/react/24/solid";
+import { useTheme } from "../../customHooks/useTheme";
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
 
   const getItemProps = (index) => ({
-    className: currentPage === index ? "bg-blue-gray-900 text-white" : "",
+    className:
+      currentPage === index
+        ? "bg-blue-gray-900 text-white dark:bg-white/60 dark:text-blu-gray-900"
+        : "",
     onClick: () => onPageChange(index),
   });
 
@@ -71,8 +75,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     onPageChange(totalPages);
   };
 
+  const { theme } = useTheme();
+
   return (
-    <ButtonGroup variant="outlined">
+    <ButtonGroup
+      variant="outlined"
+      color={theme === "light" ? "black" : "white"}
+      className="dark:border-white dark:text-white"
+    >
       <IconButton onClick={goToFirstPage} disabled={isFirstPage}>
         <ArrowLeftIcon strokeWidth={2} className="h-4 w-4" />
       </IconButton>

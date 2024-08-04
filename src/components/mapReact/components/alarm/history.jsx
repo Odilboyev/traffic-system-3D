@@ -89,13 +89,13 @@ const HistoryTable = ({
   const getRowColor = (status) => {
     switch (Number(status)) {
       case 0:
-        return "bg-green-100  text-center";
+        return "bg-green-100  text-center dark:bg-green-900 dark:text-white ";
       case 1:
-        return "bg-orange-100 text-center";
+        return "bg-orange-100 text-center  dark:bg-orange-900 dark:text-white ";
       case 2:
-        return "bg-red-100 text-center";
+        return "bg-red-100 text-center dark:bg-red-900 dark:text-white ";
       case 3:
-        return "bg-blue-gray-100 text-gray-900 text-center";
+        return "bg-blue-gray-100 text-gray-900 text-center dark:bg-gray-900 dark:text-white ";
       default:
         break;
     }
@@ -105,19 +105,19 @@ const HistoryTable = ({
   const thClassName = `pl-4 py-1 text-start border-seperate border border-blue-gray-900`;
   return (
     <>
-      <Dialog size="xxl" open={open} handler={handleOpen}>
+      <Dialog
+        size="xxl"
+        open={open}
+        handler={handleOpen}
+        className="dark:bg-blue-gray-900 dark:!text-white text-blue-gray-900"
+      >
         <DialogHeader className="justify-between">
           <div>
-            <Typography variant="h5" color="blue-gray">
+            <Typography variant="h5" className="dark:text-white">
               Tarix
             </Typography>
           </div>
-          <IconButton
-            color="blue-gray"
-            size="sm"
-            variant="text"
-            onClick={handleOpen}
-          >
+          <IconButton size="sm" variant="text" onClick={handleOpen}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -140,7 +140,7 @@ const HistoryTable = ({
           ) : data?.length > 0 ? (
             <table className="w-full table-fixed overflow-x-scroll border-seperate border border-slate-400">
               <thead className="text-left">
-                <tr className=" text-blue-gray-900 font-bold">
+                <tr className=" font-bold">
                   {TABLE_HEADER.map((v, i) => (
                     <th className={`${thClassName} `} key={i}>
                       <div className=" flex justify-between items-center">
@@ -159,30 +159,24 @@ const HistoryTable = ({
                     )} text-blue-gray-900`}
                   >
                     <td className={tdClassName}>
-                      <Typography className="text-black">
-                        {item.alarm_id}
-                      </Typography>
+                      <Typography>{item.alarm_id}</Typography>
                     </td>
                     <td className={tdClassName}>
-                      <Typography className="text-black">
-                        {item.device_name}
-                      </Typography>
+                      <Typography>{item.device_name}</Typography>
                     </td>
                     <td className={tdClassName}>
-                      <Typography className="text-black">
-                        {item.sensor_name}
-                      </Typography>
+                      <Typography>{item.sensor_name}</Typography>
                     </td>
                     <td className={`${tdClassName} !text-center`}>
                       <Typography>{item?.statuserror_name}</Typography>
                     </td>
                     <td className={tdClassName}>
-                      <Typography className="font-bold text-blue-gray-800">
+                      <Typography className="font-bold ">
                         {item.start_date}
                       </Typography>
                     </td>
                     <td className={tdClassName}>
-                      <Typography className="font-bold text-blue-gray-800">
+                      <Typography className="font-bold ">
                         {" "}
                         {item.end_date === null
                           ? "No end time available"
@@ -190,7 +184,7 @@ const HistoryTable = ({
                       </Typography>
                     </td>
                     <td className={tdClassName} title="DD:HH:MM:SS">
-                      <Typography className="font-bold text-blue-gray-800">
+                      <Typography className="font-bold">
                         {item.end_date === null
                           ? "No end date available"
                           : calculateDuration(item.start_date, item.end_date)}
