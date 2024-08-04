@@ -20,6 +20,7 @@ import {
   MenuHandler,
   MenuItem,
   MenuList,
+  Radio,
   SpeedDial,
   SpeedDialContent,
   SpeedDialHandler,
@@ -32,6 +33,7 @@ import {
   ArrowsPointingOutIcon,
   Cog8ToothIcon,
   ListBulletIcon,
+  MapIcon,
 } from "@heroicons/react/16/solid";
 import "./styles.css";
 import { PieChart } from "react-minimal-pie-chart";
@@ -352,6 +354,16 @@ const MapComponent = ({
       console.log("Error fetching error history. Please try again.");
     }
   };
+  const [selectedLayer, setSelectedLayer] = useState(
+    localStorage.getItem("selectedLayer") || baseLayers[0].name
+  );
+
+  const handleLayerChange = (layerName) => {
+    setSelectedLayer(layerName);
+    layerSave("selectedLayer", layerName);
+  };
+
+  const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
   return (
     <>
       {" "}
@@ -369,7 +381,7 @@ const MapComponent = ({
       >
         <MapEvents />
         {/* <Legend map={map} /> */}
-        <LayersControl position="bottomleft">
+        {/* <LayersControl position="bottomleft">
           {baseLayers.map((layer) => (
             <LayersControl.BaseLayer
               key={layer.name}
@@ -388,7 +400,42 @@ const MapComponent = ({
               />
             </LayersControl.BaseLayer>
           ))}
-        </LayersControl>
+        </LayersControl> */}
+        {currentLayer && (
+          <TileLayer
+            url={currentLayer.url}
+            attribution={currentLayer.attribution}
+          />
+        )}
+        <Control position="bottomleft">
+          <SpeedDial placement="right">
+            <IconButton size="lg">
+              <SpeedDialHandler className=" w-10 h-10 cursor-pointer">
+                {/* <IconButton size="lg" ripple={false} color="red"> */}
+                <MapIcon className="w-5 h-5 p-2" />
+                {/* </IconButton> */}
+              </SpeedDialHandler>
+            </IconButton>
+
+            {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
+            <SpeedDialContent className="ml-4">
+              <div className="p-2 flex flex-col me-2 dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
+                {baseLayers.map((layer, i) => {
+                  const checked = selectedLayer == layer.name;
+                  return (
+                    <Radio
+                      key={i}
+                      checked={checked}
+                      variant={checked ? "filled" : "outlined"}
+                      onChange={() => handleLayerChange(layer.name)}
+                      label={layer.name}
+                    />
+                  );
+                })}
+              </div>
+            </SpeedDialContent>
+          </SpeedDial>
+        </Control>
         <ZoomControl />
         <Control position="bottomleft">
           <SpeedDial placement="right">
