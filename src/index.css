@@ -13,16 +13,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* theme */
-
-  --primary-color: #3b82f6; /* Tailwind's default blue */
-}
-
-.light {
-  --primary-color: #3b82f6; /* Light theme primary color (default blue) */
-}
-
-.dark {
-  --primary-color: #ef4444; /* Dark theme primary color (Tailwind red) */
 }
 
 input::-webkit-outer-spin-button,
@@ -36,12 +26,11 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 @layer utilities {
-  .dark {
-    button,
+  /* .dark {
     div {
       @apply bg-blue-gray-900 text-white;
     }
-  }
+  } */
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -53,5 +42,11 @@ input[type="number"] {
   }
 }
 .leaflet-left {
-  @apply !p-2 rounded-br-md rounded-tr-md !ps-0;
+  @apply !p-2 !ps-0;
+  &.leaflet-bottom {
+    @apply rounded-tr-md;
+  }
+  &.leaflet-top {
+    @apply rounded-br-md;
+  }
 }

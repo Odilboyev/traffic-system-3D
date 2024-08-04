@@ -56,8 +56,9 @@ export function SignIn() {
         backgroundSize: "cover",
       }}
     >
-      <div className={`w-full  lg:w-2/5  mx-auto p-[3%]  shadow-lg rounded`}>
-        <div className="text-center"></div>
+      <div
+        className={`w-full md:w-2/5 mx-auto p-[3%] shadow-lg bg-blue-gray-900 !text-white rounded`}
+      >
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">
             <Typography color="blue-gray" className="font-medium text-xl ">
@@ -77,7 +78,7 @@ export function SignIn() {
               // onKeyDown={(evt) =>
               //   ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
               // }
-              className={` !border-t-blue-gray-200 focus:!border-t-gray-900 mt-2`}
+              className={`!border-t-blue-gray-200 focus:!border-t-gray-900  mt-2`}
             />
             <Typography color="blue-gray" className="mt-[5%] font-medium">
               Password

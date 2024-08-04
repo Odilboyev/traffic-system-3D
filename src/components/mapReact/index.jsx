@@ -57,12 +57,14 @@ import dangerSound from "../../assets/audio/danger.mp3";
 import toaster, { toastConfig } from "../../tools/toastconfig";
 import CurrentAlarms from "./components/alarm";
 import Dropright from "../Dropright";
-import { FaClockRotateLeft } from "react-icons/fa6";
+import { FaBell, FaBellSlash, FaClockRotateLeft } from "react-icons/fa6";
 import HistoryTable from "./components/alarm/history";
 import { ThemeContext } from "../../context/themeContext";
 import { GiCrescentBlade, GiSun } from "react-icons/gi";
-import { WiMoonWaningCrescent1 } from "react-icons/wi";
+import { WiMoonWaningCrescent1, WiMoonWaningCrescent3 } from "react-icons/wi";
 import CustomMarker from "./components/customMarker";
+import ZoomControl from "./components/CustomZoomControl";
+import { TbBell, TbBellRinging } from "react-icons/tb";
 
 const home = [41.2995, 69.2401];
 
@@ -359,6 +361,7 @@ const MapComponent = ({
         zoom={zoom}
         maxZoom={18}
         style={{ height: "100vh", width: "100%" }}
+        zoomControl={false}
         // whenCreated={(mapw) => {
         //   console.log(mapw, "mapw");
         //   map.current = mapw;
@@ -386,21 +389,28 @@ const MapComponent = ({
             </LayersControl.BaseLayer>
           ))}
         </LayersControl>
+        <ZoomControl />
         <Control position="bottomleft">
           <SpeedDial placement="right">
-            <SpeedDialHandler className="shadow shadow-gray-600 rounded  w-10 h-10 cursor-pointer">
-              {/* <IconButton ripple={false} color="red"> */}
-              <ListBulletIcon className="w-5 h-5 p-2" />
-              {/* </IconButton> */}
-            </SpeedDialHandler>
+            <IconButton size="lg">
+              <SpeedDialHandler className=" w-10 h-10 cursor-pointer">
+                {/* <IconButton size="lg" ripple={false} color="red"> */}
+                <ListBulletIcon className="w-5 h-5 p-2" />
+                {/* </IconButton> */}
+              </SpeedDialHandler>
+            </IconButton>
+
             {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
-            <SpeedDialContent>
-              {" "}
-              <div className="filter-panel p-2 flex flex-col  me-2">
+            <SpeedDialContent className="ml-4">
+              <div className="filter-panel p-2 flex flex-col me-2 dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
                 {checkboxConfigurations.map(({ type, label }) => (
                   <Checkbox
                     key={type}
-                    label={<Typography color="blue-gray">{label}</Typography>}
+                    label={
+                      <Typography className="dark:text-white text-blue-gray-800">
+                        {label}
+                      </Typography>
+                    }
                     ripple={false}
                     className="m-0 p-0"
                     checked={
@@ -417,15 +427,19 @@ const MapComponent = ({
         </Control>
         <Control position="bottomleft">
           <SpeedDial placement="right">
-            <SpeedDialHandler className="shadow shadow-gray-600 rounded  w-10 h-10 cursor-pointer">
-              {/* <IconButton ripple={false} color="red"> */}
-              <Cog8ToothIcon className="w-5 h-5 p-2" />
+            <IconButton size="lg">
+              <SpeedDialHandler className=" rounded  w-10 h-10 cursor-pointer">
+                {/* <IconButton size="lg" ripple={false} color="red"> */}
 
-              {/* </IconButton> */}
-            </SpeedDialHandler>
+                <Cog8ToothIcon className="w-5 h-5 p-2" />
+
+                {/* </IconButton> */}
+              </SpeedDialHandler>
+            </IconButton>
+
             {/* color="blue" onClick={() => console.log("Filter button clicked")} */}
-            <SpeedDialContent>
-              <div className=" p-4 rounded flex flex-col justify-center items-center ">
+            <SpeedDialContent className="ml-4  dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
+              <div className="p-4 rounded flex flex-col justify-center items-center ">
                 {" "}
                 <Typography className="mb-2 select-none">
                   {isDraggable ? "Editable" : "Not Editable"}
@@ -440,48 +454,35 @@ const MapComponent = ({
           </SpeedDial>
         </Control>{" "}
         <Control position="topleft">
-          <div
-            onClick={toggleFullSceen}
-            className="p-0  hover:bg-gray-100 rounded text-blue-gray-700 border-2 border-gray-500 cursor-pointer"
-          >
+          <IconButton size="lg" onClick={toggleFullSceen}>
             {fulscreen ? (
               <ArrowsPointingInIcon className="w-8 h-8 p-1" />
             ) : (
               <ArrowsPointingOutIcon className="w-8  h-8 p-1" />
             )}
-          </div>
+          </IconButton>
         </Control>
         <Control position="topleft">
-          <div className="z-[9999999]">
-            <Badge content={alarmCount} size="sm" color="white">
-              <IconButton
-                ripple={false}
-                color="red"
-                onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
-              >
-                {isAlarmsOpen ? (
-                  <BellIcon className="w-8 h-8 p-1" />
-                ) : (
-                  <BellAlertIcon className="w-8 h-8 p-1" />
-                )}
-              </IconButton>
-              <Dropright
-                isOpen={isAlarmsOpen}
-                setIsOpen={setIsAlarmsOpen}
-                content={
-                  <CurrentAlarms
-                    data={currentAlarms}
-                    historyOpen={isAlarmHistoryOpen}
-                    setHistoryOpen={setIsAlarmHistoryOpen}
-                  />
-                }
+          {/* <Badge content={alarmCount} size="lg"> */}
+          <IconButton size="lg" onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}>
+            {isAlarmsOpen ? <TbBell /> : <TbBellRinging />}
+          </IconButton>
+          <Dropright
+            isOpen={isAlarmsOpen}
+            setIsOpen={setIsAlarmsOpen}
+            content={
+              <CurrentAlarms
+                data={currentAlarms}
+                historyOpen={isAlarmHistoryOpen}
+                setHistoryOpen={setIsAlarmHistoryOpen}
               />
-            </Badge>
-          </div>{" "}
+            }
+          />
+          {/* </Badge> */}
         </Control>
         <Control position="topleft">
           <IconButton
-            color="white"
+            size="lg"
             onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
           >
             <FaClockRotateLeft />
@@ -497,11 +498,8 @@ const MapComponent = ({
           />
         </Control>
         <Control position="topleft">
-          <IconButton
-            color={theme == "light" ? "white" : "white"}
-            onClick={() => toggleTheme()}
-          >
-            {theme == "light" ? <WiMoonWaningCrescent1 /> : <GiSun />}
+          <IconButton size="lg" onClick={() => toggleTheme()}>
+            {theme == "light" ? <WiMoonWaningCrescent3 /> : <GiSun />}
           </IconButton>
         </Control>
         <MarkerClusterGroup

@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import moment from "moment";
 import { IconButton, Typography } from "@material-tailwind/react";
 import { GetCurrentAlarms, getErrorHistory } from "../../../../apiHandlers";
 import HistoryTable from "./history";
+import { ThemeContext } from "../../../../context/themeContext";
 
-const CurrentAlarms = ({ data, historyOpen, setHistoryOpen }) => {
+const CurrentAlarms = ({ data }) => {
+  const { theme } = useContext(ThemeContext);
   return (
-    <div className=" dark:bg-gray-900">
+    <div className="dark:bg-gray-900 bg-white/80 backdrop-blur-md">
       {/* lol */}
       <div className="flex flex-col w-full">
         {data?.length > 0 ? (
@@ -63,12 +65,20 @@ const CurrentAlarms = ({ data, historyOpen, setHistoryOpen }) => {
                   <tr
                     key={index}
                     className={`border-b font-bold ${
-                      item.statuserror === 2
-                        ? "bg-red-200  "
+                      theme === "light"
+                        ? item.statuserror === 2
+                          ? "bg-red-200  "
+                          : item.statuserror === 1
+                          ? "bg-yellow-200 "
+                          : item.statuserror === 3
+                          ? "bg-gray-200 "
+                          : ""
+                        : item.statuserror === 2
+                        ? "bg-red-900 text-white"
                         : item.statuserror === 1
-                        ? "bg-yellow-200 "
+                        ? "bg-yellow-900  text-white"
                         : item.statuserror === 3
-                        ? "bg-gray-200 "
+                        ? "bg-gray-900  text-white"
                         : ""
                     } hover:bg-transparent transition-colors duration-200`}
                   >
