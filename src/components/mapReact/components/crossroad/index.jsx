@@ -193,12 +193,11 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   return (
     <Dialog
       size="xxl"
-      className="!dark:bg-blue-gray-800 "
-      color="dark"
+      className="dark:!bg-blue-gray-800 "
       open={open}
       handler={handleClose}
     >
-      <DialogHeader className="justify-between p-2">
+      <DialogHeader className="justify-between p-2 dark:!bg-blue-gray-900">
         <div>{marker?.cname}</div>
         <IconButton
           className="m-1"
@@ -210,7 +209,8 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
           <XMarkIcon className="w-5 h-5" />
         </IconButton>
       </DialogHeader>
-      <DialogBody className="h-[90vh] overflow-auto py-0">
+      <DialogBody className="h-[90vh] overflow-auto py-0 dark:bg-blue-gray-900">
+        something iowgblehrgui
         <div className="grid grid-cols-2 grid-rows-2 h-full">
           <div className={"max-h-full overflow-y-scroll border p-2"}>
             <Videos videos={data?.camera} />

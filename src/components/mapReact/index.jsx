@@ -106,8 +106,7 @@ const MapComponent = ({
       : baseLayers.filter((layer) => !layer.name.includes("Dark"));
 
   const navigate = useNavigate();
-  const layersRef = useRef(localStorage.getItem("selectedLayer"));
-  const [isLoading, setIsloading] = useState(false);
+
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
   const [clusterMarkers, setClusterMarkers] = useState([]);
@@ -129,6 +128,7 @@ const MapComponent = ({
     localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
   );
   const [markers, setMarkers] = useState([]);
+  const [areMarkersLoading, setAreMarkersLoading] = useState(false);
   const [rotated, setrotated] = useState(0);
   const [isDraggable, setiIsDraggable] = useState(false);
   // const [types, setTypes] = useState(0);
@@ -147,9 +147,9 @@ const MapComponent = ({
   ];
 
   const getDataHandler = async () => {
-    setIsloading(true);
+    setAreMarkersLoading(true);
     try {
-      setIsloading(false);
+      setAreMarkersLoading(false);
       const myData = await getMarkerData();
       if (myData?.status == 999) {
         localStorage.clear();
@@ -166,7 +166,7 @@ const MapComponent = ({
         );
       }
     } catch (error) {
-      setIsloading(false);
+      setAreMarkersLoading(false);
 
       throw new Error(error);
     }
@@ -352,14 +352,6 @@ const MapComponent = ({
       setHistoryData(all.data);
       setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
       historyData.length === 0 && setIsDataLoaded(true);
-
-      // const today = moment().startOf("day");
-      // const cases = all.value.filter((item) => {
-      //   const startDate = moment.unix(item.start_date);
-      //   return startDate.isAfter(today) || startDate.isSame(today);
-      // }).length;
-      // setCasesSinceMidnight(cases);
-
       setHistoryLoading(false);
     } catch (err) {
       setHistoryLoading(false);
@@ -376,6 +368,12 @@ const MapComponent = ({
   };
 
   const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
+
+  useEffect(() => {
+    if (theme === "dark") {
+      handleLayerChange("Dark");
+    } else handleLayerChange("2GIS");
+  }, [theme]);
   return (
     <>
       <MapContainer
@@ -396,7 +394,10 @@ const MapComponent = ({
         <ZoomControl theme={theme} />
         <Control position="topleft">
           <SpeedDial placement="right">
-            <IconButton color={theme === "light" ? "black" : "white"} size="lg">
+            <IconButton
+              // color={theme === "light" ? "black" : "white"}
+              size="lg"
+            >
               <SpeedDialHandler className="w-10 h-10 cursor-pointer">
                 <ListBulletIcon className="w-5 h-5 p-2" />
               </SpeedDialHandler>
@@ -427,7 +428,10 @@ const MapComponent = ({
         </Control>
         <Control position="topleft">
           <SpeedDial placement="right">
-            <IconButton color={theme === "light" ? "black" : "white"} size="lg">
+            <IconButton
+              // color={theme === "light" ? "black" : "white"}
+              size="lg"
+            >
               <SpeedDialHandler className="rounded w-10 h-10 cursor-pointer">
                 <Cog8ToothIcon className="w-5 h-5 p-2" />
               </SpeedDialHandler>
@@ -448,7 +452,7 @@ const MapComponent = ({
         </Control>
         <Control position="topleft">
           <IconButton
-            color={theme === "light" ? "black" : "white"}
+            // color={theme === "light" ? "black" : "white"}
             size="lg"
             onClick={toggleFullSceen}
           >
@@ -461,7 +465,10 @@ const MapComponent = ({
         </Control>
         <Control position="topleft">
           <SpeedDial placement="left">
-            <IconButton color={theme === "light" ? "black" : "white"} size="lg">
+            <IconButton
+              // color={theme === "light" ? "black" : "white"}
+              size="lg"
+            >
               <SpeedDialHandler className="w-10 h-10 cursor-pointer">
                 <MapIcon className="w-6 h-6 p-2" />
               </SpeedDialHandler>
@@ -490,7 +497,7 @@ const MapComponent = ({
         </Control>
         <Control position="topleft">
           <IconButton
-            color={theme === "light" ? "black" : "white"}
+            // color={theme === "light" ? "black" : "white"}
             size="lg"
             onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
           >
@@ -514,7 +521,7 @@ const MapComponent = ({
         </Control>
         <Control position="topleft">
           <IconButton
-            color={theme === "light" ? "black" : "white"}
+            // color={theme === "light" ? "black" : "white"}
             size="lg"
             onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
           >
@@ -532,14 +539,9 @@ const MapComponent = ({
         </Control>
         <Control position="topleft">
           <IconButton
-            color={theme === "light" ? "black" : "white"}
+            // color={theme === "light" ? "black" : "white"}
             size="lg"
-            onClick={() => {
-              toggleTheme();
-              if (theme === "light") {
-                handleLayerChange("Transport Dark");
-              } else handleLayerChange("2GIS");
-            }}
+            onClick={() => toggleTheme()}
           >
             {theme === "light" ? (
               <WiMoonWaningCrescent3 className="w-7 h-7 p-1" />

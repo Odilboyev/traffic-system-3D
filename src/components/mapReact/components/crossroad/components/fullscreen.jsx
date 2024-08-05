@@ -13,7 +13,7 @@ const FullscreenBox = ({ children, ...rest }) => {
 
   return (
     <div
-      className={` border p-2 ${
+      className={`dark:bg-blue-gray-900 border p-2 ${
         isFullscreen ? "fixed inset-0 z-[500]" : "h-full"
       } `}
       onMouseOver={() => setIsVisible(true)}

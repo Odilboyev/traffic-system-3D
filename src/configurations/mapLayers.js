@@ -32,8 +32,7 @@ const baseLayers = [
 ];
 
 const layerSave = (e) => {
-  const selectedLayer = e.target.options.name;
-  localStorage.setItem("selectedLayer", selectedLayer);
+  localStorage.setItem("selectedLayer", e);
 };
 
 export { layerSave };
