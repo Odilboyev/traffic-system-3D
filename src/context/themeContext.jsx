@@ -15,8 +15,12 @@ export const MyThemeProvider = ({ children }) => {
       setTheme(savedTheme);
     }
   }, []);
-
   useEffect(() => {
+    const previousTheme = localStorage.getItem("trafficTheme");
+    if (previousTheme && previousTheme !== theme) {
+      document.documentElement.classList.remove(previousTheme);
+    }
+    document.documentElement.classList.add(theme);
     localStorage.setItem("trafficTheme", theme);
   }, [theme]);
 
