@@ -55,9 +55,9 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
         console.log(data, "raw data");
         onTrafficLightsDataReceived(data);
       };
-      setTimeout(() => {
-        trafficSocket.close();
-      }, 5000);
+      // setTimeout(() => {
+      //   trafficSocket.close();
+      // }, 5000);
     }
 
     return () => {

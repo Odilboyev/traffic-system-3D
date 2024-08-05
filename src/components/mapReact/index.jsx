@@ -433,7 +433,7 @@ const MapComponent = ({
               </SpeedDialHandler>
             </IconButton>
             <SpeedDialContent className="ml-4 dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
-              <div className="p-4 rounded flex flex-col justify-center items-center">
+              <div className="p-4 rounded-lg flex flex-col justify-center items-center">
                 <Typography className="mb-2 select-none">
                   {isDraggable ? "Editable" : "Not Editable"}
                 </Typography>

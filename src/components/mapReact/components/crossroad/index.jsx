@@ -119,9 +119,6 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
         const data = JSON.parse(event.data);
         onTrafficLightsDataReceived(data);
       };
-      setTimeout(() => {
-        trafficSocket.close();
-      }, 5000);
     }
 
     return () => {
