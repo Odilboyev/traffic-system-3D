@@ -196,7 +196,8 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   return (
     <Dialog
       size="xxl"
-      className="!dark:bg-blue-gray-800  "
+      className="!dark:bg-blue-gray-800 "
+      color="dark"
       open={open}
       handler={handleClose}
     >

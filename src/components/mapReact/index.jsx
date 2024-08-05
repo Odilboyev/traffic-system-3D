@@ -63,12 +63,17 @@ import { FaBell, FaBellSlash, FaClockRotateLeft } from "react-icons/fa6";
 import HistoryTable from "./components/alarm/history";
 import { ThemeContext } from "../../context/themeContext";
 import { GiCrescentBlade, GiSun } from "react-icons/gi";
-import { WiMoonWaningCrescent1, WiMoonWaningCrescent3 } from "react-icons/wi";
+import {
+  WiMoonWaningCrescent1,
+  WiMoonWaningCrescent3,
+  WiSunrise,
+} from "react-icons/wi";
 import CustomMarker from "./components/customMarker";
 import ZoomControl from "./components/CustomZoomControl";
-import { TbBell, TbBellRinging } from "react-icons/tb";
+import { TbBell, TbBellRinging, TbLamp } from "react-icons/tb";
 import DropdownControl from "../DropDownControl";
 import { useTheme } from "../../customHooks/useTheme";
+import { IoMdSunny } from "react-icons/io";
 
 const home = [41.2995, 69.2401];
 
@@ -458,7 +463,7 @@ const MapComponent = ({
           <SpeedDial placement="left">
             <IconButton color={theme === "light" ? "black" : "white"} size="lg">
               <SpeedDialHandler className="w-10 h-10 cursor-pointer">
-                <MapIcon className="w-5 h-5 p-2" />
+                <MapIcon className="w-6 h-6 p-2" />
               </SpeedDialHandler>
             </IconButton>
             <SpeedDialContent className="m-4">
@@ -489,7 +494,11 @@ const MapComponent = ({
             size="lg"
             onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
           >
-            {isAlarmsOpen ? <TbBell /> : <TbBellRinging />}
+            {isAlarmsOpen ? (
+              <TbBell className="w-6 h-6" />
+            ) : (
+              <TbBellRinging className="w-6 h-6" />
+            )}
           </IconButton>
           <Dropright
             isOpen={isAlarmsOpen}
@@ -509,7 +518,7 @@ const MapComponent = ({
             size="lg"
             onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
           >
-            <FaClockRotateLeft />
+            <FaClockRotateLeft className="w-6 h-6 p-1" />
           </IconButton>
           <HistoryTable
             open={isAlarmHistoryOpen}
@@ -532,7 +541,11 @@ const MapComponent = ({
               } else handleLayerChange("2GIS");
             }}
           >
-            {theme === "light" ? <WiMoonWaningCrescent3 /> : <GiSun />}
+            {theme === "light" ? (
+              <WiMoonWaningCrescent3 className="w-7 h-7 p-1" />
+            ) : (
+              <IoMdSunny className="w-7 h-7 p-1" />
+            )}
           </IconButton>
         </Control>
         <MarkerClusterGroup

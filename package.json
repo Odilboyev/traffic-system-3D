@@ -16,6 +16,7 @@
     "@react-leaflet/core": "^2.1.0",
     "apexcharts": "^3.49.0",
     "axios": "^1.6.8",
+    "classnames": "^2.5.1",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "jwt-decode": "^4.0.0",

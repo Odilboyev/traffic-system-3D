@@ -7,7 +7,7 @@ const Dropright = ({ isOpen, content, setIsOpen }) => {
     <div className="relative inline-block text-left">
       {isOpen && (
         <div
-          className="no-scrollbar origin-top-left bottom-full absolute right-14 ml-5 max-h-[80vh] overflow-y-scroll w-[50vw] rounded-md shadow-lg  ring-1 ring-black ring-opacity-5"
+          className="no-scrollbar -top-72 absolute ml-5 max-h-[80vh] overflow-y-scroll w-[50vw] rounded-md shadow-lg  ring-1 ring-black ring-opacity-5"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
