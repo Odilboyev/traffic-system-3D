@@ -61,9 +61,7 @@ export function SignIn() {
       >
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">
-            <Typography color="blue-gray" className="font-medium text-xl ">
-              Login
-            </Typography>
+            <Typography className="font-medium text-xl ">Login</Typography>
             {error && (
               <div className="mb-2 text-red-500 text-center">{error}</div>
             )}
@@ -80,9 +78,7 @@ export function SignIn() {
               // }
               className={`!border-t-blue-gray-200 focus:!border-t-gray-900  mt-2`}
             />
-            <Typography color="blue-gray" className="mt-[5%] font-medium">
-              Password
-            </Typography>
+            <Typography className="mt-[5%] font-medium">Password</Typography>
             <PasswordInput
               labelProps={{
                 className: "hidden",

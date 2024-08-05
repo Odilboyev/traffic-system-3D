@@ -383,7 +383,6 @@ const MapComponent = ({
           />
         )}
         <ZoomControl theme={theme} />
-        {/* layerchanger */}
         <Control position="topleft">
           <SpeedDial placement="right">
             <IconButton color={theme === "light" ? "black" : "white"} size="lg">
@@ -436,7 +435,7 @@ const MapComponent = ({
             </SpeedDialContent>
           </SpeedDial>
         </Control>
-        <Control position="topright">
+        <Control position="bottomleft">
           <IconButton
             color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -477,7 +476,7 @@ const MapComponent = ({
             </SpeedDialContent>
           </SpeedDial>
         </Control>
-        <Control position="bottomright">
+        <Control position="bottomleft">
           <IconButton
             color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -497,7 +496,7 @@ const MapComponent = ({
             }
           />
         </Control>
-        <Control position="bottomright">
+        <Control position="bottomleft">
           <IconButton
             color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -515,7 +514,7 @@ const MapComponent = ({
             fetchErrorHistory={fetchErrorHistory}
           />
         </Control>
-        <Control position="topright">
+        <Control position="topleft">
           <IconButton
             color={theme === "light" ? "black" : "white"}
             size="lg"
