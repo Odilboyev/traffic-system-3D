@@ -1,42 +1,17 @@
-// src/contexts/ThemeContext.js
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useContext } from "react";
 
-const ThemeContext = createContext();
+export const ThemeContext = createContext();
 
-const MyThemeProvider = ({ children }) => {
+export const MyThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
 
-  useEffect(() => {
-    // Apply the initial theme to the document body
-    document.documentElement.classList.add(theme);
-    document.documentElement.style.setProperty(
-      "--primary-color",
-      getComputedStyle(document.documentElement).getPropertyValue(
-        `--${theme}-primary-color`
-      )
-    );
-  }, [theme]);
-
   const toggleTheme = () => {
-    setTheme((prevTheme) => {
-      const newTheme = prevTheme === "light" ? "dark" : "light";
-      document.documentElement.classList.remove(prevTheme);
-      document.documentElement.classList.add(newTheme);
-      document.documentElement.style.setProperty(
-        "--primary-color",
-        getComputedStyle(document.documentElement).getPropertyValue(
-          `--${newTheme}-primary-color`
-        )
-      );
-      return newTheme;
-    });
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
+      <div className={theme === "dark" ? "dark" : ""}>{children}</div>
     </ThemeContext.Provider>
   );
 };
-
-export { MyThemeProvider, ThemeContext };

@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import moment from "moment";
 import { Typography } from "@material-tailwind/react";
-import { ThemeContext } from "../../../../context/themeContext";
+import { useTheme } from "../../../../customHooks/useTheme";
 
 const CurrentAlarms = ({ data }) => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useTheme();
 
   return (
     <div className="dark:bg-gray-900 bg-white/80 backdrop-blur-md p-4 rounded-md shadow-md">

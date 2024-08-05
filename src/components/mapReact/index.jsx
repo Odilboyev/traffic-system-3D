@@ -35,7 +35,7 @@ import {
   ListBulletIcon,
   MapIcon,
 } from "@heroicons/react/16/solid";
-import "./styles.css";
+import "./mapStyles.css";
 import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
 import {
@@ -68,6 +68,7 @@ import CustomMarker from "./components/customMarker";
 import ZoomControl from "./components/CustomZoomControl";
 import { TbBell, TbBellRinging } from "react-icons/tb";
 import DropdownControl from "../DropDownControl";
+import { useTheme } from "../../customHooks/useTheme";
 
 const home = [41.2995, 69.2401];
 
@@ -93,7 +94,12 @@ const MapComponent = ({
       map.invalidateSize();
     }
   }, [isSidebarOpen, map]);
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme } = useTheme();
+  const filteredLayers =
+    theme === "dark"
+      ? baseLayers.filter((layer) => layer.name.includes("Dark"))
+      : baseLayers.filter((layer) => !layer.name.includes("Dark"));
+
   const navigate = useNavigate();
   const layersRef = useRef(localStorage.getItem("selectedLayer"));
   const [isLoading, setIsloading] = useState(false);
@@ -435,7 +441,7 @@ const MapComponent = ({
             </SpeedDialContent>
           </SpeedDial>
         </Control>
-        <Control position="bottomleft">
+        <Control position="topleft">
           <IconButton
             color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -448,7 +454,7 @@ const MapComponent = ({
             )}
           </IconButton>
         </Control>
-        <Control position="bottomleft">
+        <Control position="topleft">
           <SpeedDial placement="left">
             <IconButton color={theme === "light" ? "black" : "white"} size="lg">
               <SpeedDialHandler className="w-10 h-10 cursor-pointer">
@@ -457,10 +463,11 @@ const MapComponent = ({
             </IconButton>
             <SpeedDialContent className="m-4">
               <div className="flex flex-col p-3 mb-10 rounded-md dark:bg-gray-900/80  bg-white/80 backdrop-blur-md">
-                {baseLayers.map((layer, i) => (
+                {filteredLayers.map((layer, i) => (
                   <Radio
                     key={i}
                     checked={selectedLayer === layer.name}
+                    className="checked:bg-white"
                     variant={
                       selectedLayer === layer.name ? "filled" : "outlined"
                     }
@@ -476,7 +483,7 @@ const MapComponent = ({
             </SpeedDialContent>
           </SpeedDial>
         </Control>
-        <Control position="bottomleft">
+        <Control position="topleft">
           <IconButton
             color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -496,7 +503,7 @@ const MapComponent = ({
             }
           />
         </Control>
-        <Control position="bottomleft">
+        <Control position="topleft">
           <IconButton
             color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -520,8 +527,9 @@ const MapComponent = ({
             size="lg"
             onClick={() => {
               toggleTheme();
-              if (theme === "light") handleLayerChange("Transport Dark");
-              else handleLayerChange("2GIS");
+              if (theme === "light") {
+                handleLayerChange("Transport Dark");
+              } else handleLayerChange("2GIS");
             }}
           >
             {theme === "light" ? <WiMoonWaningCrescent3 /> : <GiSun />}

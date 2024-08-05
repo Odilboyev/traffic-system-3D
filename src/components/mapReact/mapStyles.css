@@ -1,0 +1,30 @@
+.leaflet-popup-content-wrapper {
+  border-radius: 0;
+}
+.leaflet-popup-content {
+  text-align: center;
+}
+/* crossroad charts */
+.chart-container {
+  height: 400px !important; /* Adjust the value as per your requirement */
+}
+.chart-container .apexcharts-canvas {
+  width: 100%;
+}
+/* custom control buttons */
+
+.control-button {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.control-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.control-button .icon {
+  color: #333; /* You can adjust the icon color based on your theme */
+}

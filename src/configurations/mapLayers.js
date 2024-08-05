@@ -35,5 +35,6 @@ const layerSave = (e) => {
   const selectedLayer = e.target.options.name;
   localStorage.setItem("selectedLayer", selectedLayer);
 };
+
 export { layerSave };
 export default baseLayers;

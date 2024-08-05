@@ -7,7 +7,6 @@ import toaster from "./tools/toastconfig";
 import dangerSound from "../src/assets/audio/danger.mp3";
 import { Resizable } from "re-resizable";
 import "react-toastify/dist/ReactToastify.css";
-import "./App.css"; // Assuming you have some global styles
 import { ThemeContext } from "./context/themeContext.jsx";
 
 const App = () => {
