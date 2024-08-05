@@ -43,31 +43,31 @@ const SensorSection = ({ device, isLoading, markerId = {} }) => {
           <Loader />
         </div>
       ) : device_data ? (
-        <div className=" grid  grid-cols-5 grid-rows-2 h-full">
+        <div className=" grid  grid-cols-5 grid-rows-2 h-full dark:bg-blue-gray-900">
           <>
-            <div className="border col-span-1 rounded-none border-none ">
-              <CardBody className="flex w-full flex-col justify-between gap-2 max-h-full overflow-y-auto">
-                <div className="flex flex-col">
+            <div className="border col-span-1 dark:bg-blue-gray-800 dark:text-white border-none ">
+              <CardBody className="flex dark:!bg-blue-gray-900 w-full h-full flex-col justify-between gap-2 max-h-full overflow-y-auto">
+                <div className="flex flex-col dark:bg-blue-gray-900 h-full">
                   <span>ID</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.name}
                   </Typography>
                 </div>
                 <div className="flex flex-col">
                   <span>Obyekt nomi</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.adres}
                   </Typography>
                 </div>
                 <div className="flex flex-col">
                   <span>Mas'ul xodim</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.masul_hodim}
                   </Typography>
                 </div>
                 <div className="flex flex-col">
                   <span>Xodim telefon raqami</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.phone
                       ? device_data.phone
                       : "Raqam mavjud emas"}
@@ -97,7 +97,7 @@ const SensorSection = ({ device, isLoading, markerId = {} }) => {
               sensor_data.length > 0 &&
               chartData &&
               chartData.length > 0 && (
-                <Card className="border-none col-span-5 m-0 shadow-none ">
+                <Card className=" dark:bg-blue-gray-800 dark:text-white border-none col-span-5 m-0 shadow-none ">
                   <Chart
                     options={chartOptions}
                     series={chartData}

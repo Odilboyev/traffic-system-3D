@@ -50,19 +50,19 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
   }, [open]);
 
   return (
-    <Dialog size="xxl" open={isDialogOpen} handler={handler}>
+    <Dialog
+      size="xxl"
+      open={isDialogOpen}
+      handler={handler}
+      className="dark:bg-blue-gray-900 dark:text-white"
+    >
       <DialogHeader className="justify-between">
         <div>
-          {/* <Typography variant="h5" color="blue-gray">
+          {/* <Typography variant="h5" >
             {!isLoading && device_data?.name}
           </Typography> */}
         </div>
-        <IconButton
-          color="blue-gray"
-          size="sm"
-          variant="text"
-          onClick={handler}
-        >
+        <IconButton size="sm" variant="text" onClick={handler}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -87,35 +87,35 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
           </div>
         ) : device_data ? (
           <>
-            <Card className="border basis-1/4 row-span-2 col-span-1 rounded-none border-none ">
+            <Card className="dark:bg-blue-gray-900 dark:text-white border basis-1/4 row-span-2 col-span-1 rounded-none border-none ">
               <CardBody className="flex w-full flex-col justify-between gap-2">
                 <div className="flex flex-col">
                   <span>ID</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.name}
                   </Typography>
                 </div>
                 <div className="flex flex-col">
                   <span>Seriya raqami</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.sn}
                   </Typography>
                 </div>
                 <div className="flex flex-col">
                   <span>Obyekt nomi</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.adres}
                   </Typography>
                 </div>
                 <div className="flex flex-col">
                   <span>Mas'ul xodim</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.masul_hodim}
                   </Typography>
                 </div>
                 <div className="flex flex-col">
                   <span>Xodim telefon raqami</span>
-                  <Typography color="blue-gray" className="font-bold">
+                  <Typography className="font-bold">
                     {device_data?.phone
                       ? device_data.phone
                       : "Raqam mavjud emas"}
@@ -124,13 +124,13 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
               </CardBody>
             </Card>
             <Card
-              className={`border-none basis-3/4 col-span-4 shadow-none overflow-y-auto text-center ${
+              className={` dark:bg-blue-gray-800 dark:text-white border-none basis-3/4 col-span-4 shadow-none overflow-y-auto text-center ${
                 (device && sensor_data && sensor_data.length === 0) ||
                 chartData?.length === 0 ||
                 (chartData == null && "row-span-2")
               }`}
             >
-              <CardBody className={`w-full h-full col-span-4`}>
+              <CardBody className={`w-full  h-full col-span-4`}>
                 <div
                   className={`grid grid-cols-[repeat(auto-fill,10rem)] gap-4 justify-around text-center w-full`}
                 >
@@ -151,7 +151,7 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
               sensor_data.length > 0 &&
               chartData &&
               chartData.length > 0 && (
-                <Card className="border-none col-span-2 shadow-none overflow-y-auto border-top border border-red-50">
+                <Card className=" dark:bg-blue-gray-800 dark:text-white border-none col-span-2 shadow-none overflow-y-auto border-top border border-red-50">
                   <div className="w-full">
                     <Chart
                       options={chartOptions}

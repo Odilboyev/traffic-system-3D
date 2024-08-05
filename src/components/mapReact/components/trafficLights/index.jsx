@@ -1,4 +1,15 @@
-import { Typography, CardBody, Card, Slider } from "@material-tailwind/react";
+import {
+  Typography,
+  CardBody,
+  Card,
+  Slider,
+  SpeedDial,
+  IconButton,
+  SpeedDialHandler,
+  SpeedDialContent,
+  useTheme,
+  Radio,
+} from "@material-tailwind/react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { memo, useEffect, useState } from "react";
@@ -15,16 +26,39 @@ import { MdStraight } from "react-icons/md";
 import { IoIosWalk, IoMdMan } from "react-icons/io";
 import baseLayers, { layerSave } from "../../../../configurations/mapLayers";
 import "leaflet-rotatedmarker";
+import Control from "react-leaflet-custom-control";
+import { MapIcon } from "@heroicons/react/16/solid";
+import ZoomControl from "../CustomZoomControl";
 const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
   const zoom = localStorage.getItem("mapZoom");
   const lightsToRender = lightsSocketData ? lightsSocketData : lights || [];
   console.log(lightsToRender, "lightsonmap");
-  const [rotated, setrotated] = useState(0);
-  const handleRotate = (id) => {
-    const marker = lightsToRender.find((marker) => marker.link_id === id);
-    setrotated(marker.rotated);
-    // setOpenedPopupMarkerId(id);
+  // const [rotated, setrotated] = useState(0);
+  // const handleRotate = (id) => {
+  //   const marker = lightsToRender.find((marker) => marker.link_id === id);
+  //   setrotated(marker.rotated);
+  //   // setOpenedPopupMarkerId(id);
+  // };
+  const [selectedLayer, setSelectedLayer] = useState(
+    localStorage.getItem("selectedLayer") || baseLayers[0].name
+  );
+  const { theme } = useTheme();
+  const filteredLayers =
+    theme === "dark"
+      ? baseLayers.filter((layer) => layer.name.includes("Dark"))
+      : baseLayers.filter((layer) => !layer.name.includes("Dark"));
+
+  const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
+  const handleLayerChange = (layerName) => {
+    setSelectedLayer(layerName);
+    layerSave("selectedLayer", layerName);
   };
+
+  useEffect(() => {
+    if (theme === "dark") {
+      handleLayerChange("Dark");
+    } else handleLayerChange("2GIS");
+  }, [theme]);
   // const currentState = lights?.map((v) => {
   //   return {
   //     ...v,
@@ -49,35 +83,52 @@ const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
       <MapContainer
         attributionControl={false}
         center={center}
-        zoom={19}
+        zoom={18}
+        zoomControl={false}
         zoomDelta={0.5}
         zoomSnap={0}
         maxZoom={22}
         style={{ height: "100%", width: "100%" }}
       >
-        {" "}
-        <LayersControl position="bottomleft">
-          {baseLayers.map((layer) => (
-            <LayersControl.BaseLayer
-              key={layer.name}
-              name={layer.name}
-              checked={
-                localStorage.getItem("selectedLayer")
-                  ? localStorage.getItem("selectedLayer") == layer.name
-                  : layer.checked
-              }
+        {currentLayer && (
+          <TileLayer
+            url={currentLayer.url}
+            attribution={currentLayer.attribution}
+          />
+        )}
+        <ZoomControl size={"md"} />
+        <Control position="topleft">
+          <SpeedDial placement="left">
+            <IconButton
+              // color={theme === "light" ? "black" : "white"}
+              size="md"
             >
-              <TileLayer
-                name={layer.name}
-                url={layer.url}
-                eventHandlers={{ add: (e) => layerSave(e) }}
-                attribution={layer.attribution}
-                maxNativeZoom={18}
-                maxZoom={22}
-              />
-            </LayersControl.BaseLayer>
-          ))}
-        </LayersControl>
+              <SpeedDialHandler className="w-10 h-10 cursor-pointer">
+                <MapIcon className="w-6 h-6 p-2" />
+              </SpeedDialHandler>
+            </IconButton>
+            <SpeedDialContent className="m-4">
+              <div className="flex flex-col p-3 mb-10 rounded-md dark:bg-gray-900/80  bg-white/80 backdrop-blur-md">
+                {filteredLayers.map((layer, i) => (
+                  <Radio
+                    key={i}
+                    checked={selectedLayer === layer.name}
+                    className="checked:bg-white"
+                    variant={
+                      selectedLayer === layer.name ? "filled" : "outlined"
+                    }
+                    onChange={() => handleLayerChange(layer.name)}
+                    label={
+                      <Typography className="mr-3 text-white">
+                        {layer.name}
+                      </Typography>
+                    }
+                  />
+                ))}
+              </div>
+            </SpeedDialContent>
+          </SpeedDial>
+        </Control>
         {lightsToRender.length > 0 &&
           lightsToRender?.map((v, i) => (
             <Marker

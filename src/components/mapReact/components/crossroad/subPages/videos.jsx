@@ -2,7 +2,7 @@ import SingleRecord from "../../singleRecord";
 
 const Videos = ({ videos }) => {
   return (
-    <div className="grid grid-cols-3  overflow-y-scroll px-3 max-h-full">
+    <div className="grid grid-cols-3  overflow-y-scroll px-3 max-h-full no-scrollbar">
       {videos?.length > 0 ? (
         videos?.map((v, i) => (
           <iframe

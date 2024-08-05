@@ -13,8 +13,8 @@ const FullscreenBox = ({ children, ...rest }) => {
 
   return (
     <div
-      className={`dark:bg-blue-gray-900 border p-2 ${
-        isFullscreen ? "fixed inset-0 z-[500]" : "h-full"
+      className={`dark:bg-blue-gray-900 border  p-2 ${
+        isFullscreen ? "fixed inset-0 z-[5000]" : "h-full"
       } `}
       onMouseOver={() => setIsVisible(true)}
       onMouseOut={() => setIsVisible(false)}
@@ -22,7 +22,7 @@ const FullscreenBox = ({ children, ...rest }) => {
     >
       <div className="relative h-full">
         <div
-          className={`${
+          className={`no-scrollbar ${
             isFullscreen
               ? "!h-screen !w-screen max-h-screen overflow-y-scroll"
               : "h-full overflow-y-scroll"
@@ -39,7 +39,6 @@ const FullscreenBox = ({ children, ...rest }) => {
             <IconButton
               onClick={handleFullscreenToggle}
               size="sm"
-              className={`${isButtonHovered ? "opacity-100" : "opacity-10"}`}
               variant={isButtonHovered ? "" : "outlined"}
               onMouseOver={() => setIsButtonHovered(true)}
               onMouseOut={() => setIsButtonHovered(false)}

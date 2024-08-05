@@ -82,15 +82,17 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   };
   const getTrafficLights = async (id) => {
     setIsLoading(true);
-    try {
-      const res = await getTrafficLightsData(id);
-      setIsLoading(false);
-      console.log(res, "traffic");
-      setTrafficLights(res);
-    } catch (error) {
-      setIsLoading(false);
+    if (id) {
+      try {
+        const res = await getTrafficLightsData(id);
+        setIsLoading(false);
+        console.log(res, "traffic");
+        setTrafficLights(res);
+      } catch (error) {
+        setIsLoading(false);
 
-      throw new Error(error);
+        throw new Error(error);
+      }
     }
   };
 
@@ -209,12 +211,11 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
           <XMarkIcon className="w-5 h-5" />
         </IconButton>
       </DialogHeader>
-      <DialogBody className="h-[90vh] overflow-auto py-0 dark:bg-blue-gray-900">
-        something iowgblehrgui
+      <DialogBody className="h-[90vh] overflow-auto py-0 dark:bg-blue-gray-900 no-scrollbar">
         <div className="grid grid-cols-2 grid-rows-2 h-full">
-          <div className={"max-h-full overflow-y-scroll border p-2"}>
+          <FullscreenBox>
             <Videos videos={data?.camera} />
-          </div>
+          </FullscreenBox>
           {/* sensors */}
           <FullscreenBox>
             {device ? (

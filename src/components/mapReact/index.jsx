@@ -99,14 +99,31 @@ const MapComponent = ({
       map.invalidateSize();
     }
   }, [isSidebarOpen, map]);
+  //theme
   const { theme, toggleTheme } = useTheme();
+  //layers
+  const [selectedLayer, setSelectedLayer] = useState(
+    localStorage.getItem("selectedLayer") || baseLayers[0].name
+  );
   const filteredLayers =
     theme === "dark"
       ? baseLayers.filter((layer) => layer.name.includes("Dark"))
       : baseLayers.filter((layer) => !layer.name.includes("Dark"));
 
-  const navigate = useNavigate();
+  const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
 
+  const handleLayerChange = (layerName) => {
+    setSelectedLayer(layerName);
+    layerSave("selectedLayer", layerName);
+  };
+  useEffect(() => {
+    if (theme === "dark") {
+      handleLayerChange("Dark");
+    } else handleLayerChange("2GIS");
+  }, [theme]);
+  //navigate
+  const navigate = useNavigate();
+  //variables
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
   const [clusterMarkers, setClusterMarkers] = useState([]);
@@ -358,22 +375,7 @@ const MapComponent = ({
       console.log("Error fetching error history. Please try again.");
     }
   };
-  const [selectedLayer, setSelectedLayer] = useState(
-    localStorage.getItem("selectedLayer") || baseLayers[0].name
-  );
 
-  const handleLayerChange = (layerName) => {
-    setSelectedLayer(layerName);
-    layerSave("selectedLayer", layerName);
-  };
-
-  const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
-
-  useEffect(() => {
-    if (theme === "dark") {
-      handleLayerChange("Dark");
-    } else handleLayerChange("2GIS");
-  }, [theme]);
   return (
     <>
       <MapContainer
