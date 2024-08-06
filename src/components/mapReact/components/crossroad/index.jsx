@@ -19,7 +19,6 @@ import {
 import FullscreenBox from "./components/fullscreen";
 import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";
-import LightsOnMap from "./subPages/lightsOnMap";
 import TrafficLights from "../trafficLights";
 function transformDataForCharts(data) {
   const transformed = data.map((direction) => {

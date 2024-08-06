@@ -389,8 +389,11 @@ const MapComponent = ({
         <MapEvents />
         {currentLayer && (
           <TileLayer
+            maxNativeZoom={22}
             url={currentLayer.url}
             attribution={currentLayer.attribution}
+            key={currentLayer.name}
+            maxZoom={22}
           />
         )}
         <ZoomControl theme={theme} />

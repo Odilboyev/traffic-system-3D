@@ -85,15 +85,17 @@ const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
         center={center}
         zoom={18}
         zoomControl={false}
-        zoomDelta={0.5}
-        zoomSnap={0}
+        zoomDelta={0.8}
         maxZoom={22}
         style={{ height: "100%", width: "100%" }}
       >
         {currentLayer && (
           <TileLayer
+            key={currentLayer.name}
             url={currentLayer.url}
             attribution={currentLayer.attribution}
+            maxNativeZoom={18}
+            maxZoom={22}
           />
         )}
         <ZoomControl size={"md"} />
@@ -168,30 +170,6 @@ const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
               </Popup>
             </Marker>
           ))}
-        {/* <Marker
-          position={center}
-          icon={L.divIcon({
-            className: "custom-marker-icon",
-            html: `
-            <div class="flex items-center w-[50px] p-1 max-h-20 rounded-lg bg-green-400">
-            <div class="max-w-[47%] rounded-lg"> <img src=${rightIcon} style="width:100%"/></div>
-            <span class="font-bold mx-1 text-white">60</span>
-            </div>
-          `,
-          })}
-        ></Marker>
-        <Marker
-          position={center?.map((v) => Number(v) + 0.0002)}
-          icon={L.divIcon({
-            className: "custom-marker-icon",
-            html: `
-            <div class="flex items-center w-[50px] p-1 max-h-20 rounded-lg bg-red-400">
-            <div class="max-w-[47%] rounded-lg"> <img src=${leftIcon} style="width:100%"/></div>
-            <span class="font-bold mx-1 text-white">60</span>
-            </div>
-          `,
-          })}
-        ></Marker> */}
       </MapContainer>
     </>
   );

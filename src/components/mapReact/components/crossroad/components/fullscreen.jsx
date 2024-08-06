@@ -39,7 +39,7 @@ const FullscreenBox = ({ children, ...rest }) => {
             <IconButton
               onClick={handleFullscreenToggle}
               size="sm"
-              variant={isButtonHovered ? "" : "outlined"}
+              variant={isButtonHovered ? "filled" : "outlined"}
               onMouseOver={() => setIsButtonHovered(true)}
               onMouseOut={() => setIsButtonHovered(false)}
             >
