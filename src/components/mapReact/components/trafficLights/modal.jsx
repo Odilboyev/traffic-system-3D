@@ -7,7 +7,7 @@ import {
 } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
 import TrafficLights from ".";
-import { getTrafficLightsData } from "../../../../apiHandlers";
+import { getTrafficLightsData } from "../../../../api/apiHandlers";
 
 const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
   const [isLoading, setIsLoading] = useState(false);

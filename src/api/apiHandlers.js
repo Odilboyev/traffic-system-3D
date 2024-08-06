@@ -1,4 +1,4 @@
-import login from "./Auth";
+import login from "../Auth";
 import config from "./api.config";
 import axios from "axios";
 const signIn = async (body) => {
@@ -98,6 +98,16 @@ const subscribeToCurrentAlarms = (onDataReceived) => {
   };
 };
 
+// dashboard data for cards
+const getInfoForCards = async () => {
+  const res = await config.get(import.meta.env.VITE_DASHBOARD_FOR_BOXES);
+  if (res && res.data.status == 999) {
+    localStorage.clear();
+    login.logout();
+    window.location.reload();
+  } else return res.data;
+};
+
 export {
   subscribeToCurrentAlarms,
   signIn,
@@ -110,4 +120,5 @@ export {
   markerHandler,
   GetCurrentAlarms,
   getErrorHistory,
+  getInfoForCards,
 };

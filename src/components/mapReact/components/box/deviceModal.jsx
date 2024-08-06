@@ -17,7 +17,7 @@ import Loader from "../../../Loader";
 import Chart from "react-apexcharts";
 
 import { useEffect, useState } from "react";
-import { getBoxSensorChart } from "../../../../apiHandlers";
+import { getBoxSensorChart } from "../../../../api/apiHandlers";
 
 const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
   const { device_data = {}, sensor_data = {} } = device || {};

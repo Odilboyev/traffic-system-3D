@@ -45,7 +45,7 @@ import {
   getMarkerData,
   markerHandler,
   subscribeToCurrentAlarms,
-} from "../../apiHandlers";
+} from "../../api/apiHandlers";
 import login from "../../Auth";
 import { useNavigate } from "react-router-dom";
 import MonitoringModal from "./components/crossroad";
@@ -382,7 +382,7 @@ const MapComponent = ({
         attributionControl={false}
         center={center}
         zoom={zoom}
-        maxZoom={18}
+        maxZoom={22}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
       >

@@ -15,7 +15,7 @@ import {
   getCrossRoadChart,
   getCrossRoadData,
   getTrafficLightsData,
-} from "../../../../apiHandlers";
+} from "../../../../api/apiHandlers";
 import FullscreenBox from "./components/fullscreen";
 import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";

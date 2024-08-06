@@ -12,7 +12,6 @@ import {
 import moment from "moment";
 import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import Pagination from "@/components/pagination";
-import { getErrorHistory } from "@/apiHandlers";
 import Loader from "../../../Loader";
 
 const TABLE_HEADER = [

@@ -2,20 +2,26 @@ import { useContext, useEffect, useState } from "react";
 import MonitoringMapReact from "./components/mapReact";
 import { ToastContainer } from "react-toastify";
 import CurrentAlarms from "./components/mapReact/components/alarm";
-import { GetCurrentAlarms, subscribeToCurrentAlarms } from "./apiHandlers";
+import {
+  GetCurrentAlarms,
+  getInfoForCards,
+  subscribeToCurrentAlarms,
+} from "./api/apiHandlers.js";
 import toaster from "./tools/toastconfig";
 import dangerSound from "../src/assets/audio/danger.mp3";
 import { Resizable } from "re-resizable";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeContext } from "./context/themeContext.jsx";
+import BottomSection from "./components/infoCard/index.jsx";
 
 const App = () => {
   const { theme } = useContext(ThemeContext);
   const [data, setCurrentAlarms] = useState(null);
+  const [bottomData, setBottomData] = useState(null);
   const [changedMarker, setChangedMarker] = useState(null);
 
   useEffect(() => {
-    getCurrentAlarmsData();
+    fetchData();
     subscribeToCurrentAlarms(onWSDataReceived);
   }, []);
 
@@ -26,7 +32,7 @@ const App = () => {
 
     if (data.status === "update") {
       toaster(data.data, toastConfig);
-      getCurrentAlarmsData();
+      fetchData();
       const sound = new Audio();
       if (data.data.statuserror === 1) {
         sound.src = dangerSound;
@@ -37,11 +43,18 @@ const App = () => {
     }
   };
 
-  const getCurrentAlarmsData = async () => {
+  const fetchData = async () => {
     try {
-      const res = await GetCurrentAlarms();
-      setCurrentAlarms(res.data);
+      const [alarmsRes, infoRes] = await Promise.all([
+        GetCurrentAlarms(),
+        getInfoForCards(),
+      ]);
+
+      setCurrentAlarms(alarmsRes.data);
+      setBottomData(infoRes);
+      console.log(infoRes);
     } catch (error) {
+      console.error("Error fetching data:", error);
       throw new Error(error);
     }
   };
@@ -70,7 +83,7 @@ const App = () => {
     >
       <ToastContainer />
       <div className="flex">
-        <Resizable
+        {/* <Resizable
           onResize={(e) => handleSidebarWidth(e)}
           size={{
             width: sidebarOpen ? sidebarWidth : 0,
@@ -81,7 +94,7 @@ const App = () => {
           <div className="w-full h-full">
             <CurrentAlarms isSidebar={sidebarOpen} data={data} />
           </div>
-        </Resizable>
+        </Resizable> */}
 
         <div style={{ width: "100%" }} className="dark dark:text-white">
           <MonitoringMapReact
@@ -90,6 +103,7 @@ const App = () => {
             handleSidebar={handleSidebar}
             changedMarker={changedMarker}
           />
+          <BottomSection cardsInfoData={bottomData} />
         </div>
       </div>
     </div>
