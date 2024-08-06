@@ -74,6 +74,7 @@ import { TbBell, TbBellRinging, TbLamp } from "react-icons/tb";
 import DropdownControl from "../DropDownControl";
 import { useTheme } from "../../customHooks/useTheme";
 import { IoMdSunny } from "react-icons/io";
+import ClockOnMap from "./components/clock";
 
 const home = [41.2995, 69.2401];
 
@@ -396,7 +397,10 @@ const MapComponent = ({
             maxZoom={22}
           />
         )}
+        {/* zoomcontrol */}
         <ZoomControl theme={theme} />
+        {/* clock */}
+        <ClockOnMap />
         <Control position="topleft">
           <SpeedDial placement="right">
             <IconButton
