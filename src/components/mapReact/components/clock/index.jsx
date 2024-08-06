@@ -54,7 +54,7 @@ const ClockOnMap = () => {
   });
 
   return (
-    <div className="w-[15vw] h-[15vw] fixed top-0 right-0 z-[99999] flex flex-col items-center justify-center p-6 bg-gray-900/80 backdrop-blur-md text-white rounded-lg shadow-lg">
+    <div className="w-[15vw] h-[15vw] fixed top-1 right-1 z-[99999] flex flex-col items-center justify-center p-6 bg-gray-900/80 backdrop-blur-md text-white rounded-lg shadow-lg">
       <div className="text-3xl font-bold">{timeString}</div>
       <div className="text-xl text-gray-400 mt-2">{date}</div>
       <div className="mt-4 text-xl font-bold text-gray-300">{location}</div>

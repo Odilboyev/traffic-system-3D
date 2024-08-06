@@ -19,7 +19,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
     <Card
       className={`w-1/${
         length + 4
-      } h-full px-10 dark:bg-gray-900/90 backdrop-blur-md  bg-white dark:!text-white my-5`}
+      } h-full px-10 dark:bg-gray-900/90 backdrop-blur-md  bg-white dark:!text-white`}
     >
       <CardHeader className="dark:bg-blue-gray-900 dark:text-white p-4">
         <Typography variant="h5" className="text-center">
