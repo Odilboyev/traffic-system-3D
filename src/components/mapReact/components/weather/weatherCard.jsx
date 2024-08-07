@@ -32,7 +32,7 @@ const WeatherCard = () => {
   return (
     <Card className="w-full bg-gray-800/80  text-white">
       <CardHeader floated={false} className="bg-gray-800 p-2">
-        <div className="flex items-center">
+        <div className="flex items-center justify-between flex-grow">
           <div className="flex-shrink-0">
             <img
               src={`${iconPath}/${today.weather_icon}`}
@@ -40,13 +40,13 @@ const WeatherCard = () => {
               className="w-12 h-12"
             />
           </div>
-          <div className="ml-4">
+          <div className="">
             <Typography variant="h5" className="text-white">
               {today.temp}°C
             </Typography>
             <Typography className="text-gray-400">{today.weather}</Typography>
           </div>
-          <div className="ml-4">
+          <div className="">
             <Typography className="text-gray-400 ">
               {today.humidity} % 💧
             </Typography>
@@ -54,7 +54,7 @@ const WeatherCard = () => {
               {today.wind} m/s 🌪️
             </Typography>
             <Typography className="text-gray-400 ">
-              {today.pressure} F/A 🌡️
+              {today.pressure} hPa 🌡️
             </Typography>
           </div>
         </div>
