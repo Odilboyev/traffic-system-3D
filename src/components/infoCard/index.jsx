@@ -1,8 +1,8 @@
 import TrafficLightsCard from "./singleCard";
-
+import PropTypes from "prop-types";
 const BottomSection = ({ cardsInfoData = [] }) => {
   return (
-    <div className="container mx-auto left-0 right-0 r absolute bottom-0 z-[9999] w-full min-h-[30vh] flex justify-center items-center gap-10 p-4 py-4 ">
+    <div className="container mx-auto left-0 right-0 r absolute bottom-1 z-[9999] w-full min-h-[20vh] flex justify-center items-center gap-10 ">
       {cardsInfoData?.length > 0 &&
         cardsInfoData.map((item, index) => (
           <TrafficLightsCard
@@ -13,5 +13,8 @@ const BottomSection = ({ cardsInfoData = [] }) => {
         ))}
     </div>
   );
+};
+BottomSection.propTypes = {
+  cardsInfoData: PropTypes.array,
 };
 export default BottomSection;

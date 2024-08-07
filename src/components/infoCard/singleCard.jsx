@@ -6,9 +6,7 @@ import {
   Progress,
   CardHeader,
 } from "@material-tailwind/react";
-import { IoIosWalk, IoMdMan, IoMdAlert } from "react-icons/io";
 import NeonIcon from "../neonIcon";
-import { LiaTrafficLightSolid } from "react-icons/lia";
 
 const TrafficLightsCard = ({ data = [], length }) => {
   const total = data.count_all;
@@ -17,11 +15,9 @@ const TrafficLightsCard = ({ data = [], length }) => {
 
   return (
     <Card
-      className={`w-1/${
-        length + 4
-      } h-full px-10 dark:bg-gray-900/90 backdrop-blur-md  bg-white dark:!text-white`}
+      className={`w-1/${length} h-full px-10 bg-gray-900/90 backdrop-blur-md text-white`}
     >
-      <CardHeader className="dark:bg-blue-gray-900 dark:text-white p-4">
+      <CardHeader className="bg-blue-gray-900 text-white p-4">
         <Typography variant="h5" className="text-center">
           {data.type_name}
         </Typography>
@@ -32,7 +28,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
             data.data.map((value, i) => (
               <div className="flex items-center gap-6" key={i}>
                 <div className="w-8 h-8  rounded-full flex items-center justify-center ">
-                  <NeonIcon icon={LiaTrafficLightSolid} status={value.status} />
+                  <NeonIcon iconType={data.type} status={value.status} />
                 </div>
                 <div className="flex-col flex">
                   <Typography variant="h4">{value.count}</Typography>

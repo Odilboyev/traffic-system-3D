@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -31,6 +31,7 @@ import Control from "react-leaflet-custom-control";
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
+  CameraIcon,
   Cog8ToothIcon,
   ListBulletIcon,
   MapIcon,
@@ -42,6 +43,7 @@ import {
   getBoxData,
   GetCurrentAlarms,
   getErrorHistory,
+  getInfoForCards,
   getMarkerData,
   markerHandler,
   subscribeToCurrentAlarms,
@@ -51,7 +53,7 @@ import { useNavigate } from "react-router-dom";
 import MonitoringModal from "./components/crossroad";
 import DeviceModal from "./components/box/deviceModal";
 import CustomPopUp from "./components/customPopup";
-import { BellAlertIcon } from "@heroicons/react/24/outline";
+import { BellAlertIcon, MoonIcon } from "@heroicons/react/24/outline";
 import { BellIcon } from "@heroicons/react/24/solid";
 import baseLayers, { layerSave } from "../../configurations/mapLayers";
 import TrafficLightsModal from "./components/trafficLights/modal";
@@ -62,12 +64,7 @@ import Dropright from "../Dropright";
 import { FaBell, FaBellSlash, FaClockRotateLeft } from "react-icons/fa6";
 import HistoryTable from "./components/alarm/history";
 import { ThemeContext } from "../../context/themeContext";
-import { GiCrescentBlade, GiSun } from "react-icons/gi";
-import {
-  WiMoonWaningCrescent1,
-  WiMoonWaningCrescent3,
-  WiSunrise,
-} from "react-icons/wi";
+import { WiSunrise } from "react-icons/wi";
 import CustomMarker from "./components/customMarker";
 import ZoomControl from "./components/CustomZoomControl";
 import { TbBell, TbBellRinging, TbLamp } from "react-icons/tb";
@@ -75,6 +72,10 @@ import DropdownControl from "../DropDownControl";
 import { useTheme } from "../../customHooks/useTheme";
 import { IoMdSunny } from "react-icons/io";
 import ClockOnMap from "./components/clock";
+import BottomSection from "../infoCard";
+import NeonIcon from "../neonIcon";
+import { LiaTrafficLightSolid } from "react-icons/lia";
+import { MdBedtime, MdOutlineSensorWindow } from "react-icons/md";
 
 const home = [41.2995, 69.2401];
 
@@ -87,19 +88,14 @@ const handleMapMove = (event) => {
   localStorage.setItem("mapZoom", newZoom);
 };
 
-const MapComponent = ({
-  isSidebarOpen,
-  handleSidebar,
-  alarmCount,
-  changedMarker,
-}) => {
+const MapComponent = ({ changedMarker }) => {
   const [map, setMap] = useState(null);
 
   useEffect(() => {
     if (map) {
       map.invalidateSize();
     }
-  }, [isSidebarOpen, map]);
+  }, [map]);
   //theme
   const { theme, toggleTheme } = useTheme();
   //layers
@@ -318,12 +314,13 @@ const MapComponent = ({
   const [currentAlarms, setCurrentAlarms] = useState(null);
   const [changedMarkerForAlarm, setChangedMarker] = useState(null);
   const [isAlarmsOpen, setIsAlarmsOpen] = useState(false);
+  const [bottomSectionData, setBottomSectionData] = useState(null);
   useEffect(() => {
     console.log(isAlarmsOpen, "alarms open");
   }, [isAlarmsOpen]);
 
   useEffect(() => {
-    getCurrentAlarmsData();
+    fetchData();
     subscribeToCurrentAlarms(onWSDataReceived);
   }, []);
 
@@ -334,7 +331,7 @@ const MapComponent = ({
 
     if (data.status === "update") {
       toaster(data.data, toastConfig);
-      getCurrentAlarmsData();
+      fetchData();
       const sound = new Audio();
       if (data.data.statuserror === 1) {
         sound.src = dangerSound;
@@ -345,11 +342,18 @@ const MapComponent = ({
     }
   };
 
-  const getCurrentAlarmsData = async () => {
+  const fetchData = async () => {
     try {
-      const res = await GetCurrentAlarms();
-      setCurrentAlarms(res.data);
+      const [alarmsRes, infoRes] = await Promise.all([
+        GetCurrentAlarms(),
+        getInfoForCards(),
+      ]);
+
+      setCurrentAlarms(alarmsRes.data);
+      setBottomSectionData(infoRes);
+      console.log(infoRes);
     } catch (error) {
+      console.error("Error fetching data:", error);
       throw new Error(error);
     }
   };
@@ -401,6 +405,8 @@ const MapComponent = ({
         <ZoomControl theme={theme} />
         {/* clock */}
         <ClockOnMap />
+        {/* bottomsection */}
+        <BottomSection cardsInfoData={bottomSectionData} />
         <Control position="topleft">
           <SpeedDial placement="right">
             <IconButton
@@ -553,7 +559,7 @@ const MapComponent = ({
             onClick={() => toggleTheme()}
           >
             {theme === "light" ? (
-              <WiMoonWaningCrescent3 className="w-7 h-7 p-1" />
+              <MdBedtime className="w-7 h-7 p-1" />
             ) : (
               <IoMdSunny className="w-7 h-7 p-1" />
             )}
@@ -624,6 +630,20 @@ const MapComponent = ({
                       setOpenPopupData={setOpenPopupIds}
                     />
                   )}
+                  {/*  <div className="w-10 h-10">
+                        <NeonIcon
+                          status={marker.statuserror}
+                          icon={
+                            marker.icon === "camera"
+                              ? CameraIcon
+                              : marker.icon === "crossroad"
+                              ? GiCrossroad
+                              : marker.icon === "svetofor"
+                              ? LiaTrafficLightSolid
+                              : MdOutlineSensorWindow
+                          }
+                        />
+                      </div> */}
                   <Tooltip direction="top">
                     {marker.type == 1 && (
                       <div className="w-[30vw]">
