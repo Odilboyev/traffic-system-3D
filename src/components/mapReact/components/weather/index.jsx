@@ -17,7 +17,7 @@ const ClockOnMap = () => {
 
   return (
     <div className="w-[15vw] min-h-[15vw] top-1 right-1 z-[9999] absolute flex-col items-center justify-center p-6 bg-gray-900/80 backdrop-blur-md text-white rounded-lg shadow-lg">
-      <div id="time">
+      <div id="time" className="text-center">
         <div className="mt-4 text-xl font-bold text-gray-300">{location}</div>
         <div className="text-xl text-gray-400 my-2">
           {time.toLocaleDateString(undefined, options)}
