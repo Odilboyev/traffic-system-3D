@@ -108,6 +108,16 @@ const getInfoForCards = async () => {
   } else return res.data;
 };
 
+// WEATHER CARD
+const getWeatherData = async () => {
+  const res = await config.get(import.meta.env.VITE_WEATHER_INFO);
+  if (res && res.data.status == 999) {
+    localStorage.clear();
+    login.logout();
+    window.location.reload();
+  } else return res.data;
+};
+
 export {
   subscribeToCurrentAlarms,
   signIn,
@@ -121,4 +131,5 @@ export {
   GetCurrentAlarms,
   getErrorHistory,
   getInfoForCards,
+  getWeatherData,
 };

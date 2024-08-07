@@ -5,8 +5,11 @@ import { signIn } from "../../api/apiHandlers";
 import login from "../../Auth";
 import PasswordInput from "../../components/PasswordInput";
 import bg from "../../../public/images/back.jpg";
+import { useTheme } from "../../customHooks/useTheme";
+import { FaSpinner } from "react-icons/fa6";
 export function SignIn() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [loginName, setLoginName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // Added state for error message
@@ -57,7 +60,7 @@ export function SignIn() {
       }}
     >
       <div
-        className={`w-full md:w-2/5 mx-auto p-[3%] shadow-lg bg-blue-gray-900 !text-white rounded`}
+        className={`w-full md:w-2/5 mx-auto p-[3%] shadow-lg bg-white dark:bg-blue-gray-900 dark:!text-white rounded`}
       >
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">
@@ -69,6 +72,7 @@ export function SignIn() {
               labelProps={{
                 className: "hidden",
               }}
+              color={theme == "dark" ? "white" : "black"}
               value={loginName}
               name="login"
               placeholder="12345..."
@@ -83,6 +87,7 @@ export function SignIn() {
               labelProps={{
                 className: "hidden",
               }}
+              color={theme == "dark" ? "white" : "black"}
               name="password"
               type="password"
               placeholder="********"
@@ -100,7 +105,7 @@ export function SignIn() {
           >
             {loading ? (
               // Render loading icon when loading is true
-              <i className="fas fa-spinner animate-spin mr-2"></i>
+              <FaSpinner className="animate-spin mx-auto" />
             ) : (
               // Render "Sign In" text when loading is false
               "Kirish"

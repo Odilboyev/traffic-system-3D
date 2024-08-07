@@ -1,7 +1,7 @@
 const baseLayers = [
   {
     name: "OpenStreetMap",
-    checked: true,
+    checked: false,
     url: "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "OpenStreetMap",
   },
@@ -24,7 +24,7 @@ const baseLayers = [
   },
   {
     name: "Dark",
-    checked: false,
+    checked: true,
     url: "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",
     attribution:
       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',

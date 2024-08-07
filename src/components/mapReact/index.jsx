@@ -3,7 +3,6 @@ import {
   MapContainer,
   TileLayer,
   Marker,
-  LayersControl,
   useMapEvents,
   Tooltip,
 } from "react-leaflet";
@@ -12,14 +11,8 @@ import L from "leaflet";
 import "leaflet-rotatedmarker";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import {
-  Badge,
-  Button,
   Checkbox,
   IconButton,
-  Menu,
-  MenuHandler,
-  MenuItem,
-  MenuList,
   Radio,
   SpeedDial,
   SpeedDialContent,
@@ -31,7 +24,6 @@ import Control from "react-leaflet-custom-control";
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
-  CameraIcon,
   Cog8ToothIcon,
   ListBulletIcon,
   MapIcon,
@@ -53,25 +45,20 @@ import { useNavigate } from "react-router-dom";
 import MonitoringModal from "./components/crossroad";
 import DeviceModal from "./components/box/deviceModal";
 import CustomPopUp from "./components/customPopup";
-import { BellAlertIcon, MoonIcon } from "@heroicons/react/24/outline";
-import { BellIcon } from "@heroicons/react/24/solid";
 import baseLayers, { layerSave } from "../../configurations/mapLayers";
 import TrafficLightsModal from "./components/trafficLights/modal";
 import dangerSound from "../../assets/audio/danger.mp3";
 import toaster, { toastConfig } from "../../tools/toastconfig";
 import CurrentAlarms from "./components/alarm";
 import Dropright from "../Dropright";
-import { FaBell, FaBellSlash, FaClockRotateLeft } from "react-icons/fa6";
+import { FaClockRotateLeft } from "react-icons/fa6";
 import HistoryTable from "./components/alarm/history";
-import { ThemeContext } from "../../context/themeContext";
-import { WiSunrise } from "react-icons/wi";
-import CustomMarker from "./components/customMarker";
 import ZoomControl from "./components/CustomZoomControl";
 import { TbBell, TbBellRinging, TbLamp } from "react-icons/tb";
 import DropdownControl from "../DropDownControl";
 import { useTheme } from "../../customHooks/useTheme";
 import { IoMdSunny } from "react-icons/io";
-import ClockOnMap from "./components/clock";
+import ClockOnMap from "./components/weather";
 import BottomSection from "../infoCard";
 import NeonIcon from "../neonIcon";
 import { LiaTrafficLightSolid } from "react-icons/lia";

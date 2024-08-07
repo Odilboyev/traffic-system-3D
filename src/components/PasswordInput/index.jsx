@@ -31,7 +31,7 @@ const PasswordInput = ({ value, onChange, ...rest }) => {
         variant="text"
         color="gray"
         onClick={togglePasswordVisibility}
-        className="!absolute right-0 rounded"
+        className="!absolute right-0 rounded dark:text-white"
       >
         {isPasswordVisible ? (
           <EyeSlashIcon className="h-5 w-5" />
