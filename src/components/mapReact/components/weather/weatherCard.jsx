@@ -28,34 +28,35 @@ const WeatherCard = () => {
 
   const today = weatherData.today;
   const nextDays = Object.values(weatherData.nextdays);
-  const iconPath = "@/../../public/icons/wheather_icons";
+  const iconPath = "../../../../../public/icons/wheather_icons";
 
   return (
     <Card className="w-full text-white shadow-none bg-transparent">
-      <CardBody>
-        <div className="flex justify-evenly items-center gap-5 mb-4">
+      <CardBody className="pt-0">
+        <div className="flex justify-evenly items-center gap-5 my-10">
+          {" "}
+          <div className="text-center w-1/5">
+            <img
+              src={`${iconPath}/${today.weather_icon}`}
+              alt="Weather icon"
+              className="w-full my-3"
+            />
+          </div>
           <div className="flex flex-col gap-2 ">
             <div>
               <Typography variant="h5" className="text-white">
                 {today.temp}°C
               </Typography>
               <Typography className="text-gray-400">
-                {today.humidity}% 💧
+                {today.humidity}%
               </Typography>
               <Typography className="text-gray-400">
-                {today.wind} m/s 💨
+                {today.wind} m/s
               </Typography>
             </div>
-            <div className="text-center">
-              <img
-                src={`${iconPath}/${today.weather_icon}`}
-                alt="Weather icon"
-                className="w-16 h-16 my-3"
-              />
-            </div>
-          </div>
+          </div>{" "}
           <div className="flex flex-col justify-between h-full items-stretch">
-            <div className="flex justify-between gap-5 mb-7 flex-grow">
+            <div className="flex justify-between gap-5 mb-7">
               <div>
                 <Typography className="text-white">
                   {nextDays[0].temp_max}°C
@@ -64,15 +65,15 @@ const WeatherCard = () => {
                   {nextDays[0].humidity_max}
                 </Typography>
               </div>
-              <div className="text-center flex-grow">
+              <div className="text-center w-2/5">
                 <img
                   src={`${iconPath}/${nextDays[0].wheather_icon_day}`}
                   alt="Weather icon"
-                  className="w-8 h-8"
+                  className="w-full"
                 />
               </div>
             </div>
-            <div className="flex justify-between gap-5 flex-grow">
+            <div className="flex justify-between gap-5 ">
               <div>
                 <Typography className="text-white">
                   {nextDays[0].temp_min}°C
@@ -81,18 +82,18 @@ const WeatherCard = () => {
                   {nextDays[0].humidity_min}
                 </Typography>
               </div>
-              <div className="text-center flex-grow">
+              <div className="text-center w-2/5">
                 <img
                   src={`${iconPath}/${nextDays[0].wheather_icon_night}`}
                   alt="Weather icon"
-                  className="w-8 h-8"
+                  className="w-full"
                 />
               </div>
             </div>
           </div>
         </div>
         {/* <div className="border border-top mt-5"></div> */}
-        <div className="mt-4 flex ">
+        <div className="mt-4 flex max-w-full overflow-x-scroll no-scrollbar">
           {nextDays?.slice(1).map((day, index) => (
             <div
               key={index}

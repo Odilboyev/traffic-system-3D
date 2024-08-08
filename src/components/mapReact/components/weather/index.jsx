@@ -17,14 +17,14 @@ const ClockOnMap = () => {
 
   return (
     <div className="w-[15vw] min-h-[15vw] top-1 right-1 z-[9999] absolute flex-col items-center justify-center p-6 bg-gray-900/80 backdrop-blur-md text-white rounded-lg shadow-lg">
-      <div id="time" className="text-center">
+      <div id="time" className="text-center mb-0">
         <div className="mt-4 text-xl font-bold text-gray-300">{location}</div>
         <div className="text-xl text-gray-400 my-2">
           {time.toLocaleDateString(undefined, options)}
         </div>{" "}
-        <div className="text-3xl font-bold">{timeToString(time)}</div>
+        <div className="text-3xl font-bold mb-0">{timeToString(time)}</div>
       </div>
-      <div id="weather" className="mt-4">
+      <div id="weather" className="">
         <WeatherCard />
       </div>
     </div>
@@ -36,7 +36,8 @@ const timeToString = (time) => {
   return time.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true,
+    second: "2-digit",
+    hour12: false,
   });
 };
 const options = {
