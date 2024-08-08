@@ -20,11 +20,12 @@ import {
   Switch,
   Typography,
 } from "@material-tailwind/react";
-import Control from "react-leaflet-custom-control";
+import Control from "../CustomControl";
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
   Cog8ToothIcon,
+  LanguageIcon,
   ListBulletIcon,
   MapIcon,
 } from "@heroicons/react/16/solid";
@@ -63,6 +64,8 @@ import BottomSection from "../infoCard";
 import NeonIcon from "../neonIcon";
 import { LiaTrafficLightSolid } from "react-icons/lia";
 import { MdBedtime, MdOutlineSensorWindow } from "react-icons/md";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../langSwitcher";
 
 const home = [41.2995, 69.2401];
 
@@ -83,6 +86,10 @@ const MapComponent = ({ changedMarker }) => {
       map.invalidateSize();
     }
   }, [map]);
+
+  // language `-`
+  const { t } = useTranslation();
+
   //theme
   const { theme, toggleTheme } = useTheme();
   //layers
@@ -108,6 +115,9 @@ const MapComponent = ({ changedMarker }) => {
   //navigate
   const navigate = useNavigate();
   //variables
+  //error message
+  const [errorMessage, setErrorMessage] = useState(null);
+  /// ----------------------------------------------------------------
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
   const [clusterMarkers, setClusterMarkers] = useState([]);
@@ -139,8 +149,9 @@ const MapComponent = ({ changedMarker }) => {
     crossroad: true,
     trafficlights: true,
   });
+  console.log(t("more2"), "all");
   const checkboxConfigurations = [
-    { type: "all", label: "All" },
+    { type: "all", label: t("all") },
     { type: "box", label: "Box" },
     { type: "camera", label: "Cameras" },
     { type: "crossroad", label: "Crossroads" },
@@ -156,7 +167,7 @@ const MapComponent = ({ changedMarker }) => {
         localStorage.clear();
         login.logout();
         navigate("/", { replace: true });
-        localStorage.setItem("data", JSON.stringify(myData));
+        localStorage.setItem("data-to-debug", JSON.stringify(myData));
         window.location.reload();
       } else {
         setMarkers(
@@ -168,7 +179,9 @@ const MapComponent = ({ changedMarker }) => {
       }
     } catch (error) {
       setAreMarkersLoading(false);
-
+      if (error.code === "ERR_NETWORK") {
+        setErrorMessage("You are offline. Please try again");
+      }
       throw new Error(error);
     }
   };
@@ -378,6 +391,11 @@ const MapComponent = ({ changedMarker }) => {
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
       >
+        {errorMessage && (
+          <div className="w-[50vw] h-[20vh] z-[9999] rounded-md bg-white backdrop-blur-md flex justify-center items-center dark:text-white">
+            {errorMessage}
+          </div>
+        )}
         <MapEvents />
         {currentLayer && (
           <TileLayer
@@ -497,6 +515,7 @@ const MapComponent = ({ changedMarker }) => {
             </SpeedDialContent>
           </SpeedDial>
         </Control>
+        <LanguageSwitcher position={"topleft"} />
         <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
@@ -565,7 +584,7 @@ const MapComponent = ({ changedMarker }) => {
             weight: 0,
             opacity: 0,
           }}
-          iconCreateFunction={(e) => ClusterIcon(e)}
+          iconCreateFunction={(e) => ClusterIcon(e, changedMarker)}
         >
           {markers?.map((marker, i) => {
             if (
@@ -684,22 +703,36 @@ const MapComponent = ({ changedMarker }) => {
 };
 
 export default MapComponent;
-const ClusterIcon = (cluster) => {
+const ClusterIcon = (cluster, changedMarker) => {
   const childMarkers = cluster.getAllChildMarkers();
   const statusCounts = {};
+  let isHighlighted = false;
+
   childMarkers.forEach((marker) => {
     const status = marker.options.statuserror;
     statusCounts[status] = (statusCounts[status] || 0) + 1;
+    // if (
+    //   marker.options.cid === changedMarker?.cid &&
+    //   marker.options.type === changedMarker?.type
+    // ) {
+    //   isHighlighted = true;
+    // }
   });
+
   const pieChartData = Object.entries(statusCounts).map(([status, count]) => ({
     status: parseInt(status),
     count,
   }));
+
   const pieChartIcon = L.divIcon({
-    className: "cluster !bg-transparent",
+    className: `cluster !bg-transparent `,
     iconSize: L.point(50, 50),
     html: renderToString(
-      <div className="w-20 h-20 !bg-transparent group-has-[div]:!bg-transparent">
+      <div
+        className={`w-20 h-20 !bg-transparent group-has-[div]:!bg-transparent  ${
+          isHighlighted ? "animate-pulse" : ""
+        }`}
+      >
         <PieChart
           data={pieChartData.map((datam) => ({
             value: datam.count,
@@ -727,6 +760,7 @@ const ClusterIcon = (cluster) => {
       </div>
     ),
   });
+
   return pieChartIcon;
 };
 

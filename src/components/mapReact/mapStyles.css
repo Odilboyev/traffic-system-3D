@@ -28,3 +28,23 @@
 .control-button .icon {
   color: #333; /* You can adjust the icon color based on your theme */
 }
+
+/* animation for a pie chart */
+
+@keyframes neon {
+  0%,
+  100% {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+      0 0 10px rgba(255, 255, 255, 0.4), 0 0 15px rgba(255, 255, 255, 0.2),
+      0 0 25px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.6),
+      0 0 20px rgba(255, 255, 255, 0.4), 0 0 25px rgba(255, 255, 255, 0.2),
+      0 0 35px rgba(255, 255, 255, 0.1);
+  }
+}
+
+.animate-pulse {
+  animation: neon 1s infinite alternate;
+}

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import MonitoringMapReact from "./components/mapReact";
 import { ToastContainer } from "react-toastify";
 import { subscribeToCurrentAlarms } from "./api/apiHandlers.js";
@@ -10,18 +10,23 @@ import { ThemeContext } from "./context/themeContext.jsx";
 
 const App = () => {
   const { theme } = useContext(ThemeContext);
-  const [changedMarker, setChangedMarker] = useState(null);
+  const changedMarkerRef = useRef(null);
 
   useEffect(() => {
     subscribeToCurrentAlarms(onWSDataReceived);
   }, []);
 
   const onWSDataReceived = (data) => {
-    if (data.marker !== undefined && data.marker !== null) {
-      setChangedMarker(data.marker);
-    }
-
     if (data.status === "update") {
+      if (data.marker !== undefined && data.marker !== null) {
+        changedMarkerRef.current = data.marker;
+
+        // setTimeout(() => {
+        //   changedMarkerRef.current = null;
+        //   // Force a re-render if needed
+        // }, 3000); // Stop animation after 3 seconds
+      }
+
       toaster(data.data, toastConfig);
       const sound = new Audio();
       if (data.data.statuserror === 1) {
@@ -43,7 +48,7 @@ const App = () => {
     >
       <ToastContainer className="z-[99999]" />
 
-      <MonitoringMapReact changedMarker={changedMarker} />
+      <MonitoringMapReact changedMarker={changedMarkerRef.current} />
     </div>
   );
 };

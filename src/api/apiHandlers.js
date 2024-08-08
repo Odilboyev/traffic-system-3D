@@ -117,6 +117,15 @@ const getWeatherData = async () => {
     window.location.reload();
   } else return res.data;
 };
+// LANGUAGES
+const getTexts = async () => {
+  const res = await config.get(import.meta.env.VITE_LANGUAGE);
+  if (res && res.data.status == 999) {
+    localStorage.clear();
+    login.logout();
+    window.location.reload();
+  } else return res.data;
+};
 
 export {
   subscribeToCurrentAlarms,
@@ -132,4 +141,5 @@ export {
   getErrorHistory,
   getInfoForCards,
   getWeatherData,
+  getTexts,
 };

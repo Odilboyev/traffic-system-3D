@@ -6,9 +6,9 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { getWeatherData } from "../../../../api/apiHandlers";
+import icon from "../../../../assets/icons/wheather_icons/01d.png";
 const WeatherCard = () => {
   const [weatherData, setWeatherData] = useState(null);
-
   const fetchWeatherData = async () => {
     try {
       const response = await getWeatherData();
@@ -28,7 +28,7 @@ const WeatherCard = () => {
 
   const today = weatherData.today;
   const nextDays = Object.values(weatherData.nextdays);
-  const iconPath = "../../../../../public/icons/wheather_icons";
+  const iconPath = "icons/wheather_icons";
 
   return (
     <Card className="w-full text-white shadow-none bg-transparent">
@@ -38,6 +38,7 @@ const WeatherCard = () => {
           <div className="text-center w-1/5">
             <img
               src={`${iconPath}/${today.weather_icon}`}
+              //   src={icon}
               alt="Weather icon"
               className="w-full my-3"
             />
