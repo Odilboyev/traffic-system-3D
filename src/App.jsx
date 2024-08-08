@@ -4,6 +4,7 @@ import { ToastContainer } from "react-toastify";
 import { subscribeToCurrentAlarms } from "./api/apiHandlers.js";
 import toaster from "./tools/toastconfig";
 import dangerSound from "../src/assets/audio/danger.mp3";
+import positiveSound from "../src/assets/audio/positive.wav";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeContext } from "./context/themeContext.jsx";
 
@@ -27,6 +28,8 @@ const App = () => {
         sound.src = dangerSound;
       } else if (data.data.statuserror === 2) {
         sound.src = dangerSound;
+      } else if (data.data.statuserror === 0) {
+        sound.src = positiveSound;
       }
       sound.play();
     }
@@ -38,7 +41,7 @@ const App = () => {
         theme === "dark" ? "bg-gray-900 text-white" : " text-black"
       }`}
     >
-      <ToastContainer />
+      <ToastContainer className="z-[99999]" />
 
       <MonitoringMapReact changedMarker={changedMarker} />
     </div>
