@@ -18,11 +18,12 @@ const Svetoforlar = () => {
 
   const handleMapEvents = () => {
     if (zoom >= 18) {
-      fetchTrafficLights({
-        lat: center.lat,
-        lng: center.lng,
-        zoom: map.getZoom(),
-      });
+      if (trafficLights.length === 0)
+        fetchTrafficLights({
+          lat: center.lat,
+          lng: center.lng,
+          zoom: map.getZoom(),
+        });
     } else {
       clearTrafficLights();
     }
