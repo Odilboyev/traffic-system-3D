@@ -83,9 +83,9 @@ const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
       <MapContainer
         attributionControl={false}
         center={center}
-        zoom={18}
         zoomControl={false}
         zoomDelta={0.8}
+        zoom={zoom}
         maxZoom={22}
         style={{ height: "100%", width: "100%" }}
       >
@@ -94,11 +94,11 @@ const TrafficLights = ({ center, lights = [], lightsSocketData = [] }) => {
             key={currentLayer.name}
             url={currentLayer.url}
             attribution={currentLayer.attribution}
-            maxNativeZoom={18}
+            maxNativeZoom={22}
             maxZoom={22}
           />
         )}
-        <ZoomControl size={"md"} />
+        <ZoomControl size={"md"} position={"topleft"} />
         <Control position="topleft">
           <SpeedDial placement="left">
             <IconButton

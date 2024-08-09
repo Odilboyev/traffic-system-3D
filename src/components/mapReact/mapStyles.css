@@ -48,3 +48,9 @@
 .animate-pulse {
   animation: neon 1s infinite alternate;
 }
+
+#monitoring .leaflet-top,
+.weather {
+  top: 50%;
+  transform: translate(0%, -50%);
+}

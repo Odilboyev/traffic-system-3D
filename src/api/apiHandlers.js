@@ -127,6 +127,16 @@ const getTexts = async () => {
   } else return res.data;
 };
 
+// SVETOFORLAR
+const getNearByTrafficLights = async (body) => {
+  const res = await config.post(import.meta.env.VITE_NEARBYLIGHTS, body);
+  if (res && res.data.status == 999) {
+    localStorage.clear();
+    login.logout();
+    window.location.reload();
+  } else return res.data;
+};
+
 export {
   subscribeToCurrentAlarms,
   signIn,
@@ -142,4 +152,5 @@ export {
   getInfoForCards,
   getWeatherData,
   getTexts,
+  getNearByTrafficLights,
 };

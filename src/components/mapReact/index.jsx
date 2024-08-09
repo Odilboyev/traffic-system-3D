@@ -66,6 +66,7 @@ import { LiaTrafficLightSolid } from "react-icons/lia";
 import { MdBedtime, MdOutlineSensorWindow } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../langSwitcher";
+import Svetoforlar from "./components/svetofor";
 
 const home = [41.2995, 69.2401];
 
@@ -384,6 +385,7 @@ const MapComponent = ({ changedMarker }) => {
   return (
     <>
       <MapContainer
+        id="monitoring"
         attributionControl={false}
         center={center}
         zoom={zoom}
@@ -412,6 +414,8 @@ const MapComponent = ({ changedMarker }) => {
         <ClockOnMap />
         {/* bottomsection */}
         <BottomSection cardsInfoData={bottomSectionData} />
+        {/* lights */}
+        <Svetoforlar />
         <Control position="topleft">
           <SpeedDial placement="right">
             <IconButton
@@ -423,7 +427,7 @@ const MapComponent = ({ changedMarker }) => {
               </SpeedDialHandler>
             </IconButton>
             <SpeedDialContent className="ml-4">
-              <div className="filter-panel p-2 flex flex-col dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
+              <div className="filter-panel p-2 flex flex-col dark:bg-gray-900/80 text-blue-gray-900 dark:text-white bg-white/80 backdrop-blur-md">
                 {checkboxConfigurations.map(({ type, label }) => (
                   <Checkbox
                     key={type}
@@ -456,7 +460,7 @@ const MapComponent = ({ changedMarker }) => {
                 <Cog8ToothIcon className="w-5 h-5 p-2" />
               </SpeedDialHandler>
             </IconButton>
-            <SpeedDialContent className="ml-4 dark:bg-gray-900/80 dark:text-white bg-white/80 backdrop-blur-md">
+            <SpeedDialContent className="ml-4 dark:bg-gray-900/80 dark:text-white text-blue-gray-900 bg-white/80 backdrop-blur-md">
               <div className="p-4 rounded-lg flex flex-col justify-center items-center">
                 <Typography className="mb-2 select-none">
                   {isDraggable ? "Editable" : "Not Editable"}
@@ -494,7 +498,7 @@ const MapComponent = ({ changedMarker }) => {
               </SpeedDialHandler>
             </IconButton>
             <SpeedDialContent className="m-4">
-              <div className="flex flex-col p-3 mb-10 rounded-md dark:bg-gray-900/80  bg-white/80 backdrop-blur-md">
+              <div className="flex flex-col p-3 mb-10 rounded-md dark:bg-gray-900/80 text-blue-gray-900 bg-white/80 backdrop-blur-md">
                 {filteredLayers.map((layer, i) => (
                   <Radio
                     key={i}
@@ -729,7 +733,7 @@ const ClusterIcon = (cluster, changedMarker) => {
     iconSize: L.point(50, 50),
     html: renderToString(
       <div
-        className={`w-20 h-20 !bg-transparent group-has-[div]:!bg-transparent  ${
+        className={`w-20 h-20 !bg-transparent  group-has-[div]:!bg-transparent  ${
           isHighlighted ? "animate-pulse" : ""
         }`}
       >
@@ -740,10 +744,14 @@ const ClusterIcon = (cluster, changedMarker) => {
             color: getStatusColor(datam.status),
           }))}
           style={{
-            filter: `drop-shadow(0 0 0.75rem #0101018d)`,
+            filter: `drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))`,
             background: "transparent !important",
           }}
-          segmentsStyle={{ transition: "stroke .3s", cursor: "pointer" }}
+          segmentsStyle={{
+            transition: "stroke .3s",
+            cursor: "pointer",
+            // filter: "drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))",
+          }}
           segmentsShift={1}
           radius={42}
           labelStyle={{

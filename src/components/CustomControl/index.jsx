@@ -20,7 +20,9 @@ const Control = (props) => {
   }, []);
 
   const controlContainer = (
-    <div className="leaflet-control leaflet-bar">{props.children}</div>
+    <div className="leaflet-control leaflet-bar leaflet-center">
+      {props.children}
+    </div>
   );
 
   L.DomEvent.disableClickPropagation(container);
