@@ -5,6 +5,7 @@ import L from "leaflet";
 import { MdStraight } from "react-icons/md";
 import { IoIosWalk, IoMdMan } from "react-icons/io";
 import { renderToString } from "react-dom/server";
+import NeonIcon from "../../../neonIcon";
 
 const Svetoforlar = () => {
   const map = useMap();
@@ -17,7 +18,7 @@ const Svetoforlar = () => {
   const zoom = map.getZoom();
 
   const handleMapEvents = () => {
-    if (zoom >= 18) {
+    if (zoom >= 21) {
       if (trafficLights.length === 0)
         fetchTrafficLights({
           lat: center.lat,
@@ -39,7 +40,6 @@ const Svetoforlar = () => {
       const socket = new WebSocket(wssLink);
 
       socket.onmessage = (event) => {
-        console.log("WebSocket message received:", event.data);
         try {
           const data = JSON.parse(event.data);
           if (data) updateTrafficLights(data);
@@ -110,7 +110,6 @@ const Svetoforlar = () => {
         };
       });
 
-      console.log("Updated traffic lights:", updatedLights);
       setTrafficLights(updatedLights);
     }
   };
@@ -122,27 +121,35 @@ const Svetoforlar = () => {
           key={i}
           position={[v.lat, v.lng]}
           icon={L.divIcon({
-            className: "custom-marker-icon",
-            html: `
-              <div class="flex items-center justify-center w-[50px] p-1 max-h-20 rounded-lg ${
-                v.status === 1
-                  ? "bg-green-400"
-                  : v.status === 2
-                  ? "bg-red-400"
-                  : "bg-yellow-400"
-              }">
-                <div class="text-xl rounded-lg text-white font-bolder">
-                  ${renderToString(
-                    <div style={{ transform: `rotate(${v.rotate}deg)` }}>
-                      {iconSelector(v.type, v.status)}
-                    </div>
-                  )}
-                </div>
-                <span class="font-bold mx-1 text-white">${
-                  v.countdown || 0
-                }</span>
-              </div>
-            `,
+            className:
+              "w-8 h-8  rounded-full flex items-center justify-center ",
+            html: renderToString(
+              <NeonIcon
+                icon={iconSelector({ type: v.type, status: v.status })}
+                status={v.status === 1 ? 0 : v.status === 2 ? 2 : 1}
+                text={v.countdown || "0"}
+              />
+            ),
+            // html: `
+            //   <div class="flex items-center justify-center w-[50px] p-1 max-h-20 rounded-lg ${
+            //     v.status === 1
+            //       ? "bg-green-400"
+            //       : v.status === 2
+            //       ? "bg-red-400"
+            //       : "bg-yellow-400"
+            //   }">
+            //     <div class="text-xl rounded-lg text-white font-bolder">
+            //       ${renderToString(
+            //         <div style={{ transform: `rotate(${v.rotate}deg)` }}>
+            //           {iconSelector(v.type, v.status)}
+            //         </div>
+            //       )}
+            //     </div>
+            //     <span class="font-bold mx-1 text-white">${
+            //       v.countdown || 0
+            //     }</span>
+            //   </div>
+            // `,
           })}
         />
       ))}
@@ -150,12 +157,12 @@ const Svetoforlar = () => {
   );
 };
 
-const iconSelector = (type, status) => {
+const iconSelector = ({ type = 1, status = 0 }) => {
   switch (type) {
     case 1:
-      return <MdStraight />;
+      return MdStraight;
     case 2:
-      return status === 1 ? <IoIosWalk /> : <IoMdMan />;
+      return status === 1 ? IoIosWalk : IoMdMan;
     default:
       return null;
   }

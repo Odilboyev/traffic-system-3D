@@ -7,6 +7,9 @@ import {
   CardHeader,
 } from "@material-tailwind/react";
 import NeonIcon from "../neonIcon";
+import { LiaTrafficLightSolid } from "react-icons/lia";
+import { CameraIcon } from "@heroicons/react/16/solid";
+import { MdOutlineSensorWindow } from "react-icons/md";
 
 const TrafficLightsCard = ({ data = [], length }) => {
   const total = data.count_all;
@@ -28,7 +31,10 @@ const TrafficLightsCard = ({ data = [], length }) => {
             data.data.map((value, i) => (
               <div className="flex items-center gap-6" key={i}>
                 <div className="w-8 h-8  rounded-full flex items-center justify-center ">
-                  <NeonIcon iconType={data.type} status={value.status} />
+                  <NeonIcon
+                    icon={iconSwitcher(data.type)}
+                    status={value.status}
+                  />
                 </div>
                 <div className="flex-col flex">
                   <Typography variant="h4">{value.count}</Typography>
@@ -53,3 +59,18 @@ const TrafficLightsCard = ({ data = [], length }) => {
 };
 
 export default TrafficLightsCard;
+const iconSwitcher = (type) => {
+  if (typeof type === "number") {
+    switch (type) {
+      case 4:
+        return LiaTrafficLightSolid;
+      case 1:
+        return CameraIcon;
+      case 3:
+        return MdOutlineSensorWindow;
+
+      default:
+        LiaTrafficLightSolid;
+    }
+  }
+};
