@@ -12,14 +12,14 @@ const statusStyles = {
   3: "bg-gray-500/20 text-gray-300 ring-gray-300",
 };
 
-const NeonIcon = ({ icon: Icon, text, status }) => {
+const NeonIcon = ({ icon: Icon, iconStyle, text, status }) => {
   const statusClass = statusStyles[status] || statusStyles[0];
   console.log(Icon, text);
   return (
     <div
       className={`flex items-center justify-center p-2 rounded-full shadow-neon ring-1 ${statusClass} `}
     >
-      <Icon className="w-8 h-8" />
+      <Icon className="w-8 h-8" style={iconStyle} />
       {text && (
         <Typography className="mx-3 min-w-4 font-bold text-2xl">
           {text}

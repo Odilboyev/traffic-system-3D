@@ -101,7 +101,14 @@ const MapComponent = ({ changedMarker }) => {
     theme === "dark"
       ? baseLayers.filter((layer) => layer.name.includes("Dark"))
       : baseLayers.filter((layer) => !layer.name.includes("Dark"));
-
+  const [center] = useState(
+    JSON.parse(localStorage.getItem("mapCenter"))
+      ? JSON.parse(localStorage.getItem("mapCenter"))
+      : home
+  );
+  const [zoom, setZoom] = useState(
+    localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
+  );
   const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
 
   const handleLayerChange = (layerName) => {
@@ -111,7 +118,10 @@ const MapComponent = ({ changedMarker }) => {
   useEffect(() => {
     if (theme === "dark") {
       handleLayerChange("Dark");
-    } else handleLayerChange("2GIS");
+    } else {
+      handleLayerChange("2GIS");
+      setZoom(17);
+    }
   }, [theme]);
   //navigate
   const navigate = useNavigate();
@@ -131,14 +141,6 @@ const MapComponent = ({ changedMarker }) => {
   const [isLightsLoading, setIsLightsLoading] = useState(false);
   const [activeLight, setActiveLight] = useState(26);
 
-  const [center] = useState(
-    JSON.parse(localStorage.getItem("mapCenter"))
-      ? JSON.parse(localStorage.getItem("mapCenter"))
-      : home
-  );
-  const [zoom] = useState(
-    localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
-  );
   const [markers, setMarkers] = useState([]);
   const [areMarkersLoading, setAreMarkersLoading] = useState(false);
   const [rotated, setrotated] = useState(0);

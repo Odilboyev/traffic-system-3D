@@ -126,6 +126,7 @@ const Svetoforlar = () => {
             html: renderToString(
               <NeonIcon
                 icon={iconSelector({ type: v.type, status: v.status })}
+                iconStyle={{ transform: `rotate(${v.rotate}deg)` }}
                 status={v.status === 1 ? 0 : v.status === 2 ? 2 : 1}
                 text={v.countdown || "0"}
               />
