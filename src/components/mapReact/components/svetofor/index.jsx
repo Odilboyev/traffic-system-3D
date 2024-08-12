@@ -143,8 +143,11 @@ const Svetoforlar = () => {
             className: "  rounded-full flex items-center justify-center ",
             html: renderToString(
               <NeonIcon
-                icon={iconSelector({ type: v.type, status: v.status })}
-                iconStyle={{ transform: `rotate(${v.rotate}deg)` }}
+                icon={iconSelector({
+                  type: v.type,
+                  status: v.status,
+                  style: { transform: `rotate(${v.rotate}deg)` },
+                })}
                 status={v.status === 1 ? 0 : v.status === 2 ? 2 : 1}
                 text={v.countdown || "0"}
               />
@@ -156,7 +159,7 @@ const Svetoforlar = () => {
   );
 };
 
-const iconSelector = ({ type = 1, status = 0 }) => {
+const iconSelector = ({ type = 1, status = 0, style }) => {
   const IconComponent = (() => {
     switch (type) {
       case 1:
@@ -169,7 +172,7 @@ const iconSelector = ({ type = 1, status = 0 }) => {
   })();
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center" style={style}>
       <IconComponent className=" sm:h-8 sm:w-8 md:h-4 md:w-4 lg:h-6 lg:w-6 xl:h-8 xl:w-8" />
     </div>
   );
