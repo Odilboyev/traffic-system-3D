@@ -3,7 +3,7 @@ import moment from "moment";
 import { Typography } from "@material-tailwind/react";
 import { useTheme } from "../../../../customHooks/useTheme";
 
-const CurrentAlarms = ({ data }) => {
+const CurrentAlarms = ({ data = [] }) => {
   const { theme } = useTheme();
 
   return (

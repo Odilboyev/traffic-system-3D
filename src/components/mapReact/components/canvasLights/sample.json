@@ -1,0 +1,56 @@
+{
+  "lanes": [
+    {
+      "x": 100,
+      "y": 400,
+      "width": 600,
+      "height": 50,
+      "direction": "right",
+      "arrows": ["straight", "right-turn"],
+      "trafficLight": "green"
+    },
+    {
+      "x": 700,
+      "y": 300,
+      "width": 50,
+      "height": 600,
+      "direction": "up",
+      "arrows": ["straight", "left-turn"],
+      "trafficLight": "red"
+    },
+    {
+      "x": 100,
+      "y": 500,
+      "width": 600,
+      "height": 50,
+      "direction": "left",
+      "arrows": ["straight", "left-turn"],
+      "trafficLight": "red"
+    },
+    {
+      "x": 200,
+      "y": 300,
+      "width": 50,
+      "height": 600,
+      "direction": "down",
+      "arrows": ["straight", "right-turn"],
+      "trafficLight": "green"
+    }
+  ],
+  "signals": [
+    { "x": 400, "y": 400, "color": "red" },
+    { "x": 600, "y": 500, "color": "green" }
+  ],
+  "crosswalks": [
+    {
+      "start": { "x": 150, "y": 350 },
+      "end": { "x": 650, "y": 350 },
+      "color": "white"
+    },
+    {
+      "start": { "x": 750, "y": 150 },
+      "end": { "x": 750, "y": 650 },
+      "color": "white"
+    }
+  ]
+}

@@ -125,7 +125,7 @@ const Svetoforlar = () => {
           lat: existingLight?.lat ?? 0,
           lng: existingLight?.lng ?? 0,
           rotate: existingLight?.rotate ?? 0,
-          type: existingLight?.type ?? 0,
+          // type: existingLight?.type ?? 0,
         };
       });
 
@@ -167,13 +167,13 @@ const iconSelector = ({ type = 1, status = 0, style }) => {
       case 2:
         return status === 1 ? IoIosWalk : IoMdMan;
       default:
-        return null;
+        return MdStraight;
     }
   })();
 
   return (
     <div className="flex items-center justify-center" style={style}>
-      <IconComponent className=" sm:h-8 sm:w-8 md:h-4 md:w-4 lg:h-6 lg:w-6 xl:h-8 xl:w-8" />
+      <IconComponent className=" sm:h-8 sm:w-8 md:h-5 md:w-5 lg:h-6 lg:w-6 xl:h-8 xl:w-8" />
     </div>
   );
 };

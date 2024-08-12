@@ -25,8 +25,8 @@ const TrafficLightsCard = ({ data = [], length }) => {
           {data.type_name}
         </Typography>
       </CardHeader>
-      <CardBody className="flex flex-col justify-center items-center h-full pb-10 pt-8">
-        <div className="flex justify-start md:justify-evenly items-center mb-10 flex-wrap gap-4 ">
+      <div className="flex flex-col justify-center items-center h-full pb-10 pt-8">
+        <div className="flex justify-start 2xl:justify-evenly  items-center mb-10 flex-wrap gap-5 ">
           {data.data?.length > 0 &&
             data.data.map((value, i) => (
               <div className="flex items-center gap-6" key={i}>
@@ -55,7 +55,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
           // label={`${onlinePercentage}%`}
           label={true}
         />
-      </CardBody>
+      </div>
     </Card>
   );
 };

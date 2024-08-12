@@ -2,7 +2,7 @@ import TrafficLightsCard from "./singleCard";
 import PropTypes from "prop-types";
 const BottomSection = ({ cardsInfoData = [] }) => {
   return (
-    <div className="container mx-auto left-0 right-0 r absolute bottom-1 z-[9999] min-h-[20vh] flex justify-center items-center gap-10 ">
+    <div className="max-w-[70%]  px-5 mx-auto left-0 right-0 r absolute bottom-1 z-[9999] min-h-[20vh] flex justify-center items-center gap-10 ">
       {cardsInfoData?.length > 0 &&
         cardsInfoData.map((item, index) => (
           <TrafficLightsCard
