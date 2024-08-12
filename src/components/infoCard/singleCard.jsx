@@ -18,7 +18,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
 
   return (
     <Card
-      className={`w-1/${length} h-full px-10 bg-gray-900/90 backdrop-blur-md text-white`}
+      className={`w-1/${length} px-10 bg-gray-900/90 backdrop-blur-md text-white`}
     >
       <CardHeader className="bg-blue-gray-900 text-white p-4">
         <Typography variant="h5" className="text-center">
@@ -26,18 +26,20 @@ const TrafficLightsCard = ({ data = [], length }) => {
         </Typography>
       </CardHeader>
       <CardBody className="flex flex-col justify-center items-center h-full pb-10 pt-8">
-        <div className="flex justify-evenly items-center mb-10 flex-wrap gap-10 ">
+        <div className="flex justify-start md:justify-evenly items-center mb-10 flex-wrap gap-4 ">
           {data.data?.length > 0 &&
             data.data.map((value, i) => (
               <div className="flex items-center gap-6" key={i}>
-                <div className="w-8 h-8  rounded-full flex items-center justify-center ">
+                <div className=" rounded-full flex items-center justify-center ">
                   <NeonIcon
                     icon={iconSwitcher(data.type)}
                     status={value.status}
                   />
                 </div>
                 <div className="flex-col flex">
-                  <Typography variant="h4">{value.count}</Typography>
+                  <Typography className="text-xl font-bold">
+                    {value.count}
+                  </Typography>
                   <Typography className="text-blue-gray-300 ">
                     {value.status_name}
                   </Typography>
@@ -49,7 +51,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
           // variant="gradient"
           value={onlinePercentage}
           color="light-green"
-          className="bg-blue-gray-900 h-6 font-bold shadow-neon "
+          className="bg-blue-gray-900 h-6 font-bold shadow-neon md:max-w-sm"
           // label={`${onlinePercentage}%`}
           label={true}
         />
@@ -60,7 +62,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
 
 export default TrafficLightsCard;
 const iconSwitcher = (type) => {
-  if (typeof type === "number") {
+  const IconComponent = (() => {
     switch (type) {
       case 4:
         return LiaTrafficLightSolid;
@@ -68,9 +70,14 @@ const iconSwitcher = (type) => {
         return CameraIcon;
       case 3:
         return MdOutlineSensorWindow;
-
       default:
-        LiaTrafficLightSolid;
+        return LiaTrafficLightSolid; // Default icon
     }
-  }
+  })();
+
+  return (
+    <div className="flex items-center justify-center">
+      <IconComponent className=" sm:h-8 sm:w-8 md:h-3 md:w-3 lg:h-4 lg:w-4 xl:h-5 xl:w-5" />
+    </div>
+  );
 };

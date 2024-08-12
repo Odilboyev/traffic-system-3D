@@ -1,0 +1,46 @@
+{
+  "ctrlType": 0,
+  "ctrlMode": 4,
+  "ctrlId": 1,
+  "downgrade": false,
+  "desc": "1_daily",
+  "cycle": 74,
+  "start": "2024-08-09 17:13:13",
+  "time": "2024-08-09 17:13:23",
+  "current": 11,
+  "stage": 1,
+  "maxStage": 2,
+  "locked": false,
+  "lockLeft": 0,
+  "hasfault": false,
+  "coordinateTrans": false,
+  "phase": [
+    {
+      "id": 1,
+      "desc": "phase1",
+      "status": 1,
+      "countdown": 25,
+      "total": 44,
+      "now": 10,
+      "linkChannels": [1, 2, 12]
+    },
+    {
+      "id": 2,
+      "desc": "phase2",
+      "status": 2,
+      "countdown": 32,
+      "total": 30,
+      "now": 0,
+      "linkChannels": [3, 4, 8]
+    }
+  ],
+  "ring": [[1, 2]],
+  "channel": [
+    { "id": 1, "status": 1, "countdown": 25, "type": 11, "dir": 3 },
+    { "id": 2, "status": 1, "countdown": 25, "type": 11, "dir": 1 },
+    { "id": 3, "status": 2, "countdown": 32, "type": 11, "dir": 4 },
+    { "id": 4, "status": 2, "countdown": 34, "type": 31, "dir": 1 },
+    { "id": 8, "status": 2, "countdown": 34, "type": 31, "dir": 3 },
+    { "id": 12, "status": 1, "countdown": 24, "type": 31, "dir": 2 }
+  ]
+}

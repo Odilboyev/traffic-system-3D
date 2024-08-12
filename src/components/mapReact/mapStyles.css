@@ -49,8 +49,7 @@
   animation: neon 1s infinite alternate;
 }
 
-#monitoring .leaflet-top,
-.weather {
+#monitoring .leaflet-top {
   top: 50%;
   transform: translate(0%, -50%);
 }

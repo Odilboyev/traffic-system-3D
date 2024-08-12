@@ -83,18 +83,11 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
   return (
     <>
       <Dialog size="xxl" open={isDialogOpen} handler={handleClose}>
-        <DialogHeader className="justify-between">
+        <DialogHeader className="justify-between dark:bg-blue-gray-900 dark:text-white">
           <div>
-            <Typography variant="h5" color="blue-gray">
-              {light?.cname}
-            </Typography>
+            <Typography variant="h5">{light?.cname}</Typography>
           </div>
-          <IconButton
-            color="blue-gray"
-            size="sm"
-            variant="text"
-            onClick={handler}
-          >
+          <IconButton size="sm" variant="text" onClick={handler}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -112,7 +105,7 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
           </IconButton>
         </DialogHeader>
 
-        <DialogBody className="min-h-[90vh] max-h-[90vh]">
+        <DialogBody className="min-h-[90vh] max-h-[90v] dark:bg-blue-gray-900 dark:text-white">
           <TrafficLights
             center={[light?.lat, light?.lng]}
             lights={trafficLights}

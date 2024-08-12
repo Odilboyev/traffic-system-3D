@@ -12,21 +12,37 @@ const Svetoforlar = () => {
   const [trafficLights, setTrafficLights] = useState([]);
   const [trafficSocket, setTrafficSocket] = useState(null);
   const [currentSvetoforId, setCurrentSvetoforId] = useState(null);
-  const [wssLink, setWssLink] = useState(null); // Store the WebSocket link
-
-  const center = map.getCenter();
-  const zoom = map.getZoom();
+  const [wssLink, setWssLink] = useState(null);
+  const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
 
   const handleMapEvents = () => {
+    const center = map.getCenter();
+    const zoom = map.getZoom();
+    console.log(zoom);
     if (zoom >= 21) {
-      if (trafficLights.length === 0)
+      if (trafficLights.length === 0) {
         fetchTrafficLights({
           lat: center.lat,
           lng: center.lng,
           zoom: map.getZoom(),
         });
+      }
     } else {
       clearTrafficLights();
+    }
+
+    const currentLocation = L.latLng(center.lat, center.lng);
+
+    if (lastSuccessfulLocation) {
+      const distanceFromLast = currentLocation.distanceTo(
+        lastSuccessfulLocation
+      );
+      console.log(distanceFromLast);
+      if (distanceFromLast > 100 && trafficSocket) {
+        // Close WebSocket if more than 100 meters away from the last successful location
+        clearTrafficLights();
+        return;
+      }
     }
   };
 
@@ -70,10 +86,13 @@ const Svetoforlar = () => {
 
       setTrafficLights(response.data);
 
+      // Update the last successful location
+      setLastSuccessfulLocation(L.latLng(body.lat, body.lng));
+
       // Only open a new WebSocket if the svetofor_id has changed
       if (currentSvetoforId !== response.svetofor_id) {
         setCurrentSvetoforId(response.svetofor_id);
-        setWssLink(response.wss_link); // Update WebSocket link
+        setWssLink(response.wss_link);
       }
     } catch (error) {
       console.error("Error fetching traffic lights:", error);
@@ -88,11 +107,11 @@ const Svetoforlar = () => {
       setTrafficSocket(null);
     }
     setCurrentSvetoforId(null);
-    setWssLink(null); // Clear WebSocket link
+    setWssLink(null);
+    setLastSuccessfulLocation(null);
   };
 
   const updateTrafficLights = (data) => {
-    console.log("Updating traffic lights with data:", data);
     if (data) {
       const prevLights = [...trafficLights];
 
@@ -121,8 +140,7 @@ const Svetoforlar = () => {
           key={i}
           position={[v.lat, v.lng]}
           icon={L.divIcon({
-            className:
-              "w-8 h-8  rounded-full flex items-center justify-center ",
+            className: "  rounded-full flex items-center justify-center ",
             html: renderToString(
               <NeonIcon
                 icon={iconSelector({ type: v.type, status: v.status })}
@@ -131,26 +149,6 @@ const Svetoforlar = () => {
                 text={v.countdown || "0"}
               />
             ),
-            // html: `
-            //   <div class="flex items-center justify-center w-[50px] p-1 max-h-20 rounded-lg ${
-            //     v.status === 1
-            //       ? "bg-green-400"
-            //       : v.status === 2
-            //       ? "bg-red-400"
-            //       : "bg-yellow-400"
-            //   }">
-            //     <div class="text-xl rounded-lg text-white font-bolder">
-            //       ${renderToString(
-            //         <div style={{ transform: `rotate(${v.rotate}deg)` }}>
-            //           {iconSelector(v.type, v.status)}
-            //         </div>
-            //       )}
-            //     </div>
-            //     <span class="font-bold mx-1 text-white">${
-            //       v.countdown || 0
-            //     }</span>
-            //   </div>
-            // `,
           })}
         />
       ))}
@@ -159,14 +157,22 @@ const Svetoforlar = () => {
 };
 
 const iconSelector = ({ type = 1, status = 0 }) => {
-  switch (type) {
-    case 1:
-      return MdStraight;
-    case 2:
-      return status === 1 ? IoIosWalk : IoMdMan;
-    default:
-      return null;
-  }
+  const IconComponent = (() => {
+    switch (type) {
+      case 1:
+        return MdStraight;
+      case 2:
+        return status === 1 ? IoIosWalk : IoMdMan;
+      default:
+        return null;
+    }
+  })();
+
+  return (
+    <div className="flex items-center justify-center">
+      <IconComponent className=" sm:h-8 sm:w-8 md:h-4 md:w-4 lg:h-6 lg:w-6 xl:h-8 xl:w-8" />
+    </div>
+  );
 };
 
 export default Svetoforlar;

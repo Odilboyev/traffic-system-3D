@@ -392,6 +392,7 @@ const MapComponent = ({ changedMarker }) => {
         center={center}
         zoom={zoom}
         maxZoom={22}
+        zoomDelta={0.6}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
       >
