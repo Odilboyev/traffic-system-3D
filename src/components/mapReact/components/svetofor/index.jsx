@@ -6,6 +6,15 @@ import { MdStraight } from "react-icons/md";
 import { IoIosWalk, IoMdMan } from "react-icons/io";
 import { renderToString } from "react-dom/server";
 import NeonIcon from "../../../neonIcon";
+import {
+  TbArrowRampLeft,
+  TbArrowRampRight,
+  TbCornerUpLeft,
+  TbCornerUpRight,
+} from "react-icons/tb";
+import { PiArrowULeftDownBold } from "react-icons/pi";
+
+import ThreeArrowsIcon from "./threeArrowIcon";
 
 const Svetoforlar = () => {
   const map = useMap();
@@ -168,6 +177,18 @@ const iconSelector = ({ type = 1, status = 0, style }) => {
         return MdStraight;
       case 2:
         return status === 1 ? IoIosWalk : IoMdMan;
+      case 3:
+        return TbCornerUpRight;
+      case 4:
+        return TbCornerUpLeft;
+      case 5:
+        return TbArrowRampRight;
+      case 6:
+        return TbArrowRampLeft;
+      case 7:
+        return ThreeArrowsIcon;
+      case 8:
+        return PiArrowULeftDownBold;
       default:
         return MdStraight;
     }
