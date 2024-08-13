@@ -7,7 +7,7 @@ const CurrentAlarms = ({ data = [] }) => {
   const { theme } = useTheme();
 
   return (
-    <div className="dark:bg-gray-900 bg-white/80 backdrop-blur-md z-[999999] p-4 rounded-md shadow-md">
+    <div className=" backdrop-blur-md p-4 rounded-md shadow-md">
       <div className="flex flex-col w-full">
         {data?.length > 0 ? (
           <div className="overflow-x-auto">
@@ -64,11 +64,11 @@ const CurrentAlarms = ({ data = [] }) => {
                     key={index}
                     className={`border-b ${
                       item.statuserror === 2
-                        ? "bg-red-200 dark:bg-red-800"
+                        ? "bg-red-200/80 dark:bg-red-800/80"
                         : item.statuserror === 1
-                        ? "bg-yellow-200 dark:bg-yellow-800"
+                        ? "bg-yellow-200/80 dark:bg-yellow-800/80"
                         : item.statuserror === 3
-                        ? "bg-gray-200 dark:bg-gray-800"
+                        ? "bg-gray-200/80 dark:bg-gray-800/80"
                         : ""
                     } hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200`}
                   >

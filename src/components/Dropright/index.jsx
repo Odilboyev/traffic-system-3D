@@ -1,8 +1,10 @@
 import { IconButton } from "@material-tailwind/react";
 import React, { useState } from "react";
 import { IoMdClose } from "react-icons/io";
+import { useTheme } from "../../customHooks/useTheme";
 
 const Dropright = ({ isOpen, content, setIsOpen }) => {
+  const { theme } = useTheme();
   return (
     <div className="fixed top-5 inline-block text-left">
       {isOpen && (
@@ -14,8 +16,10 @@ const Dropright = ({ isOpen, content, setIsOpen }) => {
         >
           {" "}
           <IconButton
+            size="sm"
+            color={theme === "dark" ? "black" : "white"}
             onClick={() => setIsOpen(false)}
-            className=" absolute right-0 top-0 z-50"
+            className=" absolute right-0 top-0 z-50 "
           >
             <IoMdClose className="w-5 h-5 p-1" />
           </IconButton>
