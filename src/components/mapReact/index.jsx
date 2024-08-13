@@ -523,7 +523,7 @@ const MapComponent = ({ changedMarker }) => {
           </SpeedDial>
         </Control>
         <LanguageSwitcher position={"topleft"} />
-        <Control position="topleft">
+        <Control className="z-[999999]" position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
             size="lg"

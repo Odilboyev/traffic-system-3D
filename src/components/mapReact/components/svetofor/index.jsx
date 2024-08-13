@@ -19,7 +19,7 @@ const Svetoforlar = () => {
     const center = map.getCenter();
     const zoom = map.getZoom();
     console.log(zoom);
-    if (zoom >= 21) {
+    if (zoom >= 19) {
       if (trafficLights.length === 0) {
         fetchTrafficLights({
           lat: center.lat,
@@ -65,7 +65,9 @@ const Svetoforlar = () => {
       };
 
       setTrafficSocket(socket);
-
+      socket.onclose = (e) => {
+        console.log(e, "WebSocket closed");
+      };
       return () => {
         if (socket) {
           socket.close();
@@ -125,7 +127,7 @@ const Svetoforlar = () => {
           lat: existingLight?.lat ?? 0,
           lng: existingLight?.lng ?? 0,
           rotate: existingLight?.rotate ?? 0,
-          // type: existingLight?.type ?? 0,
+          type: existingLight?.type ?? 0,
         };
       });
 

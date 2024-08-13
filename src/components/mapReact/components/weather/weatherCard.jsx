@@ -13,6 +13,7 @@ const WeatherCard = () => {
     try {
       const response = await getWeatherData();
       setWeatherData(response);
+      console.log(response);
     } catch (error) {
       console.error("Error fetching the weather data:", error);
     }

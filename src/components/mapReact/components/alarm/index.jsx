@@ -7,7 +7,7 @@ const CurrentAlarms = ({ data = [] }) => {
   const { theme } = useTheme();
 
   return (
-    <div className="dark:bg-gray-900 bg-white/80 backdrop-blur-md p-4 rounded-md shadow-md">
+    <div className="dark:bg-gray-900 bg-white/80 backdrop-blur-md z-[999999] p-4 rounded-md shadow-md">
       <div className="flex flex-col w-full">
         {data?.length > 0 ? (
           <div className="overflow-x-auto">

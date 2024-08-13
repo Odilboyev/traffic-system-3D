@@ -4,10 +4,10 @@ import { IoMdClose } from "react-icons/io";
 
 const Dropright = ({ isOpen, content, setIsOpen }) => {
   return (
-    <div className="relative inline-block text-left">
+    <div className="fixed top-5 inline-block text-left">
       {isOpen && (
         <div
-          className="no-scrollbar -top-72 absolute ml-5 max-h-[80vh] overflow-y-scroll w-[50vw] rounded-md shadow-lg  ring-1 ring-black ring-opacity-5"
+          className="top-0 left-0 no-scrollbar absolute ml-5 max-h-[80vh] overflow-y-scroll w-[50vw] rounded-md shadow-lg  ring-1 ring-black ring-opacity-5"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
