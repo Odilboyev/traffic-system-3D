@@ -18,15 +18,15 @@ const TrafficLightsCard = ({ data = [], length }) => {
 
   return (
     <Card
-      className={`w-1/${length} px-10 bg-gray-900/90 backdrop-blur-md text-white`}
+      className={`w-1/${length} px-10 xl:px-5 bg-gray-900/90 backdrop-blur-md text-white`}
     >
       <CardHeader className="bg-blue-gray-900 text-white p-4">
         <Typography variant="h5" className="text-center">
           {data.type_name}
         </Typography>
       </CardHeader>
-      <div className="flex flex-col justify-center items-center h-full pb-10 pt-8">
-        <div className="flex justify-start 2xl:justify-evenly  items-center mb-10 flex-wrap gap-5 ">
+      <div className="flex flex-col justify-center items-center h-full pb-10 pt-8 w-full">
+        <div className="w-full flex justify-start xl:justify-evenly  items-center mb-10 flex-wrap gap-5 ">
           {data.data?.length > 0 &&
             data.data.map((value, i) => (
               <div className="flex items-center gap-6" key={i}>
@@ -51,7 +51,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
           // variant="gradient"
           value={onlinePercentage}
           color="light-green"
-          className="bg-blue-gray-900 h-6 font-bold shadow-neon md:max-w-sm"
+          className="bg-blue-gray-900 h-6 font-bold shadow-neon xl:max-w-[80%]"
           // label={`${onlinePercentage}%`}
           label={true}
         />

@@ -1,0 +1,56 @@
+.crossroad {
+  display: grid;
+  grid-template-rows: 1fr 4fr 1fr;
+  grid-template-columns: 1fr 4fr 1fr;
+  gap: 10px;
+  height: 100vh;
+}
+
+.road {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.horizontal {
+  grid-column: span 3;
+  height: 100%;
+  flex-direction: row;
+}
+
+.vertical {
+  grid-row: span 3;
+  width: 100%;
+}
+
+.center {
+  grid-row: 2 / 3;
+  grid-column: 2 / 3;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background: gray;
+}
+
+.lane {
+  height: 20px;
+  width: 100%;
+  margin: 2px 0;
+}
+
+.arrow {
+  height: 100px;
+  width: 100px;
+  margin: 10px;
+}
+
+.red {
+  background: red;
+}
+
+.green {
+  background: green;
+}

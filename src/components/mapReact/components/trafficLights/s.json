@@ -1,0 +1,68 @@
+{
+  "lanes": [
+    {
+      "id": "lane-1",
+      "coordinates": { "x1": 100, "y1": 0, "x2": 100, "y2": 200 },
+      "status": "open",
+      "width": 10,
+      "direction": "straight"
+    },
+    {
+      "id": "lane-2",
+      "coordinates": { "x1": 200, "y1": 0, "x2": 200, "y2": 200 },
+      "status": "closed",
+      "width": 10,
+      "direction": "right"
+    },
+    {
+      "id": "lane-3",
+      "coordinates": { "x1": 300, "y1": 0, "x2": 300, "y2": 300 },
+      "status": "closed",
+      "width": 15,
+      "direction": "right"
+    }
+  ],
+  "arrows": [
+    {
+      "id": "arrow-1",
+      "coordinates": { "x": 150, "y": 100 },
+      "direction": "straight",
+      "status": "open"
+    },
+    {
+      "id": "arrow-2",
+      "coordinates": { "x": 250, "y": 100 },
+      "direction": "left",
+      "status": "closed"
+    }
+  ],
+  "trafficLights": [
+    {
+      "id": "light-1",
+      "coordinates": { "x": 50, "y": 50 },
+      "status": "green"
+    },
+    {
+      "id": "light-2",
+      "coordinates": { "x": 250, "y": 50 },
+      "status": "red"
+    },
+    {
+      "id": "light-3",
+      "coordinates": { "x": 250, "y": 50 },
+      "status": "green"
+    }
+  ],
+  "pedestrianCrossings": [
+    {
+      "id": "ped-1",
+      "coordinates": { "x1": 50, "y1": 300, "x2": 150, "y2": 300 },
+      "status": "closed"
+    },
+    {
+      "id": "ped-2",
+      "coordinates": { "x1": 250, "y1": 300, "x2": 350, "y2": 300 },
+      "status": "open"
+    }
+  ]
+}

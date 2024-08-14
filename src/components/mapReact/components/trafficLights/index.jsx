@@ -1,9 +1,11 @@
 import { memo } from "react";
 import RoadCanvas from "../canvasLights";
+import CrossroadVisualization from "./d3Road";
+import CrossroadByDiv from "./roadByDiv";
 const TrafficLights = () => {
   return (
     <div>
-      <RoadCanvas />
+      <CrossroadByDiv />
     </div>
   );
 };
