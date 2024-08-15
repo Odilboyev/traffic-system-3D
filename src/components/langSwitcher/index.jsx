@@ -36,7 +36,7 @@ const LanguageSwitcher = ({ position }) => {
           </SpeedDialHandler>
         </IconButton>
         <SpeedDialContent className="m-4">
-          <div className="flex flex-col p-3 mb-10 rounded-md dark:bg-gray-900/80 bg-white/80 backdrop-blur-md">
+          <div className="flex flex-col p-3 mb-10 rounded-md bg-gray-900/80  backdrop-blur-md">
             {languages.map((language, i) => (
               <Radio
                 key={i}

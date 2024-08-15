@@ -49,7 +49,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
         </div>
         <Progress
           // variant="gradient"
-          value={onlinePercentage}
+          value={+onlinePercentage}
           color="light-green"
           className="bg-blue-gray-900 h-6 font-bold shadow-neon xl:max-w-[80%]"
           // label={`${onlinePercentage}%`}

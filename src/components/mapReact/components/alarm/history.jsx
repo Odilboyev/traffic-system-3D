@@ -13,6 +13,8 @@ import moment from "moment";
 import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import Pagination from "@/components/pagination";
 import Loader from "../../../Loader";
+import Modal from "../../../Modal";
+import { t } from "i18next";
 
 const TABLE_HEADER = [
   { name: "Event ID", keyName: "event_id" },
@@ -104,37 +106,12 @@ const HistoryTable = ({
   const thClassName = `pl-4 py-1 text-start border-seperate border border-blue-gray-900`;
   return (
     <>
-      <Dialog
-        size="xxl"
+      <Modal
         open={open}
-        handler={handleOpen}
-        className="dark:bg-blue-gray-900 dark:!text-white text-blue-gray-900"
-      >
-        <DialogHeader className="justify-between">
-          <div>
-            <Typography variant="h5" className="dark:text-white">
-              Tarix
-            </Typography>
-          </div>
-          <IconButton size="sm" variant="text" onClick={handleOpen}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              className="h-5 w-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </IconButton>
-        </DialogHeader>
-        <DialogBody className="overflow-y-scroll !px-5">
-          {isLoading ? (
+        handleOpen={handleOpen}
+        title={t("history")}
+        body={
+          isLoading ? (
             <Loader />
           ) : data?.length > 0 ? (
             <table className="w-full table-fixed overflow-x-scroll border-seperate border border-slate-400">
@@ -195,18 +172,18 @@ const HistoryTable = ({
             </table>
           ) : !isLoading && data?.length === 0 ? (
             <Typography>No data</Typography>
-          ) : null}
-        </DialogBody>
-        <DialogFooter className="flex justify-center items-center mt-auto">
-          {historyTotalPages != null && (
+          ) : null
+        }
+        bottom={
+          historyTotalPages != null && (
             <Pagination
               currentPage={currentPage}
               totalPages={historyTotalPages ? historyTotalPages : 0}
               onPageChange={handlePageChange}
             />
-          )}
-        </DialogFooter>
-      </Dialog>
+          )
+        }
+      />
     </>
   );
 };
@@ -233,8 +210,4 @@ const calculateDuration = (start_date, end_date) => {
     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
   return durationString;
-};
-
-const padZero = (value) => {
-  return String(value).padStart(2, "0"); // Pad the value with leading zeros if necessary
 };

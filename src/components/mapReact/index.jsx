@@ -5,6 +5,7 @@ import {
   Marker,
   useMapEvents,
   Tooltip,
+  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -67,6 +68,7 @@ import { MdBedtime, MdOutlineSensorWindow } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../langSwitcher";
 import Svetoforlar from "./components/svetofor";
+import { useLeafletContext } from "@react-leaflet/core";
 
 const home = [41.2995, 69.2401];
 
@@ -78,6 +80,12 @@ const handleMapMove = (event) => {
   localStorage.setItem("mapCenter", JSON.stringify(newCenter));
   localStorage.setItem("mapZoom", newZoom);
 };
+const center = JSON.parse(localStorage.getItem("mapCenter"))
+  ? JSON.parse(localStorage.getItem("mapCenter"))
+  : home;
+const zoom = localStorage.getItem("mapZoom")
+  ? localStorage.getItem("mapZoom")
+  : 13;
 
 const MapComponent = ({ changedMarker }) => {
   const [map, setMap] = useState(null);
@@ -90,7 +98,6 @@ const MapComponent = ({ changedMarker }) => {
 
   // language `-`
   const { t } = useTranslation();
-
   //theme
   const { theme, toggleTheme } = useTheme();
   //layers
@@ -101,28 +108,41 @@ const MapComponent = ({ changedMarker }) => {
     theme === "dark"
       ? baseLayers.filter((layer) => layer.name.includes("Dark"))
       : baseLayers.filter((layer) => !layer.name.includes("Dark"));
-  const [center] = useState(
-    JSON.parse(localStorage.getItem("mapCenter"))
-      ? JSON.parse(localStorage.getItem("mapCenter"))
-      : home
-  );
-  const [zoom, setZoom] = useState(
-    localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
-  );
+
   const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
+  const [fulscreen, setFullscreen] = useState(false);
+
+  const toggleFullSceen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setFullscreen(false);
+      }
+    }
+  };
 
   const handleLayerChange = (layerName) => {
     setSelectedLayer(layerName);
     layerSave("selectedLayer", layerName);
   };
+  //
+  const MapEvents = () => {
+    useMapEvents({
+      moveend: handleMapMove,
+    });
+    return null;
+  };
   useEffect(() => {
     if (theme === "dark") {
       handleLayerChange("Dark");
     } else {
-      handleLayerChange("2GIS");
-      setZoom(17);
+      handleLayerChange("Transport");
     }
   }, [theme]);
+
   //navigate
   const navigate = useNavigate();
   //variables
@@ -131,7 +151,6 @@ const MapComponent = ({ changedMarker }) => {
   /// ----------------------------------------------------------------
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
-  const [clusterMarkers, setClusterMarkers] = useState([]);
 
   const [isBoxModalOpen, setIsBoxModalOpen] = useState(false);
   const [isBoxLoading, setIsBoxLoading] = useState(false);
@@ -143,7 +162,6 @@ const MapComponent = ({ changedMarker }) => {
 
   const [markers, setMarkers] = useState([]);
   const [areMarkersLoading, setAreMarkersLoading] = useState(false);
-  const [rotated, setrotated] = useState(0);
   const [isDraggable, setiIsDraggable] = useState(false);
   // const [types, setTypes] = useState(0);
   const [filter, setFilter] = useState({
@@ -222,17 +240,11 @@ const MapComponent = ({ changedMarker }) => {
       })
     );
     setMarkerUpdate(markerUpdate + 1);
-
-    // Update the cluster icons
-    if (clusterRef.current) {
-      console.log(clusterMarkers);
-    }
   };
 
   useEffect(() => {
     if (changedMarker) {
       updateMarker(changedMarker);
-      console.log("changed marker");
     }
   }, [changedMarker]);
 
@@ -258,11 +270,6 @@ const MapComponent = ({ changedMarker }) => {
         return m;
       })
     );
-  };
-  const handleRotate = (id) => {
-    const marker = markers.find((marker) => marker.id === id);
-    setrotated(marker.rotated);
-    // setOpenedPopupMarkerId(id);
   };
   const handleMonitorCrossroad = (marker) => {
     setActiveMarker(marker);
@@ -291,26 +298,6 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
 
-  const MapEvents = () => {
-    useMapEvents({
-      moveend: handleMapMove,
-    });
-    return null;
-  };
-
-  const [fulscreen, setFullscreen] = useState(false);
-
-  const toggleFullSceen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setFullscreen(true);
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-        setFullscreen(false);
-      }
-    }
-  };
   const [openPopupIds, setOpenPopupIds] = useState([]);
   // ----------------------------------------------------------------
   /// alarms
@@ -318,9 +305,6 @@ const MapComponent = ({ changedMarker }) => {
   const [changedMarkerForAlarm, setChangedMarker] = useState(null);
   const [isAlarmsOpen, setIsAlarmsOpen] = useState(false);
   const [bottomSectionData, setBottomSectionData] = useState(null);
-  useEffect(() => {
-    console.log(isAlarmsOpen, "alarms open");
-  }, [isAlarmsOpen]);
 
   useEffect(() => {
     fetchData();
@@ -363,9 +347,8 @@ const MapComponent = ({ changedMarker }) => {
 
   // history of alarms
   const [isAlarmHistoryOpen, setIsAlarmHistoryOpen] = useState(false);
-  const itemsPerPage = 10; // Number of items to display per page
+  const itemsPerPage = 20; // Number of items to display per page
   const [historyData, setHistoryData] = useState([]);
-  const [isDataLoaded, setIsDataLoaded] = useState(false); // New state
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyTotalPages, setHistoryTotalPages] = useState(null);
 
@@ -376,7 +359,6 @@ const MapComponent = ({ changedMarker }) => {
 
       setHistoryData(all.data);
       setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
-      historyData.length === 0 && setIsDataLoaded(true);
       setHistoryLoading(false);
     } catch (err) {
       setHistoryLoading(false);
@@ -391,7 +373,7 @@ const MapComponent = ({ changedMarker }) => {
         attributionControl={false}
         center={center}
         zoom={zoom}
-        maxZoom={22}
+        maxZoom={theme === "dark" ? 22 : 18}
         zoomDelta={0.6}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
@@ -404,7 +386,7 @@ const MapComponent = ({ changedMarker }) => {
         <MapEvents />
         {currentLayer && (
           <TileLayer
-            maxNativeZoom={22}
+            maxNativeZoom={currentLayer.maxNativeZoom}
             url={currentLayer.url}
             attribution={currentLayer.attribution}
             key={currentLayer.name}
@@ -501,7 +483,7 @@ const MapComponent = ({ changedMarker }) => {
               </SpeedDialHandler>
             </IconButton>
             <SpeedDialContent className="m-4">
-              <div className="flex flex-col p-3 mb-10 rounded-md dark:bg-gray-900/80 text-blue-gray-900 bg-white/80 backdrop-blur-md">
+              <div className="flex flex-col p-3 mb-10 rounded-md bg-gray-900/80 text-blue-gray-900 backdrop-blur-md">
                 {filteredLayers.map((layer, i) => (
                   <Radio
                     key={i}
@@ -643,20 +625,6 @@ const MapComponent = ({ changedMarker }) => {
                       setOpenPopupData={setOpenPopupIds}
                     />
                   )}
-                  {/*  <div className="w-10 h-10">
-                        <NeonIcon
-                          status={marker.statuserror}
-                          icon={
-                            marker.icon === "camera"
-                              ? CameraIcon
-                              : marker.icon === "crossroad"
-                              ? GiCrossroad
-                              : marker.icon === "svetofor"
-                              ? LiaTrafficLightSolid
-                              : MdOutlineSensorWindow
-                          }
-                        />
-                      </div> */}
                   <Tooltip direction="top">
                     {marker.type == 1 && (
                       <div className="w-[30vw]">
@@ -673,10 +641,8 @@ const MapComponent = ({ changedMarker }) => {
               </>
             );
           })}{" "}
-        </MarkerClusterGroup>{" "}
-        {/* <Popup position={["41.2995", "69.2401"]}>something </Popup> */}
-        {/* <CustomPopUps markers={markers} handleOpen={handlePopupOpen} /> */}
-      </MapContainer>{" "}
+        </MarkerClusterGroup>
+      </MapContainer>
       {isbigMonitorOpen && (
         <MonitoringModal
           marker={activeMarker}
