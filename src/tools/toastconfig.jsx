@@ -30,7 +30,7 @@ const generateToastContent = (sensorData) => (
   </div>
 );
 
-const toaster = (sensorData, toastConfig) => {
+const toaster = (sensorData) => {
   const toastContent = generateToastContent(sensorData);
 
   switch (sensorData.statuserror) {

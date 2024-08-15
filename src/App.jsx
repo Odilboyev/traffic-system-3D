@@ -23,7 +23,7 @@ const App = () => {
     }
 
     if (data.status === "update") {
-      toaster(data.data, toastConfig);
+      toaster(data.data);
       const sound = new Audio();
       // Play sound based on data.data.statuserror
       if (data.data.statuserror === 1) {
@@ -49,14 +49,3 @@ const App = () => {
 };
 
 export default App;
-
-const toastConfig = {
-  position: "top-right",
-  autoClose: 8000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true,
-  progress: undefined,
-  theme: "colored",
-};
