@@ -23,6 +23,10 @@ const generateToastContent = (sensorData) => (
       <p className="inline-block mr-4">{t("status_name")}:</p>
       <strong>{sensorData.status_name}</strong>
     </div>
+    <div className="mb-2">
+      <p className="inline-block mr-4">{t("eventdate")}:</p>
+      <strong>{sensorData.eventdate.split(" ")[1]}</strong>
+    </div>
   </div>
 );
 
