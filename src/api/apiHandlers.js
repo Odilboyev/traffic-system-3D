@@ -136,6 +136,15 @@ const getNearByTrafficLights = async (body) => {
     window.location.reload();
   } else return res.data;
 };
+// SVETOFORLAR
+const getCameraCaseHistory = async () => {
+  const res = await config.get(import.meta.env.VITE_CAMERA_CASE_HISTORY);
+  if (res && res.data.status == 999) {
+    localStorage.clear();
+    login.logout();
+    window.location.reload();
+  } else return res.data;
+};
 
 export {
   subscribeToCurrentAlarms,
@@ -153,4 +162,5 @@ export {
   getWeatherData,
   getTexts,
   getNearByTrafficLights,
+  getCameraCaseHistory,
 };

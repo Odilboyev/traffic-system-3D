@@ -1,11 +1,10 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import moment from "moment";
 import { Typography } from "@material-tailwind/react";
 import { useTheme } from "../../../../customHooks/useTheme";
 
 const CurrentAlarms = ({ data = [] }) => {
   const { theme } = useTheme();
-
   return (
     <div className=" backdrop-blur-md p-4 rounded-md shadow-md">
       <div className="flex flex-col w-full">

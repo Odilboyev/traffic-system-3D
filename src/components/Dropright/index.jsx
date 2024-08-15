@@ -1,5 +1,5 @@
 import { IconButton } from "@material-tailwind/react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useTheme } from "../../customHooks/useTheme";
 

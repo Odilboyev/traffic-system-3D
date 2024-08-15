@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getNearByTrafficLights } from "../../../../api/apiHandlers";
 import { Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";

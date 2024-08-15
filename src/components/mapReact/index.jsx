@@ -12,8 +12,12 @@ import L from "leaflet";
 import "leaflet-rotatedmarker";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import {
+  Button,
+  ButtonGroup,
   Checkbox,
   IconButton,
+  List,
+  ListItem,
   Radio,
   SpeedDial,
   SpeedDialContent,
@@ -35,6 +39,7 @@ import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
 import {
   getBoxData,
+  getCameraCaseHistory,
   GetCurrentAlarms,
   getErrorHistory,
   getInfoForCards,
@@ -53,8 +58,7 @@ import dangerSound from "../../assets/audio/danger.mp3";
 import toaster, { toastConfig } from "../../tools/toastconfig";
 import CurrentAlarms from "./components/alarm";
 import Dropright from "../Dropright";
-import { FaClockRotateLeft } from "react-icons/fa6";
-import HistoryTable from "./components/alarm/history";
+import { FaCamera, FaClockRotateLeft } from "react-icons/fa6";
 import ZoomControl from "./components/CustomZoomControl";
 import { TbBell, TbBellRinging, TbLamp } from "react-icons/tb";
 import DropdownControl from "../DropDownControl";
@@ -69,6 +73,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../langSwitcher";
 import Svetoforlar from "./components/svetofor";
 import { useLeafletContext } from "@react-leaflet/core";
+import HistoryTable from "./components/caseHistory/all.casehistory";
 
 const home = [41.2995, 69.2401];
 
@@ -80,12 +85,6 @@ const handleMapMove = (event) => {
   localStorage.setItem("mapCenter", JSON.stringify(newCenter));
   localStorage.setItem("mapZoom", newZoom);
 };
-const center = JSON.parse(localStorage.getItem("mapCenter"))
-  ? JSON.parse(localStorage.getItem("mapCenter"))
-  : home;
-const zoom = localStorage.getItem("mapZoom")
-  ? localStorage.getItem("mapZoom")
-  : 13;
 
 const MapComponent = ({ changedMarker }) => {
   const [map, setMap] = useState(null);
@@ -108,6 +107,12 @@ const MapComponent = ({ changedMarker }) => {
     theme === "dark"
       ? baseLayers.filter((layer) => layer.name.includes("Dark"))
       : baseLayers.filter((layer) => !layer.name.includes("Dark"));
+  const center = JSON.parse(localStorage.getItem("mapCenter"))
+    ? JSON.parse(localStorage.getItem("mapCenter"))
+    : home;
+  const zoom = localStorage.getItem("mapZoom")
+    ? localStorage.getItem("mapZoom")
+    : 13;
 
   const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
   const [fulscreen, setFullscreen] = useState(false);
@@ -356,12 +361,32 @@ const MapComponent = ({ changedMarker }) => {
     setHistoryLoading(true);
     try {
       const all = await getErrorHistory(current);
-
+      console.log("trigger ");
       setHistoryData(all.data);
       setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
       setHistoryLoading(false);
     } catch (err) {
       setHistoryLoading(false);
+      console.log("Error fetching error history. Please try again.");
+    }
+  };
+  // history of camera alarms
+  const [isCamAlarmHistoryOpen, setCamIsAlarmHistoryOpen] = useState(false);
+  const camItemsPerPage = 20; // Number of items to display per page
+  const [camHistoryData, setCamHistoryData] = useState([]);
+  const [camHistoryLoading, setCamHistoryLoading] = useState(false);
+  const [camHistoryTotalPages, setCamHistoryTotalPages] = useState(null);
+
+  const fetchCamErrorHistory = async (current) => {
+    setCamHistoryLoading(true);
+    try {
+      const all = await getCameraCaseHistory(current);
+      console.log("trigger cam");
+      setCamHistoryData(all.data);
+      setCamHistoryTotalPages(all.total_pages ? all.total_pages : 1);
+      setCamHistoryLoading(false);
+    } catch (err) {
+      setCamHistoryLoading(false);
       console.log("Error fetching error history. Please try again.");
     }
   };
@@ -530,6 +555,37 @@ const MapComponent = ({ changedMarker }) => {
           />
         </Control>
         <Control position="topleft">
+          <SpeedDial placement="left">
+            <IconButton
+              // color={theme === "light" ? "black" : "white"}
+              size="lg"
+            >
+              <SpeedDialHandler className=" cursor-pointer">
+                <FaClockRotateLeft className="w-6 h-6 p-1" />
+              </SpeedDialHandler>
+            </IconButton>
+            <SpeedDialContent className="m-4">
+              {" "}
+              <ButtonGroup>
+                <Button>Camera</Button>
+                <Button>Camera</Button>
+                <Button>Camera</Button>
+              </ButtonGroup>
+              <div className="flex flex-col p-3 mb-10 rounded-md bg-gray-900/80 text-blue-gray-900 backdrop-blur-md">
+                <HistoryTable
+                  open={isAlarmHistoryOpen}
+                  handleOpen={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
+                  data={historyData}
+                  isLoading={historyLoading}
+                  itemsPerPage={itemsPerPage}
+                  historyTotalPages={historyTotalPages}
+                  fetchErrorHistory={fetchErrorHistory}
+                />
+              </div>
+            </SpeedDialContent>
+          </SpeedDial>
+        </Control>
+        <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -545,6 +601,24 @@ const MapComponent = ({ changedMarker }) => {
             itemsPerPage={itemsPerPage}
             historyTotalPages={historyTotalPages}
             fetchErrorHistory={fetchErrorHistory}
+          />
+        </Control>
+        <Control position="topleft">
+          <IconButton
+            // color={theme === "light" ? "black" : "white"}
+            size="lg"
+            onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
+          >
+            <FaCamera className="w-6 h-6 p-1" />
+          </IconButton>
+          <HistoryTable
+            open={isCamAlarmHistoryOpen}
+            handleOpen={() => setCamIsAlarmHistoryOpen(!isCamAlarmHistoryOpen)}
+            data={camHistoryData}
+            isLoading={camHistoryLoading}
+            itemsPerPage={camItemsPerPage}
+            historyTotalPages={camHistoryTotalPages}
+            fetchErrorHistory={fetchCamErrorHistory}
           />
         </Control>
         <Control position="topleft">

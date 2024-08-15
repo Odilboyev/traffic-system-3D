@@ -7,7 +7,7 @@ import {
   SpeedDialHandler,
   Typography,
 } from "@material-tailwind/react";
-import React, { memo } from "react";
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import Control from "../CustomControl";
 

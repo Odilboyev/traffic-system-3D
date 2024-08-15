@@ -5,7 +5,7 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TrafficLights from ".";
 import { getTrafficLightsData } from "../../../../api/apiHandlers";
 

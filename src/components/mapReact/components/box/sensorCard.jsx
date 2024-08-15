@@ -1,6 +1,6 @@
 import { Card, CardBody, Chip, Typography } from "@material-tailwind/react";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const SensorCard = ({
   sensor_name,

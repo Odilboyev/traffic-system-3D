@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import roadData from "./sample.json";
 const CrossroadCanvas = () => {
   const canvasRef = useRef(null);
