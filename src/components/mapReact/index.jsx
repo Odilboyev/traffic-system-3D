@@ -177,7 +177,6 @@ const MapComponent = ({ changedMarker }) => {
     crossroad: true,
     trafficlights: true,
   });
-  console.log(t("more2"), "all");
   const checkboxConfigurations = [
     { type: "all", label: t("all") },
     { type: "box", label: "Box" },
@@ -352,26 +351,26 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
 
-  // history of alarms
-  const [isAlarmHistoryOpen, setIsAlarmHistoryOpen] = useState(false);
-  const itemsPerPage = 20; // Number of items to display per page
-  const [historyData, setHistoryData] = useState([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
-  const [historyTotalPages, setHistoryTotalPages] = useState(null);
+  // // history of alarms
+  // const [isAlarmHistoryOpen, setIsAlarmHistoryOpen] = useState(false);
+  // const itemsPerPage = 20; // Number of items to display per page
+  // const [historyData, setHistoryData] = useState([]);
+  // const [historyLoading, setHistoryLoading] = useState(false);
+  // const [historyTotalPages, setHistoryTotalPages] = useState(null);
 
-  const fetchErrorHistory = async (current) => {
-    setHistoryLoading(true);
-    try {
-      const all = await getErrorHistory(current);
-      console.log("trigger ");
-      setHistoryData(all.data);
-      setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
-      setHistoryLoading(false);
-    } catch (err) {
-      setHistoryLoading(false);
-      console.log("Error fetching error history. Please try again.");
-    }
-  };
+  // const fetchErrorHistory = async (current) => {
+  //   setHistoryLoading(true);
+  //   try {
+  //     const all = await getErrorHistory(current);
+  //     console.log("trigger ");
+  //     setHistoryData(all.data);
+  //     setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
+  //     setHistoryLoading(false);
+  //   } catch (err) {
+  //     setHistoryLoading(false);
+  //     console.log("Error fetching error history. Please try again.");
+  //   }
+  // };
 
   return (
     <>
@@ -529,29 +528,11 @@ const MapComponent = ({ changedMarker }) => {
           <Dropright
             isOpen={isAlarmsOpen}
             setIsOpen={setIsAlarmsOpen}
-            content={
-              <CurrentAlarms
-                data={currentAlarms}
-                historyOpen={isAlarmHistoryOpen}
-                setHistoryOpen={setIsAlarmHistoryOpen}
-              />
-            }
+            content={<CurrentAlarms data={currentAlarms} />}
           />
         </Control>
-        <Control position="topleft">
-          <SpeedDial placement="left">
-            <IconButton
-              // color={theme === "light" ? "black" : "white"}
-              size="lg"
-            >
-              <SpeedDialHandler className=" cursor-pointer">
-                <FaClockRotateLeft className="w-6 h-6 p-1" />
-              </SpeedDialHandler>
-            </IconButton>
-            <SpeedDialContent className="m-4"></SpeedDialContent>
-          </SpeedDial>
-        </Control>
-        <Control position="topleft">
+
+        {/* <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -568,7 +549,7 @@ const MapComponent = ({ changedMarker }) => {
             historyTotalPages={historyTotalPages}
             fetchErrorHistory={fetchErrorHistory}
           />
-        </Control>
+        </Control> */}
 
         <Control position="topleft">
           <IconButton

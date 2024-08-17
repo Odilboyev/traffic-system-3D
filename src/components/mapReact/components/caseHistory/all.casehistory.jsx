@@ -21,8 +21,8 @@ const HistoryTable = ({
 
   // Fetch history data when type or currentPage changes
   useEffect(() => {
-    fetchErrorHistory(type, currentPage);
-  }, [type, currentPage]);
+    open && fetchErrorHistory(type, currentPage);
+  }, [type, currentPage, open]);
 
   // Update filteredData when data or sorting criteria change
   useEffect(() => {
