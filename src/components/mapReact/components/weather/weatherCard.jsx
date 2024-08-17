@@ -58,7 +58,7 @@ const WeatherCard = () => {
             </div>
           </div>{" "}
           <div className="flex flex-col justify-between h-full items-stretch">
-            <div className="flex justify-between gap-5 mb-7">
+            <div className="flex justify-between gap-5 mb-3">
               <div>
                 <Typography className="text-white">
                   {nextDays[0].temp_max}°C
@@ -95,7 +95,7 @@ const WeatherCard = () => {
           </div>
         </div>
         {/* <div className="border border-top mt-5"></div> */}
-        <div className="mt-4 flex max-w-full overflow-x-scroll no-scrollbar">
+        {/* <div className="mt-4 flex max-w-full overflow-x-scroll no-scrollbar">
           {nextDays?.slice(1).map((day, index) => (
             <div
               key={index}
@@ -136,7 +136,7 @@ const WeatherCard = () => {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </CardBody>
     </Card>
   );
