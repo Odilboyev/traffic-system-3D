@@ -15,7 +15,22 @@ import {
 import { PiArrowULeftDownBold } from "react-icons/pi";
 
 import ThreeArrowsIcon from "./threeArrowIcon";
+function fixIncompleteJSON(message) {
+  // Check if message starts with "{" and doesn't end with "}"
+  if (message.startsWith("{") && !message.endsWith("}")) {
+    // Count opening and closing braces
+    const openBracesCount = (message.match(/{/g) || []).length;
+    const closeBracesCount = (message.match(/}/g) || []).length;
 
+    // If there are more opening braces than closing braces, add the missing closing braces
+    if (openBracesCount > closeBracesCount) {
+      const missingBraces = openBracesCount - closeBracesCount;
+      message += "}".repeat(missingBraces);
+    }
+  }
+
+  return message;
+}
 const Svetoforlar = () => {
   const map = useMap();
   const [trafficLights, setTrafficLights] = useState([]);
@@ -68,10 +83,15 @@ const Svetoforlar = () => {
       const socket = new WebSocket(wssLink);
 
       socket.onmessage = (event) => {
+        let message = event.data;
+
+        // Fix incomplete JSON message
+        message = fixIncompleteJSON(message);
         try {
-          const data = JSON.parse(event.data);
+          const data = JSON.parse(message);
           if (data) updateTrafficLights(data);
         } catch (error) {
+          console.log("Raw data error:", event.data); // Log raw data
           console.error("Error parsing WebSocket data:", error);
         }
       };
