@@ -3,13 +3,19 @@ import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useTheme } from "../../customHooks/useTheme";
 
-const Dropright = ({ isOpen, content, setIsOpen }) => {
+const Dropright = ({
+  isOpen,
+  content,
+  setIsOpen,
+  wrapperClass = "fixed top-5 inline-block text-left",
+  sndWrapperClass = "top-0 left-0 no-scrollbar absolute ml-5 max-h-[80vh] overflow-y-scroll w-[50vw] rounded-md shadow-lg  ring-1 ring-black ring-opacity-5",
+}) => {
   const { theme } = useTheme();
   return (
-    <div className="fixed top-5 inline-block text-left">
+    <div className={wrapperClass}>
       {isOpen && (
         <div
-          className="top-0 left-0 no-scrollbar absolute ml-5 max-h-[80vh] overflow-y-scroll w-[50vw] rounded-md shadow-lg  ring-1 ring-black ring-opacity-5"
+          className={sndWrapperClass}
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"

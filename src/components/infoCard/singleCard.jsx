@@ -28,24 +28,27 @@ const TrafficLightsCard = ({ data = [], length }) => {
       <div className="flex flex-col justify-center items-center h-full pb-10 pt-8 w-full">
         <div className="w-full flex justify-start xl:justify-evenly  items-center mb-10 flex-wrap gap-5 ">
           {data.data?.length > 0 &&
-            data.data.map((value, i) => (
-              <div className="flex items-center gap-6" key={i}>
-                <div className=" rounded-full flex items-center justify-center ">
-                  <NeonIcon
-                    icon={iconSwitcher(data.type)}
-                    status={value.status}
-                  />
-                </div>
-                <div className="flex-col flex">
-                  <Typography className="text-xl font-bold">
-                    {value.count}
-                  </Typography>
-                  <Typography className="text-blue-gray-300 ">
-                    {value.status_name}
-                  </Typography>
-                </div>
-              </div>
-            ))}
+            data.data.map(
+              (value, i) =>
+                value.status !== 1 && (
+                  <div className="flex items-center gap-6" key={i}>
+                    <div className=" rounded-full flex items-center justify-center ">
+                      <NeonIcon
+                        icon={iconSwitcher(data.type)}
+                        status={value.status}
+                      />
+                    </div>
+                    <div className="flex-col flex">
+                      <Typography className="text-xl font-bold">
+                        {value.count}
+                      </Typography>
+                      <Typography className="text-blue-gray-300 ">
+                        {value.status_name}
+                      </Typography>
+                    </div>
+                  </div>
+                )
+            )}
         </div>
         <Progress
           // variant="gradient"

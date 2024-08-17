@@ -12,6 +12,7 @@ const getMarkerData = async () => {
   const res = await config.get(import.meta.env.VITE_MARKER_DATA);
 
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -21,6 +22,7 @@ const getBoxData = async (id) => {
   const res = await config.get(import.meta.env.VITE_DEVICE_DATA + id);
 
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -37,6 +39,7 @@ const getBoxSensorChart = async (device_id, sensor_id) => {
 const getCrossRoadData = async (id) => {
   const res = await config.get(import.meta.env.VITE_CROSSROAD_DATA + id);
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -45,6 +48,7 @@ const getCrossRoadData = async (id) => {
 const getTrafficLightsData = async (id) => {
   const res = await config.get(import.meta.env.VITE_TRAFFICLIGHTS_DATA + id);
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -54,6 +58,7 @@ const getCrossRoadChart = async (body) => {
   const res = await config.post(import.meta.env.VITE_CROSSROAD_CHART, body);
 
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -64,6 +69,7 @@ const markerHandler = async (body) => {
   const res = await config.post(import.meta.env.VITE_MARKER, body);
 
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -74,6 +80,7 @@ const GetCurrentAlarms = async () => {
   const res = await config.get(import.meta.env.VITE_CURRENT_ALARMS);
 
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -84,6 +91,7 @@ const getErrorHistory = async (current) => {
     import.meta.env.VITE_GET_ERROR_HISTORY + `/${current}`
   );
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -102,6 +110,7 @@ const subscribeToCurrentAlarms = (onDataReceived) => {
 const getInfoForCards = async () => {
   const res = await config.get(import.meta.env.VITE_DASHBOARD_FOR_BOXES);
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -112,6 +121,7 @@ const getInfoForCards = async () => {
 const getWeatherData = async () => {
   const res = await config.get(import.meta.env.VITE_WEATHER_INFO);
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -121,6 +131,7 @@ const getWeatherData = async () => {
 const getTexts = async () => {
   const res = await config.get(import.meta.env.VITE_LANGUAGE);
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -131,15 +142,27 @@ const getTexts = async () => {
 const getNearByTrafficLights = async (body) => {
   const res = await config.post(import.meta.env.VITE_NEARBYLIGHTS, body);
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
   } else return res.data;
 };
-// SVETOFORLAR
-const getCameraCaseHistory = async () => {
-  const res = await config.get(import.meta.env.VITE_CAMERA_CASE_HISTORY);
+// Event history
+const endpointMap = {
+  all: import.meta.env.VITE_GET_ERROR_HISTORY,
+  camera: import.meta.env.VITE_CAMERA_CASE_HISTORY,
+  trafficlight: import.meta.env.VITE_TRAFFIC_LIGHT_HISTORY,
+  boxcontroller: import.meta.env.VITE_BOX_CONTROLLER_HISTORY,
+  crossroad: import.meta.env.VITE_CROSSROAD_HISTORY,
+  // Add more mappings as needed
+};
+
+const getCaseHistory = async (type, current) => {
+  console.log(type);
+  const res = await config.get(endpointMap[type] + `/${current}`);
   if (res && res.data.status == 999) {
+    console.log("logged out", res);
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -162,5 +185,5 @@ export {
   getWeatherData,
   getTexts,
   getNearByTrafficLights,
-  getCameraCaseHistory,
+  getCaseHistory,
 };

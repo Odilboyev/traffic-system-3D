@@ -20,6 +20,10 @@ import FullscreenBox from "./components/fullscreen";
 import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";
 import TrafficLights from "../trafficLights";
+import Svetoforlar from "../svetofor";
+import { MapContainer, TileLayer } from "react-leaflet";
+import { useTheme } from "../../../../customHooks/useTheme";
+import baseLayers from "../../../../configurations/mapLayers";
 function transformDataForCharts(data) {
   const transformed = data.map((direction) => {
     const series = [
@@ -48,6 +52,12 @@ function transformDataForCharts(data) {
 }
 
 const MonitoringModal = ({ open, handleOpen, marker }) => {
+  const { theme } = useTheme();
+  console.log(localStorage.getItem("selectedLayer"), "selectedLayer is ");
+  const currentLayer = baseLayers.find(
+    (layer) => layer.name == localStorage.getItem("selectedLayer")
+  );
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [data, setData] = useState(null);
@@ -95,40 +105,40 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     }
   };
 
-  const onTrafficLightsDataReceived = (data) => {
-    // console.log(data, "traffic with socket");
-    // console.log(trafficSocketData, "old traffic data");
-    setTrafficSocketData((light) => {
-      return data?.channel.map((v) => {
-        return {
-          ...v,
-          lat: trafficLights.find((light) => v.id === light.link_id).lat,
-          lng: trafficLights.find((light) => v.id === light.link_id).lng,
-          rotate: trafficLights.find((light) => v.id === light.link_id).rotate,
-          type: trafficLights.find((light) => v.id === light.link_id).type,
-        };
-      });
-    });
-  };
-  useEffect(() => {
-    let trafficSocket;
-    if (open && trafficLights) {
-      trafficSocket = new WebSocket(
-        import.meta.env.VITE_TRAFFIC_SOCKET + data?.svetofor.svetofor_id
-      );
-      trafficSocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        onTrafficLightsDataReceived(data);
-      };
-    }
+  // const onTrafficLightsDataReceived = (data) => {
+  //   // console.log(data, "traffic with socket");
+  //   // console.log(trafficSocketData, "old traffic data");
+  //   setTrafficSocketData((light) => {
+  //     return data?.channel.map((v) => {
+  //       return {
+  //         ...v,
+  //         lat: trafficLights.find((light) => v.id === light.link_id).lat,
+  //         lng: trafficLights.find((light) => v.id === light.link_id).lng,
+  //         rotate: trafficLights.find((light) => v.id === light.link_id).rotate,
+  //         type: trafficLights.find((light) => v.id === light.link_id).type,
+  //       };
+  //     });
+  //   });
+  // };
+  // useEffect(() => {
+  //   let trafficSocket;
+  //   if (open && trafficLights) {
+  //     trafficSocket = new WebSocket(
+  //       import.meta.env.VITE_TRAFFIC_SOCKET + data?.svetofor.svetofor_id
+  //     );
+  //     trafficSocket.onmessage = (event) => {
+  //       const data = JSON.parse(event.data);
+  //       onTrafficLightsDataReceived(data);
+  //     };
+  //   }
 
-    return () => {
-      // Clean up the socket connection when the dialog is closed
-      if (trafficSocket) {
-        trafficSocket.close();
-      }
-    };
-  }, [open, trafficLights]);
+  //   return () => {
+  //     // Clean up the socket connection when the dialog is closed
+  //     if (trafficSocket) {
+  //       trafficSocket.close();
+  //     }
+  //   };
+  // }, [open, trafficLights]);
 
   const getSensorData = async (id) => {
     setIsLoading(true);
@@ -230,13 +240,34 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
           </FullscreenBox>{" "}
           {/* traffic lights */}
           <FullscreenBox>
-            <TrafficLights
+            <MapContainer
+              id="monitoring"
+              attributionControl={false}
+              center={[marker?.lat, marker?.lng]}
+              zoom={localStorage.getItem("mapZoom") || 18}
+              maxZoom={theme === "dark" ? 22 : 18}
+              zoomDelta={0.6}
+              style={{ height: "100vh", width: "100%" }}
+              zoomControl={false}
+            >
+              {currentLayer && (
+                <TileLayer
+                  maxNativeZoom={currentLayer.maxNativeZoom}
+                  url={currentLayer.url}
+                  attribution={currentLayer.attribution}
+                  key={currentLayer.name}
+                  maxZoom={22}
+                />
+              )}
+              <Svetoforlar />
+            </MapContainer>
+            {/* <TrafficLights
               open={open}
               lightsId={data?.svetofor.svetofor_id}
               lights={trafficLights}
               lightsSocketData={trafficSocketData}
               center={[marker?.lat, marker?.lng]}
-            />
+            /> */}
             {/* <TrafficLights /> */}
             {/* ) : (
               <Typography>No traffic lights here</Typography>

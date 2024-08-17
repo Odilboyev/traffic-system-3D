@@ -29,7 +29,9 @@ import Control from "../CustomControl";
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
+  Cog6ToothIcon,
   Cog8ToothIcon,
+  CogIcon,
   LanguageIcon,
   ListBulletIcon,
   MapIcon,
@@ -39,7 +41,6 @@ import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
 import {
   getBoxData,
-  getCameraCaseHistory,
   GetCurrentAlarms,
   getErrorHistory,
   getInfoForCards,
@@ -74,6 +75,7 @@ import LanguageSwitcher from "../langSwitcher";
 import Svetoforlar from "./components/svetofor";
 import { useLeafletContext } from "@react-leaflet/core";
 import HistoryTable from "./components/caseHistory/all.casehistory";
+import AlarmHistory from "./components/alarmHistory";
 
 const home = [41.2995, 69.2401];
 
@@ -131,7 +133,7 @@ const MapComponent = ({ changedMarker }) => {
 
   const handleLayerChange = (layerName) => {
     setSelectedLayer(layerName);
-    layerSave("selectedLayer", layerName);
+    layerSave(layerName);
   };
   //
   const MapEvents = () => {
@@ -370,26 +372,6 @@ const MapComponent = ({ changedMarker }) => {
       console.log("Error fetching error history. Please try again.");
     }
   };
-  // history of camera alarms
-  const [isCamAlarmHistoryOpen, setCamIsAlarmHistoryOpen] = useState(false);
-  const camItemsPerPage = 20; // Number of items to display per page
-  const [camHistoryData, setCamHistoryData] = useState([]);
-  const [camHistoryLoading, setCamHistoryLoading] = useState(false);
-  const [camHistoryTotalPages, setCamHistoryTotalPages] = useState(null);
-
-  const fetchCamErrorHistory = async (current) => {
-    setCamHistoryLoading(true);
-    try {
-      const all = await getCameraCaseHistory(current);
-      console.log("trigger cam");
-      setCamHistoryData(all.data);
-      setCamHistoryTotalPages(all.total_pages ? all.total_pages : 1);
-      setCamHistoryLoading(false);
-    } catch (err) {
-      setCamHistoryLoading(false);
-      console.log("Error fetching error history. Please try again.");
-    }
-  };
 
   return (
     <>
@@ -484,6 +466,8 @@ const MapComponent = ({ changedMarker }) => {
             </SpeedDialContent>
           </SpeedDial>
         </Control>
+        {/* history of alarms for types */}
+        <AlarmHistory />
         <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
@@ -564,25 +548,7 @@ const MapComponent = ({ changedMarker }) => {
                 <FaClockRotateLeft className="w-6 h-6 p-1" />
               </SpeedDialHandler>
             </IconButton>
-            <SpeedDialContent className="m-4">
-              {" "}
-              <ButtonGroup>
-                <Button>Camera</Button>
-                <Button>Camera</Button>
-                <Button>Camera</Button>
-              </ButtonGroup>
-              <div className="flex flex-col p-3 mb-10 rounded-md bg-gray-900/80 text-blue-gray-900 backdrop-blur-md">
-                <HistoryTable
-                  open={isAlarmHistoryOpen}
-                  handleOpen={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
-                  data={historyData}
-                  isLoading={historyLoading}
-                  itemsPerPage={itemsPerPage}
-                  historyTotalPages={historyTotalPages}
-                  fetchErrorHistory={fetchErrorHistory}
-                />
-              </div>
-            </SpeedDialContent>
+            <SpeedDialContent className="m-4"></SpeedDialContent>
           </SpeedDial>
         </Control>
         <Control position="topleft">
@@ -603,24 +569,7 @@ const MapComponent = ({ changedMarker }) => {
             fetchErrorHistory={fetchErrorHistory}
           />
         </Control>
-        <Control position="topleft">
-          <IconButton
-            // color={theme === "light" ? "black" : "white"}
-            size="lg"
-            onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
-          >
-            <FaCamera className="w-6 h-6 p-1" />
-          </IconButton>
-          <HistoryTable
-            open={isCamAlarmHistoryOpen}
-            handleOpen={() => setCamIsAlarmHistoryOpen(!isCamAlarmHistoryOpen)}
-            data={camHistoryData}
-            isLoading={camHistoryLoading}
-            itemsPerPage={camItemsPerPage}
-            historyTotalPages={camHistoryTotalPages}
-            fetchErrorHistory={fetchCamErrorHistory}
-          />
-        </Control>
+
         <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}

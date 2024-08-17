@@ -31,8 +31,8 @@ const Svetoforlar = () => {
     if (zoom >= 19) {
       if (trafficLights.length === 0) {
         fetchTrafficLights({
-          lat: center.lat,
-          lng: center.lng,
+          lat: center?.lat,
+          lng: center?.lng,
           zoom: map.getZoom(),
         });
       }
@@ -54,6 +54,9 @@ const Svetoforlar = () => {
       }
     }
   };
+  useEffect(() => {
+    handleMapEvents();
+  }, []);
 
   useMapEvents({
     dragend: handleMapEvents,
