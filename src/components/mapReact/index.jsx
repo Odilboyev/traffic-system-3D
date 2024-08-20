@@ -5,19 +5,14 @@ import {
   Marker,
   useMapEvents,
   Tooltip,
-  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet-rotatedmarker";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import {
-  Button,
-  ButtonGroup,
   Checkbox,
   IconButton,
-  List,
-  ListItem,
   Radio,
   SpeedDial,
   SpeedDialContent,
@@ -29,10 +24,7 @@ import Control from "../CustomControl";
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
-  Cog6ToothIcon,
   Cog8ToothIcon,
-  CogIcon,
-  LanguageIcon,
   ListBulletIcon,
   MapIcon,
 } from "@heroicons/react/16/solid";
@@ -42,15 +34,14 @@ import { renderToString } from "react-dom/server";
 import {
   getBoxData,
   GetCurrentAlarms,
-  getErrorHistory,
   getInfoForCards,
   getMarkerData,
   markerHandler,
   subscribeToCurrentAlarms,
-} from "../../api/apiHandlers";
+} from "../../api/api.handlers";
 import login from "../../Auth";
 import { useNavigate } from "react-router-dom";
-import MonitoringModal from "./components/crossroad";
+import CorssroadModal from "./components/crossroad";
 import DeviceModal from "./components/box/deviceModal";
 import CustomPopUp from "./components/customPopup";
 import baseLayers, { layerSave } from "../../configurations/mapLayers";
@@ -59,23 +50,18 @@ import dangerSound from "../../assets/audio/danger.mp3";
 import toaster, { toastConfig } from "../../tools/toastconfig";
 import CurrentAlarms from "./components/alarm";
 import Dropright from "../Dropright";
-import { FaCamera, FaClockRotateLeft } from "react-icons/fa6";
 import ZoomControl from "./components/CustomZoomControl";
-import { TbBell, TbBellRinging, TbLamp } from "react-icons/tb";
-import DropdownControl from "../DropDownControl";
+import { TbBell, TbBellRinging } from "react-icons/tb";
 import { useTheme } from "../../customHooks/useTheme";
 import { IoMdSunny } from "react-icons/io";
 import ClockOnMap from "./components/weather";
 import BottomSection from "../infoCard";
-import NeonIcon from "../neonIcon";
-import { LiaTrafficLightSolid } from "react-icons/lia";
-import { MdBedtime, MdOutlineSensorWindow } from "react-icons/md";
+import { MdBedtime } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../langSwitcher";
 import Svetoforlar from "./components/svetofor";
-import { useLeafletContext } from "@react-leaflet/core";
-import HistoryTable from "./components/caseHistory/all.casehistory";
-import AlarmHistory from "./components/alarmHistory";
+import DeviceManagement from "../deviceManagement";
+import AlarmHistory from "./components/caseHistory";
 
 const home = [41.2995, 69.2401];
 
@@ -351,27 +337,6 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
 
-  // // history of alarms
-  // const [isAlarmHistoryOpen, setIsAlarmHistoryOpen] = useState(false);
-  // const itemsPerPage = 20; // Number of items to display per page
-  // const [historyData, setHistoryData] = useState([]);
-  // const [historyLoading, setHistoryLoading] = useState(false);
-  // const [historyTotalPages, setHistoryTotalPages] = useState(null);
-
-  // const fetchErrorHistory = async (current) => {
-  //   setHistoryLoading(true);
-  //   try {
-  //     const all = await getErrorHistory(current);
-  //     console.log("trigger ");
-  //     setHistoryData(all.data);
-  //     setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
-  //     setHistoryLoading(false);
-  //   } catch (err) {
-  //     setHistoryLoading(false);
-  //     console.log("Error fetching error history. Please try again.");
-  //   }
-  // };
-
   return (
     <>
       <MapContainer
@@ -385,7 +350,7 @@ const MapComponent = ({ changedMarker }) => {
         zoomControl={false}
       >
         {errorMessage && (
-          <div className="w-[50vw] h-[20vh] z-[9999] rounded-md bg-white backdrop-blur-md flex justify-center items-center dark:text-white">
+          <div className="w-[50vw] h-[20vh] z-[9999] rounded-md bg-blue-gray-900 backdrop-blur-md flex justify-center items-center text-white">
             {errorMessage}
           </div>
         )}
@@ -418,14 +383,12 @@ const MapComponent = ({ changedMarker }) => {
               </SpeedDialHandler>
             </IconButton>
             <SpeedDialContent className="ml-4">
-              <div className="filter-panel p-2 flex flex-col dark:bg-gray-900/80 text-blue-gray-900 dark:text-white bg-white/80 backdrop-blur-md">
+              <div className="filter-panel p-2 flex rounded-md flex-col bg-gray-900/80 text-whit backdrop-blur-md">
                 {checkboxConfigurations.map(({ type, label }) => (
                   <Checkbox
                     key={type}
                     label={
-                      <Typography className="dark:text-white text-blue-gray-800">
-                        {label}
-                      </Typography>
+                      <Typography className="text-white">{label}</Typography>
                     }
                     ripple={false}
                     className="m-0 p-0"
@@ -451,7 +414,7 @@ const MapComponent = ({ changedMarker }) => {
                 <Cog8ToothIcon className="w-5 h-5 p-2" />
               </SpeedDialHandler>
             </IconButton>
-            <SpeedDialContent className="ml-4 dark:bg-gray-900/80 dark:text-white text-blue-gray-900 bg-white/80 backdrop-blur-md">
+            <SpeedDialContent className="ml-4 rounded-md bg-gray-900/80 text-white backdrop-blur-md">
               <div className="p-4 rounded-lg flex flex-col justify-center items-center">
                 <Typography className="mb-2 select-none">
                   {isDraggable ? "Editable" : "Not Editable"}
@@ -465,8 +428,14 @@ const MapComponent = ({ changedMarker }) => {
             </SpeedDialContent>
           </SpeedDial>
         </Control>
-        {/* history of alarms for types */}
-        <AlarmHistory />
+        {/* aalarm history */}
+        <Control position="topleft">
+          <AlarmHistory />
+        </Control>
+        {/* Device Management */}
+        <Control position="topleft">
+          <DeviceManagement />
+        </Control>
         <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
@@ -531,26 +500,6 @@ const MapComponent = ({ changedMarker }) => {
             content={<CurrentAlarms data={currentAlarms} />}
           />
         </Control>
-
-        {/* <Control position="topleft">
-          <IconButton
-            // color={theme === "light" ? "black" : "white"}
-            size="lg"
-            onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
-          >
-            <FaClockRotateLeft className="w-6 h-6 p-1" />
-          </IconButton>
-          <HistoryTable
-            open={isAlarmHistoryOpen}
-            handleOpen={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
-            data={historyData}
-            isLoading={historyLoading}
-            itemsPerPage={itemsPerPage}
-            historyTotalPages={historyTotalPages}
-            fetchErrorHistory={fetchErrorHistory}
-          />
-        </Control> */}
-
         <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
@@ -648,7 +597,7 @@ const MapComponent = ({ changedMarker }) => {
         </MarkerClusterGroup>
       </MapContainer>
       {isbigMonitorOpen && (
-        <MonitoringModal
+        <CorssroadModal
           marker={activeMarker}
           open={isbigMonitorOpen}
           handleOpen={() => {

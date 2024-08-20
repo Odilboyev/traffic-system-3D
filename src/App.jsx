@@ -6,7 +6,7 @@ import dangerSound from "../src/assets/audio/danger.mp3";
 import positiveSound from "../src/assets/audio/positive.wav";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeContext } from "./context/themeContext.jsx";
-import { subscribeToCurrentAlarms } from "./api/apiHandlers.js";
+import { subscribeToCurrentAlarms } from "./api/api.handlers.js";
 
 const App = () => {
   const { theme } = useContext(ThemeContext);

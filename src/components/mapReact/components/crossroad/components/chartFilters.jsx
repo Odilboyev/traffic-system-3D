@@ -1,12 +1,15 @@
 import React from "react";
 import DatePicker from "../../../../datePicker";
 import { Option, Select } from "@material-tailwind/react";
+import { useTheme } from "../../../../../customHooks/useTheme";
 
 const ChartFilters = ({ time, timeHandler, interval, intervalHandler }) => {
+  const { theme } = useTheme();
   return (
-    <div className="max-w-full flex gap-2 p-2 rounded-b fixed ! z-50">
+    <div className="max-w-full flex gap-2 p-2 rounded-b fixed dark:text-white ! z-50">
       <DatePicker date={time} dateHandler={timeHandler} label={"Sana"} />
       <Select
+        className="dark:bg-blue-gray-900 dark:text-white"
         label="Interval"
         onChange={(e) => intervalHandler(e)}
         value={interval}

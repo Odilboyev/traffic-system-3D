@@ -5,7 +5,7 @@ import Chart from "react-apexcharts";
 import { useEffect, useState } from "react";
 import SensorTable from "../components/sensortable";
 import Loader from "../../../../Loader";
-import { getBoxSensorChart } from "../../../../../api/apiHandlers";
+import { getBoxSensorChart } from "../../../../../api/api.handlers";
 
 const SensorSection = ({ device, isLoading, markerId = {} }) => {
   const { device_data, sensor_data } = device;

@@ -12,13 +12,13 @@ const ModalCharts = ({
 }) => {
   const options = {
     chart: {
-      // type: "line",
-      // height: 350,
-      // stacked: false,
+      type: "area",
+      height: 350,
     },
     colors: ["#0bd500", "#9700fb", "#0066e3", "#ff6600"],
     stroke: {
-      width: 0.8,
+      width: 0.9,
+      curve: "smooth",
     },
     dataLabels: {
       enabled: false, // <--- HERE

@@ -17,6 +17,7 @@ const DatePicker = ({ date, label, dateHandler }) => {
           <Input
             label={label}
             onChange={() => null}
+            className="dark:!text-white"
             value={date ? format(new Date(date), "yyyy-MM-dd") : ""}
           />
         </PopoverHandler>
@@ -29,7 +30,7 @@ const DatePicker = ({ date, label, dateHandler }) => {
             className="border-0"
             classNames={{
               caption: "flex justify-center py-2 mb-4 relative items-center",
-              caption_label: "text-sm font-medium text-gray-900",
+              caption_label: "text-sm font-medium text-gray-900 ",
               nav: "flex items-center",
               nav_button:
                 "h-6 w-6 bg-transparent hover:bg-blue-gray-50 p-1 rounded-md transition-colors duration-300",
@@ -44,7 +45,7 @@ const DatePicker = ({ date, label, dateHandler }) => {
               day_range_end: "day-range-end",
               day_selected:
                 "rounded-md bg-gray-900 text-white hover:bg-gray-900 hover:text-white focus:bg-gray-900 focus:text-white",
-              day_today: "rounded-md bg-gray-200 text-gray-900",
+              day_today: "rounded-md bg-gray-200 text-gray-900 ",
               day_outside:
                 "day-outside text-gray-500 opacity-50 aria-selected:bg-gray-500 aria-selected:text-gray-900 aria-selected:bg-opacity-10",
               day_disabled: "text-gray-500 opacity-50",

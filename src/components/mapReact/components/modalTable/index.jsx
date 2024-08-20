@@ -5,24 +5,24 @@ import Loader from "../../../Loader";
 import Modal from "../../../Modal";
 import { t } from "i18next";
 
-const HistoryTable = ({
+const ModalTable = ({
   open,
+  title,
   handleOpen,
-  type,
   data = [],
   isLoading,
-  historyTotalPages,
-  fetchErrorHistory,
+  totalPages,
+  fetchHandler,
 }) => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
 
-  // Fetch history data when type or currentPage changes
+  // Fetch modal data when type or currentPage changes
   useEffect(() => {
-    open && fetchErrorHistory(type, currentPage);
-  }, [type, currentPage, open]);
+    open && fetchHandler(currentPage);
+  }, [currentPage, open]);
 
   // Update filteredData when data or sorting criteria change
   useEffect(() => {
@@ -71,12 +71,12 @@ const HistoryTable = ({
     <Modal
       open={open}
       handleOpen={handleOpen}
-      title={t(type)}
+      title={title}
       body={
         isLoading ? (
           <Loader />
         ) : data?.length > 0 ? (
-          <table className="w-full table-fixed overflow-x-scroll border border-slate-400">
+          <table className="w-full table-auto overflow-x-scroll border border-slate-400">
             <thead className="text-left">
               <tr className="font-bold">
                 {tableHeaders.map((key, i) => (
@@ -85,7 +85,7 @@ const HistoryTable = ({
                     key={i}
                     onClick={() => handleHeader(key)}
                   >
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between gap-4 items-center">
                       <Typography className="font-bold">
                         {t(key)} {/* Translate column name */}
                       </Typography>
@@ -122,10 +122,10 @@ const HistoryTable = ({
         ) : null
       }
       bottom={
-        historyTotalPages != null && (
+        totalPages != null && (
           <Pagination
             currentPage={currentPage}
-            totalPages={historyTotalPages ? historyTotalPages : 0}
+            totalPages={totalPages ? totalPages : 0}
             onPageChange={handlePageChange}
           />
         )
@@ -134,7 +134,7 @@ const HistoryTable = ({
   );
 };
 
-export default HistoryTable;
+export default ModalTable;
 
 const getRowColor = (status) => {
   switch (Number(status)) {

@@ -148,17 +148,16 @@ const getNearByTrafficLights = async (body) => {
     window.location.reload();
   } else return res.data;
 };
-// Event history
+// devices
 const endpointMap = {
-  all: import.meta.env.VITE_GET_ERROR_HISTORY,
-  camera: import.meta.env.VITE_CAMERA_CASE_HISTORY,
-  trafficlight: import.meta.env.VITE_TRAFFIC_LIGHT_HISTORY,
-  boxcontroller: import.meta.env.VITE_BOX_CONTROLLER_HISTORY,
-  crossroad: import.meta.env.VITE_CROSSROAD_HISTORY,
+  camera: import.meta.env.VITE_CAMERAS,
+  trafficlight: import.meta.env.VITE_TRAFFIC_LIGHTS,
+  boxcontroller: import.meta.env.VITE_BOX_CONTROLLERS,
+  crossroad: import.meta.env.VITE_CROSSROADS,
   // Add more mappings as needed
 };
 
-const getCaseHistory = async (type, current) => {
+const getDevices = async (type, current) => {
   console.log(type);
   const res = await config.get(endpointMap[type] + `/${current}`);
   if (res && res.data.status == 999) {
@@ -185,5 +184,5 @@ export {
   getWeatherData,
   getTexts,
   getNearByTrafficLights,
-  getCaseHistory,
+  getDevices,
 };

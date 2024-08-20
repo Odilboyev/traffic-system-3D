@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getNearByTrafficLights } from "../../../../api/apiHandlers";
+import { getNearByTrafficLights } from "../../../../api/api.handlers";
 import { Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import { MdStraight } from "react-icons/md";

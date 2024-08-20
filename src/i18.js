@@ -1,11 +1,10 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { getTexts } from "./api/apiHandlers";
+import { getTexts } from "./api/api.handlers";
 
 const loadTranslations = async () => {
   try {
     const response = await getTexts();
-    console.log(response, "translations loaded");
     i18n.use(initReactI18next).init({
       debug: true,
       resources: response,

@@ -15,7 +15,7 @@ import {
   getCrossRoadChart,
   getCrossRoadData,
   getTrafficLightsData,
-} from "../../../../api/apiHandlers";
+} from "../../../../api/api.handlers";
 import FullscreenBox from "./components/fullscreen";
 import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";
@@ -24,13 +24,15 @@ import Svetoforlar from "../svetofor";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { useTheme } from "../../../../customHooks/useTheme";
 import baseLayers from "../../../../configurations/mapLayers";
+import Loader from "../../../Loader";
+import { TbLoader } from "react-icons/tb";
 function transformDataForCharts(data) {
   const transformed = data.map((direction) => {
     const series = [
-      { name: "carall", data: [], type: "line" },
-      { name: "carmid", data: [], type: "column" },
-      { name: "carbig", data: [], type: "column" },
-      { name: "carsmall", data: [], type: "column" },
+      { name: "carall", data: [] },
+      { name: "carmid", data: [] },
+      { name: "carbig", data: [] },
+      { name: "carsmall", data: [] },
       // Add more series for other car types if needed
     ];
 
@@ -51,7 +53,7 @@ function transformDataForCharts(data) {
   return transformed;
 }
 
-const MonitoringModal = ({ open, handleOpen, marker }) => {
+const CorssroadModal = ({ open, handleOpen, marker }) => {
   const { theme } = useTheme();
   console.log(localStorage.getItem("selectedLayer"), "selectedLayer is ");
   const currentLayer = baseLayers.find(
@@ -59,7 +61,7 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   );
 
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isChartLoading, setChartLoading] = useState(false);
   const [data, setData] = useState(null);
 
   const [trafficLights, setTrafficLights] = useState(null);
@@ -105,41 +107,6 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
     }
   };
 
-  // const onTrafficLightsDataReceived = (data) => {
-  //   // console.log(data, "traffic with socket");
-  //   // console.log(trafficSocketData, "old traffic data");
-  //   setTrafficSocketData((light) => {
-  //     return data?.channel.map((v) => {
-  //       return {
-  //         ...v,
-  //         lat: trafficLights.find((light) => v.id === light.link_id).lat,
-  //         lng: trafficLights.find((light) => v.id === light.link_id).lng,
-  //         rotate: trafficLights.find((light) => v.id === light.link_id).rotate,
-  //         type: trafficLights.find((light) => v.id === light.link_id).type,
-  //       };
-  //     });
-  //   });
-  // };
-  // useEffect(() => {
-  //   let trafficSocket;
-  //   if (open && trafficLights) {
-  //     trafficSocket = new WebSocket(
-  //       import.meta.env.VITE_TRAFFIC_SOCKET + data?.svetofor.svetofor_id
-  //     );
-  //     trafficSocket.onmessage = (event) => {
-  //       const data = JSON.parse(event.data);
-  //       onTrafficLightsDataReceived(data);
-  //     };
-  //   }
-
-  //   return () => {
-  //     // Clean up the socket connection when the dialog is closed
-  //     if (trafficSocket) {
-  //       trafficSocket.close();
-  //     }
-  //   };
-  // }, [open, trafficLights]);
-
   const getSensorData = async (id) => {
     setIsLoading(true);
 
@@ -165,6 +132,7 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   };
 
   const getChartData = async () => {
+    setChartLoading(true);
     try {
       const res = await getCrossRoadChart(req);
 
@@ -175,6 +143,8 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
       }
     } catch (error) {
       throw new Error(error);
+    } finally {
+      setChartLoading(false);
     }
   };
   useEffect(() => {
@@ -261,21 +231,12 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
               )}
               <Svetoforlar />
             </MapContainer>
-            {/* <TrafficLights
-              open={open}
-              lightsId={data?.svetofor.svetofor_id}
-              lights={trafficLights}
-              lightsSocketData={trafficSocketData}
-              center={[marker?.lat, marker?.lng]}
-            /> */}
-            {/* <TrafficLights /> */}
-            {/* ) : (
-              <Typography>No traffic lights here</Typography>
-           */}
           </FullscreenBox>
           {/* chart data for the number of cars */}
           <FullscreenBox>
-            {chartData && chartData?.length > 0 ? (
+            {isChartLoading ? (
+              <TbLoader className="animate animate-spin" />
+            ) : chartData && chartData?.length > 0 ? (
               <ModalCharts
                 directions={chartData}
                 interval={interval}
@@ -284,7 +245,7 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
                 handleTime={handleDate}
               />
             ) : (
-              <Typography> No Chart Data</Typography>
+              <Typography>No Chart Data</Typography>
             )}
           </FullscreenBox>
         </div>
@@ -293,9 +254,9 @@ const MonitoringModal = ({ open, handleOpen, marker }) => {
   );
 };
 
-MonitoringModal.propTypes = {
+CorssroadModal.propTypes = {
   open: PropTypes.bool,
   handleOpen: PropTypes.func,
   marker: PropTypes.any,
 };
-export default MonitoringModal;
+export default CorssroadModal;
