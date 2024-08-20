@@ -21,9 +21,10 @@ const ModalTable = ({
 
   // Fetch modal data when type or currentPage changes
   useEffect(() => {
-    open && fetchHandler(currentPage);
+    open && currentPage !== 1 && fetchHandler(currentPage);
   }, [currentPage, open]);
 
+  console.log(filteredData, "filtered data in modal");
   // Update filteredData when data or sorting criteria change
   useEffect(() => {
     if (data.length > 0) {
@@ -81,7 +82,7 @@ const ModalTable = ({
               <tr className="font-bold">
                 {tableHeaders.map((key, i) => (
                   <th
-                    className="pl-4 py-1 text-start border-separate border border-blue-gray-900 cursor-pointer"
+                    className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
                     key={i}
                     onClick={() => handleHeader(key)}
                   >
@@ -101,13 +102,13 @@ const ModalTable = ({
               {filteredData.map((item, i) => (
                 <tr
                   key={i}
-                  className={`${getRowColor(
-                    item.statuserror
-                  )} text-blue-gray-900`}
+                  className={`
+                    dark:text-white 
+                   text-blue-gray-900`}
                 >
                   {tableHeaders.map((key, index) => (
                     <td
-                      className="px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900"
+                      className="px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white"
                       key={index}
                     >
                       <Typography>{item[key]}</Typography>

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MonitoringMapReact from "./components/mapReact";
 import { ToastContainer } from "react-toastify";
 import toaster from "./tools/toastconfig";
@@ -12,30 +12,29 @@ const App = () => {
   const { theme } = useContext(ThemeContext);
   const [changedMarker, setChangedMarker] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  // console.log(changedMarker, "changed marker");
+  useEffect(() => {
+    console.log(changedMarker, "changed marker");
+  }, [changedMarker]);
+
   useEffect(() => {
     if (!setIsSubscribed) subscribeToCurrentAlarms(onWSDataReceived);
-  }, []);
+  }, [isSubscribed]);
   const onWSDataReceived = (data) => {
     setIsSubscribed(true);
-    if (data["marker"] !== undefined && data["marker"] !== null) {
-      setChangedMarker(data.marker);
-    }
+    setChangedMarker(data.data);
+    toaster(data.data);
 
-    if (data.status === "update") {
-      toaster(data.data);
-      const sound = new Audio();
-      // Play sound based on data.data.statuserror
-      if (data.data.statuserror === 1) {
-        sound.src = dangerSound;
-      } else if (data.data.statuserror === 0) {
-        sound.src = positiveSound;
-      } else if (data.data.statuserror === 2) {
-        sound.src = dangerSound;
-      }
-      sound.play();
+    const sound = new Audio();
+    // Play sound based on data.data.statuserror
+    if (data.data.statuserror === 1) {
+      sound.src = dangerSound;
+    } else if (data.data.statuserror === 0) {
+      sound.src = positiveSound;
+    } else if (data.data.statuserror === 2) {
+      sound.src = dangerSound;
     }
   };
+
   return (
     <div
       className={`min-h-screen app-container ${

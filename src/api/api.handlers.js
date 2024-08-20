@@ -151,7 +151,7 @@ const getNearByTrafficLights = async (body) => {
 // devices
 const endpointMap = {
   camera: import.meta.env.VITE_CAMERAS,
-  trafficlight: import.meta.env.VITE_TRAFFIC_LIGHTS,
+  svetofor: import.meta.env.VITE_TRAFFIC_LIGHTS,
   boxcontroller: import.meta.env.VITE_BOX_CONTROLLERS,
   crossroad: import.meta.env.VITE_CROSSROADS,
   // Add more mappings as needed

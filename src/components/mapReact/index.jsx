@@ -76,13 +76,11 @@ const handleMapMove = (event) => {
 
 const MapComponent = ({ changedMarker }) => {
   const [map, setMap] = useState(null);
-
   useEffect(() => {
     if (map) {
       map.invalidateSize();
     }
   }, [map]);
-
   // language `-`
   const { t } = useTranslation();
   //theme
@@ -206,9 +204,11 @@ const MapComponent = ({ changedMarker }) => {
   }, []);
   useEffect(() => {
     console.log(markers, "markers changed");
-
-    return () => {};
   }, [markers]);
+  useEffect(() => {
+    console.log(changedMarker, "changed marker");
+  }, [changedMarker]);
+
   const handleMarkerDragEnd = (id, type, event) => {
     const { lat, lng } = event.target.getLatLng();
 
@@ -283,7 +283,6 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
   const handleLightsModalOpen = async (light) => {
-    console.log(light, "lights");
     if (light) {
       setActiveLight(light);
       setIsLightsModalOpen(true);
@@ -330,7 +329,6 @@ const MapComponent = ({ changedMarker }) => {
 
       setCurrentAlarms(alarmsRes.data);
       setBottomSectionData(infoRes);
-      console.log(infoRes);
     } catch (error) {
       console.error("Error fetching data:", error);
       throw new Error(error);

@@ -1,4 +1,3 @@
-import Control from "react-leaflet-custom-control";
 import {
   IconButton,
   List,
@@ -14,35 +13,34 @@ import { getDevices } from "../../api/api.handlers";
 
 const DeviceManagement = () => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
-  const [deviceType, setdeviceType] = useState("corssroad"); // default type
+  const [deviceType, setdeviceType] = useState(""); // default type
   const [isAlarmdeviceOpen, setIsAlarmdeviceOpen] = useState(false);
   const [deviceData, setdeviceData] = useState([]);
   const [deviceLoading, setdeviceLoading] = useState(false);
   const [deviceTotalPages, setdeviceTotalPages] = useState(null);
 
-  const fetchDeviceData = useCallback(
-    async (current) => {
-      setdeviceLoading(true);
-      try {
-        const all = await getDevices(deviceType, current);
-        setdeviceData(all.data);
-        setdeviceTotalPages(all.total_pages ? all.total_pages : 1);
-      } catch (err) {
-        console.log("Error fetching error device. Please try again.");
-      } finally {
-        setdeviceLoading(false);
-      }
-    },
-    [deviceType]
-  );
+  const fetchDeviceData = useCallback(async (type, current = 1) => {
+    setdeviceLoading(true);
+    setdeviceData([]); // Clear existing data before fetching new data
+    try {
+      const all = await getDevices(type, current);
+      setdeviceData(all.data);
+      setdeviceTotalPages(all.total_pages ? all.total_pages : 1);
+    } catch (err) {
+      console.log("Error fetching error device. Please try again.");
+    } finally {
+      setdeviceLoading(false);
+    }
+  }, []);
 
   // Handler for changing the device type
   const handleTypeChange = (type) => {
+    setdeviceType(type); // Update device type
+    fetchDeviceData(type); // Fetch data for the selected type
     setIsDroprightOpen(false); // Close the dropdown
-    setdeviceType(type);
-    setIsAlarmdeviceOpen(true);
-    fetchDeviceData(1); // Fetch data for the selected type
+    setIsAlarmdeviceOpen(true); // Open the modal
   };
+
   return (
     <>
       <IconButton
@@ -58,7 +56,7 @@ const DeviceManagement = () => {
         setIsOpen={setIsDroprightOpen}
         content={
           <div className="p-4 rounded-lg flex flex-col justify-center items-center">
-            <Typography>{t("management")}</Typography>
+            <Typography>{t("management_device")}</Typography>
             <List className="text-white">
               <ListItem
                 className="shadow-sm"
@@ -80,7 +78,7 @@ const DeviceManagement = () => {
               </ListItem>
               <ListItem
                 className="shadow-sm"
-                onClick={() => handleTypeChange("trafficlight")}
+                onClick={() => handleTypeChange("svetofor")}
               >
                 {t("svetofor")}
               </ListItem>
@@ -90,12 +88,16 @@ const DeviceManagement = () => {
       />
       <ModalTable
         open={isAlarmdeviceOpen}
-        handleOpen={() => setIsAlarmdeviceOpen(!isAlarmdeviceOpen)}
+        handleOpen={() => {
+          setdeviceData([]);
+          setIsAlarmdeviceOpen(!isAlarmdeviceOpen);
+        }}
+        title={t(deviceType)}
         data={deviceData}
         isLoading={deviceLoading}
         itemsPerPage={20}
         totalPages={deviceTotalPages}
-        fetchHandler={fetchDeviceData}
+        fetchHandler={(current) => fetchDeviceData(deviceType, current)}
       />
     </>
   );
