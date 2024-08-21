@@ -130,7 +130,7 @@ const ModalTable = ({
             {data?.length > 0 ? (
               <table className="w-full table-auto overflow-x-scroll border border-slate-400">
                 <thead className="text-left">
-                  <tr className="font-bold">
+                  <tr className="font-bold hover:">
                     {tableHeaders.map((key, i) => (
                       <th
                         className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
@@ -154,8 +154,11 @@ const ModalTable = ({
                     <tr
                       key={i}
                       className={`
-                        dark:text-white 
-                       text-black`}
+        dark:text-white 
+        text-black
+        hover:bg-gray-100 dark:hover:bg-gray-700 // Add hover effect here
+        cursor-pointer
+      `}
                     >
                       {tableHeaders.map((key, index) => {
                         if (key === "location") {

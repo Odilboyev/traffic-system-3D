@@ -2,7 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import MonitoringMapReact from "./components/mapReact";
 import { ToastContainer } from "react-toastify";
 import dangerSound from "../src/assets/audio/danger.mp3";
-import positiveSound from "../src/assets/audio/positive.wav";
+import positiveSound from "../src/assets/audio/positive.mp3";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeContext } from "./context/themeContext.jsx";
 import { subscribeToCurrentAlarms } from "./api/api.handlers.js";
