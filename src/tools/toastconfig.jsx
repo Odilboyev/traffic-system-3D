@@ -1,8 +1,9 @@
 import { t } from "i18next";
+import { useMap } from "react-leaflet";
 import { toast } from "react-toastify";
 
 const generateToastContent = (sensorData) => (
-  <div className="w-full">
+  <div className="w-full pointer-events-none">
     <div className="mb-2">
       <p className="inline-block mr-4">{t("crossroad")}:</p>
       <strong>{sensorData.crossroad_name}</strong>
@@ -24,33 +25,49 @@ const generateToastContent = (sensorData) => (
       <strong>{sensorData.status_name}</strong>
     </div>
     <div className="mb-2">
+      <p className="inline-block mr-4">{t("sensor_value")}:</p>
+      <strong>{sensorData.sensor_value}</strong>
+    </div>
+    <div className="mb-2">
       <p className="inline-block mr-4">{t("eventdate")}:</p>
       <strong>{sensorData.eventdate.split(" ")[1]}</strong>
     </div>
   </div>
 );
 
-const toaster = (sensorData) => {
+const toaster = (sensorData, map) => {
   const toastContent = generateToastContent(sensorData);
+  const handleClick = () => {
+    if (sensorData.lat && sensorData.lng) {
+      map.flyTo([sensorData.lat, sensorData.lng], 18);
+    }
+  };
+
+  const toastOptions = {
+    ...toastConfig,
+    onClick: handleClick,
+    icon: false,
+  };
 
   switch (sensorData.statuserror) {
     case 0:
-      toast.success(toastContent, toastConfig);
+      toast.success(toastContent, toastOptions);
       break;
     case 1:
-      toast.warn(toastContent, toastConfig);
+      toast.warn(toastContent, toastOptions);
       break;
     case 2:
-      toast.error(toastContent, toastConfig);
+      toast.error(toastContent, toastOptions);
       break;
     default:
-      toast.info(toastContent, toastConfig);
+      toast.info(toastContent, toastOptions);
   }
+  return null;
 };
 
 const toastConfig = {
   position: "top-right",
-  autoClose: 5000,
+  autoClose: 15000,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,

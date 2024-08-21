@@ -1,7 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import MonitoringMapReact from "./components/mapReact";
 import { ToastContainer } from "react-toastify";
-import toaster from "./tools/toastconfig";
 import dangerSound from "../src/assets/audio/danger.mp3";
 import positiveSound from "../src/assets/audio/positive.wav";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,20 +11,18 @@ const App = () => {
   const { theme } = useContext(ThemeContext);
   const [changedMarker, setChangedMarker] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  useEffect(() => {
-    console.log(changedMarker, "changed marker");
-  }, [changedMarker]);
 
   useEffect(() => {
-    if (!setIsSubscribed) subscribeToCurrentAlarms(onWSDataReceived);
+    if (!isSubscribed) {
+      subscribeToCurrentAlarms(onWSDataReceived);
+    }
   }, [isSubscribed]);
+
   const onWSDataReceived = (data) => {
     setIsSubscribed(true);
     setChangedMarker(data.data);
-    toaster(data.data);
 
     const sound = new Audio();
-    // Play sound based on data.data.statuserror
     if (data.data.statuserror === 1) {
       sound.src = dangerSound;
     } else if (data.data.statuserror === 0) {
@@ -33,12 +30,13 @@ const App = () => {
     } else if (data.data.statuserror === 2) {
       sound.src = dangerSound;
     }
+    sound.play();
   };
 
   return (
     <div
       className={`min-h-screen app-container ${
-        theme === "dark" ? "bg-gray-900 text-white" : " text-black"
+        theme === "dark" ? "bg-gray-900 text-white" : "text-black"
       }`}
     >
       <ToastContainer className="z-[99999]" />

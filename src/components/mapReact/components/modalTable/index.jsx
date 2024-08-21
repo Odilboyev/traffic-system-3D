@@ -4,6 +4,8 @@ import Pagination from "@/components/pagination";
 import Loader from "../../../Loader";
 import Modal from "../../../Modal";
 import { t } from "i18next";
+import { LiaSearchLocationSolid } from "react-icons/lia";
+import { useMap } from "react-leaflet"; // Import useMap hook
 
 const ModalTable = ({
   open,
@@ -18,13 +20,13 @@ const ModalTable = ({
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
+  const map = useMap(); // Get the map instance using useMap hook
 
   // Fetch modal data when type or currentPage changes
   useEffect(() => {
     open && currentPage !== 1 && fetchHandler(currentPage);
   }, [currentPage, open]);
 
-  console.log(filteredData, "filtered data in modal");
   // Update filteredData when data or sorting criteria change
   useEffect(() => {
     if (data.length > 0) {
@@ -65,8 +67,28 @@ const ModalTable = ({
     });
   };
 
-  // Extract headers dynamically based on data keys
-  const tableHeaders = data.length > 0 ? Object.keys(data[0]) : [];
+  // Extract headers dynamically based on data keys, excluding 'lat', 'lng', and 'location'
+  let tableHeaders = data.length > 0 ? Object.keys(data[0]) : [];
+
+  // Remove 'lat', 'lng', and 'location' and add a single 'location' header
+  tableHeaders = tableHeaders.filter(
+    (key) => key !== "lat" && key !== "lng" && key !== "location"
+  );
+  if (
+    data.length > 0 &&
+    ("lat" in data[0] || "lng" in data[0] || "location" in data[0])
+  ) {
+    tableHeaders.push("location");
+  }
+
+  // Handle location click and fly to the map location
+  const locationHandler = ({ lat, lng }) => {
+    console.log(lat, lng);
+    if (lat && lng) {
+      map.flyTo([lat, lng], 20); // Adjust zoom level as needed
+    }
+    handleOpen();
+  };
 
   return (
     <Modal
@@ -106,16 +128,38 @@ const ModalTable = ({
                     dark:text-white 
                    text-black`}
                 >
-                  {tableHeaders.map((key, index) => (
-                    <td
-                      className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
-                        key === "statuserror" && getRowColor(item[key])
-                      }`}
-                      key={index}
-                    >
-                      <Typography>{item[key]}</Typography>
-                    </td>
-                  ))}
+                  {tableHeaders.map((key, index) => {
+                    if (key === "location") {
+                      return (
+                        <td
+                          onClick={() =>
+                            locationHandler(
+                              item.lat
+                                ? { lat: item.lat, lng: item.lng }
+                                : JSON.parse(item.location)
+                            )
+                          }
+                          className={`cursor-pointer px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white`}
+                          key={index}
+                        >
+                          <Typography>
+                            <LiaSearchLocationSolid />
+                          </Typography>
+                        </td>
+                      );
+                    } else {
+                      return (
+                        <td
+                          className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
+                            key === "statuserror" && getRowColor(item[key])
+                          }`}
+                          key={index}
+                        >
+                          <Typography>{item[key]}</Typography>
+                        </td>
+                      );
+                    }
+                  })}
                 </tr>
               ))}
             </tbody>

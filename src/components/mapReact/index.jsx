@@ -5,6 +5,7 @@ import {
   Marker,
   useMapEvents,
   Tooltip,
+  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -73,14 +74,26 @@ const handleMapMove = (event) => {
   localStorage.setItem("mapCenter", JSON.stringify(newCenter));
   localStorage.setItem("mapZoom", newZoom);
 };
+//
+
+const MapEvents = ({ changedMarker, fetchAlarmsData }) => {
+  const map = useMap();
+
+  useMapEvents({
+    moveend: handleMapMove, // Assuming you have a handleMapMove function defined
+  });
+
+  useEffect(() => {
+    if (changedMarker) {
+      fetchAlarmsData();
+      toaster(changedMarker, map); // Pass the map instance if necessary
+    }
+  }, [changedMarker, map]);
+
+  return null; // This component does not render anything
+};
 
 const MapComponent = ({ changedMarker }) => {
-  const [map, setMap] = useState(null);
-  useEffect(() => {
-    if (map) {
-      map.invalidateSize();
-    }
-  }, [map]);
   // language `-`
   const { t } = useTranslation();
   //theme
@@ -119,13 +132,7 @@ const MapComponent = ({ changedMarker }) => {
     setSelectedLayer(layerName);
     layerSave(layerName);
   };
-  //
-  const MapEvents = () => {
-    useMapEvents({
-      moveend: handleMapMove,
-    });
-    return null;
-  };
+
   useEffect(() => {
     if (theme === "dark") {
       handleLayerChange("Dark");
@@ -152,6 +159,7 @@ const MapComponent = ({ changedMarker }) => {
   const [activeLight, setActiveLight] = useState(26);
 
   const [markers, setMarkers] = useState([]);
+  const [bottomSectionData, setBottomSectionData] = useState(null);
   const [areMarkersLoading, setAreMarkersLoading] = useState(false);
   const [isDraggable, setiIsDraggable] = useState(false);
   // const [types, setTypes] = useState(0);
@@ -169,25 +177,32 @@ const MapComponent = ({ changedMarker }) => {
     { type: "trafficlights", label: "Traffic Lights" },
   ];
 
+  useEffect(() => {
+    changedMarker &&
+      setMarkers((markers) => {
+        markers.map(
+          (marker) =>
+            marker.cid == changedMarker.cid && marker.type == changedMarker.type
+        );
+        return markers;
+      });
+  }, [changedMarker]);
+
   const getDataHandler = async () => {
     setAreMarkersLoading(true);
     try {
       setAreMarkersLoading(false);
-      const myData = await getMarkerData();
-      if (myData?.status == 999) {
-        localStorage.clear();
-        login.logout();
-        navigate("/", { replace: true });
-        localStorage.setItem("data-to-debug", JSON.stringify(myData));
-        window.location.reload();
-      } else {
-        setMarkers(
-          myData.data.map((marker) => ({
-            ...marker,
-            isPopupOpen: false,
-          }))
-        );
-      }
+      const [myData, bottomData] = await Promise.all([
+        getMarkerData(),
+        getInfoForCards(),
+      ]);
+      setMarkers(
+        myData.data.map((marker) => ({
+          ...marker,
+          isPopupOpen: false,
+        }))
+      );
+      setBottomSectionData(bottomData);
     } catch (error) {
       setAreMarkersLoading(false);
       if (error.code === "ERR_NETWORK") {
@@ -198,6 +213,7 @@ const MapComponent = ({ changedMarker }) => {
   };
   useEffect(() => {
     getDataHandler();
+
     return () => {
       setMarkers([]);
     };
@@ -293,42 +309,12 @@ const MapComponent = ({ changedMarker }) => {
   // ----------------------------------------------------------------
   /// alarms
   const [currentAlarms, setCurrentAlarms] = useState(null);
-  const [changedMarkerForAlarm, setChangedMarker] = useState(null);
   const [isAlarmsOpen, setIsAlarmsOpen] = useState(false);
-  const [bottomSectionData, setBottomSectionData] = useState(null);
 
-  useEffect(() => {
-    fetchData();
-    subscribeToCurrentAlarms(onWSDataReceived);
-  }, []);
-
-  const onWSDataReceived = (data) => {
-    if (data.marker !== undefined && data.marker !== null) {
-      setChangedMarker(data.marker);
-    }
-
-    if (data.status === "update") {
-      toaster(data.data, toastConfig);
-      fetchData();
-      const sound = new Audio();
-      if (data.data.statuserror === 1) {
-        sound.src = dangerSound;
-      } else if (data.data.statuserror === 2) {
-        sound.src = dangerSound;
-      }
-      sound.play();
-    }
-  };
-
-  const fetchData = async () => {
+  const fetchAlarmsData = async () => {
     try {
-      const [alarmsRes, infoRes] = await Promise.all([
-        GetCurrentAlarms(),
-        getInfoForCards(),
-      ]);
-
+      const alarmsRes = await GetCurrentAlarms();
       setCurrentAlarms(alarmsRes.data);
-      setBottomSectionData(infoRes);
     } catch (error) {
       console.error("Error fetching data:", error);
       throw new Error(error);
@@ -352,7 +338,10 @@ const MapComponent = ({ changedMarker }) => {
             {errorMessage}
           </div>
         )}
-        <MapEvents />
+        <MapEvents
+          changedMarker={changedMarker}
+          fetchAlarmsData={fetchAlarmsData}
+        />
         {currentLayer && (
           <TileLayer
             maxNativeZoom={currentLayer.maxNativeZoom}
