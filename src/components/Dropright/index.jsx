@@ -23,7 +23,7 @@ const Dropright = ({
           {" "}
           <IconButton
             size="sm"
-            color={theme === "dark" ? "black" : "white"}
+            // color={theme === "dark" ? "black" : "white"}
             onClick={() => setIsOpen(false)}
             className=" absolute right-0 top-0 z-50 "
           >
