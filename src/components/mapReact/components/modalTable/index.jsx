@@ -104,11 +104,13 @@ const ModalTable = ({
                   key={i}
                   className={`
                     dark:text-white 
-                   text-blue-gray-900`}
+                   text-black`}
                 >
                   {tableHeaders.map((key, index) => (
                     <td
-                      className="px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white"
+                      className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
+                        key === "statuserror" && getRowColor(item[key])
+                      }`}
                       key={index}
                     >
                       <Typography>{item[key]}</Typography>
