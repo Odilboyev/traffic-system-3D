@@ -1,6 +1,6 @@
 import Control from "react-leaflet-custom-control";
 import { IconButton } from "@material-tailwind/react";
-import { useState, useCallback, memo } from "react";
+import { useState, useCallback, memo, useEffect } from "react";
 import { MdHistory } from "react-icons/md";
 import ModalTable from "../modalTable";
 import { getErrorHistory } from "../../../../api/api.handlers";
@@ -25,10 +25,14 @@ const AlarmHistory = () => {
       setHistoryLoading(false);
     }
   }, []);
+
   return (
     <>
       <IconButton
-        onClick={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
+        onClick={() => {
+          setIsAlarmHistoryOpen(!isAlarmHistoryOpen);
+          fetchErrorHistory(1);
+        }}
         size="lg"
       >
         <MdHistory className="w-6 h-6 " />
