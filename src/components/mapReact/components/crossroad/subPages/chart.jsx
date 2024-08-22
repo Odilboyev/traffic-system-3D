@@ -1,7 +1,69 @@
 import { Typography } from "@material-tailwind/react";
 import Chart from "react-apexcharts";
-import { useState } from "react";
 import ChartFilters from "../components/chartFilters";
+import { t } from "i18next";
+// Default chart options
+const getChartOptions = () => ({
+  chart: {
+    height: 350,
+    stacked: true,
+  },
+  legend: {
+    position: "right",
+    offsetY: 40,
+  },
+  fill: {
+    opacity: 1,
+  },
+  plotOptions: {
+    bar: {
+      horizontal: false,
+      borderRadiusApplication: "end", // 'around', 'end'
+      borderRadiusWhenStacked: "last", // 'all', 'last'
+      dataLabels: {
+        total: {
+          enabled: true,
+          style: {
+            fontSize: "13px",
+            fontWeight: 900,
+          },
+        },
+      },
+    },
+  },
+  xaxis: {
+    type: "datetime",
+    labels: {
+      format: "dd.MM.yy HH:mm", // Fixed format typo HH:MM to HH:mm
+      rotate: -45,
+      tickPlacement: "on",
+    },
+  },
+  yaxis: {
+    labels: {
+      minWidth: 40,
+    },
+  },
+});
+
+const DirectionChart = ({ direction, index }) => (
+  <div className="min-h-[50vh] overflow-visible">
+    <div className="text-left px-3 flex">
+      <Typography>{index + 1}.</Typography>
+      <Typography className="font-bold">{direction.directionName}</Typography>
+    </div>
+    <div className="h-full">
+      <Chart
+        width="100%"
+        height="300"
+        type="bar"
+        key={direction.directionName}
+        options={getChartOptions()}
+        series={direction.series}
+      />
+    </div>
+  </div>
+);
 
 const ModalCharts = ({
   directions = [],
@@ -9,80 +71,29 @@ const ModalCharts = ({
   handleTime,
   interval,
   handleInterval,
-}) => {
-  const options = {
-    chart: {
-      type: "area",
-      height: 350,
-    },
-    colors: ["#0bd500", "#9700fb", "#0066e3", "#ff6600"],
-    stroke: {
-      width: 0.9,
-      curve: "smooth",
-    },
-    dataLabels: {
-      enabled: false, // <--- HERE
-    },
-    // fill: {
-    //   type: "gradient",
-    //   gradient: {
-    //     opacityFrom: 0.8,
-    //     opacityTo: 0.4,
-    //   },
-    // },
-    legend: {
-      position: "top",
-      horizontalAlign: "left",
-    },
-    xaxis: {
-      type: "datetime",
-      labels: {
-        format: "dd.MM.yy HH:MM",
-        rotate: -45,
-        tickPlacement: "on",
-        // rotateAlways: true,
-      },
-    },
-    yaxis: {
-      labels: {
-        minWidth: 40,
-      },
-    },
-  };
-  return (
-    <>
-      {/* create a div with 2 select components */}
-      <ChartFilters
-        time={time}
-        timeHandler={handleTime}
-        interval={interval}
-        intervalHandler={handleInterval}
-      />
-
-      <div className="mt-16">
-        {directions?.map((direction, i) => (
-          <div className={` min-h-[50vh] overflow-visible`} key={i}>
-            {" "}
-            <div className="text-left px-3 flex">
-              <Typography>{i + 1}.</Typography>
-              <Typography className="font-bold text-blue-gray-900">
-                {direction.directionName}
-              </Typography>
-            </div>
-            <div className={` h-full`}>
-              <Chart
-                width={"100%"}
-                height={"300"}
-                key={direction.directionName}
-                options={options}
-                series={direction.series}
-              />
-            </div>
-          </div>
-        ))}
+}) => (
+  <>
+    <ChartFilters
+      time={time}
+      timeHandler={handleTime}
+      interval={interval}
+      intervalHandler={handleInterval}
+    />
+    <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500">
+      <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r">
+        <p>{t("yesterday")}</p>
+        <b> 18079</b>
       </div>
-    </>
-  );
-};
+      <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center">
+        <p> {t("today")}: 13:08</p> <b>6890</b>
+      </div>
+    </div>
+    <div className="mt-16">
+      {directions.map((direction, i) => (
+        <DirectionChart key={i} direction={direction} index={i} type="bar" />
+      ))}
+    </div>
+  </>
+);
 
 export default ModalCharts;

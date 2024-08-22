@@ -21,7 +21,7 @@ import {
   Switch,
   Typography,
 } from "@material-tailwind/react";
-import Control from "../CustomControl";
+import Control from "../customControl";
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
@@ -44,14 +44,13 @@ import login from "../../Auth";
 import { useNavigate } from "react-router-dom";
 import CorssroadModal from "./components/crossroad";
 import DeviceModal from "./components/box/deviceModal";
-import CustomPopUp from "./components/customPopup";
+import CustomPopUp from "./components/customPopup/index.jsx";
 import baseLayers, { layerSave } from "../../configurations/mapLayers";
 import TrafficLightsModal from "./components/trafficLights/modal";
 import dangerSound from "../../assets/audio/danger.mp3";
 import toaster, { toastConfig } from "../../tools/toastconfig";
 import CurrentAlarms from "./components/alarm";
-import Dropright from "../Dropright";
-import ZoomControl from "./components/CustomZoomControl";
+import Dropright from "../dropright";
 import { TbBell, TbBellRinging } from "react-icons/tb";
 import { useTheme } from "../../customHooks/useTheme";
 import { IoMdSunny } from "react-icons/io";
@@ -63,6 +62,7 @@ import LanguageSwitcher from "../langSwitcher";
 import Svetoforlar from "./components/svetofor";
 import DeviceManagement from "../deviceManagement";
 import AlarmHistory from "./components/caseHistory";
+import ZoomControl from "./components/customZoomControl/index.jsx";
 
 const home = [41.2995, 69.2401];
 
@@ -213,7 +213,7 @@ const MapComponent = ({ changedMarker }) => {
   };
   useEffect(() => {
     getDataHandler();
-
+    fetchAlarmsData();
     return () => {
       setMarkers([]);
     };

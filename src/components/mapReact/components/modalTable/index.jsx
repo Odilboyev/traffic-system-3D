@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Input, Typography } from "@material-tailwind/react";
 import Pagination from "@/components/pagination";
-import Loader from "../../../Loader";
-import Modal from "../../../Modal";
+import Loader from "../../../loader";
+import Modal from "../../../modal";
 import { t } from "i18next";
 import { LiaSearchLocationSolid } from "react-icons/lia";
 import { useMap } from "react-leaflet"; // Import useMap hook

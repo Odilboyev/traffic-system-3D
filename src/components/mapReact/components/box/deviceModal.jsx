@@ -13,7 +13,7 @@ import {
   Spinner,
 } from "@material-tailwind/react";
 import SensorCard from "./sensorCard";
-import Loader from "../../../Loader";
+import Loader from "../../../loader";
 import Chart from "react-apexcharts";
 
 import { useEffect, useState } from "react";

@@ -1,7 +1,7 @@
 import { Button } from "@material-tailwind/react";
 import { memo, useEffect, useRef, useState } from "react";
 import { Popup, useMap } from "react-leaflet";
-import SingleRecord from "./singleRecord";
+import SingleRecord from "../singleRecord";
 import L from "leaflet";
 import { isEqual } from "lodash";
 

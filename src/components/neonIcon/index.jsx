@@ -2,10 +2,10 @@ import PropTypes from "prop-types";
 import { Typography } from "@material-tailwind/react";
 
 const statusStyles = {
-  0: "bg-green-500/20 text-green-300 ring-green-300 ",
-  1: "bg-yellow-500/20 text-yellow-300 ring-yellow-300",
-  2: "bg-red-500/20 text-red-300 ring-red-300",
-  3: "bg-gray-500/20 text-gray-300 ring-gray-300",
+  0: "dark:bg-green-500/20 bg-green-600/20 dark:text-green-300 text-green-400 ring-green-300 ",
+  1: "dark:bg-yellow-500/20 bg-orange-600/20 dark:text-yellow-300 text-orange-600 dark:ring-yellow-300 ring-orange-600",
+  2: "dark:bg-red-500/20 bg-red-600/20 dark:text-red-300 text-red-400 ring-red-300",
+  3: "dark:bg-gray-500/20 bg-gray-600/20 dark:text-gray-300 text-gray-400 ring-gray-300",
 };
 
 const NeonIcon = ({ icon: Icon, iconStyle, text, status }) => {

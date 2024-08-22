@@ -2,7 +2,7 @@ import { PlusIcon } from "@heroicons/react/16/solid";
 import { IconButton } from "@material-tailwind/react";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { useMap } from "react-leaflet";
-import Control from "../../CustomControl";
+import Control from "../../../customControl";
 
 const ZoomControl = ({ theme, position, size }) => {
   const map = useMap();

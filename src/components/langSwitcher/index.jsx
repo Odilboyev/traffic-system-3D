@@ -9,7 +9,7 @@ import {
 } from "@material-tailwind/react";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import Control from "../CustomControl";
+import Control from "../customControl";
 
 const LanguageSwitcher = ({ position }) => {
   const { i18n } = useTranslation();

@@ -7,7 +7,7 @@ import {
 import { CogIcon } from "@heroicons/react/16/solid";
 import { useState, useCallback, memo } from "react";
 import { t } from "i18next";
-import Dropright from "../Dropright";
+import Dropright from "../dropright";
 import ModalTable from "../mapReact/components/modalTable";
 import { getDevices } from "../../api/api.handlers";
 

@@ -183,7 +183,7 @@ const Svetoforlar = () => {
                   style: { transform: `rotate(${v.rotate}deg)` },
                 })}
                 status={v.status === 1 ? 0 : v.status === 2 ? 2 : 1}
-                text={v.countdown || "0"}
+                // text={v.countdown || "0"}
               />
             ),
           })}

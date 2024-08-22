@@ -24,12 +24,12 @@ import Svetoforlar from "../svetofor";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { useTheme } from "../../../../customHooks/useTheme";
 import baseLayers from "../../../../configurations/mapLayers";
-import Loader from "../../../Loader";
+import Loader from "../../../loader";
 import { TbLoader } from "react-icons/tb";
 function transformDataForCharts(data) {
   const transformed = data.map((direction) => {
     const series = [
-      { name: "carall", data: [] },
+      // { name: "carall", data: [] },
       { name: "carmid", data: [] },
       { name: "carbig", data: [] },
       { name: "carsmall", data: [] },
@@ -40,10 +40,10 @@ function transformDataForCharts(data) {
       const { date, carall, carmid, carbig, carsmall } = item;
       const x = date;
 
-      series[0].data.push({ x, y: carall });
-      series[1].data.push({ x, y: carmid });
-      series[2].data.push({ x, y: carbig });
-      series[3].data.push({ x, y: carsmall });
+      // series[0].data.push({ x, y: carall });
+      series[0].data.push({ x, y: carmid });
+      series[1].data.push({ x, y: carbig });
+      series[2].data.push({ x, y: carsmall });
       // Push data for other car types to their respective series
     });
 
@@ -174,7 +174,7 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
   return (
     <Dialog
       size="xxl"
-      className="dark:!bg-blue-gray-800 "
+      className="dark:!bg-blue-gray-800 dark:text-white "
       open={open}
       handler={handleClose}
     >
@@ -214,7 +214,7 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
               id="monitoring"
               attributionControl={false}
               center={[marker?.lat, marker?.lng]}
-              zoom={localStorage.getItem("mapZoom") || 18}
+              zoom={19}
               maxZoom={theme === "dark" ? 22 : 18}
               zoomDelta={0.6}
               style={{ height: "100vh", width: "100%" }}

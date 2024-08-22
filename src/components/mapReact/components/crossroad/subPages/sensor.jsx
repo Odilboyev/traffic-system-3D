@@ -4,7 +4,7 @@ import Chart from "react-apexcharts";
 
 import { useEffect, useState } from "react";
 import SensorTable from "../components/sensortable";
-import Loader from "../../../../Loader";
+import Loader from "../../../../loader";
 import { getBoxSensorChart } from "../../../../../api/api.handlers";
 
 const SensorSection = ({ device, isLoading, markerId = {} }) => {
