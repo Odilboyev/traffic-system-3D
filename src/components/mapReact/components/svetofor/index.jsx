@@ -147,20 +147,15 @@ const Svetoforlar = () => {
 
   const updateTrafficLights = (data) => {
     if (data) {
-      const prevLights = [...trafficLights];
-
-      const updatedLights = data.channel.map((v) => {
-        const existingLight = prevLights.find(
-          (light) => v.id === light.link_id
-        );
-
-        return {
-          ...v,
-          lat: existingLight?.lat ?? 0,
-          lng: existingLight?.lng ?? 0,
-          rotate: existingLight?.rotate ?? 0,
-          type: existingLight?.type ?? 0,
-        };
+      const updatedLights = trafficLights.map((light) => {
+        const update = data.channel.find((v) => v.id === light.link_id);
+        return update
+          ? {
+              ...light,
+              status: update.type === 100 ? light.status : update.status,
+              countdown: update.countdown,
+            }
+          : light;
       });
 
       setTrafficLights(updatedLights);
@@ -174,16 +169,19 @@ const Svetoforlar = () => {
           key={i}
           position={[v.lat, v.lng]}
           icon={L.divIcon({
-            className: "  rounded-full flex items-center justify-center ",
+            className: "rounded-full flex items-center justify-center ",
             html: renderToString(
               <NeonIcon
-                icon={iconSelector({
-                  type: v.type,
-                  status: v.status,
-                  style: { transform: `rotate(${v.rotate}deg)` },
-                })}
+                icon={
+                  v.type !== 100 &&
+                  iconSelector({
+                    type: v.type,
+                    status: v.status,
+                    style: { transform: `rotate(${v.rotate}deg)` },
+                  })
+                }
                 status={v.status === 1 ? 0 : v.status === 2 ? 2 : 1}
-                // text={v.countdown || "0"}
+                text={v.type === 100 && (v.countdown || "0")}
               />
             ),
           })}

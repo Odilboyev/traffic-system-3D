@@ -1,4 +1,3 @@
-import Control from "react-leaflet-custom-control";
 import { IconButton } from "@material-tailwind/react";
 import { useState, useCallback, memo, useEffect } from "react";
 import { MdHistory } from "react-icons/md";

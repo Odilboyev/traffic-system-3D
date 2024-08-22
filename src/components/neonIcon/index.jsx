@@ -15,7 +15,7 @@ const NeonIcon = ({ icon: Icon, iconStyle, text, status }) => {
       className={`flex items-center justify-center p-2 rounded-full shadow-neon ring-1 ${statusClass} `}
     >
       {/* <Icon className="w-full" style={iconStyle} /> */}
-      {Icon}
+      {Icon && Icon}
       {text && (
         <Typography className="mx-2 min-w-4 font-bold text-2xl">
           {text}
