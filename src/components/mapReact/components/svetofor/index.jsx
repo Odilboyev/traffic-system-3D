@@ -172,6 +172,7 @@ const Svetoforlar = () => {
             className: "rounded-full flex items-center justify-center ",
             html: renderToString(
               <NeonIcon
+                isRounded={false}
                 icon={
                   v.type !== 100 &&
                   iconSelector({

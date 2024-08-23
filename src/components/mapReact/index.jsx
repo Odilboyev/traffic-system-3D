@@ -34,7 +34,7 @@ import { PieChart } from "react-minimal-pie-chart";
 import { renderToString } from "react-dom/server";
 import {
   getBoxData,
-  GetCurrentAlarms,
+  getCurrentAlarms,
   getInfoForCards,
   getMarkerData,
   markerHandler,
@@ -313,7 +313,7 @@ const MapComponent = ({ changedMarker }) => {
 
   const fetchAlarmsData = async () => {
     try {
-      const alarmsRes = await GetCurrentAlarms();
+      const alarmsRes = await getCurrentAlarms();
       setCurrentAlarms(alarmsRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);

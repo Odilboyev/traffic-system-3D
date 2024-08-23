@@ -15,6 +15,9 @@ const getChartOptions = () => ({
   fill: {
     opacity: 1,
   },
+  dataLabels: {
+    enabled: false, // <--- HERE
+  },
   plotOptions: {
     bar: {
       horizontal: false,

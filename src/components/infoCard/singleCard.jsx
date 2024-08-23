@@ -34,6 +34,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
                   <div className="flex items-center gap-6" key={i}>
                     <div className=" rounded-full flex items-center justify-center ">
                       <NeonIcon
+                        isRounded
                         icon={iconSwitcher(data.type)}
                         status={value.status}
                       />

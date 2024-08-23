@@ -26,142 +26,121 @@ import { useTheme } from "../../../../customHooks/useTheme";
 import baseLayers from "../../../../configurations/mapLayers";
 import Loader from "../../../loader";
 import { TbLoader } from "react-icons/tb";
+import CrossroadDashboard from "./subPages/crossroadDash";
+
+// Helper function to transform chart data
 function transformDataForCharts(data) {
-  const transformed = data.map((direction) => {
+  return data.map((direction) => {
     const series = [
-      // { name: "carall", data: [] },
       { name: "carmid", data: [] },
       { name: "carbig", data: [] },
       { name: "carsmall", data: [] },
-      // Add more series for other car types if needed
     ];
 
     direction.data.forEach((item) => {
-      const { date, carall, carmid, carbig, carsmall } = item;
-      const x = date;
-
-      // series[0].data.push({ x, y: carall });
-      series[0].data.push({ x, y: carmid });
-      series[1].data.push({ x, y: carbig });
-      series[2].data.push({ x, y: carsmall });
-      // Push data for other car types to their respective series
+      const { date, carmid, carbig, carsmall } = item;
+      series[0].data.push({ x: date, y: carmid });
+      series[1].data.push({ x: date, y: carbig });
+      series[2].data.push({ x: date, y: carsmall });
     });
 
     return { directionName: direction.direction_name, series };
   });
-
-  return transformed;
 }
 
 const CorssroadModal = ({ open, handleOpen, marker }) => {
   const { theme } = useTheme();
-  console.log(localStorage.getItem("selectedLayer"), "selectedLayer is ");
   const currentLayer = baseLayers.find(
-    (layer) => layer.name == localStorage.getItem("selectedLayer")
+    (layer) => layer.name === localStorage.getItem("selectedLayer")
   );
 
   const [isLoading, setIsLoading] = useState(false);
   const [isChartLoading, setChartLoading] = useState(false);
   const [data, setData] = useState(null);
-
   const [trafficLights, setTrafficLights] = useState(null);
-  const [trafficSocketData, setTrafficSocketData] = useState(null);
-
   const [chartData, setChartData] = useState(null);
-  const [chartDate, setChartDate] = useState(new Date().toJSON().split("T")[0]);
+  const [chartDate, setChartDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [interval, setInterval] = useState(60);
-
   const [device, setDevice] = useState(null);
 
   const handleDate = (date) => {
-    const formattedDate = format(date, "yyyy-MM-dd");
-    setChartDate(formattedDate);
+    setChartDate(format(date, "yyyy-MM-dd"));
   };
-  const getData = async (id) => {
+
+  const fetchData = async (id) => {
     setIsLoading(true);
     try {
-      const res = await getCrossRoadData(id);
-      setIsLoading(false);
-
-      setData(res?.data);
-      getTrafficLights(res?.data.svetofor.svetofor_id);
+      const crossroadData = await getCrossRoadData(id);
+      setData(crossroadData?.data);
+      fetchTrafficLights(crossroadData?.data?.svetofor?.svetofor_id);
     } catch (error) {
+      console.error("Failed to fetch crossroad data:", error);
+    } finally {
       setIsLoading(false);
-
-      throw new Error(error);
-    }
-  };
-  const getTrafficLights = async (id) => {
-    setIsLoading(true);
-    if (id) {
-      try {
-        const res = await getTrafficLightsData(id);
-        setIsLoading(false);
-        console.log(res, "traffic");
-        setTrafficLights(res);
-      } catch (error) {
-        setIsLoading(false);
-
-        throw new Error(error);
-      }
     }
   };
 
-  const getSensorData = async (id) => {
+  const fetchTrafficLights = async (id) => {
+    if (!id) return;
     setIsLoading(true);
-
     try {
-      const res = await getBoxData(id);
+      const trafficLightsData = await getTrafficLightsData(id);
+      setTrafficLights(trafficLightsData);
+    } catch (error) {
+      console.error("Failed to fetch traffic lights data:", error);
+    } finally {
       setIsLoading(false);
+    }
+  };
 
+  const fetchSensorData = async (id) => {
+    if (!id) return;
+    setIsLoading(true);
+    try {
+      const sensorData = await getBoxData(id);
       setDevice({
-        device_data: res?.device_data,
-        sensor_data: res?.sensor_data,
+        device_data: sensorData?.device_data,
+        sensor_data: sensorData?.sensor_data,
       });
     } catch (error) {
+      console.error("Failed to fetch sensor data:", error);
+    } finally {
       setIsLoading(false);
-
-      throw new Error(error);
     }
   };
 
-  const req = {
-    crossroad_id: marker?.cid,
-    date: chartDate,
-    interval: interval,
-  };
-
-  const getChartData = async () => {
+  const fetchChartData = async () => {
     setChartLoading(true);
     try {
-      const res = await getCrossRoadChart(req);
-
+      const res = await getCrossRoadChart({
+        crossroad_id: marker?.cid,
+        date: chartDate,
+        interval: interval,
+      });
       const transformedData = transformDataForCharts(res.direction_data);
-
-      if (transformedData.length > 0) {
-        setChartData(transformedData);
-      }
+      setChartData(transformedData.length > 0 ? transformedData : null);
     } catch (error) {
-      throw new Error(error);
+      console.error("Failed to fetch chart data:", error);
     } finally {
       setChartLoading(false);
     }
   };
+
   useEffect(() => {
-    if (open && data === null) {
-      getData(marker?.cid);
-    }
-    if (data && device === null && data?.box_device) {
-      getSensorData(data.box_device?.id);
+    if (open) {
+      if (!data) fetchData(marker?.cid);
+      if (data && !device && data?.box_device) {
+        fetchSensorData(data.box_device?.id);
+      }
     }
     return () => {};
   }, [open, data]);
 
   useEffect(() => {
-    open && getChartData();
-    return () => {
-      setChartData(null);
-    };
+    if (open) fetchChartData();
+    return () => setChartData(null);
   }, [chartDate, interval]);
 
   const handleClose = () => {
@@ -171,21 +150,23 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
     setTrafficLights(null);
     handleOpen();
   };
+
   return (
     <Dialog
       size="xxl"
-      className="dark:!bg-blue-gray-800 dark:text-white "
+      className="dark:!bg-blue-gray-800 dark:text-white"
       open={open}
       handler={handleClose}
     >
-      <DialogHeader className="justify-between p-2 dark:!bg-blue-gray-900">
-        <div>{marker?.cname}</div>
+      <DialogHeader className="justify-between p-2 dark:!bg-blue-gray-900 dark:text-white">
+        <Typography className="text-2xl font-bold">{marker?.cname}</Typography>
         <IconButton
           className="m-1"
           color="blue-gray"
           size="sm"
           variant="text"
-          onClick={() => handleOpen()}
+          onClick={handleOpen}
+          aria-label="Close dialog"
         >
           <XMarkIcon className="w-5 h-5" />
         </IconButton>
@@ -195,7 +176,6 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
           <FullscreenBox>
             <Videos videos={data?.camera} />
           </FullscreenBox>
-          {/* sensors */}
           <FullscreenBox>
             {device ? (
               <SensorSection
@@ -207,8 +187,7 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
             ) : (
               <Typography>No Sensor data</Typography>
             )}
-          </FullscreenBox>{" "}
-          {/* traffic lights */}
+          </FullscreenBox>
           <FullscreenBox>
             <MapContainer
               id="monitoring"
@@ -232,11 +211,11 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
               <Svetoforlar />
             </MapContainer>
           </FullscreenBox>
-          {/* chart data for the number of cars */}
           <FullscreenBox>
-            {isChartLoading ? (
+            <CrossroadDashboard marker={marker} />
+            {/* {isChartLoading ? (
               <TbLoader className="animate animate-spin" />
-            ) : chartData && chartData?.length > 0 ? (
+            ) : chartData && chartData.length > 0 ? (
               <ModalCharts
                 directions={chartData}
                 interval={interval}
@@ -246,7 +225,7 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
               />
             ) : (
               <Typography>No Chart Data</Typography>
-            )}
+            )} */}
           </FullscreenBox>
         </div>
       </DialogBody>
@@ -255,8 +234,14 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
 };
 
 CorssroadModal.propTypes = {
-  open: PropTypes.bool,
-  handleOpen: PropTypes.func,
-  marker: PropTypes.any,
+  open: PropTypes.bool.isRequired,
+  handleOpen: PropTypes.func.isRequired,
+  marker: PropTypes.shape({
+    cid: PropTypes.number,
+    cname: PropTypes.string,
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+  }),
 };
+
 export default CorssroadModal;
