@@ -5,41 +5,59 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { CogIcon } from "@heroicons/react/16/solid";
-import { useState, useCallback, memo } from "react";
+import { useState, useCallback, memo, useEffect } from "react";
 import { t } from "i18next";
 import Dropright from "../dropright";
 import ModalTable from "../mapReact/components/modalTable";
-import { getDevices } from "../../api/api.handlers";
+import { getDevices, getErrorHistory } from "../../api/api.handlers";
 
 const DeviceManagement = () => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
-  const [deviceType, setdeviceType] = useState(""); // default type
-  const [isAlarmdeviceOpen, setIsAlarmdeviceOpen] = useState(false);
-  const [deviceData, setdeviceData] = useState([]);
-  const [deviceLoading, setdeviceLoading] = useState(false);
-  const [deviceTotalPages, setdeviceTotalPages] = useState(null);
+  const [deviceType, setDeviceType] = useState(""); // Default type
+  const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
+  const [deviceData, setDeviceData] = useState([]);
+  const [deviceLoading, setDeviceLoading] = useState(false);
+  const [deviceTotalPages, setDeviceTotalPages] = useState(null);
 
   const fetchDeviceData = useCallback(async (type, current = 1) => {
-    setdeviceLoading(true);
-    setdeviceData([]); // Clear existing data before fetching new data
+    setDeviceLoading(true);
+    setDeviceData([]); // Clear existing data before fetching new data
     try {
       const all = await getDevices(type, current);
-      setdeviceData(all.data);
-      setdeviceTotalPages(all.total_pages ? all.total_pages : 1);
+      setDeviceData(all.data);
+      setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
     } catch (err) {
-      console.log("Error fetching error device. Please try again.");
+      console.log("Error fetching device data. Please try again.");
     } finally {
-      setdeviceLoading(false);
+      setDeviceLoading(false);
     }
   }, []);
 
   // Handler for changing the device type
   const handleTypeChange = (type) => {
-    setdeviceType(type); // Update device type
+    setDeviceType(1); // Update device type
+    console.log(type);
     fetchDeviceData(type); // Fetch data for the selected type
     setIsDroprightOpen(false); // Close the dropdown
-    setIsAlarmdeviceOpen(true); // Open the modal
+    setIsAlarmDeviceOpen(true); // Open the device modal
   };
+  // fetchErrorHistory
+  const fetchErrorHistory = useCallback(async (current, id) => {
+    console.log(id, deviceType, current, "Fetching error history");
+    setDeviceLoading(true);
+    try {
+      const all = await getErrorHistory(current, {
+        type: deviceType,
+        device_id: id,
+      });
+      setDeviceData(all.data);
+      setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
+    } catch (err) {
+      console.log("Error fetching error history. Please try again.");
+    } finally {
+      setDeviceLoading(false);
+    }
+  }, []);
 
   return (
     <>
@@ -87,13 +105,16 @@ const DeviceManagement = () => {
         }
       />
       <ModalTable
-        open={isAlarmdeviceOpen}
+        open={isAlarmDeviceOpen}
         handleOpen={() => {
-          setdeviceData([]);
-          setIsAlarmdeviceOpen(!isAlarmdeviceOpen);
+          setDeviceTotalPages(null);
+          setDeviceData([]);
+          setIsAlarmDeviceOpen(false); // Correctly close the device modal
         }}
+        itemCallback={fetchErrorHistory}
         title={t(deviceType)}
         data={deviceData}
+        showActions={true}
         isLoading={deviceLoading}
         itemsPerPage={20}
         totalPages={deviceTotalPages}
@@ -102,4 +123,5 @@ const DeviceManagement = () => {
     </>
   );
 };
+
 export default memo(DeviceManagement);

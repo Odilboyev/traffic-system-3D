@@ -6,7 +6,7 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
-import React from "react";
+import React, { memo } from "react";
 
 const Modal = ({ title, handleOpen, open, body, bottom, ...rest }) => {
   return (
@@ -53,4 +53,4 @@ const Modal = ({ title, handleOpen, open, body, bottom, ...rest }) => {
   );
 };
 
-export default Modal;
+export default memo(Modal);

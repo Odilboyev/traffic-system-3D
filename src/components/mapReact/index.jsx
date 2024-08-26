@@ -63,6 +63,7 @@ import Svetoforlar from "./components/svetofor";
 import DeviceManagement from "../deviceManagement";
 import AlarmHistory from "./components/caseHistory";
 import ZoomControl from "./components/customZoomControl/index.jsx";
+import { usePopupContext } from "../../context/popupContext.jsx";
 
 const home = [41.2995, 69.2401];
 
@@ -269,16 +270,6 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
 
-  const handlePopupOpen = (marker) => {
-    setMarkers((prevMarkers) =>
-      prevMarkers.map((m) => {
-        if (m.cid === marker.cid && m.type === marker.type) {
-          return { ...m, isPopupOpen: true };
-        }
-        return m;
-      })
-    );
-  };
   const handleMonitorCrossroad = (marker) => {
     setActiveMarker(marker);
     setIsbigMonitorOpen(!isbigMonitorOpen);
@@ -304,8 +295,6 @@ const MapComponent = ({ changedMarker }) => {
       setIsLightsModalOpen(true);
     }
   };
-
-  const [openPopupIds, setOpenPopupIds] = useState([]);
   // ----------------------------------------------------------------
   /// alarms
   const [currentAlarms, setCurrentAlarms] = useState(null);
@@ -319,6 +308,23 @@ const MapComponent = ({ changedMarker }) => {
       console.error("Error fetching data:", error);
       throw new Error(error);
     }
+  };
+
+  // handle popups
+
+  const { updatePopupState } = usePopupContext();
+
+  const handleMarkerClick = (id) => {
+    // Open the popup for this marker
+    handleOpenPopup(id);
+  };
+
+  const handleOpenPopup = (id) => {
+    updatePopupState(id, { visible: true });
+  };
+
+  const handleClosePopup = (id) => {
+    updatePopupState(id, { visible: false });
   };
 
   return (
@@ -547,7 +553,7 @@ const MapComponent = ({ changedMarker }) => {
                         ? () => handleBoxModalOpen(marker)
                         : marker.type == 4
                         ? () => handleLightsModalOpen(marker)
-                        : () => handlePopupOpen(marker),
+                        : () => handleMarkerClick(marker.cid),
                     dragend: (event) =>
                       handleMarkerDragEnd(marker.cid, marker.type, event),
                   }}
@@ -560,22 +566,29 @@ const MapComponent = ({ changedMarker }) => {
                 >
                   {marker.type === 1 && (
                     <CustomPopUp
+                      onClose={() => handleClosePopup(marker.cid)}
                       marker={marker}
-                      openPopupData={openPopupIds}
-                      setOpenPopupData={setOpenPopupIds}
                     />
                   )}
                   <Tooltip direction="top">
                     {marker.type == 1 && (
-                      <div className="w-[30vw]">
+                      <div
+                        style={{
+                          width: "12vw",
+                          height: "8vw",
+                          overflow: "hidden",
+                        }}
+                      >
                         <img
                           src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
                           className="w-full"
                           alt=""
                         />
+                        <Typography className="my-0">
+                          {marker?.cname}
+                        </Typography>
                       </div>
                     )}
-                    <Typography>{marker?.cname}</Typography>
                   </Tooltip>
                 </Marker>
               </>

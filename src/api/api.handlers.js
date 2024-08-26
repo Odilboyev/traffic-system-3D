@@ -49,8 +49,8 @@ const markerHandler = async (body) =>
   postData(import.meta.env.VITE_MARKER, body);
 const getCurrentAlarms = async () =>
   getData(import.meta.env.VITE_CURRENT_ALARMS);
-const getErrorHistory = async (current) =>
-  getData(import.meta.env.VITE_GET_ERROR_HISTORY, `/${current}`);
+const getErrorHistory = async (current, body) =>
+  postData(import.meta.env.VITE_GET_ERROR_HISTORY + `/${current}`, body);
 const getBoxSensorChart = async (device_id, sensor_id) =>
   postData(import.meta.env.VITE_SENSOR_CHART, { device_id, sensor_id });
 const getInfoForCards = async () =>

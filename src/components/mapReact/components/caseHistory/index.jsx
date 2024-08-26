@@ -38,7 +38,11 @@ const AlarmHistory = () => {
       </IconButton>
       <ModalTable
         open={isAlarmHistoryOpen}
-        handleOpen={() => setIsAlarmHistoryOpen(!isAlarmHistoryOpen)}
+        handleOpen={() => {
+          setHistoryData([]);
+          setHistoryTotalPages(null);
+          setIsAlarmHistoryOpen(!isAlarmHistoryOpen);
+        }}
         data={historyData}
         title={t("history")}
         isLoading={historyLoading}

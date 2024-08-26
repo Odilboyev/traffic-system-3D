@@ -1,39 +1,26 @@
-import { Button } from "@material-tailwind/react";
-import { memo, useEffect, useRef, useState } from "react";
-import { Popup, useMap } from "react-leaflet";
+import { memo, useEffect, useRef } from "react";
+import { Popup } from "react-leaflet";
 import SingleRecord from "../singleRecord";
-import L from "leaflet";
-import { isEqual } from "lodash";
 
-const CustomPopUp = memo(function CustomPopup({
+const DraggablePopup = memo(function DraggablePopup({
   marker = {},
-  openPopupData = [],
-  setOpenPopupData = () => {},
+  onClose = () => {},
+  id,
 }) {
-  const popupRef = useRef(null);
-
   return (
-    <>
-      <Popup
-        ref={popupRef}
-        interactive
-        minWidth={"600px"}
-        closeOnClick={false}
-        autoClose={false}
-        keepInView={true}
-        className="p-0 z-[50000000]"
-        eventHandlers={{
-          mouseover: (e) => {
-            const element = e.target.getElement();
-            const draggable = new L.Draggable(element);
-            draggable.enable();
-          },
-        }}
-      >
-        <SingleRecord {...marker} />
-      </Popup>
-    </>
+    <Popup
+      // ref={popupRef}
+      eventHandlers={{ close: onClose }}
+      maxWidth={"100%"}
+      interactive
+      closeOnClick={false}
+      autoClose={false}
+      keepInView={true}
+      className="m-0 !p-0 z-[50000000] select-none"
+    >
+      <SingleRecord mselink={marker?.mselink} cname={marker?.cname} />
+    </Popup>
   );
-},
-isEqual);
-export default CustomPopUp;
+});
+
+export default DraggablePopup;
