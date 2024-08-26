@@ -54,7 +54,7 @@ import Dropright from "../dropright";
 import { TbBell, TbBellRinging } from "react-icons/tb";
 import { useTheme } from "../../customHooks/useTheme";
 import { IoMdSunny } from "react-icons/io";
-import ClockOnMap from "./components/weather";
+import WeatherWidget from "./components/weather";
 import BottomSection from "../infoCard";
 import { MdBedtime } from "react-icons/md";
 import { useTranslation } from "react-i18next";
@@ -62,8 +62,9 @@ import LanguageSwitcher from "../langSwitcher";
 import Svetoforlar from "./components/svetofor";
 import DeviceManagement from "../deviceManagement";
 import AlarmHistory from "./components/caseHistory";
-import ZoomControl from "./components/customZoomControl/index.jsx";
-import { usePopupContext } from "../../context/popupContext.jsx";
+import ZoomControl from "./components/controls/customZoomControl/index.jsx";
+import FilterControl from "./components/controls/filterControl/index.jsx";
+import WidgetControl from "./components/controls/widgetControl/index.jsx";
 
 const home = [41.2995, 69.2401];
 
@@ -170,14 +171,10 @@ const MapComponent = ({ changedMarker }) => {
     crossroad: true,
     trafficlights: true,
   });
-  const checkboxConfigurations = [
-    { type: "all", label: t("all") },
-    { type: "box", label: "Box" },
-    { type: "camera", label: "Cameras" },
-    { type: "crossroad", label: "Crossroads" },
-    { type: "trafficlights", label: "Traffic Lights" },
-  ];
-
+  const [widgets, setWidgets] = useState({
+    bottomsection: true,
+    weather: true,
+  });
   useEffect(() => {
     changedMarker &&
       setMarkers((markers) => {
@@ -257,19 +254,6 @@ const MapComponent = ({ changedMarker }) => {
     }
   }, [changedMarker]);
 
-  const handleFilterChange = (name, checked) => {
-    if (name === "all") {
-      setFilter({
-        box: checked,
-        camera: checked,
-        crossroad: checked,
-        trafficlights: checked,
-      });
-    } else {
-      setFilter((prevFilter) => ({ ...prevFilter, [name]: checked }));
-    }
-  };
-
   const handleMonitorCrossroad = (marker) => {
     setActiveMarker(marker);
     setIsbigMonitorOpen(!isbigMonitorOpen);
@@ -310,23 +294,6 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
 
-  // handle popups
-
-  const { updatePopupState } = usePopupContext();
-
-  const handleMarkerClick = (id) => {
-    // Open the popup for this marker
-    handleOpenPopup(id);
-  };
-
-  const handleOpenPopup = (id) => {
-    updatePopupState(id, { visible: true });
-  };
-
-  const handleClosePopup = (id) => {
-    updatePopupState(id, { visible: false });
-  };
-
   return (
     <>
       <MapContainer
@@ -358,45 +325,32 @@ const MapComponent = ({ changedMarker }) => {
           />
         )}
         {/* zoomcontrol */}
-        <ZoomControl theme={theme} />
-        {/* clock */}
-        <ClockOnMap />
-        {/* bottomsection */}
-        <BottomSection cardsInfoData={bottomSectionData} />
+        <ZoomControl theme={theme} />{" "}
+        <Control position="topleft">
+          <FilterControl
+            filter={filter}
+            changeFilter={setFilter}
+            placement={"right"}
+          />
+        </Control>
+        {/* widgets */}
+        <Control position="topleft">
+          <WidgetControl
+            filter={widgets}
+            changeFilter={setWidgets}
+            placement={"right"}
+          />
+        </Control>
+        <div className={widgets.weather ? "visible" : "invisible"}>
+          {" "}
+          <WeatherWidget />
+        </div>
+        <div className={widgets.bottomsection ? "visible" : "invisible"}>
+          {" "}
+          <BottomSection cardsInfoData={bottomSectionData} />
+        </div>
         {/* lights */}
         <Svetoforlar />
-        <Control position="topleft">
-          <SpeedDial placement="right">
-            <IconButton
-              // color={theme === "light" ? "black" : "white"}
-              size="lg"
-            >
-              <SpeedDialHandler className="w-10 h-10 cursor-pointer">
-                <ListBulletIcon className="w-5 h-5 p-2" />
-              </SpeedDialHandler>
-            </IconButton>
-            <SpeedDialContent className="ml-4">
-              <div className="filter-panel p-2 flex rounded-md flex-col bg-gray-900/80 text-whit backdrop-blur-md">
-                {checkboxConfigurations.map(({ type, label }) => (
-                  <Checkbox
-                    key={type}
-                    label={
-                      <Typography className="text-white">{label}</Typography>
-                    }
-                    ripple={false}
-                    className="m-0 p-0"
-                    checked={
-                      type === "all"
-                        ? filter.box && filter.camera && filter.crossroad
-                        : filter[type]
-                    }
-                    onChange={(e) => handleFilterChange(type, e.target.checked)}
-                  />
-                ))}
-              </div>
-            </SpeedDialContent>
-          </SpeedDial>
-        </Control>
         <Control position="topleft">
           <SpeedDial placement="right">
             <IconButton
@@ -553,7 +507,7 @@ const MapComponent = ({ changedMarker }) => {
                         ? () => handleBoxModalOpen(marker)
                         : marker.type == 4
                         ? () => handleLightsModalOpen(marker)
-                        : () => handleMarkerClick(marker.cid),
+                        : null,
                     dragend: (event) =>
                       handleMarkerDragEnd(marker.cid, marker.type, event),
                   }}
@@ -564,12 +518,7 @@ const MapComponent = ({ changedMarker }) => {
                   })}
                   rotatedAngle={marker.type === 3 ? marker.rotated : 0}
                 >
-                  {marker.type === 1 && (
-                    <CustomPopUp
-                      onClose={() => handleClosePopup(marker.cid)}
-                      marker={marker}
-                    />
-                  )}
+                  {marker.type === 1 && <CustomPopUp marker={marker} />}
                   <Tooltip direction="top">
                     {marker.type == 1 && (
                       <div

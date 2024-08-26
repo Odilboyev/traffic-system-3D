@@ -3,17 +3,12 @@ import { Popup } from "react-leaflet";
 import SingleRecord from "../singleRecord";
 import L from "leaflet";
 
-const DraggablePopup = memo(function DraggablePopup({
-  marker = {},
-  onClose = () => {},
-  id,
-}) {
+const DraggablePopup = memo(function DraggablePopup({ marker = {} }) {
   const popupRef = useRef(null);
   return (
     <Popup
       eventHandlers={{
         mouseover: (e) => {
-          // console.log('over',e.target.getElement())
           const element = e.target.getElement();
           const draggable = new L.Draggable(element);
           draggable.enable();

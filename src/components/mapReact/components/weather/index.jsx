@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import WeatherCard from "./weatherCard";
 
-const ClockOnMap = () => {
+const WeatherWidget = () => {
   const [time, setTime] = useState(new Date());
   const [location, setLocation] = useState("Tashkent");
 
@@ -31,7 +31,7 @@ const ClockOnMap = () => {
   );
 };
 
-export default ClockOnMap;
+export default WeatherWidget;
 const timeToString = (time) => {
   return time.toLocaleTimeString([], {
     hour: "2-digit",
