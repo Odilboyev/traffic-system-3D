@@ -334,13 +334,6 @@ const MapComponent = ({ changedMarker }) => {
           />
         </Control>
         {/* widgets */}
-        <Control position="topleft">
-          <WidgetControl
-            filter={widgets}
-            changeFilter={setWidgets}
-            placement={"right"}
-          />
-        </Control>
         <div className={widgets.weather ? "visible" : "invisible"}>
           {" "}
           <WeatherWidget />
@@ -351,6 +344,7 @@ const MapComponent = ({ changedMarker }) => {
         </div>
         {/* lights */}
         <Svetoforlar />
+        {/* settings */}
         <Control position="topleft">
           <SpeedDial placement="right">
             <IconButton
@@ -362,14 +356,24 @@ const MapComponent = ({ changedMarker }) => {
               </SpeedDialHandler>
             </IconButton>
             <SpeedDialContent className="ml-4 rounded-md bg-gray-900/80 text-white backdrop-blur-md">
-              <div className="p-4 rounded-lg flex flex-col justify-center items-center">
-                <Typography className="mb-2 select-none">
-                  {isDraggable ? "Editable" : "Not Editable"}
-                </Typography>
-                <Switch
-                  size={"sm"}
+              <div className="p-4 rounded-lg flex flex-col">
+                <Typography className="text-sm ">{t("markers")}</Typography>
+                <Checkbox
+                  label={
+                    <Typography className="text-white">
+                      {isDraggable ? "Editable" : "Not Editable"}
+                    </Typography>
+                  }
+                  ripple={false}
                   checked={isDraggable}
                   onChange={(e) => setiIsDraggable(e.target.checked)}
+                />{" "}
+                <div className="border-t border-y-gray-800 w-full my-2"></div>
+                <Typography className=" text-sm">{t("widgets")}</Typography>
+                <WidgetControl
+                  filter={widgets}
+                  changeFilter={setWidgets}
+                  placement={"right"}
                 />
               </div>
             </SpeedDialContent>

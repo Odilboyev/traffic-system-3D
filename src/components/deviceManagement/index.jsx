@@ -35,7 +35,7 @@ const DeviceManagement = () => {
 
   // Handler for changing the device type
   const handleTypeChange = (type) => {
-    setDeviceType(1); // Update device type
+    setDeviceType(type); // Update device type
     console.log(type);
     fetchDeviceData(type); // Fetch data for the selected type
     setIsDroprightOpen(false); // Close the dropdown
@@ -44,10 +44,12 @@ const DeviceManagement = () => {
   // fetchErrorHistory
   const fetchErrorHistory = useCallback(async (current, id) => {
     console.log(id, deviceType, current, "Fetching error history");
+    const type =
+      deviceType === "camera" ? 1 : deviceData == "boxcontroller" ? 3 : 4;
     setDeviceLoading(true);
     try {
       const all = await getErrorHistory(current, {
-        type: deviceType,
+        type,
         device_id: id,
       });
       setDeviceData(all.data);
@@ -112,13 +114,13 @@ const DeviceManagement = () => {
           setIsAlarmDeviceOpen(false); // Correctly close the device modal
         }}
         itemCallback={fetchErrorHistory}
-        title={t(deviceType)}
+        title={deviceType}
         data={deviceData}
         showActions={true}
         isLoading={deviceLoading}
         itemsPerPage={20}
         totalPages={deviceTotalPages}
-        fetchHandler={(current) => fetchDeviceData(deviceType, current)}
+        fetchHandler={fetchDeviceData}
       />
     </>
   );

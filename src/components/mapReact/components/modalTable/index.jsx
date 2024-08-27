@@ -28,7 +28,7 @@ const ModalTable = ({
 }) => {
   const { theme } = useTheme();
   const [showTableActions, setShowTableActions] = useState(showActions);
-  const [titleToShow, setTitleToShow] = useState(title);
+  const [titleToShow, setTitleToShow] = useState(t(title));
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -145,8 +145,8 @@ const ModalTable = ({
               {isSubPageOpen && (
                 <Button
                   onClick={() => {
-                    setTitleToShow(title);
-                    fetchHandler(currentPage);
+                    setTitleToShow(t(title));
+                    fetchHandler(title, currentPage);
                     setShowTableActions(true);
                     setIsSubPageOpen(false);
                   }}
@@ -225,17 +225,19 @@ const ModalTable = ({
                             </IconButton>
                           ) : null}
 
-                          <IconButton
-                            onClick={() => {
-                              console.log(item, "item");
-                              setShowTableActions(false);
-                              setIsSubPageOpen(true);
-                              itemCallback(1, item.id);
-                              setTitleToShow(`${t("history")} - ${title}`);
-                            }}
-                          >
-                            <MdHistory className="font-bold w-5 h-5" />
-                          </IconButton>
+                          {title !== "crossroad" && (
+                            <IconButton
+                              onClick={() => {
+                                console.log(item, "item");
+                                setShowTableActions(false);
+                                setIsSubPageOpen(true);
+                                itemCallback(1, item.id);
+                                setTitleToShow(`${t("history")} - ${title}`);
+                              }}
+                            >
+                              <MdHistory className="font-bold w-5 h-5" />
+                            </IconButton>
+                          )}
                           <IconButton
                             onClick={() => console.log("Edit clicked")}
                           >
