@@ -15,6 +15,7 @@ import { useTheme } from "../../../../customHooks/useTheme";
 import { MdSearch, MdEdit, MdDelete, MdHistory } from "react-icons/md"; // Import additional icons
 import { ChevronLeftIcon } from "@heroicons/react/16/solid";
 import moment from "moment/moment";
+import FilterTypes from "./filterTypes";
 
 const ModalTable = ({
   open,
@@ -30,7 +31,9 @@ const ModalTable = ({
 }) => {
   const { theme } = useTheme();
   const [showTableActions, setShowTableActions] = useState(showActions);
-  const [titleToShow, setTitleToShow] = useState(t(title));
+  const [titleToShow, setTitleToShow] = useState(
+    title ? t(title) : t("history")
+  );
   useEffect(() => {
     setTitleToShow(t(title));
     console.log(title, "setTitleToShow");
@@ -43,6 +46,15 @@ const ModalTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // New state for search term
+  const [selectedFilter, setSelectedFilter] = useState(null); // State for selected filter
+  const [typeOptions, setTypeOptions] = useState(
+    Array.from(
+      new Set(data.map((item) => `${item.type}:${item.type_name}`))
+    ).map((combined) => {
+      const [type, type_name] = combined.split(":");
+      return { type: parseInt(type, 10), type_name };
+    })
+  );
   const map = useMap(); // Get the map instance using useMap hook
 
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
@@ -51,16 +63,22 @@ const ModalTable = ({
     if (open && currentPage !== 1) !isSubPageOpen && fetchHandler(currentPage);
     isSubPageOpen && itemCallback(currentPage, title, subPageId);
   }, [currentPage, open]);
-
-  // Update filteredData when data, sorting criteria, or search term change
   useEffect(() => {
-    if (data.length > 0) {
-      // Sort data based on the current sort criteria
-      const sorted = sortData(data, sortedColumn, sortOrder);
+    setTypeOptions(
+      Array.from(
+        new Set(data.map((item) => `${item.type}:${item.type_name}`))
+      ).map((combined) => {
+        const [type, type_name] = combined.split(":");
+        return { type: parseInt(type, 10), type_name };
+      })
+    );
+  }, [data]);
 
-      // Filter sorted data based on the search term
+  useEffect(() => {
+    console.log(typeOptions);
+    if (data.length > 0) {
+      const sorted = sortData(data, sortedColumn, sortOrder);
       const searched = sorted.filter((item) => {
-        // Check if any field contains the search term
         return Object.values(item).some(
           (value) =>
             value &&
@@ -68,9 +86,14 @@ const ModalTable = ({
         );
       });
 
-      setFilteredData(searched);
+      // Filter the data based on the selected type filter (by type)
+      const filtered = selectedFilter
+        ? searched.filter((item) => item.type === selectedFilter)
+        : searched;
+
+      setFilteredData(filtered);
     }
-  }, [data, sortedColumn, sortOrder, searchTerm]);
+  }, [data, sortedColumn, sortOrder, searchTerm, selectedFilter]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -107,18 +130,6 @@ const ModalTable = ({
   // Extract headers dynamically based on data keys, excluding 'lat', 'lng', and 'location'
   let tableHeaders = data.length > 0 ? Object.keys(data[0]) : [];
 
-  // // Remove 'lat', 'lng', and 'location' and add a single 'location' header
-  // // tableHeaders = tableHeaders.filter(
-  // //   (key) => key !== "lat" && key !== "lng" && key !== "location"
-  // // );
-  // // if (
-  // //   data.length > 0 &&
-  // //   ("lat" in data[0] || "lng" in data[0] || "location" in data[0])
-  // // ) {
-  // //   tableHeaders.push("location");
-  // // }
-
-  // Handle location click and fly to the map location
   const locationHandler = ({ lat, lng }) => {
     console.log(lat, lng);
     if (lat && lng) {
@@ -140,6 +151,7 @@ const ModalTable = ({
       (isSubPageOpen && hiddenOnSubPageKeys.includes(key)) // Hide specific keys when isSubPageOpen is true
     );
   };
+
   return (
     <Modal
       open={open}
@@ -156,7 +168,11 @@ const ModalTable = ({
         ) : (
           <>
             <div className="flex justify-between w-full py-3">
-              <div className=" w-1/6">
+              <div
+                className={`${
+                  itemCallback ? "w-2/6" : "w-3/6"
+                } flex justify-between gap-5 `}
+              >
                 <Input
                   size="sm"
                   color={theme === "dark" ? "white" : "black"}
@@ -166,6 +182,16 @@ const ModalTable = ({
                   icon={<MdSearch className="dark:text-white" />}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
+
+                {typeOptions.length > 1 && !itemCallback ? (
+                  <>
+                    <div className="h-full border mx-5"></div>
+                    <FilterTypes
+                      typeOptions={typeOptions}
+                      onFilterChange={setSelectedFilter}
+                    />
+                  </>
+                ) : null}
               </div>
               {isSubPageOpen && (
                 <Button

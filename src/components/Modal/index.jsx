@@ -45,7 +45,7 @@ const Modal = ({ title, handleOpen, open, body, bottom, ...rest }) => {
           </svg>
         </IconButton>
       </DialogHeader>
-      <DialogBody className="overflow-y-scroll !px-5">{body}</DialogBody>
+      <DialogBody className="overflow-y-scroll !px-5 py-0">{body}</DialogBody>
       <DialogFooter className="flex justify-center items-center mt-auto">
         {bottom}
       </DialogFooter>
