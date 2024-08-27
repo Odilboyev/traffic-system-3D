@@ -6,7 +6,7 @@ const loadTranslations = async () => {
   try {
     const response = await getTexts();
     i18n.use(initReactI18next).init({
-      debug: true,
+      debug: false,
       resources: response,
       lng: "ru", // default language
       fallbackLng: "en",

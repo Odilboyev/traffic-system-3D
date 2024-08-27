@@ -15,6 +15,7 @@ const DeviceManagement = () => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
   const [deviceType, setDeviceType] = useState(""); // Default type
   const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
   const [deviceData, setDeviceData] = useState([]);
   const [deviceLoading, setDeviceLoading] = useState(false);
   const [deviceTotalPages, setDeviceTotalPages] = useState(null);
@@ -26,6 +27,7 @@ const DeviceManagement = () => {
       const all = await getDevices(type, current);
       setDeviceData(all.data);
       setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
+      setTotalItems(all.total_items);
     } catch (err) {
       console.log("Error fetching device data. Please try again.");
     } finally {
@@ -42,24 +44,24 @@ const DeviceManagement = () => {
     setIsAlarmDeviceOpen(true); // Open the device modal
   };
   // fetchErrorHistory
-  const fetchErrorHistory = useCallback(async (current, id) => {
-    console.log(id, deviceType, current, "Fetching error history");
-    const type =
-      deviceType === "camera" ? 1 : deviceData == "boxcontroller" ? 3 : 4;
+  const fetchErrorHistory = async (current, type, id) => {
+    console.log(current, type, id, "Fetching error history");
+    const dtype = type === "camera" ? 1 : type == "boxcontroller" ? 3 : 4;
     setDeviceLoading(true);
     try {
       const all = await getErrorHistory(current, {
-        type,
+        type: dtype,
         device_id: id,
       });
       setDeviceData(all.data);
       setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
+      setTotalItems(all.total_items);
     } catch (err) {
       console.log("Error fetching error history. Please try again.");
     } finally {
       setDeviceLoading(false);
     }
-  }, []);
+  };
 
   return (
     <>
@@ -113,6 +115,7 @@ const DeviceManagement = () => {
           setDeviceData([]);
           setIsAlarmDeviceOpen(false); // Correctly close the device modal
         }}
+        totalItems={totalItems}
         itemCallback={fetchErrorHistory}
         title={deviceType}
         data={deviceData}

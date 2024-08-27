@@ -24,7 +24,7 @@ const FullscreenBox = ({ children, ...rest }) => {
         <div
           className={`no-scrollbar ${
             isFullscreen
-              ? "!h-screen !w-screen max-h-screen overflow-y-scroll"
+              ? "!h-screen !w-screen min-h-screen overflow-y-scroll"
               : "h-full overflow-y-scroll"
           }`}
         >

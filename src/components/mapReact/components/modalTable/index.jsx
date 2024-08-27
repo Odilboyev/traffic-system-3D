@@ -23,12 +23,20 @@ const ModalTable = ({
   itemCallback,
   data = [],
   isLoading,
+  totalItems = 0,
   totalPages,
   fetchHandler,
 }) => {
   const { theme } = useTheme();
   const [showTableActions, setShowTableActions] = useState(showActions);
   const [titleToShow, setTitleToShow] = useState(t(title));
+  useEffect(() => {
+    setTitleToShow(t(title));
+    console.log(title, "setTitleToShow");
+  }, [title]);
+
+  const [subPageId, setSubPageId] = useState(null);
+
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,7 +47,8 @@ const ModalTable = ({
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
   // Fetch modal data when type or currentPage changes
   useEffect(() => {
-    open && currentPage !== 1 && fetchHandler(currentPage);
+    if (open && currentPage !== 1) !isSubPageOpen && fetchHandler(currentPage);
+    isSubPageOpen && itemCallback(currentPage, title, subPageId);
   }, [currentPage, open]);
 
   // Update filteredData when data, sorting criteria, or search term change
@@ -122,6 +131,8 @@ const ModalTable = ({
       open={open}
       handleOpen={() => {
         handleOpen();
+        setIsSubPageOpen(false);
+        setTitleToShow("");
         setCurrentPage(1);
       }}
       title={titleToShow}
@@ -131,7 +142,7 @@ const ModalTable = ({
         ) : (
           <>
             <div className="flex justify-between w-full py-3">
-              <div className="mb-6 w-1/6">
+              <div className=" w-1/6">
                 <Input
                   size="sm"
                   color={theme === "dark" ? "white" : "black"}
@@ -150,11 +161,10 @@ const ModalTable = ({
                     setShowTableActions(true);
                     setIsSubPageOpen(false);
                   }}
-                  size="sm"
-                  className="flex gap-4 items-center "
+                  className="flex gap-2 items-center  "
                 >
-                  <ChevronLeftIcon className="w-5 h-5" />
-                  Back
+                  <ChevronLeftIcon className="w-5 h-5 m-0" />
+                  <p>{t("back")}</p>
                 </Button>
               )}
             </div>
@@ -163,22 +173,26 @@ const ModalTable = ({
               <table className="w-full table-auto overflow-x-scroll border border-slate-400">
                 <thead className="text-left">
                   <tr className="font-bold">
-                    {tableHeaders.map((key, i) => (
-                      <th
-                        className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
-                        key={i}
-                        onClick={() => handleHeader(key)}
-                      >
-                        <div className="flex justify-between gap-4 items-center">
-                          <Typography className="font-bold">
-                            {t(key)} {/* Translate column name */}
-                          </Typography>
-                          {sortedColumn === key && (
-                            <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
-                          )}
-                        </div>
-                      </th>
-                    ))}
+                    {tableHeaders.map((key, i) =>
+                      key !== "lat" && key !== "lng" && key !== "location" ? (
+                        <th
+                          className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
+                          key={i}
+                          onClick={() => handleHeader(key)}
+                        >
+                          <div className="flex justify-between gap-4 items-center">
+                            <Typography className="font-bold">
+                              {t(key)} {/* Translate column name */}
+                            </Typography>
+                            {sortedColumn === key && (
+                              <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
+                            )}
+                          </div>
+                        </th>
+                      ) : (
+                        ""
+                      )
+                    )}
                     {/* Add a header for the control column */}
                     {showTableActions && (
                       <th className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white">
@@ -195,8 +209,8 @@ const ModalTable = ({
                       key={i}
                       className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
                     >
-                      {tableHeaders.map((key, index) => {
-                        return (
+                      {tableHeaders.map((key, index) =>
+                        key !== "lat" && key !== "lng" && key !== "location" ? (
                           <td
                             key={index}
                             className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
@@ -205,13 +219,16 @@ const ModalTable = ({
                           >
                             <Typography>{item[key]}</Typography>
                           </td>
-                        );
-                      })}
+                        ) : (
+                          ""
+                        )
+                      )}
                       {/* Control column */}
-                      {showActions && (
+                      {showActions && !isSubPageOpen && (
                         <td className="px-4 py-1 flex gap-3 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white">
                           {(item.lat && item.lng) || item.location ? (
                             <IconButton
+                              type="text"
                               onClick={() =>
                                 item.lat
                                   ? locationHandler({
@@ -227,18 +244,25 @@ const ModalTable = ({
 
                           {title !== "crossroad" && (
                             <IconButton
+                              type="text"
                               onClick={() => {
                                 console.log(item, "item");
                                 setShowTableActions(false);
+                                setCurrentPage(1);
                                 setIsSubPageOpen(true);
-                                itemCallback(1, item.id);
-                                setTitleToShow(`${t("history")} - ${title}`);
+                                itemCallback(1, title, item.id);
+                                setSubPageId(item.id);
+                                setTitleToShow(
+                                  `${t("history")} - ${title} ${
+                                    "-" + item.name
+                                  }}`
+                                );
                               }}
                             >
                               <MdHistory className="font-bold w-5 h-5" />
                             </IconButton>
                           )}
-                          <IconButton
+                          {/* <IconButton
                             onClick={() => console.log("Edit clicked")}
                           >
                             <MdEdit className="font-bold w-5 h-5" />
@@ -247,7 +271,7 @@ const ModalTable = ({
                             onClick={() => console.log("Delete clicked")}
                           >
                             <MdDelete className="font-bold w-5 h-5" />
-                          </IconButton>
+                          </IconButton> */}
                         </td>
                       )}
                     </tr>
@@ -263,6 +287,7 @@ const ModalTable = ({
       bottom={
         totalPages != null && (
           <Pagination
+            totalItems={totalItems}
             currentPage={currentPage}
             totalPages={totalPages ? totalPages : 0}
             onPageChange={handlePageChange}

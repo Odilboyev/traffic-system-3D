@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { IconButton, ButtonGroup } from "@material-tailwind/react";
+import { IconButton, ButtonGroup, Typography } from "@material-tailwind/react";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -7,8 +7,9 @@ import {
   ArrowRightIcon,
 } from "@heroicons/react/24/solid";
 import { useTheme } from "../../customHooks/useTheme";
+import { t } from "i18next";
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ currentPage, totalPages, totalItems, onPageChange }) => {
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
 
@@ -78,25 +79,32 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const { theme } = useTheme();
 
   return (
-    <ButtonGroup
-      variant="outlined"
-      color={theme === "light" ? "black" : "white"}
-      className="dark:border-white dark:text-white"
-    >
-      <IconButton onClick={goToFirstPage} disabled={isFirstPage}>
-        <ArrowLeftIcon strokeWidth={2} className="h-4 w-4" />
-      </IconButton>
-      <IconButton onClick={prev} disabled={isFirstPage}>
-        <ChevronLeftIcon strokeWidth={2} className="h-4 w-4" />
-      </IconButton>
-      {getPageNumbers()}
-      <IconButton onClick={next} disabled={isLastPage}>
-        <ChevronRightIcon strokeWidth={2} className="h-4 w-4" />
-      </IconButton>
-      <IconButton onClick={goToLastPage} disabled={isLastPage}>
-        <ArrowRightIcon strokeWidth={2} className="h-4 w-4" />
-      </IconButton>
-    </ButtonGroup>
+    <div className="">
+      <Typography className="text-center mb-4">
+        {" "}
+        {t("totalitems")}:{" "}
+        <b className="dark:text-white text-black">{totalItems}</b>
+      </Typography>
+      <ButtonGroup
+        variant="outlined"
+        color={theme === "light" ? "black" : "white"}
+        className="dark:border-white dark:text-white"
+      >
+        <IconButton onClick={goToFirstPage} disabled={isFirstPage}>
+          <ArrowLeftIcon strokeWidth={2} className="h-4 w-4" />
+        </IconButton>
+        <IconButton onClick={prev} disabled={isFirstPage}>
+          <ChevronLeftIcon strokeWidth={2} className="h-4 w-4" />
+        </IconButton>
+        {getPageNumbers()}
+        <IconButton onClick={next} disabled={isLastPage}>
+          <ChevronRightIcon strokeWidth={2} className="h-4 w-4" />
+        </IconButton>
+        <IconButton onClick={goToLastPage} disabled={isLastPage}>
+          <ArrowRightIcon strokeWidth={2} className="h-4 w-4" />
+        </IconButton>
+      </ButtonGroup>
+    </div>
   );
 };
 

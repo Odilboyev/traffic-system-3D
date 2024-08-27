@@ -17,6 +17,7 @@ const DraggablePopup = memo(function DraggablePopup({ marker = {} }) {
       ref={popupRef}
       // eventHandlers={{ close: onClose }}
       maxWidth={"100%"}
+      minHeight={"100%"}
       interactive
       closeOnClick={false}
       autoClose={false}

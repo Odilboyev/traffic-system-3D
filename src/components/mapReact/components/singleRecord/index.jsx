@@ -4,7 +4,7 @@ const SingleRecord = ({ mselink, cname }) => {
   return (
     <div
       style={{
-        width: "12vw",
+        minWidth: "12vw",
         minHeight: "8vw",
         overflow: "hidden",
       }}

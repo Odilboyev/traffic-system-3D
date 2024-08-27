@@ -65,6 +65,7 @@ import AlarmHistory from "./components/caseHistory";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import FilterControl from "./components/controls/filterControl/index.jsx";
 import WidgetControl from "./components/controls/widgetControl/index.jsx";
+import useLocalStorageState from "../../customHooks/uselocalStorageState.jsx";
 
 const home = [41.2995, 69.2401];
 
@@ -163,31 +164,20 @@ const MapComponent = ({ changedMarker }) => {
   const [markers, setMarkers] = useState([]);
   const [bottomSectionData, setBottomSectionData] = useState(null);
   const [areMarkersLoading, setAreMarkersLoading] = useState(false);
-  const [isDraggable, setiIsDraggable] = useState(false);
-  // const [types, setTypes] = useState(0);
-  const [filter, setFilter] = useState(() => {
-    // Read from local storage or initialize with default values
-    const savedFilter = localStorage.getItem("filter");
-    return savedFilter
-      ? JSON.parse(savedFilter)
-      : { box: true, camera: true, crossroad: true, trafficlights: true };
+  const [filter, setFilter] = useLocalStorageState("traffic_filter", {
+    box: true,
+    camera: true,
+    crossroad: true,
+    trafficlights: true,
   });
-
-  const [widgets, setWidgets] = useState(() => {
-    // Read from local storage or initialize with default values
-    const savedWidgets = localStorage.getItem("widgets");
-    return savedWidgets
-      ? JSON.parse(savedWidgets)
-      : { bottomsection: true, weather: true };
+  const [widgets, setWidgets] = useLocalStorageState("traffic_widgets", {
+    bottomsection: true,
+    weather: true,
   });
-  useEffect(() => {
-    localStorage.setItem("filter", JSON.stringify(filter));
-  }, [filter]);
-
-  // Save widgets to local storage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("widgets", JSON.stringify(widgets));
-  }, [widgets]);
+  const [isDraggable, setIsDraggable] = useLocalStorageState(
+    "traffic_isDraggable",
+    false
+  );
 
   useEffect(() => {
     changedMarker &&
@@ -380,7 +370,7 @@ const MapComponent = ({ changedMarker }) => {
                   }
                   ripple={false}
                   checked={isDraggable}
-                  onChange={(e) => setiIsDraggable(e.target.checked)}
+                  onChange={(e) => setIsDraggable(e.target.checked)}
                 />{" "}
                 <div className="border-t border-y-gray-800 w-full my-2"></div>
                 <Typography className=" text-sm">{t("widgets")}</Typography>
