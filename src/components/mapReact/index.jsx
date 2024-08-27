@@ -165,16 +165,30 @@ const MapComponent = ({ changedMarker }) => {
   const [areMarkersLoading, setAreMarkersLoading] = useState(false);
   const [isDraggable, setiIsDraggable] = useState(false);
   // const [types, setTypes] = useState(0);
-  const [filter, setFilter] = useState({
-    box: true,
-    camera: true,
-    crossroad: true,
-    trafficlights: true,
+  const [filter, setFilter] = useState(() => {
+    // Read from local storage or initialize with default values
+    const savedFilter = localStorage.getItem("filter");
+    return savedFilter
+      ? JSON.parse(savedFilter)
+      : { box: true, camera: true, crossroad: true, trafficlights: true };
   });
-  const [widgets, setWidgets] = useState({
-    bottomsection: true,
-    weather: true,
+
+  const [widgets, setWidgets] = useState(() => {
+    // Read from local storage or initialize with default values
+    const savedWidgets = localStorage.getItem("widgets");
+    return savedWidgets
+      ? JSON.parse(savedWidgets)
+      : { bottomsection: true, weather: true };
   });
+  useEffect(() => {
+    localStorage.setItem("filter", JSON.stringify(filter));
+  }, [filter]);
+
+  // Save widgets to local storage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("widgets", JSON.stringify(widgets));
+  }, [widgets]);
+
   useEffect(() => {
     changedMarker &&
       setMarkers((markers) => {
