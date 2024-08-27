@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useTheme } from "../../../../customHooks/useTheme";
 import { t } from "i18next";
 
-const FilterTypes = ({ typeOptions, onFilterChange }) => {
+const FilterTypes = ({ typeOptions, onFilterChange, ...rest }) => {
   const [selectedFilter, setSelectedFilter] = useState(null);
   const { theme } = useTheme();
   const handleFilterClick = (filterValue) => {
@@ -12,14 +12,14 @@ const FilterTypes = ({ typeOptions, onFilterChange }) => {
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-3" {...rest}>
       {/* "All" Button */}
       <Button
         color={theme === "dark" ? "white" : "black"}
         variant={selectedFilter === null ? "filled" : "outlined"}
-        onClick={() => handleFilterClick(null)}
+        onClick={() => handleFilterClick(undefined)}
       >
-        {t("al")}
+        {t("all")}
       </Button>
       {/* Filter buttons for each type */}
       {typeOptions.map(({ type, type_name }) => (

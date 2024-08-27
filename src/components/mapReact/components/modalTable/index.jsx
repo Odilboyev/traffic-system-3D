@@ -12,7 +12,7 @@ import { t } from "i18next";
 import { LiaSearchLocationSolid } from "react-icons/lia";
 import { useMap } from "react-leaflet";
 import { useTheme } from "../../../../customHooks/useTheme";
-import { MdSearch, MdEdit, MdDelete, MdHistory } from "react-icons/md"; // Import additional icons
+import { MdSearch, MdEdit, MdDelete, MdHistory } from "react-icons/md";
 import { ChevronLeftIcon } from "@heroicons/react/16/solid";
 import moment from "moment/moment";
 import FilterTypes from "./filterTypes";
@@ -45,37 +45,19 @@ const ModalTable = ({
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // New state for search term
-  const [selectedFilter, setSelectedFilter] = useState(null); // State for selected filter
-  const [typeOptions, setTypeOptions] = useState(
-    Array.from(
-      new Set(data.map((item) => `${item.type}:${item.type_name}`))
-    ).map((combined) => {
-      const [type, type_name] = combined.split(":");
-      return { type: parseInt(type, 10), type_name };
-    })
-  );
-  const map = useMap(); // Get the map instance using useMap hook
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState(null);
+
+  const map = useMap();
 
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
-  // Fetch modal data when type or currentPage changes
+
   useEffect(() => {
     if (open && currentPage !== 1) !isSubPageOpen && fetchHandler(currentPage);
     isSubPageOpen && itemCallback(currentPage, title, subPageId);
   }, [currentPage, open]);
-  useEffect(() => {
-    setTypeOptions(
-      Array.from(
-        new Set(data.map((item) => `${item.type}:${item.type_name}`))
-      ).map((combined) => {
-        const [type, type_name] = combined.split(":");
-        return { type: parseInt(type, 10), type_name };
-      })
-    );
-  }, [data]);
 
   useEffect(() => {
-    console.log(typeOptions);
     if (data.length > 0) {
       const sorted = sortData(data, sortedColumn, sortOrder);
       const searched = sorted.filter((item) => {
@@ -86,7 +68,6 @@ const ModalTable = ({
         );
       });
 
-      // Filter the data based on the selected type filter (by type)
       const filtered = selectedFilter
         ? searched.filter((item) => item.type === selectedFilter)
         : searched;
@@ -127,13 +108,12 @@ const ModalTable = ({
     });
   };
 
-  // Extract headers dynamically based on data keys, excluding 'lat', 'lng', and 'location'
   let tableHeaders = data.length > 0 ? Object.keys(data[0]) : [];
 
   const locationHandler = ({ lat, lng }) => {
     console.log(lat, lng);
     if (lat && lng) {
-      map.flyTo([lat, lng], 20); // Adjust zoom level as needed
+      map.flyTo([lat, lng], 20);
     }
     handleOpen();
   };
@@ -147,8 +127,8 @@ const ModalTable = ({
     ];
 
     return (
-      hiddenKeys.includes(key) || // Hide keys always
-      (isSubPageOpen && hiddenOnSubPageKeys.includes(key)) // Hide specific keys when isSubPageOpen is true
+      hiddenKeys.includes(key) ||
+      (isSubPageOpen && hiddenOnSubPageKeys.includes(key))
     );
   };
 
@@ -163,14 +143,16 @@ const ModalTable = ({
       }}
       title={titleToShow}
       body={
-        isLoading ? (
-          <Loader />
-        ) : (
-          <>
-            <div className="flex justify-between w-full py-3">
+        <>
+          <div className="flex justify-between w-full py-3">
+            <div
+              className={`${
+                itemCallback ? "w-2/6" : "w-4/6"
+              } flex justify-between gap-5 `}
+            >
               <div
                 className={`${
-                  itemCallback ? "w-2/6" : "w-3/6"
+                  itemCallback ? "w-full" : "w-3/6"
                 } flex justify-between gap-5 `}
               >
                 <Input
@@ -178,168 +160,159 @@ const ModalTable = ({
                   color={theme === "dark" ? "white" : "black"}
                   label={t("search")}
                   value={searchTerm}
-                  className="dark:focus:!border-b-white dark:focus:!border-x-white border-b-black focus:!border-t-0 border-x-black"
+                  className=" dark:focus:!border-b-white dark:focus:!border-x-white border-b-black focus:!border-t-0 border-x-black"
                   icon={<MdSearch className="dark:text-white" />}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-
-                {typeOptions.length > 1 && !itemCallback ? (
-                  <>
-                    <div className="h-full border mx-5"></div>
-                    <FilterTypes
-                      typeOptions={typeOptions}
-                      onFilterChange={setSelectedFilter}
-                    />
-                  </>
-                ) : null}
               </div>
-              {isSubPageOpen && (
-                <Button
-                  onClick={() => {
-                    setTitleToShow(t(title));
-                    fetchHandler(title, currentPage);
-                    setShowTableActions(true);
-                    setIsSubPageOpen(false);
-                  }}
-                  className="flex gap-2 items-center  "
-                >
-                  <ChevronLeftIcon className="w-5 h-5 m-0" />
-                  <p>{t("back")}</p>
-                </Button>
-              )}
-            </div>
 
-            {data?.length > 0 ? (
-              <table className="w-full table-auto overflow-x-scroll border border-slate-400">
-                <thead className="text-left">
-                  <tr className="font-bold">
-                    {tableHeaders.map((key, i) =>
+              {/* Static filter options */}
+              {!itemCallback ? (
+                <FilterTypes
+                  typeOptions={[
+                    { type: 1, type_name: "camera" },
+                    { type: 3, type_name: "boxcontroller" },
+                    { type: 4, type_name: "svetofor" },
+                  ]}
+                  onFilterChange={(selectedType) => {
+                    setSelectedFilter(selectedType);
+                    fetchHandler(1, selectedType);
+                  }}
+                />
+              ) : null}
+            </div>
+            {isSubPageOpen && (
+              <Button
+                onClick={() => {
+                  setTitleToShow(t(title));
+                  fetchHandler(title, currentPage);
+                  setShowTableActions(true);
+                  setIsSubPageOpen(false);
+                }}
+                className="flex gap-2 items-center  "
+              >
+                <ChevronLeftIcon className="w-5 h-5 m-0" />
+                <p>{t("back")}</p>
+              </Button>
+            )}
+          </div>
+          {isLoading ? (
+            <Loader />
+          ) : data?.length > 0 ? (
+            <table className="w-full table-auto overflow-x-scroll border border-slate-400">
+              <thead className="text-left">
+                <tr className="font-bold">
+                  {tableHeaders.map((key, i) =>
+                    shouldHideColumn(key) ? null : (
+                      <th
+                        className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
+                        key={i}
+                        onClick={() => handleHeader(key)}
+                      >
+                        <div className="flex justify-between gap-4 items-center">
+                          <Typography className="font-bold">
+                            {t(key)}
+                          </Typography>
+                          {sortedColumn === key && (
+                            <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
+                          )}
+                        </div>
+                      </th>
+                    )
+                  )}
+                  {showTableActions && (
+                    <th className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white">
+                      <Typography className="font-bold">
+                        {t("actions")}
+                      </Typography>
+                    </th>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="overflow-x-scroll font-bold">
+                {filteredData.map((item, i) => (
+                  <tr
+                    key={i}
+                    className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
+                  >
+                    {tableHeaders.map((key, index) =>
                       shouldHideColumn(key) ? null : (
-                        <th
-                          className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
-                          key={i}
-                          onClick={() => handleHeader(key)}
+                        <td
+                          key={index}
+                          className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
+                            key === "statuserror" && getRowColor(item[key])
+                          }`}
                         >
-                          <div className="flex justify-between gap-4 items-center">
-                            <Typography className="font-bold">
-                              {t(key)} {/* Translate column name */}
-                            </Typography>
-                            {sortedColumn === key && (
-                              <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
-                            )}
-                          </div>
-                        </th>
+                          <Typography>
+                            {key === "duration"
+                              ? moment.utc(item[key] * 1000).format("HH:mm:ss")
+                              : key === "statuserror"
+                              ? item["statuserror_name"]
+                              : item[key]}
+                          </Typography>
+                        </td>
                       )
                     )}
-                    {/* Add a header for the control column */}
-                    {showTableActions && (
-                      <th className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white">
-                        <Typography className="font-bold">
-                          {t("actions")} {/* Translate 'actions' */}
-                        </Typography>
-                      </th>
+
+                    {showActions && !isSubPageOpen && (
+                      <td className="p-2 flex gap-2 justify-start">
+                        <IconButton
+                          color="amber"
+                          size="sm"
+                          onClick={() => {
+                            setTitleToShow(item.type_name);
+                            setIsSubPageOpen(true);
+                            setShowTableActions(false);
+                            setSubPageId(item.device_id);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          <MdHistory className="text-white" />
+                        </IconButton>
+                        <IconButton
+                          color="green"
+                          size="sm"
+                          onClick={() => {
+                            item.lat &&
+                              item.lng &&
+                              locationHandler({
+                                lat: item.lat,
+                                lng: item.lng,
+                              });
+                          }}
+                        >
+                          <LiaSearchLocationSolid className="text-white" />
+                        </IconButton>
+                        <IconButton color="blue" size="sm">
+                          <MdEdit className="text-white" />
+                        </IconButton>
+                        <IconButton color="red" size="sm">
+                          <MdDelete className="text-white" />
+                        </IconButton>
+                      </td>
                     )}
                   </tr>
-                </thead>
-                <tbody className="overflow-x-scroll font-bold">
-                  {filteredData.map((item, i) => (
-                    <tr
-                      key={i}
-                      className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
-                    >
-                      {tableHeaders.map((key, index) =>
-                        // Check if isSubPageOpen is true and if the key should be hidden
-                        shouldHideColumn(key) ? null : ( // Return null to hide the column
-                          <td
-                            key={index}
-                            className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
-                              key === "statuserror" && getRowColor(item[key])
-                            }`}
-                          >
-                            <Typography>
-                              {key === "duration"
-                                ? moment
-                                    .utc(item[key] * 1000)
-                                    .format("HH:mm:ss")
-                                : key === "statuserror"
-                                ? item["statuserror_name"]
-                                : item[key]}
-                            </Typography>
-                          </td>
-                        )
-                      )}
-
-                      {/* Control column */}
-                      {showActions && !isSubPageOpen && (
-                        <td className="px-4 py-1 flex gap-3 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white">
-                          {(item.lat && item.lng) || item.location ? (
-                            <IconButton
-                              type="text"
-                              onClick={() =>
-                                item.lat
-                                  ? locationHandler({
-                                      lat: item.lat,
-                                      lng: item.lng,
-                                    })
-                                  : locationHandler(JSON.parse(item.location))
-                              }
-                            >
-                              <LiaSearchLocationSolid className="font-bold w-5 h-5" />
-                            </IconButton>
-                          ) : null}
-
-                          {title !== "crossroad" && (
-                            <IconButton
-                              type="text"
-                              onClick={() => {
-                                console.log(item, "item");
-                                setShowTableActions(false);
-                                setCurrentPage(1);
-                                setIsSubPageOpen(true);
-                                itemCallback(1, title, item.id);
-                                setSubPageId(item.id);
-                                setTitleToShow(
-                                  `${t("history")} - ${title} ${
-                                    "- " + item.name
-                                  }`
-                                );
-                              }}
-                            >
-                              <MdHistory className="font-bold w-5 h-5" />
-                            </IconButton>
-                          )}
-                          {/* <IconButton
-                            onClick={() => console.log("Edit clicked")}
-                          >
-                            <MdEdit className="font-bold w-5 h-5" />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => console.log("Delete clicked")}
-                          >
-                            <MdDelete className="font-bold w-5 h-5" />
-                          </IconButton> */}
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : !isLoading && data?.length === 0 ? (
-              <Typography>No data</Typography>
-            ) : null}
-          </>
-        )
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="flex justify-center items-center h-[30vh]">
+              <Typography>{t("nodata")}</Typography>
+            </div>
+          )}
+        </>
       }
-      bottom={
-        totalPages != null && (
-          <Pagination
-            totalItems={totalItems}
-            currentPage={currentPage}
-            totalPages={totalPages ? totalPages : 0}
-            onPageChange={handlePageChange}
-          />
-        )
+      footer={
+        <Pagination
+          totalItems={totalItems}
+          pageSize={15}
+          fetchHandler={fetchHandler}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+          currentPage={currentPage}
+        />
       }
+      titleColor={theme === "dark" ? "white" : "black"}
     />
   );
 };

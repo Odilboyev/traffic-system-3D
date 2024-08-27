@@ -12,10 +12,10 @@ const AlarmHistory = () => {
   const [historyTotalPages, setHistoryTotalPages] = useState(null);
 
   // fetchErrorHistory
-  const fetchErrorHistory = useCallback(async (current) => {
+  const fetchErrorHistory = useCallback(async (current, type) => {
     setHistoryLoading(true);
     try {
-      const all = await getErrorHistory(current);
+      const all = await getErrorHistory(current, { type });
       setHistoryData(all.data);
       setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
     } catch (err) {
