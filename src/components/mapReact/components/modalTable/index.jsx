@@ -14,6 +14,7 @@ import { useMap } from "react-leaflet";
 import { useTheme } from "../../../../customHooks/useTheme";
 import { MdSearch, MdEdit, MdDelete, MdHistory } from "react-icons/md"; // Import additional icons
 import { ChevronLeftIcon } from "@heroicons/react/16/solid";
+import moment from "moment/moment";
 
 const ModalTable = ({
   open,
@@ -125,7 +126,20 @@ const ModalTable = ({
     }
     handleOpen();
   };
+  const shouldHideColumn = (key) => {
+    const hiddenKeys = ["lat", "lng", "location", "statuserror_name"];
+    const hiddenOnSubPageKeys = [
+      "type",
+      "type_name",
+      "device_id",
+      "device_name",
+    ];
 
+    return (
+      hiddenKeys.includes(key) || // Hide keys always
+      (isSubPageOpen && hiddenOnSubPageKeys.includes(key)) // Hide specific keys when isSubPageOpen is true
+    );
+  };
   return (
     <Modal
       open={open}
@@ -174,7 +188,7 @@ const ModalTable = ({
                 <thead className="text-left">
                   <tr className="font-bold">
                     {tableHeaders.map((key, i) =>
-                      key !== "lat" && key !== "lng" && key !== "location" ? (
+                      shouldHideColumn(key) ? null : (
                         <th
                           className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
                           key={i}
@@ -189,8 +203,6 @@ const ModalTable = ({
                             )}
                           </div>
                         </th>
-                      ) : (
-                        ""
                       )
                     )}
                     {/* Add a header for the control column */}
@@ -210,19 +222,27 @@ const ModalTable = ({
                       className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
                     >
                       {tableHeaders.map((key, index) =>
-                        key !== "lat" && key !== "lng" && key !== "location" ? (
+                        // Check if isSubPageOpen is true and if the key should be hidden
+                        shouldHideColumn(key) ? null : ( // Return null to hide the column
                           <td
                             key={index}
                             className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
                               key === "statuserror" && getRowColor(item[key])
                             }`}
                           >
-                            <Typography>{item[key]}</Typography>
+                            <Typography>
+                              {key === "duration"
+                                ? moment
+                                    .utc(item[key] * 1000)
+                                    .format("HH:mm:ss")
+                                : key === "statuserror"
+                                ? item["statuserror_name"]
+                                : item[key]}
+                            </Typography>
                           </td>
-                        ) : (
-                          ""
                         )
                       )}
+
                       {/* Control column */}
                       {showActions && !isSubPageOpen && (
                         <td className="px-4 py-1 flex gap-3 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white">
@@ -254,8 +274,8 @@ const ModalTable = ({
                                 setSubPageId(item.id);
                                 setTitleToShow(
                                   `${t("history")} - ${title} ${
-                                    "-" + item.name
-                                  }}`
+                                    "- " + item.name
+                                  }`
                                 );
                               }}
                             >
