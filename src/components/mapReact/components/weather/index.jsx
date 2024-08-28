@@ -41,8 +41,8 @@ const timeToString = (time) => {
   });
 };
 const options = {
-  weekday: "long",
+  weekday: "short",
   year: "numeric",
-  month: "long",
+  month: "short",
   day: "numeric",
 };

@@ -122,17 +122,13 @@ const ModalTable = ({
   };
   const shouldHideColumn = (key) => {
     const hiddenKeys = ["lat", "lng", "location", "statuserror_name"];
-    const hiddenOnSubPageKeys = [
-      "type",
-      "type_name",
-      "device_id",
-      "device_name",
-    ];
+    const hiddenOnSubPageKeys = ["type", "type_name", "device_id"];
+    const hiddenOnAllHistory = ["type", "type_name", "device_id"];
 
     return (
       hiddenKeys.includes(key) ||
       (isSubPageOpen && hiddenOnSubPageKeys.includes(key)) ||
-      (!itemCallback && hiddenOnSubPageKeys.includes(key))
+      (!itemCallback && hiddenOnAllHistory.includes(key))
     );
   };
   const historyHandler = (item) => {
