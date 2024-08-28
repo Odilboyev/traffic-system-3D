@@ -3,35 +3,49 @@ import Chart from "react-apexcharts";
 import { t } from "i18next";
 
 // Function to get chart options
+// Function to get chart options with contrast colors
+// Function to get chart options with distinct colors for each data type
 const getChartOptions = (isArea = false, isDarkMode = false) => ({
   chart: {
     height: 350,
-    stacked: !isArea,
+    stacked: false,
     zoom: {
-      enabled: false, // Disable zoom functionality
+      enabled: false,
     },
     toolbar: {
-      show: false, // Hide the toolbar
+      show: false,
     },
-    background: isDarkMode ? "#1F2937" : "#FFFFFF", // Dynamic background for dark mode
+    background: isDarkMode ? "#1F2937" : "#FFFFFF",
   },
   legend: {
     position: "top",
     horizontalAlign: "left",
     labels: {
-      colors: isDarkMode ? "#E5E7EB" : "#1F2937", // Dynamic legend text color
+      colors: isDarkMode ? "#E5E7EB" : "#1F2937",
     },
   },
   dataLabels: {
-    enabled: false, // <--- HERE
+    enabled: isArea ? false : true,
+    style: {
+      fontSize: "12px",
+      colors: [isDarkMode ? "#E5E7EB" : "#1F2937"], // Colors for data labels
+    },
+    formatter: function (val) {
+      return val.toLocaleString(); // Format numbers with commas
+    },
   },
   stroke: {
-    width: 0.9,
+    width: 2,
     curve: "smooth",
-    colors: isDarkMode ? ["#E5E7EB"] : ["#1F2937"], // Dynamic stroke color
+    colors: isDarkMode
+      ? ["#ff8c00", "#FF4500"] // Two distinct colors for "Today" and "Yesterday" in dark mode
+      : ["#0066CC", "#FF8C00"], // Two distinct colors for "Today" and "Yesterday" in light mode
   },
   fill: {
-    opacity: 1,
+    opacity: 0.7,
+    colors: isDarkMode
+      ? ["#FF8C00", "#FF4500"] // Fill colors for dark mode
+      : ["#0066CC", "#FF8C00"], // Fill colors for light mode
   },
   plotOptions: {
     bar: {
@@ -44,7 +58,7 @@ const getChartOptions = (isArea = false, isDarkMode = false) => ({
           style: {
             fontSize: "13px",
             fontWeight: 900,
-            colors: [isDarkMode ? "#E5E7EB" : "#1F2937"], // Dynamic data label color
+            colors: [isDarkMode ? "#E5E7EB" : "#1F2937"],
           },
         },
       },
@@ -57,7 +71,7 @@ const getChartOptions = (isArea = false, isDarkMode = false) => ({
       rotate: -45,
       tickPlacement: "on",
       style: {
-        colors: isDarkMode ? "#E5E7EB" : "#1F2937", // Dynamic x-axis label color
+        colors: isDarkMode ? "#E5E7EB" : "#1F2937",
       },
     },
   },
@@ -65,19 +79,19 @@ const getChartOptions = (isArea = false, isDarkMode = false) => ({
     labels: {
       minWidth: 40,
       style: {
-        colors: isDarkMode ? "#E5E7EB" : "#1F2937", // Dynamic y-axis label color
+        colors: isDarkMode ? "#E5E7EB" : "#1F2937",
       },
     },
   },
   theme: {
-    mode: isDarkMode ? "dark" : "light", // Adapt theme mode
+    mode: isDarkMode ? "dark" : "light",
   },
 });
 
 // Component to render a bar chart
 const BarChart = ({ data, title, isDarkMode }) => (
   <div className="mt-6 w-1/2">
-    <Typography className="font-bold text-center text-gray-800 dark:text-gray-200">
+    <Typography className="font-bold text-center text-gray-800 dark:!text-gray-200 mb-6">
       {title}
     </Typography>
     <Chart
@@ -93,7 +107,7 @@ const BarChart = ({ data, title, isDarkMode }) => (
 // Component to render an area chart
 const AreaChart = ({ data, title, isDarkMode }) => (
   <div className="mt-6 w-1/2">
-    <Typography className="font-bold text-center text-gray-800 dark:text-gray-200">
+    <Typography className="font-bold text-center text-gray-800 dark:!text-gray-200 mb-6">
       {title}
     </Typography>
     <Chart
@@ -175,7 +189,7 @@ const CrossroadStats = ({ crossroadStats }) => {
       {by_direction_data.map((direction, index) => (
         <div
           key={index}
-          className="mb-6 border-b border-gray-200 dark:border-gray-600"
+          className="mb-6 border-b border-gray-200 dark:border-gray-600 dark:text-white"
         >
           <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500 dark:bg-gray-700 text-white">
             <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-600">
