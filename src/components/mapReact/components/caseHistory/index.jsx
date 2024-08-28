@@ -10,7 +10,7 @@ const AlarmHistory = () => {
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyTotalPages, setHistoryTotalPages] = useState(null);
-
+  const [totalItems, setTotalItems] = useState(0);
   // fetchErrorHistory
   const fetchErrorHistory = useCallback(async (current, type) => {
     setHistoryLoading(true);
@@ -18,6 +18,7 @@ const AlarmHistory = () => {
       const all = await getErrorHistory(current, { type });
       setHistoryData(all.data);
       setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
+      setTotalItems(all.total_items);
     } catch (err) {
       console.log("Error fetching error history. Please try again.");
     } finally {
@@ -45,6 +46,7 @@ const AlarmHistory = () => {
         }}
         data={historyData}
         title={t("history")}
+        totalItems={totalItems}
         isLoading={historyLoading}
         itemsPerPage={20}
         totalPages={historyTotalPages}

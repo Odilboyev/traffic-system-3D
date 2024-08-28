@@ -16,7 +16,7 @@ const FilterTypes = ({ typeOptions, onFilterChange, ...rest }) => {
       {/* "All" Button */}
       <Button
         color={theme === "dark" ? "white" : "black"}
-        variant={selectedFilter === null ? "filled" : "outlined"}
+        variant={selectedFilter === undefined ? "filled" : "outlined"}
         onClick={() => handleFilterClick(undefined)}
       >
         {t("all")}

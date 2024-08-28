@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { IconButton, ButtonGroup, Typography } from "@material-tailwind/react";
 import {
   ChevronLeftIcon,
@@ -20,6 +20,9 @@ const Pagination = ({ currentPage, totalPages, totalItems, onPageChange }) => {
         : "",
     onClick: () => onPageChange(index),
   });
+  useEffect(() => {
+    console.log(totalPages);
+  }, [totalPages]);
 
   const getPageNumbers = () => {
     const pageNumbers = [];
@@ -80,10 +83,9 @@ const Pagination = ({ currentPage, totalPages, totalItems, onPageChange }) => {
 
   return (
     <div className="">
-      <Typography className="text-center mb-4">
+      <Typography className="text-right mb-4">
         {" "}
-        {t("totalitems")}:{" "}
-        <b className="dark:text-white text-black">{totalItems}</b>
+        {t("total")}: <b className="dark:text-white text-black">{totalItems}</b>
       </Typography>
       <ButtonGroup
         variant="outlined"

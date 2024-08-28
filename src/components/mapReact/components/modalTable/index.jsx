@@ -47,15 +47,18 @@ const ModalTable = ({
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState(null);
-
   const map = useMap();
 
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
-
   useEffect(() => {
-    if (open && currentPage !== 1) !isSubPageOpen && fetchHandler(currentPage);
-    isSubPageOpen && itemCallback(currentPage, title, subPageId);
-  }, [currentPage, open]);
+    if (open) {
+      if (!isSubPageOpen && currentPage !== 1) {
+        fetchHandler(currentPage, selectedFilter);
+      } else if (isSubPageOpen) {
+        itemCallback(currentPage, title, subPageId);
+      }
+    }
+  }, [currentPage, open, selectedFilter]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -128,16 +131,17 @@ const ModalTable = ({
 
     return (
       hiddenKeys.includes(key) ||
-      (isSubPageOpen && hiddenOnSubPageKeys.includes(key))
+      (isSubPageOpen && hiddenOnSubPageKeys.includes(key)) ||
+      (!itemCallback && hiddenOnSubPageKeys.includes(key))
     );
   };
   const historyHandler = (item) => {
-    setTitleToShow(item.type_name);
-    setIsSubPageOpen(true);
     setShowTableActions(false);
-    itemCallback(currentPage, title, item.id);
-    setSubPageId(item.device_id);
     setCurrentPage(1);
+    setIsSubPageOpen(true);
+    itemCallback(1, title, item.id);
+    setSubPageId(item.id);
+    setTitleToShow(`${t("history")} - ${title} ${"- " + item.name}`);
   };
 
   return (
@@ -184,6 +188,7 @@ const ModalTable = ({
                   ]}
                   onFilterChange={(selectedType) => {
                     setSelectedFilter(selectedType);
+                    setCurrentPage(1);
                     fetchHandler(1, selectedType);
                   }}
                 />
@@ -265,13 +270,15 @@ const ModalTable = ({
 
                     {showActions && !isSubPageOpen && (
                       <td className="p-2 flex gap-2 justify-start">
-                        <IconButton
-                          color="amber"
-                          size="sm"
-                          onClick={() => historyHandler(item)}
-                        >
-                          <MdHistory className="text-white" />
-                        </IconButton>
+                        {title !== "crossroad" && (
+                          <IconButton
+                            color="amber"
+                            size="sm"
+                            onClick={() => historyHandler(item)}
+                          >
+                            <MdHistory className="text-white" />
+                          </IconButton>
+                        )}
                         <IconButton
                           color="green"
                           size="sm"
