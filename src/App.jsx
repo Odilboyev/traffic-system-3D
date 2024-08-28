@@ -6,9 +6,12 @@ import positiveSound from "../src/assets/audio/positive.mp3";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeContext } from "./context/themeContext.jsx";
 import { subscribeToCurrentAlarms } from "./api/api.handlers.js";
+import WarningMessage from "./components/offlineWarning/index.jsx";
 
 const App = () => {
   const { theme } = useContext(ThemeContext);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  //
   const [changedMarker, setChangedMarker] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
 
@@ -33,12 +36,27 @@ const App = () => {
     sound.play();
   };
 
+  //
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
   return (
     <div
-      className={`min-h-screen app-container ${
+      className={`min-h-screen app-container relative ${
         theme === "dark" ? "bg-gray-900 text-white" : "text-black"
       }`}
     >
+      {!isOnline && <WarningMessage />}
       <ToastContainer className="z-[99999]" />
       <MonitoringMapReact changedMarker={changedMarker} />
     </div>
