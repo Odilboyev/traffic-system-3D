@@ -365,7 +365,8 @@ const MapComponent = ({ changedMarker }) => {
                 <Checkbox
                   label={
                     <Typography className="text-white">
-                      {isDraggable ? "Editable" : "Not Editable"}
+                      {/* {isDraggable ? "Editable" : "Not Editable"} */}
+                      {t("draggable")}
                     </Typography>
                   }
                   ripple={false}

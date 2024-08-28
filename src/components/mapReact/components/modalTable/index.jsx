@@ -131,6 +131,14 @@ const ModalTable = ({
       (isSubPageOpen && hiddenOnSubPageKeys.includes(key))
     );
   };
+  const historyHandler = (item) => {
+    setTitleToShow(item.type_name);
+    setIsSubPageOpen(true);
+    setShowTableActions(false);
+    itemCallback(currentPage, title, item.id);
+    setSubPageId(item.device_id);
+    setCurrentPage(1);
+  };
 
   return (
     <Modal
@@ -233,6 +241,7 @@ const ModalTable = ({
                 {filteredData.map((item, i) => (
                   <tr
                     key={i}
+                    onClick={() => (itemCallback ? historyHandler(item) : {})}
                     className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
                   >
                     {tableHeaders.map((key, index) =>
@@ -259,13 +268,7 @@ const ModalTable = ({
                         <IconButton
                           color="amber"
                           size="sm"
-                          onClick={() => {
-                            setTitleToShow(item.type_name);
-                            setIsSubPageOpen(true);
-                            setShowTableActions(false);
-                            setSubPageId(item.device_id);
-                            setCurrentPage(1);
-                          }}
+                          onClick={() => historyHandler(item)}
                         >
                           <MdHistory className="text-white" />
                         </IconButton>
@@ -273,12 +276,12 @@ const ModalTable = ({
                           color="green"
                           size="sm"
                           onClick={() => {
-                            item.lat &&
-                              item.lng &&
-                              locationHandler({
-                                lat: item.lat,
-                                lng: item.lng,
-                              });
+                            item.lat
+                              ? locationHandler({
+                                  lat: item.lat,
+                                  lng: item.lng,
+                                })
+                              : locationHandler(JSON.parse(item.location));
                           }}
                         >
                           <LiaSearchLocationSolid className="text-white" />
@@ -303,14 +306,14 @@ const ModalTable = ({
         </>
       }
       footer={
-        <Pagination
-          totalItems={totalItems}
-          pageSize={15}
-          fetchHandler={fetchHandler}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-          currentPage={currentPage}
-        />
+        totalPages != null && (
+          <Pagination
+            totalItems={totalItems}
+            currentPage={currentPage}
+            totalPages={totalPages ? totalPages : 0}
+            onPageChange={handlePageChange}
+          />
+        )
       }
       titleColor={theme === "dark" ? "white" : "black"}
     />
