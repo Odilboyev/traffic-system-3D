@@ -247,7 +247,7 @@ const ModalTable = ({
                 {filteredData.map((item, i) => (
                   <tr
                     key={i}
-                    onClick={() => (itemCallback ? historyHandler(item) : {})}
+                    // onClick={() => (itemCallback ? historyHandler(item) : {})}
                     className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
                   >
                     {tableHeaders.map((key, index) =>
