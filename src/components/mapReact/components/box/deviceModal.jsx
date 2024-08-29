@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogBody,
@@ -12,30 +13,99 @@ import {
 import SensorCard from "./sensorCard";
 import Loader from "../../../loader";
 import Chart from "react-apexcharts";
-
-import { useEffect, useState } from "react";
+import moment from "moment";
+import { useTheme } from "../../../../customHooks/useTheme";
+import { t } from "i18next";
 import {
   getBoxSensorChart,
   getErrorHistory,
 } from "../../../../api/api.handlers";
-import moment from "moment";
-import { useTheme } from "../../../../customHooks/useTheme";
-import { t } from "i18next";
+import getRowColor from "../../../../configurations/getRowColor";
+
+const hiddenCols = ["type", "type_name", "device_id"];
+
+// Custom hook for fetching and sorting data
+const useErrorHistory = (deviceId, sensorId, sortedColumn, sortOrder) => {
+  const [errorHistory, setErrorHistory] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
+  useEffect(() => {
+    if (sensorId) {
+      fetchErrorHistory(sensorId);
+    }
+  }, [sensorId]);
+
+  useEffect(() => {
+    if (errorHistory?.length > 0) {
+      const sorted = sortData(errorHistory, sortedColumn, sortOrder);
+      setFilteredData(sorted);
+    }
+  }, [errorHistory, sortedColumn, sortOrder]);
+
+  const fetchErrorHistory = async (sensorId) => {
+    try {
+      const data = { type: 3, device_id: deviceId, sensor_id: sensorId };
+      const res = await getErrorHistory(1, data);
+      setErrorHistory(res.data);
+    } catch (error) {
+      console.error("Error fetching error history:", error);
+    }
+  };
+
+  const sortData = (data, column, order) => {
+    return [...data].sort((a, b) => {
+      const valueA = a[column];
+      const valueB = b[column];
+      if (typeof valueA === "undefined" || typeof valueB === "undefined") {
+        return order === "asc" ? -1 : 1;
+      }
+      if (typeof valueA === "number" && typeof valueB === "number") {
+        return order === "asc" ? valueA - valueB : valueB - valueA;
+      } else {
+        return order === "asc"
+          ? valueA.toString().localeCompare(valueB.toString())
+          : valueB.toString().localeCompare(valueA.toString());
+      }
+    });
+  };
+
+  return { errorHistory, filteredData };
+};
 
 const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
   const { theme } = useTheme();
-  const { device_data = {}, sensor_data = {} } = device || {};
+  const { device_data = {}, sensor_data = [] } = device || {};
   const [chartData, setChartData] = useState(null);
   const [selectedSensorId, setSelectedSensorId] = useState(null);
-  const [errorHistory, setErrorHistory] = useState([]);
-
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredData, setFilteredData] = useState([]);
-  const getChartData = async (sensor) => {
+
+  const { errorHistory, filteredData } = useErrorHistory(
+    device_data?.id,
+    selectedSensorId,
+    sortedColumn,
+    sortOrder
+  );
+
+  useEffect(() => {
+    if (sensor_data?.length > 0) {
+      handleSensorSelection(sensor_data[0].sensor_id);
+    }
+  }, [sensor_data]);
+
+  const handleSensorSelection = async (sensorId) => {
+    if ([2, 3, 16].includes(sensorId)) {
+      await fetchChartData(sensorId);
+    } else {
+      setChartData(null); // Clear chart data if sensorId is not allowed
+    }
+    setSelectedSensorId(sensorId);
+  };
+
+  const fetchChartData = async (sensorId) => {
     try {
-      const res = await getBoxSensorChart(device_data?.id, sensor);
+      const res = await getBoxSensorChart(device_data?.id, sensorId);
       const seriesData = res.data.map((item) => ({
         x: item.datetime,
         y: parseFloat(item.sensor_value),
@@ -46,45 +116,12 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
           data: seriesData,
         },
       ]);
-      setSelectedSensorId(sensor);
     } catch (error) {
-      throw new Error(error);
+      console.error("Error fetching chart data:", error);
     }
   };
 
-  const fetchErrorHistory = async (sensor_id) => {
-    const data = {
-      type: 3,
-      device_id: device_data.id,
-      sensor_id: sensor_id,
-    };
-    try {
-      const res = await getErrorHistory(1, data);
-      setErrorHistory(res.data);
-    } catch (error) {
-      console.error("Error fetching error history:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (sensor_data && sensor_data?.length > 0) {
-      getChartData(sensor_data[0].sensor_id);
-    }
-  }, [sensor_data]);
-
-  useEffect(() => {
-    if (errorHistory?.length > 0) {
-      const sorted = sortData(errorHistory, sortedColumn, sortOrder);
-
-      setFilteredData(sorted);
-    }
-  }, [errorHistory, sortedColumn, sortOrder]);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleHeader = (keyName) => {
+  const handleSort = (keyName) => {
     if (sortedColumn === keyName) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -93,27 +130,54 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
     }
   };
 
-  const sortData = (errorHistory, sortedColumn, sortOrder) => {
-    return [...errorHistory].sort((a, b) => {
-      const valueA = a[sortedColumn];
-      const valueB = b[sortedColumn];
+  const renderTableHeaders = () => (
+    <tr className="font-bold">
+      {errorHistory &&
+        Object.keys(errorHistory[0] || {})?.map((key, index) =>
+          hiddenCols.includes(key) ? null : (
+            <th
+              key={index}
+              className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
+              onClick={() => handleSort(key)}
+            >
+              <div className="flex justify-between gap-4 items-center">
+                <Typography className="font-bold">{t(key)}</Typography>
+                {sortedColumn === key && (
+                  <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
+                )}
+              </div>
+            </th>
+          )
+        )}
+    </tr>
+  );
 
-      if (typeof valueA === "undefined" || typeof valueB === "undefined") {
-        return sortOrder === "asc" ? -1 : 1;
-      }
-
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
-      } else {
-        return sortOrder === "asc"
-          ? valueA.toString().localeCompare(valueB.toString())
-          : valueB.toString().localeCompare(valueA.toString());
-      }
-    });
-  };
-
-  let tableHeaders =
-    errorHistory?.length > 0 ? Object.keys(errorHistory[0]) : [];
+  const renderTableRows = () =>
+    filteredData.map((item, i) => (
+      <tr
+        key={i}
+        className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
+      >
+        {Object.keys(item).map((key, index) =>
+          hiddenCols.includes(key) ? null : (
+            <td
+              key={index}
+              className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
+                key === "statuserror" && getRowColor(item[key])
+              }`}
+            >
+              <Typography>
+                {key === "duration"
+                  ? moment.utc(item[key] * 1000).format("HH:mm:ss")
+                  : key === "statuserror"
+                  ? item["statuserror_name"]
+                  : item[key]}
+              </Typography>
+            </td>
+          )
+        )}
+      </tr>
+    ));
 
   return (
     <Dialog
@@ -122,7 +186,7 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
       handler={handler}
       className="dark:bg-blue-gray-900 dark:text-white"
     >
-      <DialogHeader className="justify-end ">
+      <DialogHeader className="justify-end">
         <IconButton size="sm" variant="text" onClick={handler}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -148,208 +212,16 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
           </div>
         ) : device_data ? (
           <>
-            <Card className="dark:bg-blue-gray-900 dark:text-white border basis-1/6 row-span-2 col-span-1 rounded-none border-none">
-              <CardBody className="flex w-full flex-col justify-between gap-2">
-                <div className="flex flex-col">
-                  <span>ID</span>
-                  <Typography className="font-bold">
-                    {device_data?.name}
-                  </Typography>
-                </div>
-                <div className="flex flex-col">
-                  <span>Seriya raqami</span>
-                  <Typography className="font-bold">
-                    {device_data?.sn}
-                  </Typography>
-                </div>
-                <div className="flex flex-col">
-                  <span>Obyekt nomi</span>
-                  <Typography className="font-bold">
-                    {device_data?.adres}
-                  </Typography>
-                </div>
-                <div className="flex flex-col">
-                  <span>Mas'ul xodim</span>
-                  <Typography className="font-bold">
-                    {device_data?.masul_hodim}
-                  </Typography>
-                </div>
-                <div className="flex flex-col">
-                  <span>Xodim telefon raqami</span>
-                  <Typography className="font-bold">
-                    {device_data?.phone
-                      ? device_data.phone
-                      : "Raqam mavjud emas"}
-                  </Typography>
-                </div>
-              </CardBody>
-            </Card>
-            <div
-              className={`dark:text-white border-none basis-5/6 col-span-4 shadow-none overflow-y-auto text-center ${
-                (sensor_data && sensor_data.length === 0) ||
-                chartData?.length === 0 ||
-                (chartData == null && "row-span-2")
-              }`}
-            >
-              <div className="justify-around grid grid-cols-9 gap-3  text-center w-full">
-                {sensor_data && sensor_data.length > 0 ? (
-                  sensor_data.map((v, i) => (
-                    <SensorCard
-                      {...v}
-                      key={i}
-                      active={selectedSensorId == v.sensor_id}
-                      handler={(sensorId) => {
-                        sensorId == 2 || sensorId == 3 || sensorId == 16
-                          ? getChartData(sensorId)
-                          : null;
-                        setSelectedSensorId(sensorId);
-                        fetchErrorHistory(sensorId);
-                      }}
-                    />
-                  ))
-                ) : (
-                  <Card className="border-none basis-3/4 shadow-none overflow-y-auto">
-                    <Typography>No sensors</Typography>
-                  </Card>
-                )}
-              </div>
-              {sensor_data &&
-              sensor_data.length > 0 &&
-              selectedSensorId &&
-              [2, 3, 16].includes(selectedSensorId) ? (
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="no-scrollbar dark:text-white overflow-y-auto ">
-                    <Chart
-                      options={getChartOptions(theme == "dark")}
-                      series={chartData}
-                      width={"100%"}
-                      type="area"
-                    />
-                  </div>
-                  <div className="overflow-x-scroll no-scrollbar">
-                    <table className="w-full table-auto overflow-x-scroll border border-slate-400">
-                      <thead className="text-left">
-                        <tr className="font-bold">
-                          {tableHeaders.map((key, i) => (
-                            <th
-                              className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
-                              key={i}
-                              onClick={() => handleHeader(key)}
-                            >
-                              <div className="flex justify-between gap-4 items-center">
-                                <Typography className="font-bold">
-                                  {t(key)}
-                                </Typography>
-                                {sortedColumn === key && (
-                                  <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
-                                )}
-                              </div>
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="overflow-x-scroll font-bold">
-                        {filteredData.map((item, i) => (
-                          <tr
-                            key={i}
-                            // onClick={() => (itemCallback ? historyHandler(item) : {})}
-                            className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
-                          >
-                            {tableHeaders.map((key, index) => (
-                              <td
-                                key={index}
-                                className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
-                                  key === "statuserror" &&
-                                  getRowColor(item[key])
-                                }`}
-                              >
-                                <Typography>
-                                  {key === "duration"
-                                    ? moment
-                                        .utc(item[key] * 1000)
-                                        .format("HH:mm:ss")
-                                    : key === "statuserror"
-                                    ? item["statuserror_name"]
-                                    : item[key]}
-                                </Typography>
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : selectedSensorId ? (
-                <div className="p-4 dark:text-white overflow-y-auto">
-                  {errorHistory?.length > 0 ? (
-                    <table className="w-full table-auto overflow-x-scroll border border-slate-400">
-                      <thead className="text-left">
-                        <tr className="font-bold">
-                          {tableHeaders.map((key, i) => (
-                            <th
-                              className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
-                              key={i}
-                              onClick={() => handleHeader(key)}
-                            >
-                              <div className="flex justify-between gap-4 items-center">
-                                <Typography className="font-bold">
-                                  {t(key)}
-                                </Typography>
-                                {sortedColumn === key && (
-                                  <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
-                                )}
-                              </div>
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="overflow-x-scroll font-bold">
-                        {filteredData.map((item, i) => (
-                          <tr
-                            key={i}
-                            // onClick={() => (itemCallback ? historyHandler(item) : {})}
-                            className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
-                          >
-                            {tableHeaders.map((key, index) => (
-                              <td
-                                key={index}
-                                className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
-                                  key === "statuserror" &&
-                                  getRowColor(item[key])
-                                }`}
-                              >
-                                <Typography>
-                                  {key === "duration"
-                                    ? moment
-                                        .utc(item[key] * 1000)
-                                        .format("HH:mm:ss")
-                                    : key === "statuserror"
-                                    ? item["statuserror_name"]
-                                    : item[key]}
-                                </Typography>
-                              </td>
-                            ))}{" "}
-                            {/* <Pagination
-                          totalItems={totalItems}
-                          currentPage={currentPage}
-                          totalPages={totalPages ? totalPages : 0}
-                          onPageChange={handlePageChange}
-                        /> */}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <Typography className="">No data available</Typography>
-                  )}
-                </div>
-              ) : (
-                <Card className="dark:bg-blue-gray-800 dark:text-white border-none col-span-4 shadow-none overflow-y-auto">
-                  <Typography>No Data Available</Typography>
-                </Card>
-              )}
-            </div>
+            <DeviceDetails device_data={device_data} />
+            <SensorSection
+              filteredData={filteredData}
+              sensor_data={sensor_data}
+              chartData={chartData}
+              selectedSensorId={selectedSensorId}
+              handleSensorSelection={handleSensorSelection}
+              renderTableHeaders={renderTableHeaders}
+              renderTableRows={renderTableRows}
+            />
           </>
         ) : (
           <Typography>No device data</Typography>
@@ -359,100 +231,86 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
   );
 };
 
+const DeviceDetails = ({ device_data }) => (
+  <Card className="dark:bg-blue-gray-900 dark:text-white border basis-1/6 row-span-2 col-span-1 rounded-none border-none">
+    <CardBody className="flex w-full flex-col justify-between gap-2">
+      {Object.entries({
+        ID: device_data?.name,
+        "Seriya raqami": device_data?.sn,
+        "Obyekt nomi": device_data?.adres,
+        "Mas'ul xodim": device_data?.masul_hodim,
+        "Xodim telefon raqami": device_data?.phone || "Raqam mavjud emas",
+      }).map(([label, value], i) => (
+        <div key={i} className="flex flex-col">
+          <span>{label}</span>
+          <Typography className="font-bold">{value}</Typography>
+        </div>
+      ))}
+    </CardBody>
+  </Card>
+);
+
+const SensorSection = ({
+  sensor_data,
+  chartData,
+  filteredData,
+  selectedSensorId,
+  handleSensorSelection,
+  renderTableHeaders,
+  renderTableRows,
+}) => (
+  <div
+    className={`dark:text-white border-none basis-5/6 col-span-4 shadow-none overflow-y-auto text-center ${
+      sensor_data?.length === 0 || !chartData ? "row-span-2" : ""
+    }`}
+  >
+    <div className="justify-around w-full flex mb-5 flex-wrap gap-2 items-center">
+      {sensor_data?.map((item, index) => (
+        <SensorCard
+          {...item}
+          key={index}
+          handler={() => handleSensorSelection(item.sensor_id)}
+          isActive={selectedSensorId === item.sensor_id}
+        />
+      ))}
+    </div>
+    {chartData && [2, 3, 16].includes(selectedSensorId) && (
+      <Card className="col-span-3 row-span-1 shadow-none dark:bg-transparent">
+        <CardBody className="p-0">
+          <Chart
+            options={{
+              chart: {
+                id: "basic-bar",
+                type: "area",
+                height: 350,
+                animations: { enabled: false },
+              },
+              dataLabels: { enabled: false },
+              xaxis: { type: "datetime", labels: { format: "dd MMM HH:mm" } },
+              stroke: { curve: "smooth" },
+              theme: { mode: "dark" },
+              colors: ["#39B69A"],
+              tooltip: {
+                x: { format: "dd MMM HH:mm" },
+                y: { formatter: (val) => val.toFixed(2) },
+              },
+            }}
+            series={chartData}
+            type="area"
+            height={350}
+          />
+        </CardBody>
+      </Card>
+    )}
+    {filteredData?.length > 0 && (
+      <Card className="shadow-none dark:bg-transparent mt-5">
+        <table className="table-auto w-full text-xs">
+          <thead>{renderTableHeaders()}</thead>
+          <tbody>{renderTableRows()}</tbody>
+        </table>
+      </Card>
+    )}
+  </div>
+);
+
 export default DeviceModal;
-const getChartOptions = (isDarkMode = false) => ({
-  chart: {
-    height: 350,
-    stacked: false,
-    zoom: {
-      enabled: false,
-    },
-    toolbar: {
-      show: false,
-    },
-    background: isDarkMode ? "#1F2937" : "#FFFFFF",
-  },
-  legend: {
-    position: "top",
-    horizontalAlign: "left",
-    labels: {
-      colors: isDarkMode ? "#E5E7EB" : "#1F2937",
-    },
-  },
-  dataLabels: {
-    enabled: false,
-    style: {
-      fontSize: "12px",
-      colors: [isDarkMode ? "#E5E7EB" : "#1F2937"], // Colors for data labels
-    },
-    formatter: function (val) {
-      return val.toLocaleString(); // Format numbers with commas
-    },
-  },
-  stroke: {
-    width: 2,
-    curve: "smooth",
-    colors: isDarkMode
-      ? ["#ff8c00", "#FF4500"] // Two distinct colors for "Today" and "Yesterday" in dark mode
-      : ["#0066CC", "#FF8C00"], // Two distinct colors for "Today" and "Yesterday" in light mode
-  },
-  fill: {
-    opacity: 0.7,
-    colors: isDarkMode
-      ? ["#FF8C00", "#FF4500"] // Fill colors for dark mode
-      : ["#0066CC", "#FF8C00"], // Fill colors for light mode
-  },
-  plotOptions: {
-    bar: {
-      horizontal: false,
-      borderRadiusApplication: "end",
-      borderRadiusWhenStacked: "last",
-      dataLabels: {
-        total: {
-          enabled: true,
-          style: {
-            fontSize: "13px",
-            fontWeight: 900,
-            colors: [isDarkMode ? "#E5E7EB" : "#1F2937"],
-          },
-        },
-      },
-    },
-  },
-  xaxis: {
-    type: "category",
-    labels: {
-      format: "HH:mm",
-      rotate: -45,
-      tickPlacement: "on",
-      style: {
-        colors: isDarkMode ? "#E5E7EB" : "#1F2937",
-      },
-    },
-  },
-  yaxis: {
-    labels: {
-      minWidth: 40,
-      style: {
-        colors: isDarkMode ? "#E5E7EB" : "#1F2937",
-      },
-    },
-  },
-  theme: {
-    mode: isDarkMode ? "dark" : "light",
-  },
-});
-const getRowColor = (status) => {
-  switch (Number(status)) {
-    case 0:
-      return "bg-green-100 text-center dark:bg-green-900 dark:text-white";
-    case 1:
-      return "bg-orange-100 text-center dark:bg-orange-900 dark:text-white";
-    case 2:
-      return "bg-red-100 text-center dark:bg-red-900 dark:text-white";
-    case 3:
-      return "bg-blue-gray-100 text-gray-900 text-center dark:bg-blue-gray-700 dark:text-white";
-    default:
-      return "bg-white text-center dark:bg-blue-gray-900 dark:text-white";
-  }
-};

@@ -17,7 +17,7 @@ const SensorCard = ({
     <div
       onClick={() => handler(sensor_id)}
       className={`border dark:bg-blue-gray-800 dark:hover:bg-gray-800 ${
-        active && "bg-gray-800"
+        active && "dark:bg-gray-800"
       } dark:text-white `}
     >
       {" "}
