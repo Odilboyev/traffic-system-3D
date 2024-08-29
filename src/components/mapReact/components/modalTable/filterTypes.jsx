@@ -14,13 +14,13 @@ const FilterTypes = ({ typeOptions, onFilterChange, ...rest }) => {
   return (
     <div className="flex gap-3" {...rest}>
       {/* "All" Button */}
-      <Button
+      {/* <Button
         color={theme === "dark" ? "white" : "black"}
         variant={selectedFilter === undefined ? "filled" : "outlined"}
         onClick={() => handleFilterClick(undefined)}
       >
         {t("all")}
-      </Button>
+      </Button> */}
       {/* Filter buttons for each type */}
       {typeOptions.map(({ type, type_name }) => (
         <Button

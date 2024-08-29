@@ -207,8 +207,8 @@ const iconSelector = ({ type = 1, status = 0, style }) => {
         return TbArrowRampRight;
       case 6:
         return TbArrowRampLeft;
-      // case 7:
-      //   return ThreeArrowsIcon;
+      case 7:
+        return ThreeArrowsIcon;
       case 8:
         return PiArrowULeftDownBold;
       default:

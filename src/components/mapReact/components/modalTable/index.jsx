@@ -37,7 +37,7 @@ const ModalTable = ({
   useEffect(() => {
     setTitleToShow(t(title));
     console.log(title, "setTitleToShow");
-  }, [title]);
+  }, [title, open]);
 
   const [subPageId, setSubPageId] = useState(null);
 
@@ -46,7 +46,7 @@ const ModalTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState(undefined);
   const map = useMap();
 
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
@@ -123,7 +123,11 @@ const ModalTable = ({
   const shouldHideColumn = (key) => {
     const hiddenKeys = ["lat", "lng", "location", "statuserror_name"];
     const hiddenOnSubPageKeys = ["type", "type_name", "device_id"];
-    const hiddenOnAllHistory = ["type", "type_name", "device_id"];
+    const hiddenOnAllHistory = [
+      "type",
+      selectedFilter === null && "type_name",
+      "device_id",
+    ];
 
     return (
       hiddenKeys.includes(key) ||
@@ -178,6 +182,7 @@ const ModalTable = ({
               {!itemCallback ? (
                 <FilterTypes
                   typeOptions={[
+                    { type: null, type_name: "all" },
                     { type: 1, type_name: "camera" },
                     { type: 3, type_name: "boxcontroller" },
                     { type: 4, type_name: "svetofor" },
@@ -289,12 +294,12 @@ const ModalTable = ({
                         >
                           <LiaSearchLocationSolid className="text-white" />
                         </IconButton>
-                        <IconButton color="blue" size="sm">
+                        {/* <IconButton color="blue" size="sm">
                           <MdEdit className="text-white" />
                         </IconButton>
                         <IconButton color="red" size="sm">
                           <MdDelete className="text-white" />
-                        </IconButton>
+                        </IconButton> */}
                       </td>
                     )}
                   </tr>
