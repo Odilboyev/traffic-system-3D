@@ -529,7 +529,7 @@ const MapComponent = ({ changedMarker }) => {
                 >
                   {marker.type === 1 && <CustomPopUp marker={marker} />}
                   <Tooltip direction="top">
-                    {marker.type == 1 && (
+                    {marker.type == 1 ? (
                       <div
                         style={{
                           width: "8vw",
@@ -546,6 +546,8 @@ const MapComponent = ({ changedMarker }) => {
                           {marker?.cname}
                         </Typography>
                       </div>
+                    ) : (
+                      <Typography className="my-0">{marker?.cname}</Typography>
                     )}
                   </Tooltip>
                 </Marker>

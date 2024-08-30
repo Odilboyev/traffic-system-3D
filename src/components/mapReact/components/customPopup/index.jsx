@@ -21,7 +21,8 @@ const DraggablePopup = memo(function DraggablePopup({ marker = {} }) {
       interactive
       closeOnClick={false}
       autoClose={false}
-      keepInView={true}
+      keepInView={false} // Change this to false
+      autoPan={false}
       className="m-0 !p-0 z-[50000000] select-none"
     >
       <SingleRecord mselink={marker?.mselink} cname={marker?.cname} />
