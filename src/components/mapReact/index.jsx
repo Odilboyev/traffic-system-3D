@@ -532,8 +532,8 @@ const MapComponent = ({ changedMarker }) => {
                     {marker.type == 1 && (
                       <div
                         style={{
-                          width: "12vw",
-                          height: "8vw",
+                          width: "8vw",
+                          height: "6vw",
                           overflow: "hidden",
                         }}
                       >

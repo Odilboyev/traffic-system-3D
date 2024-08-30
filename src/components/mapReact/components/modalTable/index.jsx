@@ -52,9 +52,7 @@ const ModalTable = ({
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
   useEffect(() => {
     if (open) {
-      if (!isSubPageOpen && currentPage !== 1) {
-        fetchHandler(currentPage, selectedFilter);
-      } else if (isSubPageOpen) {
+      if (isSubPageOpen) {
         itemCallback(currentPage, title, subPageId);
       }
     }
