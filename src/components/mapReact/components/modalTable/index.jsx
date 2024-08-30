@@ -75,12 +75,15 @@ const ModalTable = ({
         ? searched.filter((item) => item.type === selectedFilter)
         : searched;
 
-      setFilteredData(filtered);
+      // Reverse the filtered data
+      setFilteredData(filtered.reverse());
     }
   }, [data, sortedColumn, sortOrder, searchTerm, selectedFilter]);
 
   const handlePageChange = (page) => {
+    console.log("Page changed to:", page); // Debugging log
     setCurrentPage(page);
+    fetchHandler(page, selectedFilter); // Ensure this fetches the correct data
   };
 
   const handleHeader = (keyName) => {
@@ -262,7 +265,7 @@ const ModalTable = ({
                             {key === "duration"
                               ? moment.utc(item[key] * 1000).format("HH:mm:ss")
                               : key === "statuserror"
-                              ? item["statuserror_name"]
+                              ? t(item["statuserror_name"])
                               : item[key]}
                           </Typography>
                         </td>

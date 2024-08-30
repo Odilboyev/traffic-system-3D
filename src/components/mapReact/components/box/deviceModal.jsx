@@ -304,7 +304,7 @@ const SensorSection = ({
     )}
     {filteredData?.length > 0 && (
       <Card className="shadow-none dark:bg-transparent mt-5">
-        <table className="table-auto w-full text-xs">
+        <table className="table-auto w-full no-scrollbar text-xs">
           <thead>{renderTableHeaders()}</thead>
           <tbody>{renderTableRows()}</tbody>
         </table>
