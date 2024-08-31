@@ -10,6 +10,8 @@ import {
   Card,
   Spinner,
 } from "@material-tailwind/react";
+
+import { IoMdClose } from "react-icons/io";
 import SensorCard from "./sensorCard";
 import Loader from "../../../loader";
 import Chart from "react-apexcharts";
@@ -152,8 +154,21 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
     </tr>
   );
 
-  const renderTableRows = () =>
-    filteredData.map((item, i) => (
+  const renderTableRows = () => {
+    if (filteredData.length === 0) {
+      return (
+        <tr>
+          <td
+            colSpan={Object.keys(errorHistory[0] || {}).length}
+            className="text-center py-2"
+          >
+            No data available
+          </td>
+        </tr>
+      );
+    }
+
+    return filteredData.map((item, i) => (
       <tr
         key={i}
         className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
@@ -178,6 +193,7 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
         )}
       </tr>
     ));
+  };
 
   return (
     <Dialog
@@ -187,21 +203,8 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
       className="dark:bg-blue-gray-900 dark:text-white"
     >
       <DialogHeader className="justify-end">
-        <IconButton size="sm" variant="text" onClick={handler}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            className="h-5 w-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+        <IconButton size="sm" onClick={handler}>
+          <IoMdClose className="w-5 h-5 p-1" />
         </IconButton>
       </DialogHeader>
 
@@ -264,7 +267,7 @@ const SensorSection = ({
       sensor_data?.length === 0 || !chartData ? "row-span-2" : ""
     }`}
   >
-    <div className="justify-around w-full flex mb-5 flex-wrap gap-2 items-center">
+    <div className="w-full grid grid-cols-5 mb-5 gap-2 items-center">
       {sensor_data?.map((item, index) => (
         <SensorCard
           {...item}
@@ -274,41 +277,70 @@ const SensorSection = ({
         />
       ))}
     </div>
-    {chartData && [2, 3, 16].includes(selectedSensorId) && (
-      <Card className="col-span-3 row-span-1 shadow-none dark:bg-transparent">
-        <CardBody className="p-0">
-          <Chart
-            options={{
-              chart: {
-                id: "basic-bar",
-                type: "area",
-                height: 350,
-                animations: { enabled: false },
+
+    {/* Handle Chart Data */}
+    {chartData && [2, 3, 16].includes(selectedSensorId) ? (
+      <div className="col-span-3 row-span-1 shadow-none dark:bg-transparent w-[95%] mx-auto">
+        <Chart
+          options={{
+            chart: {
+              id: "basic-bar",
+              type: "area",
+              height: 350,
+              animations: { enabled: false },
+              toolbar: {
+                show: true,
+                tools: {
+                  download: false,
+                  selection: true,
+                  zoom: true,
+                  zoomin: true,
+                  zoomout: true,
+                },
+              }, // Remove the menu bar
+              zoom: {
+                enabled: true,
+
+                type: "x", // Enable zooming only horizontally (use 'xy' for both)
+                autoScaleYaxis: true, // Automatically scale Y-axis on zoom
               },
-              dataLabels: { enabled: false },
-              xaxis: { type: "datetime", labels: { format: "dd MMM HH:mm" } },
-              stroke: { curve: "smooth" },
-              theme: { mode: "dark" },
-              colors: ["#39B69A"],
-              tooltip: {
-                x: { format: "dd MMM HH:mm" },
-                y: { formatter: (val) => val.toFixed(2) },
+              pan: {
+                enabled: true, // Enable panning
+                mode: "x", // Allow horizontal panning only
               },
-            }}
-            series={chartData}
-            type="area"
-            height={350}
-          />
-        </CardBody>
-      </Card>
-    )}
-    {filteredData?.length > 0 && (
-      <Card className="shadow-none dark:bg-transparent mt-5">
+            },
+            dataLabels: { enabled: false },
+            xaxis: {
+              type: "datetime",
+              labels: { format: "dd MMM HH:mm" },
+            },
+            stroke: { curve: "smooth", width: "4" },
+            theme: { mode: "dark" },
+            colors: ["#39B69A"],
+            tooltip: {
+              x: { format: "dd MMM HH:mm" },
+              y: { formatter: (val) => val.toFixed(2) },
+            },
+          }}
+          series={chartData}
+          type="area"
+          height={350}
+        />
+      </div>
+    ) : null}
+
+    {/* Handle Table Data */}
+    {filteredData?.length > 0 ? (
+      <div className="shadow-none dark:bg-transparent mt-5">
         <table className="table-auto w-full no-scrollbar text-xs">
           <thead>{renderTableHeaders()}</thead>
           <tbody>{renderTableRows()}</tbody>
         </table>
-      </Card>
+      </div>
+    ) : (
+      <Typography>
+        No error history data available for the selected sensor
+      </Typography>
     )}
   </div>
 );

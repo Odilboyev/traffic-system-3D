@@ -59,3 +59,10 @@
   margin: 0 !important;
   padding: 0 !important; /* If you also want to remove padding */
 }
+
+.neon-border {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6),
+    0 0 30px rgba(0, 255, 255, 0.4), 0 0 40px rgba(0, 255, 255, 0.2);
+  transition: box-shadow 0.3s ease-in-out;
+}
