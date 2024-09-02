@@ -27,6 +27,7 @@ import baseLayers from "../../../../configurations/mapLayers";
 import Loader from "../../../loader";
 import { TbLoader } from "react-icons/tb";
 import CrossroadDashboard from "./subPages/crossroadDash";
+import TrafficLightContainer from "../svetofor/managementLights";
 
 // Helper function to transform chart data
 function transformDataForCharts(data) {
@@ -189,27 +190,31 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
             )}
           </FullscreenBox>
           <FullscreenBox>
-            <MapContainer
-              id="monitoring"
-              attributionControl={false}
-              center={[marker?.lat, marker?.lng]}
-              zoom={19}
-              maxZoom={theme === "dark" ? 22 : 18}
-              zoomDelta={0.6}
-              style={{ height: "100vh", width: "100%" }}
-              zoomControl={false}
-            >
-              {currentLayer && (
-                <TileLayer
-                  maxNativeZoom={currentLayer.maxNativeZoom}
-                  url={currentLayer.url}
-                  attribution={currentLayer.attribution}
-                  key={currentLayer.name}
-                  maxZoom={22}
-                />
-              )}
-              <Svetoforlar />
-            </MapContainer>
+            {" "}
+            <div className="relative w-full h-full">
+              <MapContainer
+                id="monitoring"
+                attributionControl={false}
+                center={[marker?.lat, marker?.lng]}
+                zoom={19}
+                maxZoom={theme === "dark" ? 22 : 18}
+                zoomDelta={0.6}
+                style={{ height: "100vh", width: "100%" }}
+                zoomControl={false}
+              >
+                {currentLayer && (
+                  <TileLayer
+                    maxNativeZoom={currentLayer.maxNativeZoom}
+                    url={currentLayer.url}
+                    attribution={currentLayer.attribution}
+                    key={currentLayer.name}
+                    maxZoom={22}
+                  />
+                )}
+
+                <TrafficLightContainer isInModal={true} />
+              </MapContainer>
+            </div>
           </FullscreenBox>
           <FullscreenBox>
             <CrossroadDashboard marker={marker} />

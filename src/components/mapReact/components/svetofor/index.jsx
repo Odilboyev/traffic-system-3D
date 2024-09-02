@@ -15,6 +15,7 @@ import {
 import { PiArrowULeftDownBold } from "react-icons/pi";
 
 import ThreeArrowsIcon from "./threeArrowIcon";
+import PhasesDisplay from "../crossroad/components/phases";
 function fixIncompleteJSON(message) {
   // Check if message starts with "{" and doesn't end with "}"
   if (message.startsWith("{") && !message.endsWith("}")) {
@@ -31,13 +32,23 @@ function fixIncompleteJSON(message) {
 
   return message;
 }
-const Svetoforlar = () => {
+const Svetoforlar = ({
+  trafficLights,
+  setTrafficLights,
+  setWssLink,
+  setCurrentSvetoforId,
+  setTrafficSocket,
+  currentSvetoforId,
+  wssLink,
+  phase,
+  lastSuccessfulLocation,
+  setLastSuccessfulLocation,
+  trafficSocket,
+  clearTrafficLights,
+  updateTrafficLights,
+  isInModal,
+}) => {
   const map = useMap();
-  const [trafficLights, setTrafficLights] = useState([]);
-  const [trafficSocket, setTrafficSocket] = useState(null);
-  const [currentSvetoforId, setCurrentSvetoforId] = useState(null);
-  const [wssLink, setWssLink] = useState(null);
-  const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
 
   const handleMapEvents = () => {
     const center = map.getCenter();
@@ -69,6 +80,7 @@ const Svetoforlar = () => {
       }
     }
   };
+
   useEffect(() => {
     handleMapEvents();
   }, []);
@@ -77,7 +89,6 @@ const Svetoforlar = () => {
     dragend: handleMapEvents,
     zoomend: handleMapEvents,
   });
-
   useEffect(() => {
     if (wssLink) {
       const socket = new WebSocket(wssLink);
@@ -134,33 +145,33 @@ const Svetoforlar = () => {
     }
   };
 
-  const clearTrafficLights = () => {
-    setTrafficLights([]);
-    if (trafficSocket) {
-      trafficSocket.close();
-      setTrafficSocket(null);
-    }
-    setCurrentSvetoforId(null);
-    setWssLink(null);
-    setLastSuccessfulLocation(null);
-  };
+  // const clearTrafficLights = () => {
+  //   setTrafficLights([]);
+  //   if (trafficSocket) {
+  //     trafficSocket.close();
+  //     setTrafficSocket(null);
+  //   }
+  //   setCurrentSvetoforId(null);
+  //   setWssLink(null);
+  //   setLastSuccessfulLocation(null);
+  // };
 
-  const updateTrafficLights = (data) => {
-    if (data) {
-      const updatedLights = trafficLights.map((light) => {
-        const update = data.channel.find((v) => v.id === light.link_id);
-        return update
-          ? {
-              ...light,
-              status: update.type === 100 ? light.status : update.status,
-              countdown: update.countdown,
-            }
-          : light;
-      });
-
-      setTrafficLights(updatedLights);
-    }
-  };
+  // const updateTrafficLights = (data) => {
+  //   if (data) {
+  //     const updatedLights = trafficLights.map((light) => {
+  //       const update = data.channel.find((v) => v.id === light.link_id);
+  //       return update
+  //         ? {
+  //             ...light,
+  //             status: update.type === 100 ? light.status : update.status,
+  //             countdown: update.countdown,
+  //           }
+  //         : light;
+  //     });
+  //     setPhase(data.phase);
+  //     setTrafficLights(updatedLights);
+  //   }
+  // };
 
   return (
     <>

@@ -16,8 +16,8 @@ const SensorCard = ({
   return (
     <div
       onClick={() => handler(sensor_id)}
-      className={`h-full my-4 text-left w-[15vw] relative overflow-hidden rounded-xl shadow-xl transform transition-all duration-300 cursor-pointer ${
-        isActive ? "border border-blue-400" : "border border-transparent"
+      className={`h-full my-4 text-left w-[15vw] border-2 relative overflow-hidden rounded-xl shadow-xl transform transition-all duration-300 cursor-pointer ${
+        isActive ? " border-blue-400" : "border border-transparent"
       } ${textColor}`}
     >
       <div

@@ -66,6 +66,7 @@ import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import FilterControl from "./components/controls/filterControl/index.jsx";
 import WidgetControl from "./components/controls/widgetControl/index.jsx";
 import useLocalStorageState from "../../customHooks/uselocalStorageState.jsx";
+import TrafficLightContainer from "./components/svetofor/managementLights.jsx";
 
 const home = [41.2995, 69.2401];
 
@@ -347,7 +348,8 @@ const MapComponent = ({ changedMarker }) => {
           <BottomSection cardsInfoData={bottomSectionData} />
         </div>
         {/* lights */}
-        <Svetoforlar />
+        {/* <Svetoforlar /> */}
+        <TrafficLightContainer />
         {/* settings */}
         <Control position="topleft">
           <SpeedDial placement="right">
@@ -528,7 +530,7 @@ const MapComponent = ({ changedMarker }) => {
                   rotatedAngle={marker.type === 3 ? marker.rotated : 0}
                 >
                   {marker.type === 1 && <CustomPopUp marker={marker} />}
-                  <Tooltip direction="top">
+                  <Tooltip direction="top" className="rounded-md">
                     {marker.type == 1 ? (
                       <div
                         style={{
