@@ -251,7 +251,7 @@ const SensorSection = ({
   prepareRow,
 }) => (
   <div
-    className={`p-2 dark:text-white border-none basis-5/6 col-span-4 shadow-none overflow-y-auto  ${
+    className={`p-2 no-scrollbar dark:text-white border-none basis-5/6 col-span-4 shadow-none overflow-y-auto  ${
       sensor_data?.length === 0 || !chartData ? "row-span-2" : ""
     }`}
   >

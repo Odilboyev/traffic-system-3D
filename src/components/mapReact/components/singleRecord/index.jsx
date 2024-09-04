@@ -3,6 +3,7 @@ import { memo } from "react";
 const SingleRecord = ({ mselink, cname }) => {
   return (
     <div
+      className="rounded-xl"
       style={{
         minWidth: "12vw",
         minHeight: "8vw",

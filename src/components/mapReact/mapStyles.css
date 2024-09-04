@@ -49,6 +49,9 @@
   animation: neon 1s infinite alternate;
 }
 
+.leaflet-popup-content-wrapper {
+  border-radius: 0.75rem;
+}
 /* #monitoring .leaflet-top {
   top: 50%;
   transform: translate(0%, -50%);
