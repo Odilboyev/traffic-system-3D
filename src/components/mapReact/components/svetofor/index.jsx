@@ -16,6 +16,7 @@ import { PiArrowULeftDownBold } from "react-icons/pi";
 
 import ThreeArrowsIcon from "./threeArrowIcon";
 import PhasesDisplay from "../crossroad/components/phases";
+import PedestrianIcon from "./pedestrian";
 function fixIncompleteJSON(message) {
   // Check if message starts with "{" and doesn't end with "}"
   if (message.startsWith("{") && !message.endsWith("}")) {
@@ -209,7 +210,8 @@ const iconSelector = ({ type = 1, status = 0, style }) => {
       case 1:
         return MdStraight;
       case 2:
-        return status === 1 ? IoIosWalk : IoMdMan;
+        // return status === 1 ? IoIosWalk : IoMdMan;
+        return PedestrianIcon;
       case 3:
         return TbCornerUpRight;
       case 4:
