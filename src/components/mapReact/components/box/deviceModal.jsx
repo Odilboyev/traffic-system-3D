@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState } from "react";
+import { useTable, useSortBy, usePagination } from "react-table";
 import {
   Dialog,
   DialogBody,
@@ -8,9 +9,8 @@ import {
   Typography,
   CardBody,
   Card,
-  Spinner,
+  Button,
 } from "@material-tailwind/react";
-
 import { IoMdClose } from "react-icons/io";
 import SensorCard from "./sensorCard";
 import Loader from "../../../loader";
@@ -22,12 +22,16 @@ import {
   getBoxSensorChart,
   getErrorHistory,
 } from "../../../../api/api.handlers";
-import getRowColor from "../../../../configurations/getRowColor";
+import StatusBadge from "../../../statusBadge";
+import { useMap } from "react-leaflet";
+import { MapIcon } from "@heroicons/react/16/solid";
+import { FaLocationDot } from "react-icons/fa6";
+import FilterTypes from "../modalTable/filterTypes";
 
-const hiddenCols = ["type", "type_name", "device_id"];
+const hiddenCols = ["type", "type_name", "device_id", "statuserror_name"];
 
 // Custom hook for fetching and sorting data
-const useErrorHistory = (deviceId, sensorId, sortedColumn, sortOrder) => {
+const useErrorHistory = (deviceId, sensorId) => {
   const [errorHistory, setErrorHistory] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
@@ -39,10 +43,9 @@ const useErrorHistory = (deviceId, sensorId, sortedColumn, sortOrder) => {
 
   useEffect(() => {
     if (errorHistory?.length > 0) {
-      const sorted = sortData(errorHistory, sortedColumn, sortOrder);
-      setFilteredData(sorted);
+      setFilteredData(errorHistory);
     }
-  }, [errorHistory, sortedColumn, sortOrder]);
+  }, [errorHistory]);
 
   const fetchErrorHistory = async (sensorId) => {
     try {
@@ -54,23 +57,6 @@ const useErrorHistory = (deviceId, sensorId, sortedColumn, sortOrder) => {
     }
   };
 
-  const sortData = (data, column, order) => {
-    return [...data].sort((a, b) => {
-      const valueA = a[column];
-      const valueB = b[column];
-      if (typeof valueA === "undefined" || typeof valueB === "undefined") {
-        return order === "asc" ? -1 : 1;
-      }
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        return order === "asc" ? valueA - valueB : valueB - valueA;
-      } else {
-        return order === "asc"
-          ? valueA.toString().localeCompare(valueB.toString())
-          : valueB.toString().localeCompare(valueA.toString());
-      }
-    });
-  };
-
   return { errorHistory, filteredData };
 };
 
@@ -79,15 +65,10 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
   const { device_data = {}, sensor_data = [] } = device || {};
   const [chartData, setChartData] = useState(null);
   const [selectedSensorId, setSelectedSensorId] = useState(null);
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [sortedColumn, setSortedColumn] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const { errorHistory, filteredData } = useErrorHistory(
     device_data?.id,
-    selectedSensorId,
-    sortedColumn,
-    sortOrder
+    selectedSensorId
   );
 
   useEffect(() => {
@@ -104,6 +85,12 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
     }
     setSelectedSensorId(sensorId);
   };
+  // // const map = useMap();
+  // const locationHandler = ({ lat, lng }) => {
+  //   if (lat && lng) {
+  //     map.flyTo([lat, lng], 20);
+  //   }
+  // };
 
   const fetchChartData = async (sensorId) => {
     try {
@@ -122,78 +109,40 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
       console.error("Error fetching chart data:", error);
     }
   };
+  const columns = useMemo(() => {
+    if (!errorHistory || errorHistory.length === 0) return [];
 
-  const handleSort = (keyName) => {
-    if (sortedColumn === keyName) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortOrder("asc");
-      setSortedColumn(keyName);
-    }
-  };
-
-  const renderTableHeaders = () => (
-    <tr className="font-bold">
-      {errorHistory &&
-        Object.keys(errorHistory[0] || {})?.map((key, index) =>
-          hiddenCols.includes(key) ? null : (
-            <th
-              key={index}
-              className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
-              onClick={() => handleSort(key)}
-            >
-              <div className="flex justify-between gap-4 items-center">
-                <Typography className="font-bold">{t(key)}</Typography>
-                {sortedColumn === key && (
-                  <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
-                )}
-              </div>
-            </th>
-          )
-        )}
-    </tr>
-  );
-
-  const renderTableRows = () => {
-    if (filteredData.length === 0) {
-      return (
-        <tr>
-          <td
-            colSpan={Object.keys(errorHistory[0] || {}).length}
-            className="text-center py-2"
-          >
-            No data available
-          </td>
-        </tr>
-      );
-    }
-
-    return filteredData.map((item, i) => (
-      <tr
-        key={i}
-        className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
-      >
-        {Object.keys(item).map((key, index) =>
-          hiddenCols.includes(key) ? null : (
-            <td
-              key={index}
-              className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
-                key === "statuserror" && getRowColor(item[key])
-              }`}
-            >
-              <Typography>
-                {key === "duration"
-                  ? moment.utc(item[key] * 1000).format("HH:mm:ss")
-                  : key === "statuserror"
-                  ? item["statuserror_name"]
-                  : item[key]}
-              </Typography>
-            </td>
-          )
-        )}
-      </tr>
-    ));
-  };
+    return Object.keys(errorHistory[0])
+      .filter((key) => !hiddenCols.includes(key))
+      .map((key) => ({
+        Header: t(key),
+        accessor: key,
+        Cell: ({ value }) => {
+          if (key === "duration") {
+            return moment.utc(value * 1000).format("HH:mm:ss");
+          } else if (key === "statuserror") {
+            const statusName = errorHistory.find(
+              (item) => item[key] === value
+            )?.statuserror_name;
+            const statuserror = errorHistory.find(
+              (item) => item[key] === value
+            )?.statuserror;
+            return <StatusBadge status={statuserror} statusName={statusName} />;
+          } else {
+            return value;
+          }
+        },
+      }));
+  }, [errorHistory, hiddenCols, t]);
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable(
+      {
+        columns,
+        data: filteredData,
+      },
+      useSortBy,
+      usePagination
+    );
 
   return (
     <Dialog
@@ -215,15 +164,20 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
           </div>
         ) : device_data ? (
           <>
-            <DeviceDetails device_data={device_data} />
+            <DeviceDetails
+              device_data={device_data}
+              // locationHandler={locationHandler}
+            />
             <SensorSection
-              filteredData={filteredData}
               sensor_data={sensor_data}
               chartData={chartData}
               selectedSensorId={selectedSensorId}
               handleSensorSelection={handleSensorSelection}
-              renderTableHeaders={renderTableHeaders}
-              renderTableRows={renderTableRows}
+              getTableProps={getTableProps}
+              getTableBodyProps={getTableBodyProps}
+              headerGroups={headerGroups}
+              rows={rows}
+              prepareRow={prepareRow}
             />
           </>
         ) : (
@@ -234,36 +188,70 @@ const DeviceModal = ({ device, isDialogOpen, handler, isLoading }) => {
   );
 };
 
-const DeviceDetails = ({ device_data }) => (
-  <Card className="dark:bg-blue-gray-900 dark:text-white border basis-1/6 row-span-2 col-span-1 rounded-none border-none">
-    <CardBody className="flex w-full flex-col justify-between gap-2">
-      {Object.entries({
-        ID: device_data?.name,
-        "Seriya raqami": device_data?.sn,
-        "Obyekt nomi": device_data?.adres,
-        "Mas'ul xodim": device_data?.masul_hodim,
-        "Xodim telefon raqami": device_data?.phone || "Raqam mavjud emas",
-      }).map(([label, value], i) => (
-        <div key={i} className="flex flex-col">
-          <span>{label}</span>
-          <Typography className="font-bold">{value}</Typography>
+const DeviceDetails = ({ device_data, locationHandler }) => (
+  <div className="basis-1/6 dark:bg-blue-gray-900 dark:text-white ">
+    <Card className="dark:bg-blue-gray-900 dark:text-white shadow-lg border">
+      <CardBody className="flex w-full flex-col justify-between gap-2 ">
+        <div className="flex justify-between items-center border-b py-3">
+          <Typography className="font-bold">{device_data.name}</Typography>
+          <IconButton
+            variant="text"
+            // onClick={() =>
+            // locationHandler({ lat: device_data.lat, lng: device_data.lng })
+            // }
+          >
+            <FaLocationDot className="w-6 h-6  dark:text-white" />
+          </IconButton>
         </div>
-      ))}
-    </CardBody>
-  </Card>
+        {Object.entries({
+          "Seriya raqami": device_data?.sn,
+          "Obyekt nomi": device_data?.adres,
+          "Mas'ul xodim": device_data?.masul_hodim,
+          "Xodim telefon raqami": device_data?.phone || "Raqam mavjud emas",
+        }).map(([label, value], i) => (
+          <div key={i} className="flex flex-col border-b">
+            <span>{label}</span>
+            <Typography className="font-bold">{value}</Typography>
+          </div>
+        ))}
+      </CardBody>
+    </Card>
+    <Card className="mt-5 dark:bg-blue-gray-900 dark:text-white shadow-lg border">
+      <CardBody>
+        <Typography className="font-bold border-b pb-2">
+          {device_data.name}
+        </Typography>
+        <Button className="mt-4" color="blue">
+          device_monitoring_rele_button_restart
+        </Button>
+        <Button className="mt-4" color="blue">
+          device_monitoring_rele_button_restart
+        </Button>
+        <Button className="mt-4" color="blue">
+          device_monitoring_rele_button_restart
+        </Button>
+        <Button className="mt-4" color="blue">
+          device_monitoring_rele_button_restart
+        </Button>
+      </CardBody>
+    </Card>
+  </div>
 );
 
 const SensorSection = ({
   sensor_data,
   chartData,
-  filteredData,
   selectedSensorId,
   handleSensorSelection,
-  renderTableHeaders,
-  renderTableRows,
+  // setSelectedFilter,
+  getTableProps,
+  getTableBodyProps,
+  headerGroups,
+  rows,
+  prepareRow,
 }) => (
   <div
-    className={`dark:text-white border-none basis-5/6 col-span-4 shadow-none overflow-y-auto text-center ${
+    className={`p-2 dark:text-white border-none basis-5/6 col-span-4 shadow-none overflow-y-auto  ${
       sensor_data?.length === 0 || !chartData ? "row-span-2" : ""
     }`}
   >
@@ -279,14 +267,20 @@ const SensorSection = ({
     </div>
 
     {/* Handle Chart Data */}
-    {chartData && [2, 3, 16].includes(selectedSensorId) ? (
-      <div className="col-span-3 row-span-1 shadow-none dark:bg-transparent w-[95%] mx-auto">
+    {chartData && [2, 3, 16].includes(selectedSensorId) && (
+      <div className="w-[90%] mx-auto py-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <Typography className="m-5 my-1 text-2xl">
+          {sensor_data &&
+            selectedSensorId &&
+            sensor_data.find((id) => selectedSensorId == id.sensor_id)
+              .sensor_name}
+        </Typography>
         <Chart
+          height={350}
           options={{
             chart: {
               id: "basic-bar",
               type: "area",
-              height: 350,
               animations: { enabled: false },
               toolbar: {
                 show: true,
@@ -297,51 +291,87 @@ const SensorSection = ({
                   zoomin: true,
                   zoomout: true,
                 },
-              }, // Remove the menu bar
+              },
               zoom: {
                 enabled: true,
-
-                type: "x", // Enable zooming only horizontally (use 'xy' for both)
-                autoScaleYaxis: true, // Automatically scale Y-axis on zoom
-              },
-              pan: {
-                enabled: true, // Enable panning
-                mode: "x", // Allow horizontal panning only
+                type: "x",
+                autoScaleYaxis: true,
               },
             },
+            fill: { opacity: 0.4 },
             dataLabels: { enabled: false },
-            xaxis: {
-              type: "datetime",
-              labels: { format: "dd MMM HH:mm" },
-            },
-            stroke: { curve: "smooth", width: "4" },
-            theme: { mode: "dark" },
-            colors: ["#39B69A"],
-            tooltip: {
-              x: { format: "dd MMM HH:mm" },
-              y: { formatter: (val) => val.toFixed(2) },
-            },
+            tooltip: { x: { format: "dd MMM yyyy HH:mm:ss" } },
+            xaxis: { type: "datetime" },
           }}
           series={chartData}
           type="area"
-          height={350}
         />
       </div>
-    ) : null}
-
-    {/* Handle Table Data */}
-    {filteredData?.length > 0 ? (
-      <div className="shadow-none dark:bg-transparent mt-5">
-        <table className="table-auto w-full no-scrollbar text-xs">
-          <thead>{renderTableHeaders()}</thead>
-          <tbody>{renderTableRows()}</tbody>
-        </table>
-      </div>
-    ) : (
-      <Typography>
-        No error history data available for the selected sensor
-      </Typography>
     )}
+    <Card className="px-0 dark:bg-blue-gray-900 dark:text-white border-t border-blue-gray-50 p-4 shadow-md rounded-lg">
+      <CardBody className="px-0 pt-0">
+        <div className="flex justify-between my-5">
+          <Typography className="m-5 mt-2 text-2xl">
+            {sensor_data &&
+              selectedSensorId &&
+              sensor_data.find((id) => selectedSensorId == id.sensor_id)
+                ?.sensor_name}
+          </Typography>
+          <FilterTypes
+            active={selectedSensorId}
+            typeOptions={sensor_data.filter(
+              (v) => ![2, 3, 16].includes(v.sensor_id)
+            )}
+            valueKey="sensor_id"
+            nameKey="sensor_name"
+            onFilterChange={(selectedSensor) => {
+              // setSelectedFilter(selectedSensor);
+              handleSensorSelection(selectedSensor);
+            }}
+          />
+        </div>
+
+        <table {...getTableProps()} className="min-w-full table-auto mx-0">
+          <thead className="bg-gray-200 dark:bg-gray-800">
+            {headerGroups.map((headerGroup, i) => (
+              <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column, i) => (
+                  <th
+                    key={i}
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    className="border-b-2 border-gray-300 px-5 py-3 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide"
+                  >
+                    {column.render("Header")}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row, i) => {
+              prepareRow(row);
+              return (
+                <tr
+                  key={i}
+                  {...row.getRowProps()}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 border-b"
+                >
+                  {row.cells.map((cell, i) => (
+                    <td
+                      key={i}
+                      {...cell.getCellProps()}
+                      className="px-5 py-3 text-sm text-gray-700 dark:text-gray-200"
+                    >
+                      {cell.render("Cell")}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </CardBody>
+    </Card>
   </div>
 );
 

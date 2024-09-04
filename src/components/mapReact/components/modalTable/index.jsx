@@ -46,7 +46,7 @@ const ModalTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState(undefined);
+  const [selectedFilter, setSelectedFilter] = useState(null);
   const map = useMap();
 
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
@@ -188,6 +188,9 @@ const ModalTable = ({
                     { type: 3, type_name: "boxcontroller" },
                     { type: 4, type_name: "svetofor" },
                   ]}
+                  active={selectedFilter}
+                  valueKey="type"
+                  nameKey="type_name"
                   onFilterChange={(selectedType) => {
                     setSelectedFilter(selectedType);
                     setCurrentPage(1);

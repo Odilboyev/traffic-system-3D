@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import getRowColor from "../../../../../configurations/getRowColor";
 
 const PhasesDisplay = ({ phases }) => {
   console.log("phases display", phases);
@@ -21,19 +22,20 @@ const PhasesDisplay = ({ phases }) => {
       {phases?.map((phase) => (
         <div
           key={phase.id}
-          className={`phase z-[99999999999999] ${
-            phase.status === 1 ? "active" : ""
-          }`}
+          className={`phase z-[99999999999999] bg-blue-gray-100 text-gray-900 text-center dark:bg-blue-gray-700 dark:text-white`}
         >
-          <div className="phase-info">
+          <div className="phase-info z-[999] text-white">
             <span>{phase.desc}</span>
             <span>
               {phase.now}s / {phase.total}s
             </span>
           </div>
           <div
-            className="phase-bar"
-            style={{ width: `${(phase.now / phase.total) * 100}%` }}
+            className={`phase-bar ${getRowColor(phase.status - 1)}`}
+            style={{
+              width: `${(phase.now / phase.total) * 100}%`,
+              height: "100%",
+            }}
           ></div>
         </div>
       ))}
