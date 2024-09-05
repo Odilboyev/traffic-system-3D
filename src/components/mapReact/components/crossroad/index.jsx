@@ -17,7 +17,7 @@ import {
   getTrafficLightsData,
 } from "../../../../api/api.handlers";
 import FullscreenBox from "./components/fullscreen";
-import SensorSection from "./subPages/sensor";
+// import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";
 import TrafficLights from "../trafficLights";
 import Svetoforlar from "../svetofor";
@@ -28,6 +28,8 @@ import Loader from "../../../loader";
 import { TbLoader } from "react-icons/tb";
 import CrossroadDashboard from "./subPages/crossroadDash";
 import TrafficLightContainer from "../svetofor/managementLights";
+import SensorSection from "../sensorSection";
+import SensorPartWrapper from "../sensorSection/wrapper";
 
 // Helper function to transform chart data
 function transformDataForCharts(data) {
@@ -178,16 +180,13 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
             <Videos videos={data?.camera} />
           </FullscreenBox>
           <FullscreenBox>
-            {device ? (
-              <SensorSection
-                key={marker?.cid}
-                device={device}
-                isLoading={isLoading}
-                markerId={marker?.cid}
-              />
-            ) : (
-              <Typography>No Sensor data</Typography>
-            )}
+            <div className="overflow-y-scroll no-scrollbar">
+              {device ? (
+                <SensorPartWrapper device={device} isInCrossroad={true} />
+              ) : (
+                <Typography>No Sensor data</Typography>
+              )}
+            </div>
           </FullscreenBox>
           <FullscreenBox>
             {" "}
