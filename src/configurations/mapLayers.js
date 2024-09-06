@@ -6,13 +6,7 @@ const baseLayers = [
     url: "https://pm.bgsoft.uz/adminpanel/mapcacher.php?link=https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "OpenStreetMap",
   },
-  {
-    name: "Yandex Maps",
-    checked: false,
-    maxNativeZoom: 19,
-    url: "https://vec02.maps.yandex.net/{z}/{x}/{y}.png", // Example URL
-    attribution: 'Map data © <a href="https://yandex.com/maps">Yandex Maps</a>',
-  },
+
   {
     name: "Transport",
     checked: false,

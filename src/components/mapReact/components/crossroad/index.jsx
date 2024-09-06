@@ -30,6 +30,7 @@ import CrossroadDashboard from "./subPages/crossroadDash";
 import TrafficLightContainer from "../svetofor/managementLights";
 import SensorSection from "../sensorSection";
 import SensorPartWrapper from "../sensorSection/wrapper";
+import ZoomControl from "../controls/customZoomControl";
 
 // Helper function to transform chart data
 function transformDataForCharts(data) {
@@ -195,12 +196,12 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
                 id="monitoring"
                 attributionControl={false}
                 center={[marker?.lat, marker?.lng]}
-                zoom={19}
-                maxZoom={theme === "dark" ? 22 : 18}
-                zoomDelta={0.6}
-                style={{ height: "100vh", width: "100%" }}
+                zoom={20}
                 zoomControl={false}
+                zoomDelta={0.6}
+                style={{ height: "100%", width: "100%" }}
               >
+                <ZoomControl theme={theme} position={"bottomleft"} />{" "}
                 {currentLayer && (
                   <TileLayer
                     maxNativeZoom={currentLayer.maxNativeZoom}
@@ -210,7 +211,6 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
                     maxZoom={22}
                   />
                 )}
-
                 <TrafficLightContainer isInModal={true} />
               </MapContainer>
             </div>

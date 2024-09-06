@@ -2,6 +2,7 @@ import { Card, CardBody, Typography } from "@material-tailwind/react";
 import SensorCard from "../box/sensorCard";
 import FilterTypes from "../modalTable/filterTypes";
 import Chart from "react-apexcharts";
+import { FiAlertCircle } from "react-icons/fi";
 
 const SensorSection = ({
   sensor_data,
@@ -30,16 +31,28 @@ const SensorSection = ({
         />
       ))}
     </div>
+    <div className="flex justify-between my-5">
+      <Typography className="m-5 mt-2 text-2xl">
+        {sensor_data &&
+          selectedSensorId &&
+          sensor_data.find((id) => selectedSensorId == id.sensor_id)
+            ?.sensor_name}
+      </Typography>
+      <FilterTypes
+        active={selectedSensorId}
+        typeOptions={sensor_data}
+        valueKey="sensor_id"
+        nameKey="sensor_name"
+        onFilterChange={(selectedSensor) => {
+          // setSelectedFilter(selectedSensor);
+          handleSensorSelection(selectedSensor);
+        }}
+      />
+    </div>
 
     {/* Handle Chart Data */}
     {chartData && [2, 3, 16].includes(selectedSensorId) && (
-      <div className="w-[90%] mx-auto py-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-        <Typography className="m-5 my-1 text-2xl">
-          {sensor_data &&
-            selectedSensorId &&
-            sensor_data.find((id) => selectedSensorId == id.sensor_id)
-              .sensor_name}
-        </Typography>
+      <div className="w-[90%] no-scrollbar mx-auto py-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
         <Chart
           height={350}
           options={{
@@ -73,30 +86,12 @@ const SensorSection = ({
         />
       </div>
     )}
-    <Card className="px-0 dark:bg-blue-gray-900 dark:text-white border-t border-blue-gray-50 p-4 shadow-md rounded-lg">
-      <CardBody className="px-0 pt-0 overflow-x-scroll">
-        <div className="flex justify-between my-5">
-          <Typography className="m-5 mt-2 text-2xl">
-            {sensor_data &&
-              selectedSensorId &&
-              sensor_data.find((id) => selectedSensorId == id.sensor_id)
-                ?.sensor_name}
-          </Typography>
-          <FilterTypes
-            active={selectedSensorId}
-            typeOptions={sensor_data.filter(
-              (v) => ![2, 3, 16].includes(v.sensor_id)
-            )}
-            valueKey="sensor_id"
-            nameKey="sensor_name"
-            onFilterChange={(selectedSensor) => {
-              // setSelectedFilter(selectedSensor);
-              handleSensorSelection(selectedSensor);
-            }}
-          />
-        </div>
-
-        <table {...getTableProps()} className="min-w-full table-auto mx-0">
+    <Card className="px-0 no-scrollbar  dark:bg-blue-gray-900 dark:text-white border-t border-blue-gray-50 p-4 shadow-md rounded-lg">
+      <CardBody className="px-0 pt-0 overflow-x-scroll no-scrollbar">
+        <table
+          {...getTableProps()}
+          className="min-w-full table-auto mx-0 no-scrollbar "
+        >
           <thead className="bg-gray-200 dark:bg-gray-800">
             {headerGroups.map((headerGroup, i) => (
               <tr key={i} {...headerGroup.getHeaderGroupProps()}>
@@ -112,27 +107,39 @@ const SensorSection = ({
               </tr>
             ))}
           </thead>
+
           <tbody {...getTableBodyProps()}>
-            {rows.map((row, i) => {
-              prepareRow(row);
-              return (
-                <tr
-                  key={i}
-                  {...row.getRowProps()}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 border-b"
-                >
-                  {row.cells.map((cell, i) => (
-                    <td
-                      key={i}
-                      {...cell.getCellProps()}
-                      className="px-5 py-3 text-sm text-gray-700 dark:text-gray-200"
-                    >
-                      {cell.render("Cell")}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+            {rows?.length > 0 ? (
+              rows.map((row, i) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    key={i}
+                    {...row.getRowProps()}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 border-b"
+                  >
+                    {row.cells.map((cell, i) => (
+                      <td
+                        key={i}
+                        {...cell.getCellProps()}
+                        className="px-5 py-3 text-sm text-gray-700 dark:text-gray-200"
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td className="text-center py-5">
+                  <FiAlertCircle className="h-6 w-6 mx-auto text-gray-500 dark:text-gray-400" />
+                  <Typography className="mt-2 text-gray-700 dark:text-gray-200">
+                    No Data Available
+                  </Typography>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </CardBody>
