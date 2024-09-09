@@ -1,33 +1,38 @@
 import React, { useState } from "react";
 
 const RoadDrawing = () => {
-  const [lanes, setLanes] = useState(6); // Number of lanes per direction
-  const [laneWidth, setLaneWidth] = useState(50); // Width of a single lane
+  const [lanes, setLanes] = useState(3); // Number of lanes per direction
+  const [laneWidth, setLaneWidth] = useState(30); // Width of a single lane
   const [sidewalkWidth, setSidewalkWidth] = useState(10); // Width of the sidewalk
-  const [intersectionSize, setIntersectionSize] = useState(200); // Size of the intersection
 
-  const renderLanes = (direction) => {
+  // Calculate the intersection size dynamically
+  const totalLanes = lanes * 2; // Double the lanes for both directions
+  const intersectionSize = laneWidth * totalLanes + sidewalkWidth;
+
+  const renderLanes = (direction, type) => {
+    const splitIndex = Math.ceil(totalLanes / 2); // Divide lanes into two groups
+    const color1 = type === "from" ? "#444" : "#888"; // Color for the first half
+    const color2 = type === "from" ? "#888" : "#444"; // Color for the second half
+
     return (
       <div
         className={`flex border-4 ${
-          direction == "horizontal" ? "flex-col" : "flex-row"
-        } border-red-300`}
+          direction === "horizontal" ? "flex-col" : "flex-row"
+        } `}
         style={{
           minWidth: direction === "vertical" ? `${laneWidth}px` : "100%",
           minHeight: direction === "horizontal" ? `${laneWidth}px` : "100%",
         }}
       >
-        {Array.from({ length: lanes }).map((_, i) => (
-          <dive
+        {Array.from({ length: totalLanes }).map((_, i) => (
+          <div
             key={i}
             style={{
-              backgroundColor: "#666", // Gray color for lanes
+              backgroundColor: i < splitIndex ? color1 : color2, // Color based on lane position
               minWidth: direction === "vertical" ? `${laneWidth}px` : "100%",
               minHeight: direction === "horizontal" ? `${laneWidth}px` : "100%",
-              // height: "100%",
-              // transform: direction === "horizontal" && "rotate(90deg)",
               margin: "", // No gap between lanes
-              border: "3px solid white  ",
+              border: "2px solid white",
             }}
           />
         ))}
@@ -42,24 +47,24 @@ const RoadDrawing = () => {
         <div
           className="absolute flex flex-col items-center"
           style={{
-            width: `${laneWidth * lanes + sidewalkWidth * 2}px`,
+            width: `${laneWidth * totalLanes + sidewalkWidth * 2}px`,
             height: "100%",
           }}
         >
           {/* Vertical Lanes */}
-          {renderLanes("vertical")}
+          {renderLanes("vertical", "from")}
         </div>
 
         {/* Horizontal Road */}
         <div
-          className="absolute flex flex-row items-center" // flex col qilish kk - horizontal uchun kk
+          className="absolute flex flex-row items-center"
           style={{
-            height: `${laneWidth * lanes + sidewalkWidth * 2}px`,
+            height: `${laneWidth * totalLanes + sidewalkWidth * 2}px`,
             width: "100%",
           }}
         >
           {/* Horizontal Lanes */}
-          {renderLanes("horizontal")}
+          {renderLanes("horizontal", "to")}
         </div>
 
         {/* Intersection */}
@@ -71,9 +76,9 @@ const RoadDrawing = () => {
             top: `calc(50% - ${intersectionSize / 2}px)`,
             left: `calc(50% - ${intersectionSize / 2}px)`,
             backgroundColor: "#333", // Dark gray for intersection
-            // border: "2px solid #fff", // White border for visibility
           }}
         >
+          {/* Crosswalks */}
           {/* Crosswalks */}
           <div
             className="absolute"
@@ -100,11 +105,11 @@ const RoadDrawing = () => {
         </div>
       </div>
 
-      <div className="absolute top-10 right-10 p-4 rounded shadow-md bg-white">
+      <div className="absolute top-10 right-10 p-4 rounded shadow-md bg-white dark:bg-blue-gray-600">
         <h2 className="text-lg font-semibold mb-4">Crossroad Controls</h2>
 
         <label className="block mb-2">
-          Number of Lanes: {lanes}
+          Number of Lanes (Per Direction): {lanes}
           <input
             type="range"
             min="1"
@@ -135,18 +140,6 @@ const RoadDrawing = () => {
             max="50"
             value={sidewalkWidth}
             onChange={(e) => setSidewalkWidth(parseInt(e.target.value))}
-            className="w-full mt-1"
-          />
-        </label>
-
-        <label className="block mb-2">
-          Intersection Size: {intersectionSize}px
-          <input
-            type="range"
-            min="100"
-            max="300"
-            value={intersectionSize}
-            onChange={(e) => setIntersectionSize(parseInt(e.target.value))}
             className="w-full mt-1"
           />
         </label>
