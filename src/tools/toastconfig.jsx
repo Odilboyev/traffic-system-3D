@@ -67,7 +67,7 @@ const toaster = (sensorData, map) => {
 
 const toastConfig = {
   position: "top-right",
-  autoClose: 15000,
+  autoClose: 10000,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,

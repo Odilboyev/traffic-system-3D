@@ -19,24 +19,44 @@ const RoadDrawing = () => {
       lanesPerDirection: 4,
       laneWidth: 10,
     },
+    northeast: {
+      lanesPerDirection: 4,
+      laneWidth: 10,
+    },
+    northwest: {
+      lanesPerDirection: 4,
+      laneWidth: 10,
+    },
+    southeast: {
+      lanesPerDirection: 4,
+      laneWidth: 10,
+    },
+    southwest: {
+      lanesPerDirection: 4,
+      laneWidth: 10,
+    },
     sidewalkWidth: 10,
   });
 
   // Calculate the intersection size dynamically
   const getIntersectionSize = () => {
-    const verticalWidth = Math.max(
+    const maxWidth = Math.max(
       config.north.lanesPerDirection * config.north.laneWidth +
         config.sidewalkWidth * 2,
       config.south.lanesPerDirection * config.south.laneWidth +
-        config.sidewalkWidth * 2
-    );
-    const horizontalHeight = Math.max(
+        config.sidewalkWidth * 2,
       config.east.lanesPerDirection * config.east.laneWidth +
         config.sidewalkWidth * 2,
       config.west.lanesPerDirection * config.west.laneWidth +
         config.sidewalkWidth * 2
     );
-    return Math.max(verticalWidth, horizontalHeight);
+    const maxHeight = Math.max(
+      config.east.lanesPerDirection * config.east.laneWidth +
+        config.sidewalkWidth * 2,
+      config.west.lanesPerDirection * config.west.laneWidth +
+        config.sidewalkWidth * 2
+    );
+    return Math.max(maxWidth, maxHeight);
   };
 
   const renderLanes = (roadConfig, direction) => {
@@ -84,7 +104,7 @@ const RoadDrawing = () => {
     />
   );
 
-  const intersectionSize = 120;
+  const intersectionSize = getIntersectionSize();
 
   return (
     <div className="relative h-[90vh] flex items-center justify-center">
@@ -101,8 +121,6 @@ const RoadDrawing = () => {
             top: 0,
           }}
         >
-          {/* {renderSidewalks("vertical")}
-          {renderSidewalks("vertical")} */}
           {renderLanes(config.north, "vertical")}
         </div>
 
@@ -118,8 +136,6 @@ const RoadDrawing = () => {
             top: `50%`,
           }}
         >
-          {/* {renderSidewalks("vertical")}
-          {renderSidewalks("vertical")} */}
           {renderLanes(config.south, "vertical")}
         </div>
 
@@ -135,8 +151,6 @@ const RoadDrawing = () => {
             left: 0,
           }}
         >
-          {/* {renderSidewalks("horizontal")}
-          {renderSidewalks("horizontal")} */}
           {renderLanes(config.east, "horizontal")}
         </div>
 
@@ -152,8 +166,6 @@ const RoadDrawing = () => {
             left: `50%`,
           }}
         >
-          {/* {renderSidewalks("horizontal")}
-          {renderSidewalks("horizontal")} */}
           {renderLanes(config.west, "horizontal")}
         </div>
 
@@ -300,7 +312,10 @@ const RoadDrawing = () => {
               onChange={(e) =>
                 setConfig({
                   ...config,
-                  east: { ...config.east, laneWidth: parseInt(e.target.value) },
+                  east: {
+                    ...config.east,
+                    laneWidth: parseInt(e.target.value),
+                  },
                 })
               }
               className="w-full mt-1"
@@ -341,7 +356,10 @@ const RoadDrawing = () => {
               onChange={(e) =>
                 setConfig({
                   ...config,
-                  west: { ...config.west, laneWidth: parseInt(e.target.value) },
+                  west: {
+                    ...config.west,
+                    laneWidth: parseInt(e.target.value),
+                  },
                 })
               }
               className="w-full mt-1"
@@ -349,7 +367,7 @@ const RoadDrawing = () => {
           </label>
         </div>
 
-        {/* Controls for Sidewalk Width */}
+        {/* Sidewalk Width */}
         <div className="mb-4">
           <h3 className="text-md font-semibold">Sidewalk Width</h3>
           <label className="block mb-2">
@@ -375,25 +393,19 @@ const RoadDrawing = () => {
 };
 
 const Crosswalk = ({ orientation, position }) => {
-  const size = 10; // Crosswalk size
+  const style = {
+    top: orientation === "horizontal" && position === "top" ? 0 : undefined,
+    bottom:
+      orientation === "horizontal" && position === "bottom" ? 0 : undefined,
+    left: orientation === "vertical" && position === "left" ? 0 : undefined,
+    right: orientation === "vertical" && position === "right" ? 0 : undefined,
+    backgroundColor: "#888",
+    height: orientation === "horizontal" ? "5px" : "100%",
+    width: orientation === "vertical" ? "5px" : "100%",
+    position: "absolute",
+  };
 
-  return (
-    <div
-      className={`absolute ${
-        orientation === "horizontal" ? "w-full" : "h-full"
-      } bg-white`}
-      style={{
-        [orientation === "horizontal" ? "height" : "width"]: `${size}px`,
-        [position === "top"
-          ? "top"
-          : position === "bottom"
-          ? "bottom"
-          : position === "left"
-          ? "left"
-          : "right"]: "0",
-      }}
-    />
-  );
+  return <div style={style} />;
 };
 
 export default RoadDrawing;
