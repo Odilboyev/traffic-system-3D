@@ -44,7 +44,7 @@ const WeatherCard = () => {
           <div className="w-1/5">
             <img
               src={`${iconPath}/${today.weather_icon}`}
-              alt="Weather icon"
+              alt={today.weather_icon}
               className="w-full"
             />
           </div>
@@ -74,7 +74,7 @@ const WeatherCard = () => {
             <div className="text-center w-3/5">
               <img
                 src={`${iconPath}/${nextDays[0].wheather_icon_day}`}
-                alt="Weather icon"
+                alt={nextDays[0].wheather_icon_day}
                 className="w-full"
               />
             </div>
@@ -91,7 +91,7 @@ const WeatherCard = () => {
             <div className="text-center w-2/5">
               <img
                 src={`${iconPath}/${nextDays[0].wheather_icon_night}`}
-                alt="Weather icon"
+                alt={nextDays[0].wheather_icon_night}
                 className="w-full"
               />
             </div>
