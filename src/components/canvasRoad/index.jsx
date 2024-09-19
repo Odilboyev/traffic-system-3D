@@ -439,7 +439,7 @@ const RoadDrawing = () => {
         {/* Center Intersection */}
         {/* Intersection */}
         <div
-          className="absolute bg-blue-gray-700"
+          className="absolute rounded-full scale-125 bg-blue-gray-700"
           style={{
             width: `${intersectionSize}px`,
             height: `${intersectionSize}px`,
