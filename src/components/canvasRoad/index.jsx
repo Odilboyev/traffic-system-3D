@@ -5,8 +5,8 @@ const RoadDrawing = () => {
   const [config, setConfig] = useState({
     north: { lanesFrom: 4, lanesTo: 2, visible: true },
     south: { lanesFrom: 2, lanesTo: 3, visible: true },
-    east: { lanesFrom: 2, lanesTo: 2, visible: true },
-    west: { lanesFrom: 2, lanesTo: 2, visible: true },
+    east: { lanesFrom: 4, lanesTo: 4, visible: true },
+    west: { lanesFrom: 2, lanesTo: 3, visible: true },
     sidewalkWidth: 10,
   });
 
@@ -16,31 +16,86 @@ const RoadDrawing = () => {
   };
 
   const getMaxRoadWidth = () => {
-    return Math.max(
-      getRoadWidth(config.north),
-      getRoadWidth(config.south),
-      getRoadWidth(config.east),
-      getRoadWidth(config.west)
+    return Math.max(getRoadWidth(config.east), getRoadWidth(config.west)) + 20;
+  };
+
+  const getMaxRoadHeight = () => {
+    return Math.max(getRoadWidth(config.east), getRoadWidth(config.west)) + 20;
+  };
+  const getIntersectionSize = () => {
+    // Calculate maximum road width (lanesFrom or lanesTo, whichever is larger) plus sidewalks
+    const maxWidth = Math.max(
+      config.north.visible
+        ? Math.max(config.north.lanesFrom, config.north.lanesTo) *
+            getLaneWidth() +
+            config.sidewalkWidth * 2
+        : 0,
+      config.south.visible
+        ? Math.max(config.south.lanesFrom, config.south.lanesTo) *
+            getLaneWidth() +
+            config.sidewalkWidth * 2
+        : 0
     );
+
+    // Calculate maximum road height (lanesFrom or lanesTo, whichever is larger) plus sidewalks
+    const maxHeight = Math.max(
+      config.east.visible
+        ? Math.max(config.east.lanesFrom, config.east.lanesTo) *
+            getLaneWidth() +
+            config.sidewalkWidth * 2
+        : 0,
+      config.west.visible
+        ? Math.max(config.west.lanesFrom, config.west.lanesTo) *
+            getLaneWidth() +
+            config.sidewalkWidth * 2
+        : 0
+    );
+
+    return Math.max(maxWidth, maxHeight);
   };
 
-  const getResponsiveOctagonPoints = (scaleFactor) => {
+  // Now get the intersection size
+  const intersectionSize = getIntersectionSize() * 2;
+
+  const getResponsiveOctagonPoints = () => {
+    // Road-specific widths
+    const roadWidthNorth = getRoadWidth(config.north);
+    const roadWidthSouth = getRoadWidth(config.south);
+    const roadWidthEast = getRoadWidth(config.east);
+    const roadWidthWest = getRoadWidth(config.west);
+
+    // Calculate the maximum width and height for the octagon
+    const maxWidth = Math.max(roadWidthEast, roadWidthWest);
+    const maxHeight = Math.max(roadWidthNorth, roadWidthSouth);
+
+    // Base dimensions for the octagon based on manual adjustments
+    const baseWidth = 160;
+    const baseHeight = 160;
+
+    // Calculate scaling factors
+    const scaleX = maxWidth / baseWidth;
+    const scaleY = maxHeight / baseHeight;
+
+    // Define the base points for the octagon
     const basePoints = [
-      [30, 0],
-      [70, 0],
-      [100, 30],
-      [100, 70],
-      [70, 100],
-      [30, 100],
-      [0, 70],
-      [0, 30],
+      [20, 0],
+      [160, 0],
+      [400, 180],
+      [125, 220],
+      [35, 220],
+      [0, 173],
+      [0, 40],
     ];
-    return basePoints
-      .map(([x, y]) => `${x * scaleFactor}px ${y * scaleFactor}px`)
-      .join(", ");
+
+    // Scale the points based on the scaling factors
+    const scaledPoints = basePoints.map(([x, y]) => [x * scaleX, y * scaleY]);
+
+    // Convert points to the clipPath format
+    return scaledPoints.map(([x, y]) => `${x}px ${y}px`).join(", ");
   };
 
-  const scaleFactor = getMaxRoadWidth() / 100;
+  const scaleFactorX = getMaxRoadWidth() / 100;
+  const scaleFactorY = getMaxRoadHeight() / 100; // Use height scaling
 
   const renderLanes = (roadConfig, direction, roadName) => {
     const { lanesFrom, lanesTo, visible } = roadConfig;
@@ -48,7 +103,7 @@ const RoadDrawing = () => {
 
     const totalLanes = lanesFrom + lanesTo;
     const laneWidth = getLaneWidth();
-    const roadLength = `calc(100% - ${getMaxRoadWidth() / 2}px)`;
+    const roadLength = `calc(100%)`;
 
     const getArrowForLane = (laneIndex, isIncoming) => {
       const laneDirection = roadName.toLowerCase();
@@ -62,7 +117,7 @@ const RoadDrawing = () => {
 
     return (
       <div
-        className={`relative flex ${
+        className={`relative z-20 flex ${
           direction === "horizontal" ? "flex-col" : "flex-row"
         }`}
         style={{
@@ -74,24 +129,25 @@ const RoadDrawing = () => {
             direction === "horizontal"
               ? `${laneWidth * totalLanes}px`
               : roadLength,
-          zIndex: 1,
         }}
       >
         {/* Incoming lanes */}
         {Array.from({ length: lanesFrom }).map((_, i) => (
           <div
             key={`in-${i}`}
-            className={`flex ${
+            className={`flex  ${
               roadName === "north"
-                ? "items-end"
+                ? "items-end justify-center"
                 : roadName === "west"
-                ? "justify-end"
+                ? "justify-end items-center"
                 : ""
             }`}
             style={{
-              backgroundColor: "#444",
+              backgroundColor: "#888",
               [direction === "vertical" ? "borderRight" : "borderBottom"]:
-                i < lanesFrom - 1 ? "1px dashed white" : "none",
+                i < lanesFrom ? "1px dashed white" : "none",
+              width: direction === "vertical" ? `${laneWidth}px` : "100%",
+              height: direction === "horizontal" ? `${laneWidth}px` : "100%",
 
               textAlign: "center",
               lineHeight: `${laneWidth}px`,
@@ -105,7 +161,7 @@ const RoadDrawing = () => {
                 fontWeight: "bold",
               }}
             >
-              {getArrowForLane(i, true)}
+              {/* {getArrowForLane(i, false)} */}
             </span>
           </div>
         ))}
@@ -116,15 +172,18 @@ const RoadDrawing = () => {
             key={`out-${i}`}
             className={`flex ${
               roadName === "north"
-                ? "items-end"
+                ? "items-end justify-center"
                 : roadName === "west"
-                ? "justify-end"
+                ? "justify-end items-center"
                 : ""
             }`}
             style={{
-              backgroundColor: "#888",
+              width: direction === "vertical" ? `${laneWidth}px` : "100%",
+              height: direction === "horizontal" ? `${laneWidth}px` : "100%",
+
+              backgroundColor: "#444",
               [direction === "vertical" ? "borderRight" : "borderBottom"]:
-                i < lanesFrom - 1 ? "1px dashed white" : "none",
+                i < lanesFrom ? "1px dashed white" : "none",
               position: "relative",
               textAlign: "center",
               lineHeight: `${laneWidth}px`,
@@ -139,7 +198,7 @@ const RoadDrawing = () => {
                 fontWeight: "bold",
               }}
             >
-              {getArrowForLane(i, false)}
+              {getArrowForLane(i, true)}
             </span>
           </div>
         ))}
@@ -155,7 +214,7 @@ const RoadDrawing = () => {
           className="absolute flex flex-col items-center"
           style={{
             width: `${getRoadWidth(config.north)}px`,
-            height: "50%",
+            height: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
             top: 0,
             left: `calc(50% - ${getRoadWidth(config.north) / 2}px)`,
           }}
@@ -177,7 +236,7 @@ const RoadDrawing = () => {
             width: `${getRoadWidth(config.south)}px`,
             height: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
             bottom: 0,
-            left: `calc(50% - ${getRoadWidth(config.south) / 2}px)`,
+            // left: `calc(50% - ${getRoadWidth(config.south) / 2}px)`,
           }}
         >
           {renderLanes(config.south, "vertical", "south")}
@@ -214,7 +273,7 @@ const RoadDrawing = () => {
           className="absolute flex flex-row items-center"
           style={{
             height: `${getRoadWidth(config.west)}px`,
-            width: "50%",
+            width: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
             left: 0,
             top: `calc(50% - ${getRoadWidth(config.west) / 2}px)`,
           }}
@@ -229,18 +288,23 @@ const RoadDrawing = () => {
         </div>
 
         {/* Center Intersection */}
+
+        {/* Center Intersection */}
+        {/* Intersection */}
         <div
           className="absolute"
           style={{
-            width: `${getMaxRoadWidth()}px`,
-            height: `${getMaxRoadWidth()}px`,
-            top: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-            left: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-            clipPath: `polygon(${getResponsiveOctagonPoints(scaleFactor)})`,
-            backgroundColor: "#222",
-            zIndex: 0,
+            width: `${intersectionSize}px`,
+            height: `${intersectionSize}px`,
+            top: `calc(50% - ${intersectionSize / 2}px)`,
+            left: `calc(50% - ${intersectionSize / 2}px)`,
+            backgroundColor: "#484747",
+            boxShadow: "0 0 10px rgba(0,0,0,0.7)",
+            // zIndex: 2,
           }}
-        />
+        >
+          {/* Crosswalks */}
+        </div>
       </div>
     </div>
   );
