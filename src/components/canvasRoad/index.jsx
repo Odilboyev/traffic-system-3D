@@ -327,6 +327,7 @@ const RoadDrawing = () => {
               />
               <span className="mx-1">to</span>
               <input
+                id={"check" + direction}
                 type="checkbox"
                 checked={config[direction].visible}
                 onChange={(e) =>
@@ -334,7 +335,9 @@ const RoadDrawing = () => {
                 }
                 className="ml-2"
               />
-              <span className="ml-1">Visible</span>
+              <label htmlFor={"check" + direction} className="ml-1 select-none">
+                Visible
+              </label>
             </div>
           ))}
           <button
