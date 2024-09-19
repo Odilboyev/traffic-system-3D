@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TrafficLight from "./trafficLight"; // Adjust the import if needed
+import { TbArrowRampLeft, TbArrowRampRight } from "react-icons/tb";
 
 const RoadDrawing = () => {
   const [config, setConfig] = useState({
@@ -9,17 +10,51 @@ const RoadDrawing = () => {
     west: { lanesFrom: 2, lanesTo: 3, visible: true },
     sidewalkWidth: 10,
   });
+  const [trafficLights, setTrafficLights] = useState({
+    north: "red",
+    south: "red",
+    east: "green",
+    west: "green",
+  });
 
-  const getLaneWidth = () => 20; // Width of each lane
+  const [crosswalks, setCrosswalks] = useState({
+    north: "green",
+    south: "green",
+    east: "red",
+    west: "red",
+  });
+  const colorMappingText = {
+    green: "text-green-200",
+    yellow: "text-yellow-200",
+    red: "text-red-200",
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTrafficLights((prev) => ({
+        north: prev.north === "red" ? "green" : "red",
+        south: prev.south === "red" ? "green" : "red",
+        east: prev.east === "red" ? "green" : "red",
+        west: prev.west === "red" ? "green" : "red",
+      }));
+
+      setCrosswalks((prev) => ({
+        north: prev.north === "green" ? "red" : "green",
+        south: prev.south === "green" ? "red" : "green",
+        east: prev.east === "red" ? "green" : "red",
+        west: prev.west === "red" ? "green" : "red",
+      }));
+    }, 5000); // Change every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const getLaneWidth = () => 25; // Width of each lane
   const getRoadWidth = (roadConfig) => {
     return (roadConfig.lanesFrom + roadConfig.lanesTo) * getLaneWidth();
   };
 
   const getMaxRoadWidth = () => {
-    return Math.max(getRoadWidth(config.east), getRoadWidth(config.west)) + 20;
-  };
-
-  const getMaxRoadHeight = () => {
     return Math.max(getRoadWidth(config.east), getRoadWidth(config.west)) + 20;
   };
   const getIntersectionSize = () => {
@@ -57,46 +92,6 @@ const RoadDrawing = () => {
   // Now get the intersection size
   const intersectionSize = getIntersectionSize() * 2;
 
-  const getResponsiveOctagonPoints = () => {
-    // Road-specific widths
-    const roadWidthNorth = getRoadWidth(config.north);
-    const roadWidthSouth = getRoadWidth(config.south);
-    const roadWidthEast = getRoadWidth(config.east);
-    const roadWidthWest = getRoadWidth(config.west);
-
-    // Calculate the maximum width and height for the octagon
-    const maxWidth = Math.max(roadWidthEast, roadWidthWest);
-    const maxHeight = Math.max(roadWidthNorth, roadWidthSouth);
-
-    // Base dimensions for the octagon based on manual adjustments
-    const baseWidth = 160;
-    const baseHeight = 160;
-
-    // Calculate scaling factors
-    const scaleX = maxWidth / baseWidth;
-    const scaleY = maxHeight / baseHeight;
-
-    // Define the base points for the octagon
-    const basePoints = [
-      [20, 0],
-      [160, 0],
-      [400, 180],
-      [125, 220],
-      [35, 220],
-      [0, 173],
-      [0, 40],
-    ];
-
-    // Scale the points based on the scaling factors
-    const scaledPoints = basePoints.map(([x, y]) => [x * scaleX, y * scaleY]);
-
-    // Convert points to the clipPath format
-    return scaledPoints.map(([x, y]) => `${x}px ${y}px`).join(", ");
-  };
-
-  const scaleFactorX = getMaxRoadWidth() / 100;
-  const scaleFactorY = getMaxRoadHeight() / 100; // Use height scaling
-
   const renderLanes = (roadConfig, direction, roadName) => {
     const { lanesFrom, lanesTo, visible } = roadConfig;
     if (!visible) return null;
@@ -104,16 +99,6 @@ const RoadDrawing = () => {
     const totalLanes = lanesFrom + lanesTo;
     const laneWidth = getLaneWidth();
     const roadLength = `calc(100%)`;
-
-    const getArrowForLane = (laneIndex, isIncoming) => {
-      const laneDirection = roadName.toLowerCase();
-      let arrow = "↑";
-      if (laneDirection === "north") arrow = isIncoming ? "↑" : "↓";
-      else if (laneDirection === "south") arrow = isIncoming ? "↑" : "↓";
-      else if (laneDirection === "east") arrow = isIncoming ? "→" : "←";
-      else if (laneDirection === "west") arrow = isIncoming ? "→" : "←";
-      return arrow;
-    };
 
     return (
       <div
@@ -131,84 +116,236 @@ const RoadDrawing = () => {
               : roadLength,
         }}
       >
-        {/* Incoming lanes */}
-        {Array.from({ length: lanesFrom }).map((_, i) => (
-          <div
-            key={`in-${i}`}
-            className={`flex  ${
-              roadName === "north"
-                ? "items-end justify-center"
-                : roadName === "west"
-                ? "justify-end items-center"
-                : ""
-            }`}
-            style={{
-              backgroundColor: "#888",
-              [direction === "vertical" ? "borderRight" : "borderBottom"]:
-                i < lanesFrom ? "1px dashed white" : "none",
-              width: direction === "vertical" ? `${laneWidth}px` : "100%",
-              height: direction === "horizontal" ? `${laneWidth}px` : "100%",
+        {/* Lanes */}
+        {Array.from({ length: totalLanes }).map((_, i) => {
+          const isOutgoing = i >= lanesFrom; // Determine if it's an outgoing lane
+          const isRightmost = i === totalLanes - 1; // Check if it's the rightmost lane
+          const isLeftmost = i === 0; // Check if it's the leftmost lane
 
-              textAlign: "center",
-              lineHeight: `${laneWidth}px`,
-            }}
-          >
-            <span
+          let icon = null; // Initialize icon as null
+
+          // Render icons only for outgoing lanes (lanesTo)
+
+          if (roadName === "north") {
+            if (!isOutgoing) {
+              icon = isRightmost ? (
+                <TbArrowRampLeft className="rotate-180 " />
+              ) : isLeftmost ? (
+                <TbArrowRampRight className="rotate-180 " />
+              ) : (
+                "↓"
+              );
+            }
+          } else if (roadName === "south") {
+            if (isOutgoing) {
+              icon = isRightmost ? (
+                <TbArrowRampRight />
+              ) : isLeftmost ? (
+                <TbArrowRampLeft />
+              ) : (
+                "↑"
+              );
+            }
+          } else if (roadName === "east") {
+            if (!isOutgoing) {
+              icon = isRightmost ? (
+                <TbArrowRampLeft className="-rotate-90" />
+              ) : isLeftmost ? (
+                <TbArrowRampRight className="-rotate-90" />
+              ) : (
+                "←"
+              );
+            }
+          } else if (roadName === "west") {
+            if (isOutgoing) {
+              icon = isRightmost ? (
+                <TbArrowRampRight className="rotate-90" />
+              ) : isLeftmost ? (
+                <TbArrowRampLeft />
+              ) : (
+                "→"
+              );
+            }
+          }
+          return (
+            <div
+              key={i}
+              className={`flex ${
+                roadName === "north" ? "items-end " : "items-start"
+              } ${roadName === "west" ? "justify-end" : "justify-start"}`}
               style={{
-                zIndex: 50,
-                fontSize: "14px",
-                color: "white",
-                fontWeight: "bold",
+                backgroundColor: isOutgoing ? "#444" : "#888",
+                width: direction === "vertical" ? `${laneWidth}px` : "100%",
+                height: direction === "horizontal" ? `${laneWidth}px` : "100%",
+                textAlign: "center",
+                lineHeight: `${laneWidth}px`,
+                [direction === "vertical" ? "borderRight" : "borderBottom"]:
+                  i < totalLanes ? "1px dashed white" : "none",
               }}
             >
-              {/* {getArrowForLane(i, false)} */}
-            </span>
-          </div>
-        ))}
+              <span
+                className={`${
+                  colorMappingText[trafficLights[roadName]]
+                } font-bold `}
+                style={{
+                  zIndex: 50,
+                  padding: direction === "vertical" ? "20px 5px" : "0px 20px",
+                }}
+              >
+                {icon}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+  const renderCrosswalks = (roadConfig, direction, roadName) => {
+    const laneWidth = getLaneWidth(); // Replace with your  if needed
+    const crosswalkWidth = getRoadWidth(roadConfig); // Replace with getRoadWidth(roadConfig) if needed
+    const crosswalkHeight = laneWidth / 2;
 
-        {/* Outgoing lanes */}
-        {Array.from({ length: lanesTo }).map((_, i) => (
-          <div
-            key={`out-${i}`}
-            className={`flex ${
-              roadName === "north"
-                ? "items-end justify-center"
-                : roadName === "west"
-                ? "justify-end items-center"
-                : ""
-            }`}
-            style={{
-              width: direction === "vertical" ? `${laneWidth}px` : "100%",
-              height: direction === "horizontal" ? `${laneWidth}px` : "100%",
+    if (!roadConfig.visible) return null;
 
-              backgroundColor: "#444",
-              [direction === "vertical" ? "borderRight" : "borderBottom"]:
-                i < lanesFrom ? "1px dashed white" : "none",
-              position: "relative",
-              textAlign: "center",
-              lineHeight: `${laneWidth}px`,
-            }}
-          >
-            <span
-              style={{
-                zIndex: 50,
-                display: "inline-block",
-                fontSize: "14px",
-                color: "white",
-                fontWeight: "bold",
-              }}
-            >
-              {getArrowForLane(i, true)}
-            </span>
-          </div>
-        ))}
+    let top, left;
+
+    if (direction === "vertical") {
+      top = roadName === "north" ? `calc(100% - ${crosswalkHeight}px)` : `0`;
+      left = `calc(50% - ${crosswalkWidth / 2}px)`;
+    } else {
+      top = `calc(50% - ${crosswalkWidth / 2}px)`;
+      left = roadName === "east" ? `0` : `calc(100% - ${crosswalkHeight}px)`;
+    }
+    const colorMappingBG = {
+      green: "bg-green-200",
+      yellow: "bg-yellow-200",
+      red: "bg-red-200",
+    };
+
+    return (
+      <div
+        className={`absolute ${colorMappingBG[crosswalks[roadName]]}`}
+        style={{
+          width:
+            direction === "vertical"
+              ? `${crosswalkWidth}px`
+              : `${crosswalkHeight}px`,
+          height:
+            direction === "vertical"
+              ? `${crosswalkHeight}px`
+              : `${crosswalkWidth}px`,
+          top,
+          left,
+
+          opacity: 0.7,
+          zIndex: 50,
+        }}
+      />
+    );
+  };
+  const renderArrows = () => {
+    return (
+      <div
+        className="absolute flex flex-col items-center justify-center w-full h-full"
+        style={{
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        {/* North-South Arrows */}
+
+        <div
+          className={`flex text-white font-bold text-2xl ${
+            trafficLights.east === "green" ? "flex-col" : "flex-row"
+          }`}
+        >
+          {trafficLights.east === "green" ? (
+            <>
+              <span>←</span> <span>→</span>{" "}
+            </>
+          ) : (
+            <>
+              <span>↑</span>
+              <span>↓</span>
+            </>
+          )}
+        </div>
       </div>
     );
   };
 
+  const handleRoadChange = (direction, field, value) => {
+    setConfig((prevConfig) => ({
+      ...prevConfig,
+      [direction]: {
+        ...prevConfig[direction],
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleSubmit = () => {
+    const jsonOutput = JSON.stringify(config, null, 2);
+    console.log("Crossroad Configuration:", jsonOutput);
+    // You can further process the jsonOutput, like sending it to an API
+  };
+
   return (
-    <div className="relative h-[90vh] flex items-center justify-center">
+    <div className="relative h-[90vh]  flex items-center justify-center">
       <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute top-0 left-0 p-4 bg-white shadow-md">
+          {["north", "south", "east", "west"].map((direction) => (
+            <div key={direction} className="flex items-center mb-2">
+              <span className="mr-2 capitalize">{direction}:</span>
+              <input
+                type="number"
+                value={
+                  config[direction].lanesFrom === 0
+                    ? ""
+                    : config[direction].lanesFrom
+                }
+                onChange={(e) =>
+                  handleRoadChange(direction, "lanesFrom", +e.target.value)
+                }
+                min={0}
+                className="border p-1 w-12"
+              />
+              <span className="mx-1">from</span>
+              <input
+                type="number"
+                value={
+                  config[direction].lanesTo === 0
+                    ? ""
+                    : config[direction].lanesTo
+                }
+                onChange={(e) =>
+                  handleRoadChange(direction, "lanesTo", +e.target.value)
+                }
+                min={0}
+                className="border p-1 w-12"
+              />
+              <span className="mx-1">to</span>
+              <input
+                type="checkbox"
+                checked={config[direction].visible}
+                onChange={(e) =>
+                  handleRoadChange(direction, "visible", e.target.checked)
+                }
+                className="ml-2"
+              />
+              <span className="ml-1">Visible</span>
+            </div>
+          ))}
+          <button
+            onClick={handleSubmit}
+            className="mt-2 bg-blue-500 text-white p-2 rounded"
+          >
+            Submit
+          </button>
+        </div>
+
+        {/* rendering the roads */}
         {/* North Road */}
         <div
           className="absolute flex flex-col items-center"
@@ -220,13 +357,16 @@ const RoadDrawing = () => {
           }}
         >
           {renderLanes(config.north, "vertical", "north")}
-          <TrafficLight
-            position={{
-              top: `calc(${getMaxRoadWidth() / 2 - 20}px)`,
-              left: `calc(${getRoadWidth(config.north) / 2 - 20}px)`,
-            }}
-            rotate={{ transform: "rotate(90deg)" }}
-          />
+          {config.north.visible && (
+            <TrafficLight
+              position={{
+                top: `calc(${getMaxRoadWidth() / 2 - 20}px)`,
+                left: `calc(${getRoadWidth(config.north) / 2 - 20}px)`,
+              }}
+              rotate={{ transform: "rotate(90deg)" }}
+            />
+          )}
+          {renderCrosswalks(config.north, "vertical", "north")}
         </div>
 
         {/* South Road */}
@@ -236,17 +376,19 @@ const RoadDrawing = () => {
             width: `${getRoadWidth(config.south)}px`,
             height: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
             bottom: 0,
-            // left: `calc(50% - ${getRoadWidth(config.south) / 2}px)`,
           }}
         >
           {renderLanes(config.south, "vertical", "south")}
-          <TrafficLight
-            position={{
-              top: `calc(${getMaxRoadWidth() / 2 - 20}px)`,
-              left: `calc(${getRoadWidth(config.south) / 2 - 20}px)`,
-            }}
-            rotate={{ transform: "rotate(90deg)" }}
-          />
+          {config.south.visible && (
+            <TrafficLight
+              position={{
+                top: `calc(${getMaxRoadWidth() / 2 - 20}px)`,
+                left: `calc(${getRoadWidth(config.south) / 2 - 20}px)`,
+              }}
+              rotate={{ transform: "rotate(90deg)" }}
+            />
+          )}
+          {renderCrosswalks(config.south, "vertical", "south")}
         </div>
 
         {/* East Road */}
@@ -260,12 +402,15 @@ const RoadDrawing = () => {
           }}
         >
           {renderLanes(config.east, "horizontal", "east")}
-          <TrafficLight
-            position={{
-              top: `calc(${getRoadWidth(config.east) / 2 - 20}px)`,
-              left: `calc(${getMaxRoadWidth() / 2 - 20}px)`,
-            }}
-          />
+          {config.east.visible && (
+            <TrafficLight
+              position={{
+                top: `calc(${getRoadWidth(config.east) / 2 - 20}px)`,
+                left: `calc(${getMaxRoadWidth() / 2 - 20}px)`,
+              }}
+            />
+          )}
+          {renderCrosswalks(config.east, "horizontal", "east")}
         </div>
 
         {/* West Road */}
@@ -279,31 +424,32 @@ const RoadDrawing = () => {
           }}
         >
           {renderLanes(config.west, "horizontal", "west")}
-          <TrafficLight
-            position={{
-              top: `calc(${getRoadWidth(config.west) / 2 - 20}px)`,
-              left: `calc(${getMaxRoadWidth() / 2 - 20}px)`,
-            }}
-          />
+          {config.west.visible && (
+            <TrafficLight
+              position={{
+                top: `calc(${getRoadWidth(config.west) / 2 - 20}px)`,
+                left: `calc(${getMaxRoadWidth() / 2 - 20}px)`,
+              }}
+            />
+          )}
+          {renderCrosswalks(config.west, "horizontal", "west")}
         </div>
-
         {/* Center Intersection */}
 
         {/* Center Intersection */}
         {/* Intersection */}
         <div
-          className="absolute"
+          className="absolute bg-blue-gray-700"
           style={{
             width: `${intersectionSize}px`,
             height: `${intersectionSize}px`,
             top: `calc(50% - ${intersectionSize / 2}px)`,
             left: `calc(50% - ${intersectionSize / 2}px)`,
-            backgroundColor: "#484747",
             boxShadow: "0 0 10px rgba(0,0,0,0.7)",
-            // zIndex: 2,
           }}
         >
-          {/* Crosswalks */}
+          {renderArrows()}
+          {/* {renderCrosswalks()} */}
         </div>
       </div>
     </div>
