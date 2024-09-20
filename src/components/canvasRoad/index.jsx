@@ -24,9 +24,9 @@ const RoadDrawing = () => {
     west: "red",
   });
   const colorMappingText = {
-    green: "text-green-200",
-    yellow: "text-yellow-200",
-    red: "text-red-200",
+    green: "text-green",
+    yellow: "text-yellow-400",
+    red: "text-red-500",
   };
 
   useEffect(() => {
@@ -219,7 +219,7 @@ const RoadDrawing = () => {
       left = roadName === "east" ? `0` : `calc(100% - ${crosswalkHeight}px)`;
     }
     const colorMappingBG = {
-      green: "#a3e635",
+      green: "#4ade80",
       yellow: "#fde047",
       red: "#ef4444",
     };

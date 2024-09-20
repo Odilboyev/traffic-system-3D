@@ -8,6 +8,9 @@ module.exports = withMT({
         neon: "0 0 8px rgba(255, 255, 255, 0.4)",
         neonDark: "0 0 5px rgba(0, 0, 0, 0.5)",
       },
+      colors: {
+        green: "#4ade80",
+      },
     },
   },
   darkMode: "class",
