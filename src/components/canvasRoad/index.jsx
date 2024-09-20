@@ -49,7 +49,7 @@ const RoadDrawing = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const getLaneWidth = () => 25; // Width of each lane
+  const getLaneWidth = () => 40; // Width of each lane
   const getRoadWidth = (roadConfig) => {
     return (roadConfig.lanesFrom + roadConfig.lanesTo) * getLaneWidth();
   };
@@ -90,7 +90,7 @@ const RoadDrawing = () => {
   };
 
   // Now get the intersection size
-  const intersectionSize = getIntersectionSize() * 2;
+  const intersectionSize = getIntersectionSize() * 2.5;
 
   const renderLanes = (roadConfig, direction, roadName) => {
     const { lanesFrom, lanesTo, visible } = roadConfig;
@@ -172,9 +172,11 @@ const RoadDrawing = () => {
               key={i}
               className={`flex ${
                 roadName === "north" ? "items-end " : "items-start"
-              } ${roadName === "west" ? "justify-end" : "justify-start"}`}
+              } ${roadName === "west" ? "justify-end" : "justify-start"} ${
+                isOutgoing ? "bg-blue-gray-500" : "bg-blue-gray-700"
+              }`}
               style={{
-                backgroundColor: isOutgoing ? "#444" : "#888",
+                // backgroundColor: isOutgoing ? "#444" : "#888",
                 width: direction === "vertical" ? `${laneWidth}px` : "100%",
                 height: direction === "horizontal" ? `${laneWidth}px` : "100%",
                 textAlign: "center",
@@ -186,10 +188,10 @@ const RoadDrawing = () => {
               <span
                 className={`${
                   colorMappingText[trafficLights[roadName]]
-                } font-bold `}
+                } font-bold text-2xl`}
                 style={{
                   zIndex: 50,
-                  padding: direction === "vertical" ? "20px 5px" : "0px 20px",
+                  padding: direction === "vertical" ? "40px 5px" : "0px 40px",
                 }}
               >
                 {icon}
@@ -217,14 +219,14 @@ const RoadDrawing = () => {
       left = roadName === "east" ? `0` : `calc(100% - ${crosswalkHeight}px)`;
     }
     const colorMappingBG = {
-      green: "bg-green-200",
-      yellow: "bg-yellow-200",
-      red: "bg-red-200",
+      green: "#a3e635",
+      yellow: "#fde047",
+      red: "#ef4444",
     };
 
     return (
       <div
-        className={`absolute ${colorMappingBG[crosswalks[roadName]]}`}
+        className={`absolute `}
         style={{
           width:
             direction === "vertical"
@@ -237,7 +239,12 @@ const RoadDrawing = () => {
           top,
           left,
 
-          opacity: 0.7,
+          backgroundImage: `repeating-linear-gradient(${
+            direction === "vertical" ? "90deg" : "0"
+          }, ${colorMappingBG[crosswalks[roadName]]}, ${
+            colorMappingBG[crosswalks[roadName]]
+          } 5px, transparent 5px, transparent 10px)`,
+
           zIndex: 50,
         }}
       />
@@ -256,7 +263,7 @@ const RoadDrawing = () => {
         {/* North-South Arrows */}
 
         <div
-          className={`flex text-white font-bold text-2xl ${
+          className={`flex text-white font-bold text-5xl ${
             trafficLights.east === "green" ? "flex-col" : "flex-row"
           }`}
         >
