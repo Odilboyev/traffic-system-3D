@@ -67,7 +67,6 @@ import FilterControl from "./components/controls/filterControl/index.jsx";
 import WidgetControl from "./components/controls/widgetControl/index.jsx";
 import useLocalStorageState from "../../customHooks/uselocalStorageState.jsx";
 import TrafficLightContainer from "./components/svetofor/managementLights.jsx";
-
 const home = [41.2995, 69.2401];
 
 const handleMapMove = (event) => {
@@ -479,12 +478,36 @@ const MapComponent = ({ changedMarker }) => {
           zoomToBoundsOnClick={true}
           animate={true}
           animateAddingMarkers={false}
-          spiderLegPolylineOptions={{
-            weight: 0,
-            opacity: 0,
-          }}
+          // spiderLegPolylineOptions={{
+          //   weight: 5,
+          //   opacity: 1,
+          // }}
           iconCreateFunction={(e) => ClusterIcon(e, changedMarker)}
         >
+          <Marker
+            markerId={"34"}
+            position={[41.34104414093939, 69.2542765849464]}
+            icon={L.icon({
+              iconUrl: `icons/box1.png`,
+              iconSize: [32, 32],
+            })}
+          ></Marker>
+          <Marker
+            markerId={"39"}
+            position={[41.3410441409394, 69.2542765849485]}
+            icon={L.icon({
+              iconUrl: `icons/box2.png`,
+              iconSize: [32, 32],
+            })}
+          ></Marker>
+          <Marker
+            markerId={"30"}
+            position={[41.34104414093941, 69.2542765849466]}
+            icon={L.icon({
+              iconUrl: `icons/box0.png`,
+              iconSize: [32, 32],
+            })}
+          ></Marker>
           {markers?.map((marker, i) => {
             if (
               (marker.type === 1 && !filter.camera) ||

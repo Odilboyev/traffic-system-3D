@@ -1,61 +1,73 @@
-import { getLaneWidth, getRoadWidth } from "../utils";
+import { getIntersectionSize, getLaneWidth, getRoadWidth } from "../utils";
 import Crosswalk from "./crosswalk";
 import IntersectionArrows from "./intersectionArrows";
 import Lane from "./lane";
+import Road from "./road";
 
 const Intersection = ({ config, trafficLights, crosswalks }) => {
   const getMaxRoadWidth = () => {
     return Math.max(getRoadWidth(config.east), getRoadWidth(config.west)) + 20;
   };
-  const getIntersectionSize = () => {
-    // Calculate maximum road width (lanesFrom or lanesTo, whichever is larger) plus sidewalks
-    const maxWidth = Math.max(
-      config.north.visible
-        ? Math.max(config.north.lanesFrom, config.north.lanesTo) *
-            getLaneWidth() +
-            config.sidewalkWidth * 2
-        : 0,
-      config.south.visible
-        ? Math.max(config.south.lanesFrom, config.south.lanesTo) *
-            getLaneWidth() +
-            config.sidewalkWidth * 2
-        : 0
+
+  const intersectionSize = getIntersectionSize(config) * 2.5;
+  const renderLanes = (direction, roadName) =>
+    config[roadName].visible && (
+      <Lane
+        lanesFrom={config[roadName].lanesFrom}
+        lanesTo={config[roadName].lanesTo}
+        direction={direction}
+        roadName={roadName}
+        trafficLights={trafficLights}
+      />
     );
-    // Calculate maximum road height (lanesFrom or lanesTo, whichever is larger) plus sidewalks
-    const maxHeight = Math.max(
-      config.east.visible
-        ? Math.max(config.east.lanesFrom, config.east.lanesTo) *
-            getLaneWidth() +
-            config.sidewalkWidth * 2
-        : 0,
-      config.west.visible
-        ? Math.max(config.west.lanesFrom, config.west.lanesTo) *
-            getLaneWidth() +
-            config.sidewalkWidth * 2
-        : 0
+  const renderCrosswalks = (roadConfig, direction, roadName) => {
+    const laneWidth = 10; // Replace with your  if needed
+    const crosswalkWidth = getRoadWidth(roadConfig); // Replace with getRoadWidth(roadConfig) if needed
+    const crosswalkHeight = laneWidth / 2;
+
+    if (!roadConfig.visible) return null;
+
+    let top, left;
+
+    if (direction === "vertical") {
+      top = roadName === "north" ? `calc(100% - ${crosswalkHeight}px)` : `0`;
+      left = `calc(50% - ${crosswalkWidth / 2}px)`;
+    } else {
+      top = `calc(50% - ${crosswalkWidth / 2}px)`;
+      left = roadName === "east" ? `0` : `calc(100% - ${crosswalkHeight}px)`;
+    }
+    const colorMappingBG = {
+      green: "#4ade80",
+      yellow: "#fde047",
+      red: "#ef4444",
+    };
+
+    return (
+      <div
+        className={`absolute `}
+        style={{
+          width:
+            direction === "vertical"
+              ? `${crosswalkWidth}px`
+              : `${crosswalkHeight}px`,
+          height:
+            direction === "vertical"
+              ? `${crosswalkHeight}px`
+              : `${crosswalkWidth}px`,
+          top,
+          left,
+
+          backgroundImage: `repeating-linear-gradient(${
+            direction === "vertical" ? "90deg" : "0"
+          }, ${colorMappingBG[crosswalks[roadName]]}, ${
+            colorMappingBG[crosswalks[roadName]]
+          } 5px, transparent 5px, transparent 10px)`,
+
+          zIndex: 50,
+        }}
+      />
     );
-    return Math.max(maxWidth, maxHeight);
   };
-  const intersectionSize = getIntersectionSize() * 2.5;
-  const renderLanes = (direction, roadName) => (
-    <Lane
-      lanesFrom={config[roadName].lanesFrom}
-      lanesTo={config[roadName].lanesTo}
-      direction={direction}
-      roadName={roadName}
-      trafficLights={trafficLights}
-    />
-  );
-
-  const renderCrosswalks = (direction, roadConfig, roadName) => (
-    <Crosswalk
-      roadConfig={roadConfig}
-      crosswalkStatus={crosswalks[roadName]}
-      direction={direction}
-      roadName={roadName}
-    />
-  );
-
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       <div
@@ -72,23 +84,21 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
         {/* {renderCrosswalks()} */}
       </div>
       {/* {["north", "south", "east", "west"].map((direction, i) => (
-        <div
+        <Road
           key={i}
-          className="absolute flex flex-col items-center"
-          style={{
-            width: `${getRoadWidth(config[direction])}px`,
-            height: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-            top: 0,
-            left: `calc(50% - ${getRoadWidth(config[direction]) / 2}px)`,
-          }}
-        >
-          {renderLanes(config[direction].direction, direction)}
-          {renderCrosswalks(
-            config[direction].direction,
-            config[direction],
-            direction
-          )}
-        </div>
+              direction={config[direction].direction}
+              
+          renderCrosswalks={
+            <Crosswalk
+              roadConfig={config[direction]}
+              crosswalkStatus={crosswalks[direction]}
+              direction={config[direction].direction}
+              roadName={direction}
+            />
+          }
+          renderLanes={renderLanes}
+          config={direction}
+        />
       ))} */}
       <div
         className="absolute flex flex-col items-center"

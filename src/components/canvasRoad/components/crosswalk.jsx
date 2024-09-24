@@ -1,8 +1,8 @@
 import { getRoadWidth } from "../utils";
 
 const Crosswalk = ({ crosswalkStatus, roadConfig, direction, roadName }) => {
-  const crosswidth = 10; // Replace with your  if needed
-  const crosswalkWidth = getRoadWidth(roadConfig); // Replace with getRoadWidth(roadConfig) if needed
+  const crosswidth = 10;
+  const crosswalkWidth = getRoadWidth(roadConfig);
   const crosswalkHeight = crosswidth / 2;
 
   let top, left;
