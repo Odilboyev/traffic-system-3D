@@ -1,14 +1,6 @@
-import React, { useState } from "react";
-import {
-  TbArrowBack,
-  TbArrowDown,
-  TbArrowRampLeft,
-  TbArrowRampRight,
-  TbArrowUp,
-} from "react-icons/tb";
 import { iconOptions } from "../utils";
-import { Option, Select } from "@material-tailwind/react";
-
+import { Option } from "@material-tailwind/react";
+import Select from "react-select";
 const ConfigPanel = ({ config, setConfig }) => {
   const handleRoadChange = (direction, field, value) => {
     setConfig((prevConfig) => ({
@@ -19,29 +11,40 @@ const ConfigPanel = ({ config, setConfig }) => {
       },
     }));
   };
-  const getLaneIcons = (count) => {
-    const baseIcons = ["TbArrowBack", "TbArrowUp"]; // Always include these icons
+
+  const getLaneIcons = (count, side) => {
+    if (side === "lanesLeft")
+      return Array.from(
+        Array.from({ length: count }, () => {
+          return "";
+        })
+      );
+    // right side
+    const baseIcons = ["TbArrowBackUp"]; // Always include these icons
     const rightIcon = "TbArrowRampRight"; // Always the right icon
     const icons = [];
 
     // Push the base icons
     icons.push(...baseIcons);
 
-    // Add the appropriate number of up icons based on the count
-    for (let i = 0; i <= count - 1; i++) {
-      icons.push("TbArrowUp"); // Add up icons for the left lanes
+    if (count > 1) {
+      // Add the appropriate number of up icons based on the count
+      for (let i = 0; i < count - 1; i++) {
+        icons.push("TbArrowUp"); // Add up icons for the left lanes
+      }
+
+      // Add the right icon at the end
+      icons.push(rightIcon);
+      console.log(icons, "icons");
+      return icons;
     }
-
-    // Add the right icon at the end
-    icons.push(rightIcon);
-
-    return icons;
+    return ["TbArrowRampRight"];
   };
 
   const updateLaneCount = (direction, side, count) => {
     setConfig((prev) => {
       const existingLanes = config[direction][side] || [];
-      const newLanes = getLaneIcons(count)?.map((icon) => ({
+      const newLanes = getLaneIcons(count, side).map((icon) => ({
         icon: icon,
       }));
       return {
@@ -67,6 +70,7 @@ const ConfigPanel = ({ config, setConfig }) => {
       };
     });
   };
+
   const handleAngleChange = (value) => {
     setConfig((prevConfig) => ({
       ...prevConfig,
@@ -80,122 +84,136 @@ const ConfigPanel = ({ config, setConfig }) => {
   };
 
   return (
-    <div className="absolute top-0 left-0 p-4 border shadow-md z-50 h-full">
+    <div className="absolute max-w-[20vw] max-h-screen overflow-scroll top-0 left-0 p-6 border shadow-lg z-50 h-full bg-white rounded-lg space-y-6">
       {/* Angle Control */}
-      <div className="flex items-center mb-4">
-        <span className="mr-2">Angle:</span>
+      <div className="flex items-center mb-6">
+        <span className="text-sm font-medium mr-4">Rotation Angle:</span>
         <input
           type="range"
           min={0}
           max={360}
           value={config.angle}
           onChange={(e) => handleAngleChange(+e.target.value)}
-          className="w-full mx-2"
+          className="w-full accent-blue-500"
         />
-        <span>{config.angle}°</span>
+        <span className="ml-4 text-blue-600 font-semibold">
+          {config.angle}°
+        </span>
       </div>
-      {["north", "south", "east", "west"].map((direction) => (
-        <div key={direction} className="flex flex-col items-start mb-4">
-          <div className="flex items-center mb-2">
-            <span className="mr-2 capitalize">{direction}:</span>
 
-            <input
-              id={"check" + direction}
-              type="checkbox"
-              checked={config[direction].visible}
-              onChange={(e) =>
-                handleRoadChange(direction, "visible", e.target.checked)
-              }
-              className="ml-2"
-            />
-            <label htmlFor={"check" + direction} className="ml-1 select-none">
-              Visible
-            </label>
+      {["north", "south", "east", "west"].map((direction) => (
+        <div
+          key={direction}
+          className="p-4 bg-gray-100 rounded-lg border border-gray-200 mb-4 w-full"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <span className="capitalize font-medium text-gray-700">
+              {direction} Direction
+            </span>
+            <div className="flex items-center">
+              <input
+                id={"check" + direction}
+                type="checkbox"
+                checked={config[direction].visible}
+                onChange={(e) =>
+                  handleRoadChange(direction, "visible", e.target.checked)
+                }
+                className="accent-blue-500"
+              />
+              <label htmlFor={"check" + direction} className="ml-2 text-sm">
+                Visible
+              </label>
+            </div>
           </div>
 
           {/* Lane Count Controls */}
-          <div className="flex items-center mb-2">
-            <span className="mr-2">Lanes Left:</span>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm">
+              Lanes Left:{" "}
+              <span className="font-semibold">
+                {config[direction].lanesLeft.length}
+              </span>
+            </span>
             <input
-              type="number"
-              value={
-                config[direction].lanesLeft.length === 0
-                  ? ""
-                  : config[direction].lanesLeft.length
-              }
+              type="range"
+              min={1}
+              max={5}
+              value={config[direction].lanesLeft.length}
               onChange={(e) =>
                 updateLaneCount(direction, "lanesLeft", +e.target.value)
               }
-              min={0}
-              className="border p-1 w-12"
-            />
-            <span className="ml-4">Lanes Right:</span>
-            <input
-              type="number"
-              value={
-                config[direction].lanesRight.length === 0
-                  ? ""
-                  : config[direction].lanesRight.length
-              }
-              onChange={(e) =>
-                updateLaneCount(direction, "lanesRight", +e.target.value)
-              }
-              min={0}
-              className="border p-1 w-12"
+              className="w-2/3 accent-green-500"
             />
           </div>
 
-          {/* Lanes Icon Selection */}
-          {/* <div>
-            <span className="mr-2">Lane Icons (Left):</span>
-            {config[direction].lanesLeft.map((lane, index) => (
-              <select
-                key={`left-${index}`}
-                value={lane.value || ""}
-                onChange={(e) =>
-                  handleIconChange(direction, "lanesLeft", index, e)
-                }
-                className="border p-1 mx-1"
-              >
-                {iconOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.icon}
-                  </option>
-                ))}
-              </select>
-            ))}
-          </div> */}
-          <div>
-            <span className="mr-2">Lane Icons (Right):</span>
-            {config[direction].lanesRight.map((lane, index) => (
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm">
+              Lanes Right:{" "}
+              <span className="font-semibold">
+                {config[direction].lanesRight.length}
+              </span>
+            </span>
+            <input
+              type="range"
+              min={1}
+              max={5}
+              value={config[direction].lanesRight.length}
+              onChange={(e) =>
+                updateLaneCount(direction, "lanesRight", +e.target.value)
+              }
+              className="w-2/3 accent-red-500"
+            />
+          </div>
+
+          {/* Lane Icon Controls */}
+          <div className="flex flex-wrap gap-3 mt-2">
+            <span className="text-sm">Lane Icons (Right):</span>
+            <div className="flex">
+              {config[direction].lanesRight.map((lane, index) => (
+                <Select
+                  key={index}
+                  value={iconOptions.find(
+                    (option) => option.value === lane.icon
+                  )}
+                  onChange={(e) => {
+                    console.log(e.value);
+                    handleIconChange(direction, "lanesRight", index, e.value);
+                  }}
+                  getOptionLabel={(option) => <>{option.icon}</>}
+                  options={iconOptions}
+                />
+              ))}
+            </div>
+
+            {/* {config[direction].lanesRight.map((lane, index) => (
               <Select
                 key={`right-${index}`}
                 value={lane.icon || ""}
                 onChange={(e) =>
                   handleIconChange(direction, "lanesRight", index, e)
                 }
-                className="border p-1 mx-1 w-10 !min-w-0"
+                className="border p-1 mx-1 w-12 !min-w-0 bg-white text-gray-700"
               >
                 {iconOptions.map((option) => (
                   <Option
                     key={option.value}
                     value={option.value}
-                    className="text-xl text-red-800 w-10 !min-w-0"
+                    className="text-xl"
                   >
-                    <span>{option.icon}</span>
+                    <>{option.icon}</>
                   </Option>
                 ))}
               </Select>
-            ))}
+            ))} */}
           </div>
         </div>
       ))}
 
       <button
         onClick={handleSubmit}
-        className="mt-2 bg-blue-500 text-white p-2 rounded"
+        className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition duration-200"
       >
-        Submit
+        Save Configuration
       </button>
     </div>
   );
