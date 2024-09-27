@@ -32,17 +32,19 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
   const onTrafficLightsDataReceived = (data) => {
     // console.log(data, "traffic with socket");
     // console.log(trafficSocketData, "old traffic data");
-    setTrafficSocketData((light) => {
-      return data?.channel.map((v) => {
-        return {
-          ...v,
-          lat: trafficLights.find((light) => v.id === light.link_id).lat,
-          lng: trafficLights.find((light) => v.id === light.link_id).lng,
-          rotate: trafficLights.find((light) => v.id === light.link_id).rotate,
-          type: trafficLights.find((light) => v.id === light.link_id).type,
-        };
+    if (light)
+      setTrafficSocketData((light) => {
+        return data?.channel.map((v) => {
+          return {
+            ...v,
+            lat: trafficLights.find((light) => v.id === light.link_id).lat,
+            lng: trafficLights.find((light) => v.id === light.link_id).lng,
+            rotate: trafficLights.find((light) => v.id === light.link_id)
+              .rotate,
+            type: trafficLights.find((light) => v.id === light.link_id).type,
+          };
+        });
       });
-    });
   };
   useEffect(() => {
     let trafficSocket;

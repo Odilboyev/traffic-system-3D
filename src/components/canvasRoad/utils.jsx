@@ -1,35 +1,55 @@
-export const getLaneWidth = () => 40;
+import {
+  TbArrowBack,
+  TbArrowBackUp,
+  TbArrowDown,
+  TbArrowRampLeft,
+  TbArrowRampRight,
+  TbArrowUp,
+} from "react-icons/tb";
+
+export const iconOptions = [
+  { name: "Right Ramp", icon: <TbArrowRampRight />, value: "TbArrowRampRight" },
+  { name: "Arrow Up", icon: <TbArrowUp />, value: "TbArrowUp" },
+  {
+    name: "Arrow Back Up",
+    icon: <TbArrowBackUp className="-rotate-90" />,
+    value: "TbArrowBackUp",
+  },
+];
+
+export const getLaneWidth = () => 60;
 
 export const getRoadWidth = (roadConfig) => {
-  return (roadConfig.lanesFrom + roadConfig.lanesTo) * getLaneWidth();
+  return (
+    (roadConfig.lanesLeft.length + roadConfig.lanesRight.length) *
+    getLaneWidth()
+  );
 };
 export const getIntersectionSize = (config) => {
-  // Calculate maximum road width (lanesFrom or lanesTo, whichever is larger) plus sidewalks
+  // Helper function to calculate the full road width (lanes + sidewalks)
+  const calculateRoadWidth = (roadConfig) => {
+    if (!roadConfig.visible) return 0;
+    const maxLanes = Math.max(
+      roadConfig.lanesLeft.length,
+      roadConfig.lanesRight.length
+    );
+    return maxLanes * getLaneWidth() + config.sidewalkWidth * 2;
+  };
+
+  // Calculate maximum road width and height
   const maxWidth = Math.max(
-    config.north.visible
-      ? Math.max(config.north.lanesFrom, config.north.lanesTo) *
-          getLaneWidth() +
-          config.sidewalkWidth * 2
-      : 0,
-    config.south.visible
-      ? Math.max(config.south.lanesFrom, config.south.lanesTo) *
-          getLaneWidth() +
-          config.sidewalkWidth * 2
-      : 0
+    calculateRoadWidth(config.north),
+    calculateRoadWidth(config.south)
   );
-  // Calculate maximum road height (lanesFrom or lanesTo, whichever is larger) plus sidewalks
   const maxHeight = Math.max(
-    config.east.visible
-      ? Math.max(config.east.lanesFrom, config.east.lanesTo) * getLaneWidth() +
-          config.sidewalkWidth * 2
-      : 0,
-    config.west.visible
-      ? Math.max(config.west.lanesFrom, config.west.lanesTo) * getLaneWidth() +
-          config.sidewalkWidth * 2
-      : 0
+    calculateRoadWidth(config.east),
+    calculateRoadWidth(config.west)
   );
+
+  // Return the maximum size considering both width and height
   return Math.max(maxWidth, maxHeight);
 };
+
 // export const getMaxRoadWidth = (roadConfig) => {
 //   return (
 //     Math.max(getRoadWidth(roadConfig.east), getRoadWidth(roadConfig.west)) + 20

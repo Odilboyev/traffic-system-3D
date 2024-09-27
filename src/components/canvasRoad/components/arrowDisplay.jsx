@@ -1,28 +1,32 @@
 import React from "react";
-import {
-  TbArrowDown,
-  TbArrowLeft,
-  TbArrowRampLeft,
-  TbArrowRampRight,
-  TbArrowRight,
-  TbArrowUp,
-} from "react-icons/tb";
+
+import { iconOptions } from "../utils";
 
 const ArrowDisplay = ({
   laneIndex,
-  lanesFrom,
-  lanesTo,
   direction,
-  totalLanes,
   laneWidth,
+  left = false,
   roadName,
+  icon,
+  totalLanes,
   trafficLights,
 }) => {
-  const isOutgoing = laneIndex >= lanesFrom;
-  const isRightmost = laneIndex === totalLanes - 1; // Check if it's the rightmost lane
-  const isLeftmost = laneIndex === 0; // Check if it's the leftmost lane
+  // Rotation logic based on direction and roadName
+  const getRotationAngle = () => {
+    if (direction === "vertical") {
+      if (roadName === "north") return "180deg"; // No rotation
+      if (roadName === "south") return "0deg"; // Rotate 180 degrees
+    } else if (direction === "horizontal") {
+      if (roadName === "east") return "-90deg"; // Rotate 90 degrees
+      if (roadName === "west") return "90deg"; // Rotate -90 degrees (or 270deg)
+    }
+    return "0deg"; // Default to no rotation
+  };
 
-  let icon = null;
+  const isOutgoing = laneIndex >= totalLanes / 2;
+  const isRightmost = laneIndex === totalLanes - 1;
+  const isLeftmost = laneIndex === 0;
 
   const colorMappingText = {
     green: "text-green",
@@ -30,55 +34,17 @@ const ArrowDisplay = ({
     red: "text-red-500",
   };
 
-  // Add arrow icon logic based on lane direction and roadName
-
-  if (roadName === "north") {
-    if (!isOutgoing) {
-      icon = isRightmost ? (
-        <TbArrowRampLeft className="rotate-180 " />
-      ) : isLeftmost ? (
-        <TbArrowRampRight className="rotate-180 " />
-      ) : (
-        <TbArrowDown />
-      );
-    }
-  } else if (roadName === "south") {
-    if (isOutgoing) {
-      icon = isRightmost ? (
-        <TbArrowRampRight />
-      ) : isLeftmost ? (
-        <TbArrowRampLeft />
-      ) : (
-        <TbArrowUp />
-      );
-    }
-  } else if (roadName === "east") {
-    if (!isOutgoing) {
-      icon = isRightmost ? (
-        <TbArrowRampLeft className="-rotate-90" />
-      ) : isLeftmost ? (
-        <TbArrowRampRight className="-rotate-90" />
-      ) : (
-        <TbArrowLeft />
-      );
-    }
-  } else if (roadName === "west") {
-    if (isOutgoing) {
-      icon = isRightmost ? (
-        <TbArrowRampRight className="rotate-90" />
-      ) : isLeftmost ? (
-        <TbArrowRampLeft />
-      ) : (
-        <TbArrowRight />
-      );
-    }
-  }
-
   return (
     <div
-      className={`flex ${roadName === "north" ? "items-end " : "items-start"} ${
-        roadName === "west" ? "justify-end" : "justify-start"
-      } ${isOutgoing ? "bg-blue-gray-500" : "bg-blue-gray-700"}`}
+      className={`flex ${
+        direction === "vertical"
+          ? `justify-center  ${
+              roadName === "south" ? "items-start" : "items-end"
+            }`
+          : `items-center ${
+              roadName === "east" ? "justify-start" : "justify-end"
+            }`
+      } ${left ? "bg-blue-gray-500" : "bg-blue-gray-700"}`}
       style={{
         width: direction === "vertical" ? `${laneWidth}px` : "100%",
         height: direction === "horizontal" ? `${laneWidth}px` : "100%",
@@ -92,13 +58,14 @@ const ArrowDisplay = ({
         <span
           className={`${
             colorMappingText[trafficLights[roadName]]
-          } font-bolder text-2xl bg-white rounded-xl p-1 `}
+          } font-bolder text-2xl bg-white rounded-xl p-1`}
           style={{
             zIndex: 50,
-            margin: direction === "vertical" ? "40px 5px" : "0px 40px",
+            margin: direction === "vertical" ? "40px 0px" : "0px 40px",
+            transform: `rotate(${getRotationAngle()})`, // Apply rotation
           }}
         >
-          {icon}
+          {iconOptions.find((v) => v.value === icon)?.icon}
         </span>
       )}
     </div>

@@ -47,9 +47,14 @@
     "react-resize-panel": "^0.3.5",
     "react-rnd": "^10.4.11",
     "react-router-dom": "^6.23.0",
+    "react-sip": "^0.8.1",
+    "react-sipjs": "^0.0.3",
     "react-table": "^7.8.0",
     "react-toastify": "^10.0.5",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "sip": "^0.0.6",
+    "sip.js": "^0.21.2",
+    "undici": "^6.19.8"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
@@ -62,8 +67,8 @@
     "tailwindcss": "^3.4.3",
     "vite": "^5.2.0",
     "vite-plugin-mkcert": "^1.17.5",
-    "vite-plugin-pwa": "^0.19.8",
+    "vite-plugin-pwa": "^0.2.1",
     "workbox": "^0.0.0",
-    "workbox-webpack-plugin": "^7.1.0"
+    "workbox-webpack-plugin": "^4.3.1"
   }
 }

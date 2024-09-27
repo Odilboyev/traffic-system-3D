@@ -9,7 +9,7 @@ import { HiArrowsUpDown } from "react-icons/hi2";
 const IntersectionArrows = ({ trafficLights }) => {
   return (
     <div
-      className="absolute flex flex-col items-center justify-center w-full h-full"
+      className="absolute flex flex-col items-center justify-center w-full h-full z-50 text-white"
       style={{
         top: "50%",
         left: "50%",
@@ -17,7 +17,7 @@ const IntersectionArrows = ({ trafficLights }) => {
       }}
     >
       <div
-        className={`flex text-white font-bold text-5xl ${
+        className={`flex font-bold text-5xl ${
           trafficLights.east === "green" ? "flex-col" : "flex-row"
         }`}
       >

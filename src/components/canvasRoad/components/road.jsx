@@ -10,7 +10,6 @@ const Road = ({
   const roadWidth = getRoadWidth(config[config]);
 
   const isVertical = direction === "vertical";
-  const isNorthOrSouth = config === "north" || config === "south";
 
   const sizeStyle = {
     width: isVertical ? `${roadWidth}px` : `calc(50% - ${maxRoadWidth / 2}px)`,

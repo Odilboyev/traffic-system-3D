@@ -12,6 +12,7 @@ import { MyThemeProvider } from "./context/themeContext.jsx";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18.js";
 import { PopupProvider } from "./context/popupContext.jsx";
+import Domofon from "./components/domofon/index.jsx";
 // import { Route, Routes } from "react-router-dom";
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <React.StrictMode>
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Routes>
               <Route element={<PrivateRoutes />}>
                 <Route path="/" element={<App />} />
+                <Route path="/domo" element={<Domofon />} />
                 <Route path="*" element={<Navigate to={"/login"} replace />} />
               </Route>
               <Route element={<SignIn />} path="/login" />
