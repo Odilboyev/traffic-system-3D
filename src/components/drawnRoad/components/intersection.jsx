@@ -74,14 +74,21 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
       />
     );
   };
-  const calculateEdges = () => {
-    const roadWidthNorth = getRoadWidth(config.north);
-    const roadWidthSouth = getRoadWidth(config.south);
-    const roadWidthEast = getRoadWidth(config.east);
-    const roadWidthWest = getRoadWidth(config.west);
+  const roadWidthNorth = getRoadWidth(config.north);
+  const roadWidthSouth = getRoadWidth(config.south);
+  const roadWidthEast = getRoadWidth(config.east);
+  const roadWidthWest = getRoadWidth(config.west);
 
-    const centerX = intersectionSize / 2;
-    const centerY = intersectionSize / 2;
+  const centerX = intersectionSize / 2;
+  const centerY = intersectionSize / 2;
+
+  // Dynamic margin based on road width
+  const marginScale = 0.1; // Adjust this scaling factor as needed
+  const marginNorth = roadWidthNorth * marginScale;
+  const marginSouth = roadWidthSouth * marginScale;
+  const marginEast = roadWidthEast * marginScale;
+  const marginWest = roadWidthWest * marginScale;
+  const calculateEdges = () => {
     return {
       north: {
         left: centerX - roadWidthNorth / 2,
@@ -102,84 +109,43 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
     };
   };
 
+  // Update renderIntersectionBoundary
   const renderIntersectionBoundary = () => {
     const edges = calculateEdges();
 
-    // Coordinates for the corners of the roads where they meet
-    const roadEdgeDistance = 90; // Distance from the center to start diagonal lines
-    // Calculate the intersection area boundaries
-    const margin = 45; // Adjust this value based on how much smaller you want it
-
+    // Now calculate the intersection area boundaries with dynamic margins
     const points = [
-      { x: edges.north.left + margin, y: margin }, // North-left point
-      { x: edges.north.right - margin, y: margin }, // North-right point
-      { x: intersectionSize - margin, y: edges.east.top + margin }, // East-top point
-      { x: intersectionSize - margin, y: edges.east.bottom - margin }, // East-bottom point
-      { x: edges.south.right - margin, y: intersectionSize - margin }, // South-right point
-      { x: edges.south.left + margin, y: intersectionSize - margin }, // South-left point
-      { x: margin, y: edges.west.bottom - margin }, // West-bottom point
-      { x: margin, y: edges.west.top + margin }, // West-top point
+      { x: edges.north.left + marginNorth, y: marginNorth }, // North-left point
+      { x: edges.north.right - marginNorth, y: marginNorth }, // North-right point
+      { x: intersectionSize - marginEast, y: edges.east.top + marginEast }, // East-top point
+      { x: intersectionSize - marginEast, y: edges.east.bottom - marginEast }, // East-bottom point
+      { x: edges.south.right - marginSouth, y: intersectionSize - marginSouth }, // South-right point
+      { x: edges.south.left + marginSouth, y: intersectionSize - marginSouth }, // South-left point
+      { x: marginWest, y: edges.west.bottom - marginWest }, // West-bottom point
+      { x: marginWest, y: edges.west.top + marginWest }, // West-top point
     ];
+
     const pointsString = points.map((p) => `${p.x},${p.y}`).join(" ");
     return (
       <svg
         className="absolute"
-        // style={{ transform: `rotate(${config.angle}deg)` }}
         width={intersectionSize}
         height={intersectionSize}
       >
         {/* Fill the intersection area */}
-
         <polygon points={pointsString} className="fill-blue-gray-700" />
-
         {/* Draw the octagonal lines */}
-        {/* North-West Diagonal */}
-        <line
-          x1={edges.north.left + roadEdgeDistance}
-          y1={0}
-          x2={0}
-          y2={edges.west.top + roadEdgeDistance}
-          stroke="none"
-          strokeWidth="4"
-        />
-        {/* North-East Diagonal */}
-        <line
-          x1={edges.north.right - roadEdgeDistance}
-          y1={0}
-          x2={intersectionSize}
-          y2={edges.east.top + roadEdgeDistance}
-          stroke="none"
-          strokeWidth="4"
-        />
-        {/* South-West Diagonal */}
-        <line
-          x1={edges.south.left + roadEdgeDistance}
-          y1={intersectionSize}
-          x2={0}
-          y2={edges.west.bottom - roadEdgeDistance}
-          stroke="none"
-          strokeWidth="4"
-        />
-        {/* South-East Diagonal */}
-        <line
-          x1={edges.south.right - roadEdgeDistance}
-          y1={intersectionSize}
-          x2={intersectionSize}
-          y2={edges.east.bottom - roadEdgeDistance}
-          stroke="none"
-          strokeWidth="4"
-        />
       </svg>
     );
   };
 
   return (
     <div
-      className="relative w-2/3 ml-auto h-full flex items-center justify-center"
+      className="relative w-2/3 ml-auto h-full flex items-center justify-center overflow-hidden"
       style={{ transform: `rotate(${config.angle}deg)` }}
     >
       <div
-        className="absolute rounded-ful"
+        className="absolute overflow-hidden"
         style={{
           width: `${intersectionSize}px`,
           height: `${intersectionSize}px`,

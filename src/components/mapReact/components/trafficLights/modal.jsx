@@ -87,7 +87,7 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
       <Dialog size="xxl" open={isDialogOpen} handler={handleClose}>
         <DialogHeader className="justify-between dark:bg-blue-gray-900 dark:text-white">
           <div>
-            <Typography variant="h5">{light?.cname}</Typography>
+            <Typography variant="h5">{light?.cname || ""}</Typography>
           </div>
           <IconButton size="sm" variant="text" onClick={handler}>
             <svg

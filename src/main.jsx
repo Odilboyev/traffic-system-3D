@@ -24,7 +24,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Routes>
               <Route element={<PrivateRoutes />}>
                 <Route path="/" element={<App />} />
-                <Route path="/domo" element={<Domofon />} />
+                {/* <Route path="/domo" element={<Domofon />} /> */}
                 <Route path="*" element={<Navigate to={"/login"} replace />} />
               </Route>
               <Route element={<SignIn />} path="/login" />

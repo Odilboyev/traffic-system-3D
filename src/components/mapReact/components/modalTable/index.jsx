@@ -169,7 +169,6 @@ const ModalTable = ({
                 } flex justify-between gap-5 `}
               >
                 <Input
-                  size="sm"
                   color={theme === "dark" ? "white" : "black"}
                   label={t("search")}
                   value={searchTerm}

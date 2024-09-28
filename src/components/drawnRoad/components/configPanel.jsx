@@ -1,5 +1,4 @@
 import { iconOptions } from "../utils";
-import { Option } from "@material-tailwind/react";
 import Select from "react-select";
 const ConfigPanel = ({ config, setConfig }) => {
   const handleRoadChange = (direction, field, value) => {
@@ -138,6 +137,7 @@ const ConfigPanel = ({ config, setConfig }) => {
               type="range"
               min={1}
               max={5}
+              step={1} // Add this step attribute
               value={config[direction].lanesLeft.length}
               onChange={(e) =>
                 updateLaneCount(direction, "lanesLeft", +e.target.value)
@@ -156,6 +156,7 @@ const ConfigPanel = ({ config, setConfig }) => {
             <input
               type="range"
               min={1}
+              step={1} // Add this step attribute
               max={5}
               value={config[direction].lanesRight.length}
               onChange={(e) =>
@@ -168,7 +169,7 @@ const ConfigPanel = ({ config, setConfig }) => {
           {/* Lane Icon Controls */}
           <div className="flex flex-wrap gap-3 mt-2">
             <span className="text-sm">Lane Icons (Right):</span>
-            <div className="flex">
+            <div className="flex flex-wrap">
               {config[direction].lanesRight.map((lane, index) => (
                 <Select
                   key={index}

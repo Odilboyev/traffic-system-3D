@@ -417,9 +417,9 @@ const MapComponent = ({ changedMarker }) => {
             </IconButton>
             <SpeedDialContent className="m-4">
               <div className="flex flex-col p-3 mb-10 rounded-md bg-gray-900/80 text-blue-gray-900 backdrop-blur-md">
-                {filteredLayers.map((layer, i) => (
+                {filteredLayers.map((layer) => (
                   <Radio
-                    key={i}
+                    key={layer.name}
                     checked={selectedLayer === layer.name}
                     className="checked:bg-white"
                     variant={
@@ -644,10 +644,11 @@ const ClusterIcon = (cluster, changedMarker) => {
         }`}
       >
         <PieChart
-          data={pieChartData.map((datam) => ({
+          data={pieChartData.map((datam, key) => ({
             value: datam.count,
             title: datam.status,
             color: getStatusColor(datam.status),
+            key,
           }))}
           style={{
             filter: `drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))`,

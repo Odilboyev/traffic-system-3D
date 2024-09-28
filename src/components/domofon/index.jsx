@@ -24,7 +24,7 @@ function App() {
   return (
     <div className="p-5">
       {/* Your content here */}
-      <VideoCallReceiver />
+      {/* <VideoCallReceiver /> */}
     </div>
   );
 }

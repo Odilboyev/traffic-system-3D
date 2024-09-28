@@ -34,7 +34,7 @@ const options = {
 };
 
 // Construct a SimpleUser instance
-simpleUser = new SimpleUser(server, options);
+// simpleUser = new SimpleUser(server, options);
 const SIP_CONFIG = {
   uri: "sip:102@172.25.24.182",
   wsServers: ["wss://172.25.24.182:8089/ws"],

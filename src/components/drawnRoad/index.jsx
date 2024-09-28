@@ -88,7 +88,7 @@ const RoadDrawing = () => {
   }, []);
 
   return (
-    <div className="relative h-[90vh] flex items-center justify-center">
+    <div className="relative h-[90vh] flex items-center justify-center overflow-hidden">
       <ConfigPanel config={config} setConfig={setConfig} />
       <Intersection
         config={config}
