@@ -20,6 +20,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
   const renderLanes = (direction, roadName) =>
     config[roadName].visible && (
       <Lane
+        angle={config.angle}
         lanesLeft={config[roadName].lanesLeft}
         lanesRight={config[roadName].lanesRight}
         direction={direction}

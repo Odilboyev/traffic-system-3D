@@ -1,6 +1,7 @@
 import { getLaneWidth } from "../utils";
 import ArrowDisplay from "./arrowDisplay";
 const Lane = ({
+  angle,
   lanesLeft,
   lanesRight,
   direction,
@@ -37,6 +38,7 @@ const Lane = ({
             ? "-left-20 top-10"
             : "-top-10"
         }`}
+        style={{ transform: `rotate(-${angle}deg)` }}
       >
         {roadName}
       </p>
