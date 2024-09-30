@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ConfigPanel from "./components/configPanel";
 import Intersection from "./components/intersection";
-import useLocalStorageState from "../../customHooks/uselocalStorageState";
+import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 const RoadDrawing = () => {
   const [config, setConfig] = useLocalStorageState("its_roadDrawingConfig", {
     angle: 45,
@@ -47,7 +47,6 @@ const RoadDrawing = () => {
       visible: true,
       direction: "horizontal",
     },
-    sidewalkWidth: 20,
   });
 
   const [trafficLights, setTrafficLights] = useState({

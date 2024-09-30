@@ -1,4 +1,9 @@
-import { getIntersectionSize, getLaneWidth, getRoadWidth } from "../utils";
+import {
+  getCrosswalkWidth,
+  getIntersectionSize,
+  getLaneWidth,
+  getRoadWidth,
+} from "../utils";
 import Crosswalk from "./crosswalk";
 import IntersectionArrows from "./intersectionArrows";
 import Lane from "./lane";
@@ -30,7 +35,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
     );
 
   const renderCrosswalks = (roadConfig, direction, roadName) => {
-    const laneWidth = 10;
+    const laneWidth = getCrosswalkWidth();
     const crosswalkWidth = getRoadWidth(roadConfig);
     const crosswalkHeight = laneWidth / 2;
 
@@ -84,7 +89,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
   const centerY = intersectionSize / 2;
 
   // Dynamic margin based on road width
-  const marginScale = 0.1; // Adjust this scaling factor as needed
+  const marginScale = 0.02; // Adjust this scaling factor as needed
   const marginNorth = roadWidthNorth * marginScale;
   const marginSouth = roadWidthSouth * marginScale;
   const marginEast = roadWidthEast * marginScale;
@@ -139,7 +144,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
       </svg>
     );
   };
-
+  const margin = -20;
   return (
     <div
       className="relative w-2/3 ml-auto h-full flex items-center justify-center overflow-hidden"
@@ -164,7 +169,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
         style={{
           width: `${getRoadWidth(config.north)}px`,
           height: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-          top: 0,
+          top: margin,
           left: `calc(50% - ${getRoadWidth(config.north) / 2}px)`,
         }}
       >
@@ -176,7 +181,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
         style={{
           width: `${getRoadWidth(config.south)}px`,
           height: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-          bottom: 0,
+          bottom: margin,
           left: `calc(50% - ${getRoadWidth(config.south) / 2}px)`,
         }}
       >
@@ -190,7 +195,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
         style={{
           height: `${getRoadWidth(config.west)}px`,
           width: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-          left: 0,
+          left: margin,
           top: `calc(50% - ${getRoadWidth(config.west) / 2}px)`,
         }}
       >
@@ -202,7 +207,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
         style={{
           height: `${getRoadWidth(config.east)}px`,
           width: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-          right: 0,
+          right: margin,
           top: `calc(50% - ${getRoadWidth(config.east) / 2}px)`,
         }}
       >

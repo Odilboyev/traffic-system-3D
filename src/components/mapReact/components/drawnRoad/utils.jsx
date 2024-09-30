@@ -17,8 +17,8 @@ export const iconOptions = [
   },
 ];
 
-export const getLaneWidth = () => 60;
-
+export const getLaneWidth = () => 70;
+export const getCrosswalkWidth = () => 10;
 export const getRoadWidth = (roadConfig) => {
   return (
     (roadConfig.lanesLeft.length + roadConfig.lanesRight.length) *
@@ -33,7 +33,7 @@ export const getIntersectionSize = (config) => {
       roadConfig.lanesLeft.length,
       roadConfig.lanesRight.length
     );
-    return maxLanes * getLaneWidth() + config.sidewalkWidth * 2;
+    return maxLanes * getLaneWidth() + getCrosswalkWidth();
   };
 
   // Calculate maximum road width and height
