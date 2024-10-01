@@ -137,12 +137,12 @@ const ConfigPanel = ({ config, setConfig }) => {
               type="range"
               min={1}
               max={5}
-              step={1} // Add this step attribute
+              step={1}
               value={config[direction].lanesLeft.length}
               onChange={(e) =>
                 updateLaneCount(direction, "lanesLeft", +e.target.value)
               }
-              className="w-2/3 accent-green-500"
+              className="w-2/3 accent-blue-gray-500"
             />
           </div>
 
@@ -156,13 +156,13 @@ const ConfigPanel = ({ config, setConfig }) => {
             <input
               type="range"
               min={1}
-              step={1} // Add this step attribute
               max={5}
+              step={1}
               value={config[direction].lanesRight.length}
               onChange={(e) =>
                 updateLaneCount(direction, "lanesRight", +e.target.value)
               }
-              className="w-2/3 accent-red-500"
+              className="w-2/3 accent-blue-gray-800"
             />
           </div>
 

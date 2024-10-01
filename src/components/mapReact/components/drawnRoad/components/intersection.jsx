@@ -52,7 +52,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
     }
     const colorMappingBG = {
       green: "#4ade80",
-      red: "#fde047",
+      yellow: "#fde047",
       red: "#ef4444",
     };
 
@@ -88,12 +88,6 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
   const centerX = intersectionSize / 2;
   const centerY = intersectionSize / 2;
 
-  // Dynamic margin based on road width
-  const marginScale = 0.02; // Adjust this scaling factor as needed
-  const marginNorth = roadWidthNorth * marginScale;
-  const marginSouth = roadWidthSouth * marginScale;
-  const marginEast = roadWidthEast * marginScale;
-  const marginWest = roadWidthWest * marginScale;
   const calculateEdges = () => {
     return {
       north: {
@@ -115,20 +109,20 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
     };
   };
 
-  // Update renderIntersectionBoundary
+  // Update renderIntersectionBoundary without margins
   const renderIntersectionBoundary = () => {
     const edges = calculateEdges();
 
-    // Now calculate the intersection area boundaries with dynamic margins
+    // Directly calculate intersection boundary points based on edges
     const points = [
-      { x: edges.north.left + marginNorth, y: marginNorth }, // North-left point
-      { x: edges.north.right - marginNorth, y: marginNorth }, // North-right point
-      { x: intersectionSize - marginEast, y: edges.east.top + marginEast }, // East-top point
-      { x: intersectionSize - marginEast, y: edges.east.bottom - marginEast }, // East-bottom point
-      { x: edges.south.right - marginSouth, y: intersectionSize - marginSouth }, // South-right point
-      { x: edges.south.left + marginSouth, y: intersectionSize - marginSouth }, // South-left point
-      { x: marginWest, y: edges.west.bottom - marginWest }, // West-bottom point
-      { x: marginWest, y: edges.west.top + marginWest }, // West-top point
+      { x: edges.north.left, y: 0 }, // North-left point
+      { x: edges.north.right, y: 0 }, // North-right point
+      { x: intersectionSize, y: edges.east.top }, // East-top point
+      { x: intersectionSize, y: edges.east.bottom }, // East-bottom point
+      { x: edges.south.right, y: intersectionSize }, // South-right point
+      { x: edges.south.left, y: intersectionSize }, // South-left point
+      { x: 0, y: edges.west.bottom }, // West-bottom point
+      { x: 0, y: edges.west.top }, // West-top point
     ];
 
     const pointsString = points.map((p) => `${p.x},${p.y}`).join(" ");
@@ -140,11 +134,28 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
       >
         {/* Fill the intersection area */}
         <polygon points={pointsString} className="fill-blue-gray-700" />
-        {/* Draw the octagonal lines */}
       </svg>
     );
   };
-  const margin = -20;
+
+  // Function to calculate the margin based on any road having uneven lanes
+  const calculateGlobalMargin = () => {
+    const roads = [config.north, config.south, config.east, config.west];
+
+    // Check if any of the roads have uneven lanes
+    for (const road of roads) {
+      const lanesLeft = road.lanesLeft.length;
+      const lanesRight = road.lanesRight.length;
+
+      if (lanesLeft !== lanesRight) {
+        return -40; // If any road has uneven lanes, return lane width as margin
+      }
+    }
+    return 0; // No uneven lanes, no margin needed
+  };
+
+  // Calculate margin once
+  const margin = calculateGlobalMargin();
   return (
     <div
       className="relative w-2/3 ml-auto h-full flex items-center justify-center overflow-hidden"

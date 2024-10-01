@@ -1,11 +1,4 @@
-import {
-  TbArrowBack,
-  TbArrowBackUp,
-  TbArrowDown,
-  TbArrowRampLeft,
-  TbArrowRampRight,
-  TbArrowUp,
-} from "react-icons/tb";
+import { TbArrowBackUp, TbArrowRampRight, TbArrowUp } from "react-icons/tb";
 
 export const iconOptions = [
   { name: "Right Ramp", icon: <TbArrowRampRight />, value: "TbArrowRampRight" },
@@ -17,8 +10,8 @@ export const iconOptions = [
   },
 ];
 
-export const getLaneWidth = () => 70;
-export const getCrosswalkWidth = () => 10;
+export const getLaneWidth = () => 60;
+export const getCrosswalkWidth = () => 20;
 export const getRoadWidth = (roadConfig) => {
   return (
     (roadConfig.lanesLeft.length + roadConfig.lanesRight.length) *
@@ -26,7 +19,7 @@ export const getRoadWidth = (roadConfig) => {
   );
 };
 export const getIntersectionSize = (config) => {
-  // Helper function to calculate the full road width (lanes + sidewalks)
+  // Helper function to calculate the full road width (lanes + crosswalks)
   const calculateRoadWidth = (roadConfig) => {
     if (!roadConfig.visible) return 0;
     const maxLanes = Math.max(
@@ -36,22 +29,16 @@ export const getIntersectionSize = (config) => {
     return maxLanes * getLaneWidth() + getCrosswalkWidth();
   };
 
-  // Calculate maximum road width and height
-  const maxWidth = Math.max(
-    calculateRoadWidth(config.north),
-    calculateRoadWidth(config.south)
-  );
-  const maxHeight = Math.max(
-    calculateRoadWidth(config.east),
-    calculateRoadWidth(config.west)
-  );
+  // Calculate the road widths for all four directions
+  const widthNorth = calculateRoadWidth(config.north);
+  const widthSouth = calculateRoadWidth(config.south);
+  const heightEast = calculateRoadWidth(config.east);
+  const heightWest = calculateRoadWidth(config.west);
 
-  // Return the maximum size considering both width and height
-  return Math.max(maxWidth, maxHeight);
+  // Use the maximum of both widths and heights to ensure the intersection fits properly
+  const totalWidth = Math.max(widthNorth, widthSouth);
+  const totalHeight = Math.max(heightEast, heightWest);
+
+  // Return the larger value between width and height
+  return Math.max(totalWidth, totalHeight);
 };
-
-// export const getMaxRoadWidth = (roadConfig) => {
-//   return (
-//     Math.max(getRoadWidth(roadConfig.east), getRoadWidth(roadConfig.west)) + 20
-//   );
-// };
