@@ -148,7 +148,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
       const lanesRight = road.lanesRight.length;
 
       if (lanesLeft !== lanesRight) {
-        return -40; // If any road has uneven lanes, return lane width as margin
+        if (lanesLeft >= 3 && lanesRight >= 3) return -40; // If any road has uneven lanes, return lane width as margin
       }
     }
     return 0; // No uneven lanes, no margin needed

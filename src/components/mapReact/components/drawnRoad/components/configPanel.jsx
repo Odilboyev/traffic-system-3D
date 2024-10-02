@@ -12,12 +12,6 @@ const ConfigPanel = ({ config, setConfig }) => {
   };
 
   const getLaneIcons = (count, side) => {
-    if (side === "lanesLeft")
-      return Array.from(
-        Array.from({ length: count }, () => {
-          return "";
-        })
-      );
     // right side
     const baseIcons = ["TbArrowBackUp"]; // Always include these icons
     const rightIcon = "TbArrowRampRight"; // Always the right icon
@@ -43,9 +37,14 @@ const ConfigPanel = ({ config, setConfig }) => {
   const updateLaneCount = (direction, side, count) => {
     setConfig((prev) => {
       const existingLanes = config[direction][side] || [];
-      const newLanes = getLaneIcons(count, side).map((icon) => ({
-        icon: icon,
-      }));
+      const newLanes =
+        side === "lanesLeft"
+          ? Array.from({ length: count }, () => {
+              return {};
+            })
+          : getLaneIcons(count, side).map((icon) => ({
+              icon: icon,
+            }));
       return {
         ...prev,
         [direction]: {
