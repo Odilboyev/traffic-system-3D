@@ -141,21 +141,31 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
   // Function to calculate the margin based on any road having uneven lanes
   const calculateGlobalMargin = () => {
     const roads = [config.north, config.south, config.east, config.west];
-    let margin = 40;
-    // Check if any of the roads have uneven lanes
+    let totalMargin = 0;
+    let samelengthCount = 0;
+    // Loop through all roads
     for (const road of roads) {
       const lanesLeft = road.lanesLeft.length;
       const lanesRight = road.lanesRight.length;
 
-      if (lanesLeft !== lanesRight) {
-        if (lanesLeft >= 3 && lanesRight >= 3) {
-          return -margin;
+      // If lanes are equal, return 0 immediately
+      if (lanesLeft === lanesRight) {
+        samelengthCount += 1;
+      }
+      if (samelengthCount >= 3) return 0;
+
+      if (lanesLeft >= 3 && lanesRight >= 3) {
+        // Check if lanes are uneven
+        if (Math.abs(lanesLeft - lanesRight) >= 2) {
+          // Set the margin based on the difference
+          totalMargin = -(Math.abs(lanesLeft - lanesRight) * 10 + 40);
+        } else {
+          totalMargin = -40;
         }
-        if (Math.abs(lanesLeft - lanesRight) >= 2)
-          return -(Math.abs(lanesLeft - lanesRight) * 10 + 40);
       }
     }
-    return 0;
+
+    return totalMargin;
   };
 
   // Calculate margin once
