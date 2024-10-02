@@ -1,6 +1,8 @@
 import { iconOptions } from "../utils";
 import Select from "react-select";
+
 const ConfigPanel = ({ config, setConfig }) => {
+  // Handles changes in road configuration for visibility or other fields
   const handleRoadChange = (direction, field, value) => {
     setConfig((prevConfig) => ({
       ...prevConfig,
@@ -11,40 +13,31 @@ const ConfigPanel = ({ config, setConfig }) => {
     }));
   };
 
-  const getLaneIcons = (count, side) => {
-    // right side
-    const baseIcons = ["TbArrowBackUp"]; // Always include these icons
-    const rightIcon = "TbArrowRampRight"; // Always the right icon
-    const icons = [];
+  // Generates lane icons based on lane count for the right side
+  const getLaneIcons = (count) => {
+    const baseIcons = ["TbArrowBackUp"]; // Base icon(s) for lanes
+    const rightIcon = "TbArrowRampRight"; // Right-most lane icon
+    const icons = [...baseIcons];
 
-    // Push the base icons
-    icons.push(...baseIcons);
-
-    if (count > 1) {
-      // Add the appropriate number of up icons based on the count
-      for (let i = 0; i < count - 1; i++) {
-        icons.push("TbArrowUp"); // Add up icons for the left lanes
-      }
-
-      // Add the right icon at the end
-      icons.push(rightIcon);
-      console.log(icons, "icons");
-      return icons;
+    // Add upward icons based on lane count
+    for (let i = 0; i < count - 1; i++) {
+      icons.push("TbArrowUp");
     }
-    return ["TbArrowRampRight"];
+    icons.push(rightIcon);
+    return icons;
   };
 
+  // Updates the lane count for the specified direction and side
   const updateLaneCount = (direction, side, count) => {
+    // Ensure count is between 1 and 5
+    const newCount = Math.max(1, Math.min(count, 5));
+
     setConfig((prev) => {
-      const existingLanes = config[direction][side] || [];
       const newLanes =
         side === "lanesLeft"
-          ? Array.from({ length: count }, () => {
-              return {};
-            })
-          : getLaneIcons(count, side).map((icon) => ({
-              icon: icon,
-            }));
+          ? Array(newCount).fill({}) // Create lanes for "lanesLeft"
+          : getLaneIcons(newCount).map((icon) => ({ icon })); // Create lanes for "lanesRight"
+
       return {
         ...prev,
         [direction]: {
@@ -55,6 +48,7 @@ const ConfigPanel = ({ config, setConfig }) => {
     });
   };
 
+  // Updates the icon for a specific lane
   const handleIconChange = (direction, side, laneIndex, value) => {
     setConfig((prevConfig) => {
       const updatedLanes = [...prevConfig[direction][side]];
@@ -88,6 +82,7 @@ const ConfigPanel = ({ config, setConfig }) => {
         <span className="text-sm font-medium mr-4">Rotation Angle:</span>
         <input
           type="range"
+          id="rotation_angle"
           min={0}
           max={360}
           value={config.angle}
@@ -134,6 +129,7 @@ const ConfigPanel = ({ config, setConfig }) => {
             </span>
             <input
               type="range"
+              id="lanesLeft"
               min={1}
               max={5}
               step={1}
@@ -154,6 +150,7 @@ const ConfigPanel = ({ config, setConfig }) => {
             </span>
             <input
               type="range"
+              id="lanesRight"
               min={1}
               max={5}
               step={1}
@@ -175,36 +172,14 @@ const ConfigPanel = ({ config, setConfig }) => {
                   value={iconOptions.find(
                     (option) => option.value === lane.icon
                   )}
-                  onChange={(e) => {
-                    console.log(e.value);
-                    handleIconChange(direction, "lanesRight", index, e.value);
-                  }}
+                  onChange={(e) =>
+                    handleIconChange(direction, "lanesRight", index, e.value)
+                  }
                   getOptionLabel={(option) => <>{option.icon}</>}
                   options={iconOptions}
                 />
               ))}
             </div>
-
-            {/* {config[direction].lanesRight.map((lane, index) => (
-              <Select
-                key={`right-${index}`}
-                value={lane.icon || ""}
-                onChange={(e) =>
-                  handleIconChange(direction, "lanesRight", index, e)
-                }
-                className="border p-1 mx-1 w-12 !min-w-0 bg-white text-gray-700"
-              >
-                {iconOptions.map((option) => (
-                  <Option
-                    key={option.value}
-                    value={option.value}
-                    className="text-xl"
-                  >
-                    <>{option.icon}</>
-                  </Option>
-                ))}
-              </Select>
-            ))} */}
           </div>
         </div>
       ))}
