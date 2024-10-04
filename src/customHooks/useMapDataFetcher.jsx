@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 
@@ -9,49 +9,44 @@ const useMapDataFetcher = ({
   minZoom = 19, // optional minimum zoom level to trigger fetch
   fetchDistanceThreshold = 100, // optional distance threshold (in meters) for fetching data
 }) => {
+  const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
   const map = useMap();
-  let lastSuccessfulLocation = null;
 
+  // Function to check distance and trigger fetch if conditions are met
   const handleMapEvents = () => {
     const center = map.getCenter();
     const zoom = map.getZoom();
-
-    // Check if zoom level meets the requirement
-    if (zoom >= minZoom) {
-      fetchData({
-        lat: center.lat,
-        lng: center.lng,
-        zoom,
-      });
-    } else {
-      onClearData(); // Clear data when zoom is lower than the threshold
-    }
-
     const currentLocation = L.latLng(center.lat, center.lng);
 
-    if (lastSuccessfulLocation) {
-      const distanceFromLast = currentLocation.distanceTo(
-        lastSuccessfulLocation
-      );
-
-      // Only fetch if the distance moved exceeds the threshold
-      if (distanceFromLast > fetchDistanceThreshold) {
+    if (zoom >= minZoom) {
+      // Fetch data if zoom level meets the requirement
+      if (
+        !lastSuccessfulLocation ||
+        currentLocation.distanceTo(lastSuccessfulLocation) >
+          fetchDistanceThreshold
+      ) {
         fetchData({
           lat: center.lat,
           lng: center.lng,
           zoom,
         });
+        setLastSuccessfulLocation(currentLocation);
+      }
+    } else {
+      // If zoom is lower than minZoom, clear the data and reset last location
+      onClearData();
+      if (lastSuccessfulLocation !== null) {
+        setLastSuccessfulLocation(null); // Only clear if it's not already null
       }
     }
-
-    // Update the last successful location
-    lastSuccessfulLocation = currentLocation;
   };
 
+  // Effect to trigger the map event handler when component is mounted and on zoom or drag end
   useEffect(() => {
-    handleMapEvents();
+    handleMapEvents(); // Initial trigger on mount
   }, []);
 
+  // Set up event listeners for map dragging and zooming
   useMapEvents({
     dragend: handleMapEvents,
     zoomend: handleMapEvents,
