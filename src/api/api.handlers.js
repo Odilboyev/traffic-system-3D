@@ -57,8 +57,10 @@ const getInfoForCards = async () =>
   getData(import.meta.env.VITE_DASHBOARD_FOR_BOXES);
 const getWeatherData = async () => getData(import.meta.env.VITE_WEATHER_INFO);
 const getTexts = async () => getData(import.meta.env.VITE_LANGUAGE);
-const getNearByTrafficLights = async (body) =>
+const getNearbyTrafficLights = async (body) =>
   postData(import.meta.env.VITE_NEARBYLIGHTS, body);
+const getNearbySigns = async (body) =>
+  postData(import.meta.env.VITE_NEARBYSIGNS, body);
 
 // Devices API functions
 const endpointMap = {
@@ -100,6 +102,7 @@ export {
   getInfoForCards,
   getWeatherData,
   getTexts,
-  getNearByTrafficLights,
+  getNearbyTrafficLights,
+  getNearbySigns,
   getDevices,
 };

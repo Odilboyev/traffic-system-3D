@@ -10,10 +10,10 @@ const statusStyles = {
 
 // Neon text color styles
 const neonTextShadowStyles = {
-  0: "!text-green-400 dark:!text-green-300",
-  1: "!text-orange-600 dark:!text-yellow-300",
-  2: "!text-red-400 dark:!text-red-300",
-  3: "!text-gray-400 dark:!text-gray-300",
+  0: "text-green-400 dark:text-green-300",
+  1: "text-orange-600 dark:text-yellow-300",
+  2: "text-red-400 dark:text-red-300",
+  3: "text-gray-400 dark:text-gray-300",
 };
 
 const NeonIcon = ({ icon: Icon, iconStyle, isRounded, text, status }) => {
@@ -22,7 +22,7 @@ const NeonIcon = ({ icon: Icon, iconStyle, isRounded, text, status }) => {
     neonTextShadowStyles[status] || neonTextShadowStyles[0];
 
   // Determine the classes for the container
-  let containerClasses = `flex items-center justify-center p-2 shadow-sm  text-white rounded-full dark:drop-shadow-neon`;
+  let containerClasses = `flex items-center justify-center p-2 shadow-sm  text-green-300 rounded-full dark:drop-shadow-neon`;
   if (isRounded && Icon) {
     // If `isRounded` is true and `Icon` exists, add ring and background color
     containerClasses += ` rounded-full ring-1 ${statusClass}`;

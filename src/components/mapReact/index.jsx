@@ -67,6 +67,7 @@ import FilterControl from "./components/controls/filterControl/index.jsx";
 import WidgetControl from "./components/controls/widgetControl/index.jsx";
 import useLocalStorageState from "../../customHooks/uselocalStorageState.jsx";
 import TrafficLightContainer from "./components/svetofor/managementLights.jsx";
+import SignsContainer from "./components/signs/index.jsx";
 const home = [41.2995, 69.2401];
 
 const handleMapMove = (event) => {
@@ -348,6 +349,8 @@ const MapComponent = ({ changedMarker }) => {
         {/* lights */}
         {/* <Svetoforlar /> */}
         <TrafficLightContainer />
+        {/* signs  */}
+        <SignsContainer />
         {/* settings */}
         <Control position="topleft">
           <SpeedDial placement="right">

@@ -11,7 +11,7 @@ export const iconOptions = [
 ];
 
 export const getLaneWidth = () => 60;
-export const getCrosswalkWidth = () => 20;
+export const getCrosswalkWidth = () => 30;
 export const getRoadWidth = (roadConfig) => {
   return (
     (roadConfig.lanesLeft.length + roadConfig.lanesRight.length) *
