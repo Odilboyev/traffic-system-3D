@@ -33,7 +33,7 @@ const App = () => {
     } else if (data.data.statuserror === 2) {
       sound.src = dangerSound;
     }
-    sound.play();
+    // sound.play();
   };
 
   //
