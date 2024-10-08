@@ -5,6 +5,7 @@ import CustomMarker from "./customMarker";
 import "./Signs.css";
 import { getNearbySigns } from "../../../../api/api.handlers";
 import { FaXmark } from "react-icons/fa6";
+import { t } from "i18next";
 
 const Signs = ({
   signs, // signs state
@@ -15,6 +16,10 @@ const Signs = ({
   const [location, setLocation] = useState(null);
   const [popupPosition, setPopupPosition] = useState(null);
   const map = useMap();
+  const zoom = map.getZoom();
+  useEffect(() => {
+    zoom <= 18 && closePopup();
+  }, [zoom]);
 
   const handleSignClick = (sign, location) => {
     console.log("handleSignClick", sign, location);
@@ -74,7 +79,7 @@ const Signs = ({
           position={[v.lat, v.lng]}
           v={v}
           handleSignClick={handleSignClick}
-        ></CustomMarker>
+        />
       ))}
 
       {/* Custom Popup positioned using absolute positioning */}
@@ -94,18 +99,26 @@ const Signs = ({
               <FaXmark />
             </button>
             <div style={{ fontSize: "14px" }}>
-              <strong>roadsign_code:</strong> {selectedSign.roadsign_code}{" "}
-              <br />
-              <strong>roadsign_description:</strong>{" "}
+              <strong>{t("roadsign_code")}:</strong>{" "}
+              {selectedSign.roadsign_code} <br />
+              <strong>{t("roadsign_description")}:</strong>{" "}
               {selectedSign.roadsign_description} <br />
-              <strong>roadsign_installation_date:</strong>{" "}
+              <strong>{t("roadsign_installation_date")}:</strong>{" "}
               {selectedSign.roadsign_installation_date} <br />
-              <strong>removal_date:</strong> {selectedSign.removal_date || "--"}{" "}
-              <br />
-              <strong>status:</strong>{" "}
-              {selectedSign.status === "active"
-                ? "Установлен"
-                : "Не установлен"}
+              <strong>{t("removal_date")}:</strong>{" "}
+              {selectedSign.removal_date || "--"} <br />
+              <strong>{t("status")}:</strong>{" "}
+              <span
+                className={
+                  selectedSign.status === "active"
+                    ? "text-green-500"
+                    : "text-red-500"
+                }
+              >
+                {selectedSign.status === "active"
+                  ? "Installed"
+                  : "Not Installed"}
+              </span>
             </div>
           </div>
           {/* Triangle pointing to the marker */}
@@ -114,12 +127,13 @@ const Signs = ({
             style={{
               position: "absolute",
               top: "100%", // Place it below the popup
-              left: "20px", // Center it relative to the popup, adjust as needed
+              left: "-100%", // Center it relative to the popup width
+              transform: "translateX(-50%)", // Center the triangle horizontally
               width: "0",
               height: "0",
-              borderLeft: "10px solid transparent",
-              borderRight: "10px solid transparent",
-              borderTop: "10px solid #1a1a1a", // Match the background color of the popup
+              borderTop: "10px solid transparent",
+              borderBottom: "10px solid transparent",
+              borderRight: "10px solid #1a1a1a", // Match the background color of the popup
             }}
           />
         </div>

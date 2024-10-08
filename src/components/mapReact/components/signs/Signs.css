@@ -1,6 +1,3 @@
-.custom-popup-content {
-  padding: 16px;
-}
 .custom-marker-content {
   transform: scale(1); /* Ensures that the icon size remains the same */
   transform-origin: center center; /* Keeps the scaling centered */

@@ -43,7 +43,7 @@ const SignIcon = ({ v, handleSignClick }) => {
             borderTop: "10px solid white",
             margin: "0 auto",
           }}
-        ></div>
+        />
       </div>
     </div>
   );
