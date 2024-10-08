@@ -122,20 +122,6 @@ const Signs = ({
             </div>
           </div>
           {/* Triangle pointing to the marker */}
-          <div
-            className="popup-triangle"
-            style={{
-              position: "absolute",
-              top: "100%", // Place it below the popup
-              left: "-100%", // Center it relative to the popup width
-              transform: "translateX(-50%)", // Center the triangle horizontally
-              width: "0",
-              height: "0",
-              borderTop: "10px solid transparent",
-              borderBottom: "10px solid transparent",
-              borderRight: "10px solid #1a1a1a", // Match the background color of the popup
-            }}
-          />
         </div>
       )}
     </div>
