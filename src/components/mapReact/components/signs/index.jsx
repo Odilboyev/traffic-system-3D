@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Signs from "./signs";
 
-const SignsContainer = ({ isInModal }) => {
+const SignsContainer = ({ isVisible }) => {
   const [signs, setSigns] = useState([]);
 
   const clearSigns = () => {
@@ -9,9 +9,11 @@ const SignsContainer = ({ isInModal }) => {
   };
 
   return (
-    <>
-      <Signs signs={signs} setSigns={setSigns} clearSigns={clearSigns} />
-    </>
+    <div>
+      {isVisible && (
+        <Signs signs={signs} setSigns={setSigns} clearSigns={clearSigns} />
+      )}
+    </div>
   );
 };
 

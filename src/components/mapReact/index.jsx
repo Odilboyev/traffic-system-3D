@@ -68,7 +68,7 @@ import WidgetControl from "./components/controls/widgetControl/index.jsx";
 import useLocalStorageState from "../../customHooks/uselocalStorageState.jsx";
 import TrafficLightContainer from "./components/svetofor/managementLights.jsx";
 import SignsContainer from "./components/signs/index.jsx";
-const home = [41.2995, 69.2401];
+const home = [41.2995, 69.2401]; // Tashkent
 
 const handleMapMove = (event) => {
   // Save center and zoom values to localStorage
@@ -170,6 +170,7 @@ const MapComponent = ({ changedMarker }) => {
     camera: true,
     crossroad: true,
     trafficlights: true,
+    signs: true,
   });
   const [widgets, setWidgets] = useLocalStorageState("traffic_widgets", {
     bottomsection: true,
@@ -348,9 +349,9 @@ const MapComponent = ({ changedMarker }) => {
         </div>
         {/* lights */}
         {/* <Svetoforlar /> */}
-        <TrafficLightContainer />
+        {filter.trafficlights && <TrafficLightContainer />}
         {/* signs  */}
-        <SignsContainer />
+        {<SignsContainer isVisible={filter.signs} />}
         {/* settings */}
         <Control position="topleft">
           <SpeedDial placement="right">

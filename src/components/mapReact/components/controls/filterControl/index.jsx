@@ -17,6 +17,7 @@ const FilterControl = ({ placement, changeFilter, filter }) => {
     { type: "camera", label: t("camera") },
     { type: "crossroad", label: t("crossroad") },
     { type: "trafficlights", label: t("svetofor") },
+    { type: "signs", label: t("signs") },
   ];
 
   const handleFilterChange = (name, checked) => {
@@ -26,6 +27,7 @@ const FilterControl = ({ placement, changeFilter, filter }) => {
         camera: checked,
         crossroad: checked,
         trafficlights: checked,
+        signs: checked,
       });
     } else {
       changeFilter((prevFilter) => ({ ...prevFilter, [name]: checked }));
@@ -51,7 +53,11 @@ const FilterControl = ({ placement, changeFilter, filter }) => {
               className="m-0 p-0"
               checked={
                 type === "all"
-                  ? filter.box && filter.camera && filter.crossroad
+                  ? filter.box &&
+                    filter.camera &&
+                    filter.crossroad &&
+                    filter.trafficlights &&
+                    filter.signs
                   : filter[type]
               }
               onChange={(e) => handleFilterChange(type, e.target.checked)}
