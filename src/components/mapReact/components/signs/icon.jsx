@@ -3,28 +3,29 @@ const SignIcon = ({ v, handleSignClick }) => {
     <div>
       <div className="custom-marker-content relative w-full">
         <div
-          className=" bg-white border border-gray-300 rounded-lg overflow-hidden"
+          className="bg-white border border-gray-300 rounded-lg overflow-hidden"
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            padding: "6px",
+            padding: "2px", // Reduced padding for a more compact look
           }}
         >
           {v.sings_data?.length > 0 ? (
             v.sings_data.map((sign, idx) => (
-              <div className="w-full sign" key={idx}>
+              <div className="w-full max-w-full sign" key={idx}>
                 <img
-                  className="object-contain w-full active:bg-deep-orange-700"
+                  className="object-contain w-full"
                   src={`icons/signs/${sign.roadsign_image_url}`}
                   alt={`Sign ${idx}`}
                   style={{
                     borderRadius: "4px",
-                    marginBottom: "4px",
+                    marginBottom: "2px",
+                    height: "30px", // Reduced height to make the icon smaller
                   }}
                 />
               </div>
             ))
           ) : (
-            <div>No signs available</div>
+            <div style={{ fontSize: "10px" }}>No signs available</div>
           )}
         </div>
 
@@ -34,12 +35,12 @@ const SignIcon = ({ v, handleSignClick }) => {
             position: "absolute",
             left: "50%",
             transform: "translateX(-50%)",
-            bottom: -10,
+            bottom: -8, // Adjusted position to fit the smaller icon size
             width: "0",
             height: "0",
-            borderLeft: "15px solid transparent",
-            borderRight: "15px solid transparent",
-            borderTop: "15px solid white",
+            borderLeft: "10px solid transparent", // Adjusted size for a smaller triangle
+            borderRight: "10px solid transparent",
+            borderTop: "10px solid white",
             margin: "0 auto",
           }}
         ></div>

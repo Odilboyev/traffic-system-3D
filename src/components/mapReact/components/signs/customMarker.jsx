@@ -34,7 +34,7 @@ const CustomMarker = ({ position, v, location, handleSignClick, children }) => {
             element.addEventListener("click", () => {
               console.log(idx, v.sings_data[idx]);
               if (v.sings_data && v.sings_data[idx]) {
-                handleSignClick(v.sings_data[idx], location);
+                handleSignClick({ ...v.sings_data[idx], index: idx }, position);
               }
             });
           });
