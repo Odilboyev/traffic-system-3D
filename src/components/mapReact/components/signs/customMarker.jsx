@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { renderToString } from "react-dom/server";
 import SignIcon from "./icon";
 
-const CustomMarker = ({ position, v, location, handleSignClick, children }) => {
+const CustomMarker = ({ position, v, handleSignClick, children }) => {
   const markerRef = useRef(null);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const CustomMarker = ({ position, v, location, handleSignClick, children }) => {
       className:
         "custom-marker-content flex flex-col items-center justify-center p-0 rounded-lg bg-white shadow-md !w-auto !h-auto max-w-20 max-h-20 ",
       html: iconHtml,
-      iconAnchor: [12, 24],
+      iconAnchor: [10, 20],
     });
 
     // Set the custom icon to the Leaflet marker
@@ -57,11 +57,7 @@ const CustomMarker = ({ position, v, location, handleSignClick, children }) => {
     };
   }, [v, handleSignClick]);
 
-  return (
-    <Marker ref={markerRef} position={position}>
-      {children}
-    </Marker>
-  );
+  return <Marker ref={markerRef} position={position} />;
 };
 
 export default CustomMarker;

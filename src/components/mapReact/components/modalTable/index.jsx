@@ -29,6 +29,7 @@ const ModalTable = ({
   totalPages,
   fetchHandler,
 }) => {
+  const encryptedRole = atob(localStorage.getItem("its_user_role"));
   const { theme } = useTheme();
   const [showTableActions, setShowTableActions] = useState(showActions);
   const [titleToShow, setTitleToShow] = useState(
@@ -297,12 +298,17 @@ const ModalTable = ({
                         >
                           <LiaSearchLocationSolid className="text-white" />
                         </IconButton>
-                        {/* <IconButton color="blue" size="sm">
-                          <MdEdit className="text-white" />
-                        </IconButton>
-                        <IconButton color="red" size="sm">
-                          <MdDelete className="text-white" />
-                        </IconButton> */}
+                        {encryptedRole === "admin" && (
+                          <>
+                            {" "}
+                            <IconButton color="blue" size="sm">
+                              <MdEdit className="text-white" />
+                            </IconButton>
+                            <IconButton color="red" size="sm">
+                              <MdDelete className="text-white" />
+                            </IconButton>
+                          </>
+                        )}
                       </td>
                     )}
                   </tr>

@@ -22,6 +22,7 @@ const App = () => {
   }, [isSubscribed]);
 
   const onWSDataReceived = (data) => {
+    console.log(data, "socket data");
     setIsSubscribed(true);
     setChangedMarker(data.data);
 
@@ -33,7 +34,7 @@ const App = () => {
     } else if (data.data.statuserror === 2) {
       sound.src = dangerSound;
     }
-    // sound.play();
+    sound.play();
   };
 
   //

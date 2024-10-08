@@ -1,4 +1,5 @@
 import axios from "axios";
+
 // import { jwtDecode } from "jwt-decode";
 
 // const token_expire =
@@ -31,4 +32,5 @@ console.log(token_monitoring);
 // console.log(token, config);
 
 config.defaults.headers.common["Authorization"] = `Bearer ${token_monitoring}`;
+
 export default config;

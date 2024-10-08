@@ -22,7 +22,6 @@ const Signs = ({
   }, [zoom]);
 
   const handleSignClick = (sign, location) => {
-    console.log("handleSignClick", sign, location);
     setSelectedSign(sign);
     setLocation(location);
 

@@ -52,7 +52,7 @@ function transformDataForCharts(data) {
   });
 }
 
-const CorssroadModal = ({ open, handleOpen, marker }) => {
+const CrossroadModal = ({ open, handleOpen, marker }) => {
   const { theme } = useTheme();
   const currentLayer = baseLayers.find(
     (layer) => layer.name === localStorage.getItem("selectedLayer")
@@ -237,7 +237,7 @@ const CorssroadModal = ({ open, handleOpen, marker }) => {
   );
 };
 
-CorssroadModal.propTypes = {
+CrossroadModal.propTypes = {
   open: PropTypes.bool.isRequired,
   handleOpen: PropTypes.func.isRequired,
   marker: PropTypes.shape({
@@ -248,4 +248,4 @@ CorssroadModal.propTypes = {
   }),
 };
 
-export default CorssroadModal;
+export default CrossroadModal;

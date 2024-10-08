@@ -47,7 +47,7 @@ const TrafficLightContainer = ({ isInModal }) => {
 
       setTrafficSocket(socket);
       socket.onclose = (e) => {
-        console.log(e, "WebSocket closed");
+        // console.log(e, "WebSocket closed");
       };
       return () => {
         if (socket) {

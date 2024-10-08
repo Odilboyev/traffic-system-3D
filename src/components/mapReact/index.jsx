@@ -42,7 +42,7 @@ import {
 } from "../../api/api.handlers";
 import login from "../../Auth";
 import { useNavigate } from "react-router-dom";
-import CorssroadModal from "./components/crossroad";
+import CrossroadModal from "./components/crossroad";
 import DeviceModal from "./components/box/deviceModal";
 import CustomPopUp from "./components/customPopup/index.jsx";
 import baseLayers, { layerSave } from "../../configurations/mapLayers";
@@ -585,7 +585,7 @@ const MapComponent = ({ changedMarker }) => {
         </MarkerClusterGroup>
       </MapContainer>
       {isbigMonitorOpen && (
-        <CorssroadModal
+        <CrossroadModal
           marker={activeMarker}
           open={isbigMonitorOpen}
           handleOpen={() => {

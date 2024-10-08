@@ -19,4 +19,5 @@ class Auth {
   }
 }
 const login = new Auth();
+
 export default login;

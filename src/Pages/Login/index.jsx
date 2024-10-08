@@ -25,13 +25,11 @@ export function SignIn() {
     setLoading(true); // Set loading state to true
 
     try {
-      // const req = new FormData();
-      // req.append("bino_id", loginName);
-      //   req.append("password", password);
-
       const res = await signIn({ login: loginName, password: password });
       console.log(res);
       setLoading(false); // Set loading state back to false
+      const encryptedRole = btoa(res.role);
+      localStorage.setItem("its_user_role", encryptedRole);
       localStorage.setItem("big_monitoring_token", res.token);
       localStorage.setItem("big_monitoring_token_expire", res.tokenexpire);
       login.login();
