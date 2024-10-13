@@ -5,7 +5,7 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { CogIcon } from "@heroicons/react/16/solid";
-import { useState, useCallback, memo, useEffect } from "react";
+import { useState, useCallback, memo } from "react";
 import { t } from "i18next";
 import Dropright from "../dropright";
 import ModalTable from "../mapReact/components/modalTable";
@@ -14,6 +14,7 @@ import { getDevices, getErrorHistory } from "../../api/api.handlers";
 const DeviceManagement = () => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
   const [deviceType, setDeviceType] = useState(""); // Default type
+  const [userFilter, setUserFilter] = useState("list_active");
   const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [deviceData, setDeviceData] = useState([]);
@@ -23,9 +24,11 @@ const DeviceManagement = () => {
   const fetchDeviceData = useCallback(async (type, current = 1) => {
     setDeviceLoading(true);
     setDeviceData([]); // Clear existing data before fetching new data
+    console.log(type, current, "Device");
     try {
       const all = await getDevices(type, current);
       setDeviceData(all.data);
+      console.log(all.data, "device");
       setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
       setTotalItems(all.total_items);
     } catch (err) {
@@ -34,15 +37,14 @@ const DeviceManagement = () => {
       setDeviceLoading(false);
     }
   }, []);
-
-  // Handler for changing the device type
-  const handleTypeChange = (type) => {
-    setDeviceType(type); // Update device type
-    console.log(type);
-    fetchDeviceData(type); // Fetch data for the selected type
-    setIsDroprightOpen(false); // Close the dropdown
-    setIsAlarmDeviceOpen(true); // Open the device modal
+  // const handleUserFilterChange = (filterValue) => {
+  //   setUserFilter(filterValue);
+  //   fetchDeviceData(filterValue); // Fetch users based on the selected filter
+  // };
+  const createNewUser = (user) => {
+    console.log(user);
   };
+
   // fetchErrorHistory
   const fetchErrorHistory = async (current, type, id) => {
     console.log(current, type, id, "Fetching error history");
@@ -53,13 +55,27 @@ const DeviceManagement = () => {
         type: dtype,
         device_id: id,
       });
+
       setDeviceData(all.data);
       setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
       setTotalItems(all.total_items);
     } catch (err) {
-      console.log("Error fetching error history. Please try again.");
+      console.err("Error fetching error history. Please try again.", err);
     } finally {
       setDeviceLoading(false);
+    }
+  };
+
+  // Handler for changing the device type
+  const handleTypeChange = (type) => {
+    setDeviceType(type); // Update device type
+    setIsDroprightOpen(false); // Close the dropdown
+    setIsAlarmDeviceOpen(true); // Open the device modal
+
+    if (type === "users") {
+      fetchDeviceData("user/list_active"); // Fetch active users by default
+    } else {
+      fetchDeviceData(type); // Fetch data for the selected type
     }
   };
 
@@ -104,6 +120,12 @@ const DeviceManagement = () => {
               >
                 {t("svetofor")}
               </ListItem>
+              <ListItem
+                className="shadow-sm"
+                onClick={() => handleTypeChange("users")}
+              >
+                {t("users")}
+              </ListItem>
             </List>
           </div>
         }
@@ -116,14 +138,37 @@ const DeviceManagement = () => {
           setIsAlarmDeviceOpen(false); // Correctly close the device modal
         }}
         totalItems={totalItems}
-        itemCallback={fetchErrorHistory}
+        itemCallback={deviceType !== "users" && fetchErrorHistory}
         title={deviceType}
         data={deviceData}
+        pickedFilter={deviceType == "users" ? userFilter : null}
+        changePickFilter={setUserFilter}
+        backButtonProps={
+          deviceType === "users"
+            ? {
+                label: "create_new_user",
+                onClick: () => console.log("Create new user"),
+              }
+            : undefined
+        }
+        typeOptions={
+          deviceType === "users" && [
+            { type: "list_active", type_name: t("active_users") },
+            { type: "list_deactive", type_name: t("inactive_users") },
+          ]
+        }
         showActions={true}
         isLoading={deviceLoading}
-        itemsPerPage={20}
-        totalPages={deviceTotalPages}
-        fetchHandler={fetchDeviceData}
+        selectedFilter={userFilter}
+        fetchHandler={(type, page) =>
+          fetchDeviceData(
+            type,
+            page,
+            userFilter === "user/list_active"
+              ? "/list_active"
+              : "/list_deactive"
+          )
+        }
       />
     </>
   );

@@ -20,9 +20,6 @@ const Pagination = ({ currentPage, totalPages, totalItems, onPageChange }) => {
         : "",
     onClick: () => onPageChange(index),
   });
-  useEffect(() => {
-    console.log(totalPages);
-  }, [totalPages]);
 
   const getPageNumbers = () => {
     const pageNumbers = [];

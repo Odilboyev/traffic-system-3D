@@ -1,6 +1,6 @@
 import getRowColor from "../../configurations/getRowColor";
 
-const StatusBadge = ({ status, statusName }) => {
+const StatusBadge = ({ status, statusName = "", ...rest }) => {
   const getStatusIconColor = () => {
     switch (status) {
       case 0:
@@ -19,6 +19,7 @@ const StatusBadge = ({ status, statusName }) => {
       className={`flex items-center space-x-2 px-2 py-1 rounded-full ${getRowColor(
         status
       )}`}
+      {...rest}
     >
       <span className={`w-2 h-2 rounded-full ${getStatusIconColor()}`}></span>
       <span className="text-sm font-medium">{statusName}</span>

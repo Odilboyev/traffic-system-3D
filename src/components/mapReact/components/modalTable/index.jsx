@@ -1,21 +1,20 @@
+// ModalTable.js
 import { memo, useEffect, useState } from "react";
-import {
-  Button,
-  IconButton,
-  Input,
-  Typography,
-} from "@material-tailwind/react";
+import PropTypes from "prop-types";
+import { Button, Input, Typography } from "@material-tailwind/react";
+import { useTheme } from "../../../../customHooks/useTheme";
+import { MdSearch } from "react-icons/md";
+import { useMap } from "react-leaflet";
 import Pagination from "@/components/pagination";
 import Loader from "../../../loader";
 import Modal from "../../../modal";
 import { t } from "i18next";
-import { LiaSearchLocationSolid } from "react-icons/lia";
-import { useMap } from "react-leaflet";
-import { useTheme } from "../../../../customHooks/useTheme";
-import { MdSearch, MdEdit, MdDelete, MdHistory } from "react-icons/md";
-import { ChevronLeftIcon } from "@heroicons/react/16/solid";
-import moment from "moment/moment";
 import FilterTypes from "./filterTypes";
+import { ChevronLeftIcon } from "@heroicons/react/16/solid";
+import { shouldHideColumn } from "./utils";
+import { useSortedData } from "./useSortedData";
+import TableHeader from "./components/TableHeader";
+import TableRow from "./components/TableRow";
 
 const ModalTable = ({
   open,
@@ -23,120 +22,70 @@ const ModalTable = ({
   title,
   handleOpen,
   itemCallback,
+  pickedFilter,
+  changePickFilter,
   data = [],
   isLoading,
   totalItems = 0,
   totalPages,
   fetchHandler,
+  typeOptions = [
+    { type: null, type_name: "all" },
+    { type: 1, type_name: "camera" },
+    { type: 3, type_name: "boxcontroller" },
+    { type: 4, type_name: "svetofor" },
+  ],
+  backButtonProps = { label: "back", onClick: null },
 }) => {
   const encryptedRole = atob(localStorage.getItem("its_user_role"));
   const { theme } = useTheme();
+  const map = useMap();
+
   const [showTableActions, setShowTableActions] = useState(showActions);
-  const [titleToShow, setTitleToShow] = useState(
-    title ? t(title) : t("history")
-  );
-  useEffect(() => {
-    setTitleToShow(t(title));
-    console.log(title, "setTitleToShow");
-  }, [title, open]);
-
+  const [titleToShow, setTitleToShow] = useState(t(title || "history"));
   const [subPageId, setSubPageId] = useState(null);
-
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState(null);
-  const map = useMap();
-
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
+
+  const sortedData = useSortedData(
+    data,
+    sortedColumn,
+    sortOrder,
+    searchTerm,
+    title != "users" && selectedFilter
+  );
   useEffect(() => {
-    if (open) {
-      if (isSubPageOpen) {
-        itemCallback(currentPage, title, subPageId);
-      }
+    setTitleToShow(t(title));
+    setSelectedFilter(pickedFilter || typeOptions[0]?.type);
+  }, [title, open]);
+
+  useEffect(() => {
+    if (open && isSubPageOpen) {
+      itemCallback(currentPage, title, subPageId);
     }
   }, [currentPage, open, selectedFilter]);
 
-  useEffect(() => {
-    if (data.length > 0) {
-      const sorted = sortData(data, sortedColumn, sortOrder);
-      const searched = sorted.filter((item) => {
-        return Object.values(item).some(
-          (value) =>
-            value &&
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      });
-
-      const filtered = selectedFilter
-        ? searched.filter((item) => item.type === selectedFilter)
-        : searched;
-
-      // Reverse the filtered data
-      setFilteredData(filtered.reverse());
-    }
-  }, [data, sortedColumn, sortOrder, searchTerm, selectedFilter]);
-
   const handlePageChange = (page) => {
-    console.log("Page changed to:", page); // Debugging log
     setCurrentPage(page);
-    fetchHandler(page, selectedFilter); // Ensure this fetches the correct data
+    fetchHandler(page, selectedFilter);
   };
 
   const handleHeader = (keyName) => {
-    if (sortedColumn === keyName) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortOrder("asc");
-      setSortedColumn(keyName);
-    }
+    setSortOrder(
+      sortedColumn === keyName && sortOrder === "asc" ? "desc" : "asc"
+    );
+    setSortedColumn(keyName);
   };
 
-  const sortData = (data, sortedColumn, sortOrder) => {
-    return [...data].sort((a, b) => {
-      const valueA = a[sortedColumn];
-      const valueB = b[sortedColumn];
-
-      if (typeof valueA === "undefined" || typeof valueB === "undefined") {
-        return sortOrder === "asc" ? -1 : 1;
-      }
-
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
-      } else {
-        return sortOrder === "asc"
-          ? valueA.toString().localeCompare(valueB.toString())
-          : valueB.toString().localeCompare(valueA.toString());
-      }
-    });
-  };
-
-  let tableHeaders = data.length > 0 ? Object.keys(data[0]) : [];
-
-  const locationHandler = ({ lat, lng }) => {
-    console.log(lat, lng);
-    if (lat && lng) {
-      map.flyTo([lat, lng], 20);
-    }
+  const locationHandler = (lat, lng) => {
+    if (lat && lng) map.flyTo([lat, lng], 20);
     handleOpen();
   };
-  const shouldHideColumn = (key) => {
-    const hiddenKeys = ["lat", "lng", "location", "statuserror_name"];
-    const hiddenOnSubPageKeys = ["type", "type_name", "device_id"];
-    const hiddenOnAllHistory = [
-      "type",
-      selectedFilter === null && "type_name",
-      "device_id",
-    ];
 
-    return (
-      hiddenKeys.includes(key) ||
-      (isSubPageOpen && hiddenOnSubPageKeys.includes(key)) ||
-      (!itemCallback && hiddenOnAllHistory.includes(key))
-    );
-  };
   const historyHandler = (item) => {
     setShowTableActions(false);
     setCurrentPage(1);
@@ -145,6 +94,13 @@ const ModalTable = ({
     setSubPageId(item.id);
     setTitleToShow(`${t("history")} - ${title} ${"- " + item.name}`);
   };
+
+  const columns = data?.[0]
+    ? Object.keys(data[0]).filter(
+        (key) =>
+          !shouldHideColumn(key, isSubPageOpen, selectedFilter, itemCallback)
+      )
+    : [];
 
   return (
     <Modal
@@ -159,159 +115,81 @@ const ModalTable = ({
       body={
         <>
           <div className="flex justify-between w-full py-3">
-            <div
-              className={`${
-                itemCallback ? "w-2/6" : "w-4/6"
-              } flex justify-between gap-5 `}
-            >
-              <div
-                className={`${
-                  itemCallback ? "w-full" : "w-3/6"
-                } flex justify-between gap-5 `}
-              >
-                <Input
-                  color={theme === "dark" ? "white" : "black"}
-                  label={t("search")}
-                  value={searchTerm}
-                  className=" dark:focus:!border-b-white dark:focus:!border-x-white border-b-black focus:!border-t-0 border-x-black"
-                  icon={<MdSearch className="dark:text-white" />}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+            <div className={`flex ${itemCallback ? "w-2/6" : "w-4/6"} gap-5`}>
+              <Input
+                aria-label={t("search_input")}
+                color={theme === "dark" ? "white" : "black"}
+                label={t("search")}
+                value={searchTerm}
+                className="dark:focus:!border-b-white border-b-black"
+                icon={<MdSearch className="dark:text-white" />}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
 
-              {/* Static filter options */}
-              {!itemCallback ? (
+              {!itemCallback || title === "users" ? (
                 <FilterTypes
-                  typeOptions={[
-                    { type: null, type_name: "all" },
-                    { type: 1, type_name: "camera" },
-                    { type: 3, type_name: "boxcontroller" },
-                    { type: 4, type_name: "svetofor" },
-                  ]}
+                  typeOptions={typeOptions}
                   active={selectedFilter}
                   valueKey="type"
                   nameKey="type_name"
                   onFilterChange={(selectedType) => {
                     setSelectedFilter(selectedType);
+                    changePickFilter(selectedType);
                     setCurrentPage(1);
-                    fetchHandler(1, selectedType);
+                    title == "users"
+                      ? fetchHandler("user/" + selectedType, 1)
+                      : fetchHandler(1, selectedType);
                   }}
                 />
               ) : null}
             </div>
-            {isSubPageOpen && (
+            {isSubPageOpen || title === "users" ? (
               <Button
-                onClick={() => {
-                  setTitleToShow(t(title));
-                  fetchHandler(title, currentPage);
-                  setShowTableActions(true);
-                  setIsSubPageOpen(false);
-                }}
-                className="flex gap-2 items-center  "
+                onClick={
+                  backButtonProps.onClick
+                    ? backButtonProps.onClick
+                    : () => {
+                        setTitleToShow(t(title));
+                        fetchHandler(currentPage, title);
+                        setShowTableActions(true);
+                        setIsSubPageOpen(false);
+                        console.log("bakc clicked");
+                      }
+                }
+                className="flex gap-2 items-center"
               >
-                <ChevronLeftIcon className="w-5 h-5 m-0" />
-                <p>{t("back")}</p>
+                {title !== "users" && (
+                  <ChevronLeftIcon className="w-5 h-5 m-0" />
+                )}
+                <p>{t(backButtonProps.label)}</p>
               </Button>
-            )}
+            ) : null}
           </div>
           {isLoading ? (
             <Loader />
-          ) : data?.length > 0 ? (
+          ) : sortedData.length > 0 ? (
             <table className="w-full table-auto overflow-x-scroll border border-slate-400">
-              <thead className="text-left">
-                <tr className="font-bold">
-                  {tableHeaders.map((key, i) =>
-                    shouldHideColumn(key) ? null : (
-                      <th
-                        className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
-                        key={i}
-                        onClick={() => handleHeader(key)}
-                      >
-                        <div className="flex justify-between gap-4 items-center">
-                          <Typography className="font-bold">
-                            {t(key)}
-                          </Typography>
-                          {sortedColumn === key && (
-                            <span>{sortOrder === "asc" ? "▲" : "▼"}</span>
-                          )}
-                        </div>
-                      </th>
-                    )
-                  )}
-                  {showTableActions && (
-                    <th className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white">
-                      <Typography className="font-bold">
-                        {t("actions")}
-                      </Typography>
-                    </th>
-                  )}
-                </tr>
-              </thead>
+              <TableHeader
+                columns={columns}
+                sortedColumn={sortedColumn}
+                sortOrder={sortOrder}
+                onHeaderClick={handleHeader}
+                t={t}
+              />
               <tbody className="overflow-x-scroll font-bold">
-                {filteredData.map((item, i) => (
-                  <tr
+                {sortedData.map((item, i) => (
+                  <TableRow
                     key={i}
-                    // onClick={() => (itemCallback ? historyHandler(item) : {})}
-                    className={`dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer`}
-                  >
-                    {tableHeaders.map((key, index) =>
-                      shouldHideColumn(key) ? null : (
-                        <td
-                          key={index}
-                          className={`px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white ${
-                            key === "statuserror" && getRowColor(item[key])
-                          }`}
-                        >
-                          <Typography>
-                            {key === "duration"
-                              ? moment.utc(item[key] * 1000).format("HH:mm:ss")
-                              : key === "statuserror"
-                              ? t(item["statuserror_name"])
-                              : item[key]}
-                          </Typography>
-                        </td>
-                      )
-                    )}
-
-                    {showActions && !isSubPageOpen && (
-                      <td className="p-2 flex gap-2 justify-start">
-                        {title !== "crossroad" && (
-                          <IconButton
-                            color="amber"
-                            size="sm"
-                            onClick={() => historyHandler(item)}
-                          >
-                            <MdHistory className="text-white" />
-                          </IconButton>
-                        )}
-                        <IconButton
-                          color="green"
-                          size="sm"
-                          onClick={() => {
-                            item.lat
-                              ? locationHandler({
-                                  lat: item.lat,
-                                  lng: item.lng,
-                                })
-                              : locationHandler(JSON.parse(item.location));
-                          }}
-                        >
-                          <LiaSearchLocationSolid className="text-white" />
-                        </IconButton>
-                        {encryptedRole === "admin" && (
-                          <>
-                            {" "}
-                            <IconButton color="blue" size="sm">
-                              <MdEdit className="text-white" />
-                            </IconButton>
-                            <IconButton color="red" size="sm">
-                              <MdDelete className="text-white" />
-                            </IconButton>
-                          </>
-                        )}
-                      </td>
-                    )}
-                  </tr>
+                    title={title}
+                    item={item}
+                    columns={columns}
+                    showActions={showTableActions}
+                    isSubPageOpen={isSubPageOpen}
+                    locationHandler={locationHandler}
+                    historyHandler={historyHandler}
+                    encryptedRole={encryptedRole}
+                    t={t}
+                  />
                 ))}
               </tbody>
             </table>
@@ -323,11 +201,11 @@ const ModalTable = ({
         </>
       }
       footer={
-        totalPages != null && (
+        totalPages > 1 && (
           <Pagination
             totalItems={totalItems}
             currentPage={currentPage}
-            totalPages={totalPages ? totalPages : 0}
+            totalPages={totalPages}
             onPageChange={handlePageChange}
           />
         )
@@ -337,19 +215,30 @@ const ModalTable = ({
   );
 };
 
-export default memo(ModalTable);
+ModalTable.propTypes = {
+  open: PropTypes.bool.isRequired,
+  showActions: PropTypes.bool,
+  title: PropTypes.string,
+  handleOpen: PropTypes.func.isRequired,
+  itemCallback: PropTypes.func,
+  data: PropTypes.arrayOf(PropTypes.object),
+  isLoading: PropTypes.bool,
+  totalItems: PropTypes.number,
+  totalPages: PropTypes.number,
+  fetchHandler: PropTypes.func.isRequired,
+  pickedFilter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  changePickFilter: PropTypes.func,
+  typeOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      type: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      type_name: PropTypes.string.isRequired,
+    })
+  ),
 
-const getRowColor = (status) => {
-  switch (Number(status)) {
-    case 0:
-      return "bg-green-100 text-center dark:bg-green-900 dark:text-white";
-    case 1:
-      return "bg-orange-100 text-center dark:bg-orange-900 dark:text-white";
-    case 2:
-      return "bg-red-100 text-center dark:bg-red-900 dark:text-white";
-    case 3:
-      return "bg-blue-gray-100 text-gray-900 text-center dark:bg-blue-gray-700 dark:text-white";
-    default:
-      return "bg-white text-center dark:bg-blue-gray-900 dark:text-white";
-  }
+  backButtonProps: PropTypes.shape({
+    label: PropTypes.string,
+    onClick: PropTypes.func,
+  }),
 };
+
+export default memo(ModalTable);

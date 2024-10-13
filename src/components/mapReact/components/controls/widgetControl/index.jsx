@@ -13,8 +13,8 @@ import { MdWidgets } from "react-icons/md";
 const WidgetControl = ({ placement, changeFilter, filter }) => {
   const filterOptions = [
     { type: "all", label: t("all") },
-    { type: "bottomsection", label: t("devices") },
     { type: "weather", label: t("weather") },
+    { type: "bottomsection", label: t("devices") },
   ];
 
   const handleFilterChange = (name, checked) => {

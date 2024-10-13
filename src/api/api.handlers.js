@@ -68,12 +68,51 @@ const endpointMap = {
   svetofor: import.meta.env.VITE_TRAFFIC_LIGHTS,
   boxcontroller: import.meta.env.VITE_BOX_CONTROLLERS,
   crossroad: import.meta.env.VITE_CROSSROADS,
-  // Add more mappings as needed
+  users: import.meta.env.VITE_USERS,
 };
 
+// Fetch device or user data
 const getDevices = async (type, current) => {
-  const endpoint = endpointMap[type];
+  let endpoint;
+
+  // Check if the type contains 'user' and customize the endpoint if necessary
+  if (type.startsWith("user")) {
+    // Extract the suffix after 'user' (e.g., '/active') and append it to the VITE_USERS endpoint
+    const suffix = type.substring("user".length); // This will include the '/' if present
+    endpoint = `${import.meta.env.VITE_USERS}${suffix}`;
+  } else {
+    // Default to the mapped endpoint
+    endpoint = endpointMap[type];
+  }
+
   return getData(endpoint, `/${current}`);
+};
+
+// User-specific functions
+const listUsers = async (filter, current = 1) => {
+  return getDevices(filter, current);
+};
+
+const addUser = async (user) => {
+  const res = await postData(import.meta.env.VITE_USER_ADD, user);
+  return handleResponse(res);
+};
+
+const updateUser = async (user) => {
+  const res = await postData(import.meta.env.VITE_USER_UPDATE, user);
+  return handleResponse(res);
+};
+
+const deleteUser = async (userId) => {
+  const res = await postData(import.meta.env.VITE_USER_DELETE, { id: userId });
+  return handleResponse(res);
+};
+
+const recoverUser = async (userId) => {
+  const res = await postData(import.meta.env.VITE_USER_RECOVERY, {
+    id: userId,
+  });
+  return handleResponse(res);
 };
 
 // WebSocket function
@@ -105,4 +144,9 @@ export {
   getNearbyTrafficLights,
   getNearbySigns,
   getDevices,
+  listUsers,
+  addUser,
+  updateUser,
+  deleteUser,
+  recoverUser,
 };
