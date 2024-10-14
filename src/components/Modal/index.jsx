@@ -14,7 +14,7 @@ const Modal = ({ title, handleOpen, open, body, footer, ...rest }) => {
       size="xxl"
       open={open}
       handler={handleOpen}
-      className="dark:bg-blue-gray-900 dark:!text-white text-blue-gray-900"
+      className="dark:bg-gray-900 dark:!text-white text-gray-900"
       {...rest}
     >
       <DialogHeader className="justify-between">

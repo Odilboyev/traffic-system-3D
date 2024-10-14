@@ -27,7 +27,7 @@ const FilterTypes = ({
       {typeOptions.map((option) => (
         <Button
           key={option[valueKey]}
-          color={theme === "dark" ? "white" : "black"}
+          color={theme === "dark" ? "blue" : "black"}
           variant={active === option[valueKey] ? "filled" : "outlined"}
           onClick={() => handleFilterClick(option[valueKey])}
         >

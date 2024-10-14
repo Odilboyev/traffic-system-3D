@@ -2,7 +2,13 @@
 import { Typography } from "@material-tailwind/react";
 import { t } from "i18next";
 
-const TableHeader = ({ columns, sortedColumn, sortOrder, onHeaderClick }) => {
+const TableHeader = ({
+  columns,
+  sortedColumn,
+  isSubPageOpen,
+  sortOrder,
+  onHeaderClick,
+}) => {
   return (
     <thead className="text-left">
       <tr className="font-bold">
@@ -20,7 +26,10 @@ const TableHeader = ({ columns, sortedColumn, sortOrder, onHeaderClick }) => {
             </div>
           </th>
         ))}
-        <th className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white">
+        <th
+          className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white"
+          style={{ width: "160px", minWidth: "160px" }}
+        >
           <Typography className="font-bold">{t("actions")}</Typography>
         </th>
       </tr>

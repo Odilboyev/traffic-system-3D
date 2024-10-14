@@ -35,7 +35,11 @@ const ModalTable = ({
     { type: 3, type_name: "boxcontroller" },
     { type: 4, type_name: "svetofor" },
   ],
-  backButtonProps = { label: "back", onClick: null },
+  backButtonProps = {
+    label: "back",
+    onClick: null,
+    icon: <ChevronLeftIcon className="w-5 h-5 m-0" />,
+  },
 }) => {
   const encryptedRole = atob(localStorage.getItem("its_user_role"));
   const { theme } = useTheme();
@@ -92,7 +96,7 @@ const ModalTable = ({
     setIsSubPageOpen(true);
     itemCallback(1, title, item.id);
     setSubPageId(item.id);
-    setTitleToShow(`${t("history")} - ${title} ${"- " + item.name}`);
+    setTitleToShow(`${t("history")} - ${t(title)} ${"- " + item.name}`);
   };
 
   const columns = data?.[0]
@@ -145,22 +149,21 @@ const ModalTable = ({
             </div>
             {isSubPageOpen || title === "users" ? (
               <Button
+                color="blue"
                 onClick={
                   backButtonProps.onClick
                     ? backButtonProps.onClick
                     : () => {
                         setTitleToShow(t(title));
-                        fetchHandler(currentPage, title);
+                        fetchHandler(title, currentPage);
                         setShowTableActions(true);
                         setIsSubPageOpen(false);
-                        console.log("bakc clicked");
+                        console.log("bakc clicked", currentPage, title);
                       }
                 }
                 className="flex gap-2 items-center"
               >
-                {title !== "users" && (
-                  <ChevronLeftIcon className="w-5 h-5 m-0" />
-                )}
+                {backButtonProps.icon}
                 <p>{t(backButtonProps.label)}</p>
               </Button>
             ) : null}
@@ -172,9 +175,9 @@ const ModalTable = ({
               <TableHeader
                 columns={columns}
                 sortedColumn={sortedColumn}
+                isSubPageOpen={isSubPageOpen}
                 sortOrder={sortOrder}
                 onHeaderClick={handleHeader}
-                t={t}
               />
               <tbody className="overflow-x-scroll font-bold">
                 {sortedData.map((item, i) => (
@@ -188,7 +191,6 @@ const ModalTable = ({
                     locationHandler={locationHandler}
                     historyHandler={historyHandler}
                     encryptedRole={encryptedRole}
-                    t={t}
                   />
                 ))}
               </tbody>

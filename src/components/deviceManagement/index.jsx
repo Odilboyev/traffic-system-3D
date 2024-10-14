@@ -4,7 +4,7 @@ import {
   ListItem,
   Typography,
 } from "@material-tailwind/react";
-import { CogIcon } from "@heroicons/react/16/solid";
+import { CogIcon, PlusCircleIcon, PlusIcon } from "@heroicons/react/16/solid";
 import { useState, useCallback, memo } from "react";
 import { t } from "i18next";
 import Dropright from "../dropright";
@@ -46,7 +46,7 @@ const DeviceManagement = () => {
   };
 
   // fetchErrorHistory
-  const fetchErrorHistory = async (current, type, id) => {
+  const fetchErrorHistory = async (current, type, id = null) => {
     console.log(current, type, id, "Fetching error history");
     const dtype = type === "camera" ? 1 : type == "boxcontroller" ? 3 : 4;
     setDeviceLoading(true);
@@ -148,6 +148,7 @@ const DeviceManagement = () => {
             ? {
                 label: "create_new_user",
                 onClick: () => console.log("Create new user"),
+                icon: <PlusIcon className="w-5 h-5 m-0" />,
               }
             : undefined
         }

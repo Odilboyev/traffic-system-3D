@@ -39,7 +39,10 @@ const TableRow = ({
       ))}
 
       {showActions && !isSubPageOpen && (
-        <td className="p-2 flex gap-2 justify-start">
+        <td
+          className="p-2 flex gap-2 justify-start"
+          style={{ width: "160px", minWidth: "160px" }}
+        >
           {title != "users" && (
             <>
               {" "}
