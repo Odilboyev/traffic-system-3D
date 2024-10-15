@@ -16,7 +16,7 @@ const WeatherWidget = () => {
   }, []);
 
   return (
-    <div className="weather w-[15vw] min-h-[15vw] right-1  z-[9997] absolute flex-col items-center justify-center p-6 bg-gray-900/80 backdrop-blur-md text-white rounded-lg shadow-lg">
+    <div className="weather w-[15vw] min-h-[15vw] flex-col items-center justify-center p-6 bg-gray-900/80 backdrop-blur-md text-white rounded-lg shadow-lg">
       <div id="time" className="text-center mb-0">
         <div className="mt-4 text-xl font-bold text-gray-300">{location}</div>
         <div className="text-xl text-gray-400 my-2">

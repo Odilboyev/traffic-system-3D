@@ -22,7 +22,6 @@ const App = () => {
   }, [isSubscribed]);
 
   const onWSDataReceived = (data) => {
-    console.log(data, "socket data");
     setIsSubscribed(true);
     setChangedMarker(data.data);
 

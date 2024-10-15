@@ -5,49 +5,119 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { CogIcon, PlusCircleIcon, PlusIcon } from "@heroicons/react/16/solid";
-import { useState, useCallback, memo } from "react";
+import { useState, useCallback, memo, useEffect } from "react";
 import { t } from "i18next";
 import Dropright from "../dropright";
 import ModalTable from "../mapReact/components/modalTable";
-import { getDevices, getErrorHistory } from "../../api/api.handlers";
+import {
+  deleteUser,
+  getDevices,
+  getErrorHistory,
+  getUserRoles,
+  recoverUser,
+  updateUser,
+} from "../../api/api.handlers";
+import { toast, ToastContainer } from "react-toastify";
 
 const DeviceManagement = () => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
   const [deviceType, setDeviceType] = useState(""); // Default type
-  const [userFilter, setUserFilter] = useState("list_active");
   const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [deviceData, setDeviceData] = useState([]);
   const [deviceLoading, setDeviceLoading] = useState(false);
   const [deviceTotalPages, setDeviceTotalPages] = useState(null);
+  // users
+  const [userFilter, setUserFilter] = useState("list_active");
+  const [userRoles, setUserRoles] = useState([]);
 
   const fetchDeviceData = useCallback(async (type, current = 1) => {
     setDeviceLoading(true);
     setDeviceData([]); // Clear existing data before fetching new data
-    console.log(type, current, "Device");
     try {
       const all = await getDevices(type, current);
       setDeviceData(all.data);
-      console.log(all.data, "device");
       setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
       setTotalItems(all.total_items);
     } catch (err) {
-      console.log("Error fetching device data. Please try again.");
+      throw new Error(err);
     } finally {
       setDeviceLoading(false);
     }
   }, []);
-  // const handleUserFilterChange = (filterValue) => {
-  //   setUserFilter(filterValue);
-  //   fetchDeviceData(filterValue); // Fetch users based on the selected filter
-  // };
+
   const createNewUser = (user) => {
-    console.log(user);
+    // console.log(user);
+  };
+  const fetchUserRoles = async () => {
+    try {
+      const roles = await getUserRoles();
+      setUserRoles(roles.data);
+      console.log(roles.data);
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+  useEffect(() => {
+    fetchUserRoles();
+  }, []);
+  const handleUserUpdate = async (updatedUserData) => {
+    try {
+      await updateUser(updatedUserData);
+      toast.success(`User ${updatedUserData.name} updated successfully!`, {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      // Fetch the updated data to reflect changes in the table
+      await fetchDeviceData("user/list_active");
+    } catch (error) {
+      toast.error("Failed to update user. Please try again.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      throw new Error(error);
+    }
+  };
+
+  const handleUserStatus = async (user, actionType) => {
+    const confirmationMessage =
+      actionType === "deactivate"
+        ? `Are you sure you want to deactivate ${user.name}?`
+        : `Are you sure you want to activate ${user.name}?`;
+
+    if (!window.confirm(confirmationMessage)) {
+      return; // Exit the function if the user cancels
+    }
+    try {
+      if (actionType === "deactivate") {
+        await deleteUser(user.id);
+        toast.success(`User ${": " + user.name} successfully deactivated!`, {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      } else if (actionType === "activate") {
+        console.log(user.id, "deactivated");
+        await recoverUser(user.id); // Assuming you have an activateUser function
+        toast.success(`User ${": " + user.name} successfully activated!`, {
+          position: "bottom-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      // Show error toast in case of failure
+      toast.error(`Failed to ${actionType} user. Please try again.`, {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      throw new Error(error);
+    } finally {
+      console.log(userFilter);
+      await fetchDeviceData("user/" + userFilter); // Fetch active users by default after the operation
+    }
   };
 
   // fetchErrorHistory
   const fetchErrorHistory = async (current, type, id = null) => {
-    console.log(current, type, id, "Fetching error history");
     const dtype = type === "camera" ? 1 : type == "boxcontroller" ? 3 : 4;
     setDeviceLoading(true);
     try {
@@ -87,6 +157,7 @@ const DeviceManagement = () => {
       >
         <CogIcon className="w-6 h-6 " />
       </IconButton>
+
       <Dropright
         wrapperClass="relative inline-block text-left"
         sndWrapperClass="ml-3 -top-8 absolute rounded-md bg-gray-900/70 !text-white backdrop-blur-md"
@@ -138,7 +209,7 @@ const DeviceManagement = () => {
           setIsAlarmDeviceOpen(false); // Correctly close the device modal
         }}
         totalItems={totalItems}
-        itemCallback={deviceType !== "users" && fetchErrorHistory}
+        itemCallback={deviceType !== "users" ? fetchErrorHistory : null}
         title={deviceType}
         data={deviceData}
         pickedFilter={deviceType == "users" ? userFilter : null}
@@ -147,16 +218,18 @@ const DeviceManagement = () => {
           deviceType === "users"
             ? {
                 label: "create_new_user",
-                onClick: () => console.log("Create new user"),
+                onClick: createNewUser,
                 icon: <PlusIcon className="w-5 h-5 m-0" />,
               }
             : undefined
         }
         typeOptions={
-          deviceType === "users" && [
-            { type: "list_active", type_name: t("active_users") },
-            { type: "list_deactive", type_name: t("inactive_users") },
-          ]
+          deviceType === "users"
+            ? [
+                { type: "list_active", type_name: t("active_users") },
+                { type: "list_deactive", type_name: t("inactive_users") },
+              ]
+            : undefined
         }
         showActions={true}
         isLoading={deviceLoading}
@@ -170,6 +243,10 @@ const DeviceManagement = () => {
               : "/list_deactive"
           )
         }
+        deleteButtonCallback={(user) => handleUserStatus(user, "deactivate")}
+        activateButtonCallback={(user) => handleUserStatus(user, "activate")}
+        tableSelectOptions={userRoles}
+        editButtonCallback={handleUserUpdate}
       />
     </>
   );

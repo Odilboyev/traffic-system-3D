@@ -64,7 +64,12 @@ const Control = (props) => {
    * Render
    */
   return (
-    <div {...props.container} ref={controlContainerRef} className={className}>
+    <div
+      {...props.container}
+      ref={controlContainerRef}
+      className={className}
+      style={props.style}
+    >
       {props.children}
     </div>
   );

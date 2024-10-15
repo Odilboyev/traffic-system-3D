@@ -30,11 +30,6 @@ export const options = {
     type: "area",
     // height: 350,
     stacked: false,
-    events: {
-      selection: function (chart, e) {
-        console.log(new Date(e.xaxis.min));
-      },
-    },
   },
   colors: ["#0bd500", "#9700fb", "#0066e3"],
   stroke: {

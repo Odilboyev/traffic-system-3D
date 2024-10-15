@@ -16,13 +16,7 @@ export const useSortedData = (
         value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
-    console.log(sorted, "sorted");
-    console.log(
-      selectedFilter
-        ? searched.filter((item) => item.type === selectedFilter)
-        : searched.reverse(),
-      "after selected"
-    );
+
     return selectedFilter
       ? searched.filter((item) => item.type === selectedFilter)
       : searched.reverse();

@@ -4,8 +4,7 @@ import axios from "axios";
 
 // Helper function to handle responses
 const handleResponse = (res) => {
-  if (res && res.data.status === 999) {
-    console.log("logged out", res);
+  if (res && (res.data?.status === 999 || res?.status === 999)) {
     localStorage.clear();
     login.logout();
     window.location.reload();
@@ -61,7 +60,7 @@ const getNearbyTrafficLights = async (body) =>
   postData(import.meta.env.VITE_NEARBYLIGHTS, body);
 const getNearbySigns = async (body) =>
   postData(import.meta.env.VITE_NEARBYSIGNS, body);
-
+const getUserRoles = async () => getData(import.meta.env.VITE_USER_ROLES);
 // Devices API functions
 const endpointMap = {
   camera: import.meta.env.VITE_CAMERAS,
@@ -89,6 +88,8 @@ const getDevices = async (type, current) => {
 };
 
 // User-specific functions
+const getInfoAboutCurrentUser = () => getData(import.meta.env.VITE_USER_INFO);
+
 const listUsers = async (filter, current = 1) => {
   return getDevices(filter, current);
 };
@@ -103,14 +104,16 @@ const updateUser = async (user) => {
   return handleResponse(res);
 };
 
-const deleteUser = async (userId) => {
-  const res = await postData(import.meta.env.VITE_USER_DELETE, { id: userId });
+const deleteUser = async (user_id) => {
+  const res = await postData(import.meta.env.VITE_USER_DELETE, {
+    user_id,
+  });
   return handleResponse(res);
 };
 
-const recoverUser = async (userId) => {
+const recoverUser = async (user_id) => {
   const res = await postData(import.meta.env.VITE_USER_RECOVERY, {
-    id: userId,
+    user_id,
   });
   return handleResponse(res);
 };
@@ -144,7 +147,9 @@ export {
   getNearbyTrafficLights,
   getNearbySigns,
   getDevices,
+  getInfoAboutCurrentUser,
   listUsers,
+  getUserRoles,
   addUser,
   updateUser,
   deleteUser,

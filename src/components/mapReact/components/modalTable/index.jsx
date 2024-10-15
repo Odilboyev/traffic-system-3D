@@ -15,6 +15,7 @@ import { shouldHideColumn } from "./utils";
 import { useSortedData } from "./useSortedData";
 import TableHeader from "./components/TableHeader";
 import TableRow from "./components/TableRow";
+import { ToastContainer } from "react-toastify";
 
 const ModalTable = ({
   open,
@@ -40,6 +41,11 @@ const ModalTable = ({
     onClick: null,
     icon: <ChevronLeftIcon className="w-5 h-5 m-0" />,
   },
+  deleteButtonCallback,
+  editButtonCallback,
+  activateButtonCallback,
+  tableDataCallback,
+  tableSelectOptions,
 }) => {
   const encryptedRole = atob(localStorage.getItem("its_user_role"));
   const { theme } = useTheme();
@@ -118,7 +124,19 @@ const ModalTable = ({
       title={titleToShow}
       body={
         <>
-          <div className="flex justify-between w-full py-3">
+          <ToastContainer
+            position="bottom-right" // Set the position to bottom-right
+            autoClose={3000} // Auto close after 3 seconds
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            theme="colored"
+            pauseOnHover
+          />
+          <div className="flex justify-between w-full py-3 mb-2">
             <div className={`flex ${itemCallback ? "w-2/6" : "w-4/6"} gap-5`}>
               <Input
                 aria-label={t("search_input")}
@@ -158,7 +176,6 @@ const ModalTable = ({
                         fetchHandler(title, currentPage);
                         setShowTableActions(true);
                         setIsSubPageOpen(false);
-                        console.log("bakc clicked", currentPage, title);
                       }
                 }
                 className="flex gap-2 items-center"
@@ -185,12 +202,18 @@ const ModalTable = ({
                     key={i}
                     title={title}
                     item={item}
+                    selectedFilter={selectedFilter}
                     columns={columns}
                     showActions={showTableActions}
                     isSubPageOpen={isSubPageOpen}
                     locationHandler={locationHandler}
                     historyHandler={historyHandler}
                     encryptedRole={encryptedRole}
+                    deleteButtonCallback={deleteButtonCallback}
+                    editButtonCallback={editButtonCallback}
+                    activateButtonCallback={activateButtonCallback}
+                    tableDataCallback={tableDataCallback}
+                    tableSelectOptions={tableSelectOptions}
                   />
                 ))}
               </tbody>
@@ -241,6 +264,11 @@ ModalTable.propTypes = {
     label: PropTypes.string,
     onClick: PropTypes.func,
   }),
+  deleteButtonCallback: PropTypes.func,
+  editButtonCallback: PropTypes.func,
+  activateButtonCallback: PropTypes.func,
+  tableDataCallback: PropTypes.func,
+  tableSelectOptions: PropTypes.array,
 };
 
 export default memo(ModalTable);

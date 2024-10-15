@@ -40,8 +40,7 @@ const TrafficLightContainer = ({ isInModal }) => {
           const data = JSON.parse(message);
           if (data) updateTrafficLights(data);
         } catch (error) {
-          console.log("Raw data error:", event.data); // Log raw data
-          console.error("Error parsing WebSocket data:", error);
+          throw new Error(error);
         }
       };
 

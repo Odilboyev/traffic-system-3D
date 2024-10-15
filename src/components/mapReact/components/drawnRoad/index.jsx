@@ -62,9 +62,6 @@ const RoadDrawing = () => {
     east: "red",
     west: "red",
   });
-  useEffect(() => {
-    console.log("config ", config);
-  }, [config]);
 
   useEffect(() => {
     const interval = setInterval(() => {

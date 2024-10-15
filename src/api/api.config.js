@@ -25,7 +25,6 @@ const config = axios.create({
   baseURL: import.meta.env.VITE_MAIN_URL,
   // withCredentials: true,
 });
-console.log(token_monitoring);
 
 // config.defaults.withCredentials = false;
 

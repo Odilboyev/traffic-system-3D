@@ -14,7 +14,7 @@ const TableHeader = ({
       <tr className="font-bold">
         {columns.map((key, i) => (
           <th
-            className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white cursor-pointer"
+            className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white dark:text-blue-gray-400 cursor-pointer"
             key={i}
             onClick={() => onHeaderClick(key)}
           >

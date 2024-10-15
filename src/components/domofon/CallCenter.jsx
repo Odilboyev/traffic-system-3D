@@ -57,7 +57,6 @@ const VideoCallReceiver = () => {
   };
   useEffect(() => {
     connect();
-    console.log("WebSocket Server URL:", SIP_CONFIG.wsServers, "");
 
     // Create User Agent
     const userAgent = new UserAgent(SIP_CONFIG);
@@ -78,7 +77,6 @@ const VideoCallReceiver = () => {
     // Automatically answer the call if you want
     // incomingSession.accept(...);
     // Otherwise, just set the session
-    console.log("Incoming call from:", incomingSession.remoteIdentity.uri);
   };
 
   const answerCall = () => {
@@ -97,12 +95,10 @@ const VideoCallReceiver = () => {
       });
 
       session.on("bye", () => {
-        console.log("Call ended");
         setSession(null);
       });
 
       session.on("failed", () => {
-        console.log("Call failed");
         setError("Call failed");
         setSession(null);
       });

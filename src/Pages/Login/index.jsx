@@ -26,7 +26,7 @@ export function SignIn() {
 
     try {
       const res = await signIn({ login: loginName, password: password });
-      console.log(res);
+
       setLoading(false); // Set loading state back to false
       const encryptedRole = btoa(res.role);
       localStorage.setItem("its_user_role", encryptedRole);
@@ -37,7 +37,7 @@ export function SignIn() {
       window.location.reload();
     } catch (error) {
       setLoading(false); // Set loading state back to false
-      console.log(error);
+
       if (error.code == "ERR_NETWORK")
         setError("Server bilan ulanishda xatolik");
       else {

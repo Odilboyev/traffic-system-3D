@@ -20,7 +20,7 @@ const AlarmHistory = () => {
       setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
       setTotalItems(all.total_items);
     } catch (err) {
-      console.log("Error fetching error history. Please try again.");
+      throw new Error(err);
     } finally {
       setHistoryLoading(false);
     }

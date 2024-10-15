@@ -18,7 +18,7 @@ const SensorSection = ({ device, isLoading, markerId = {} }) => {
         x: item.datetime,
         y: parseFloat(item.sensor_value),
       }));
-      console.log(seriesData);
+
       seriesData.length > 0 &&
         setChartData([
           {

@@ -68,6 +68,7 @@ import WidgetControl from "./components/controls/widgetControl/index.jsx";
 import useLocalStorageState from "../../customHooks/uselocalStorageState.jsx";
 import TrafficLightContainer from "./components/svetofor/managementLights.jsx";
 import SignsContainer from "./components/signs/index.jsx";
+import UserInfoWidget from "./components/userInfo/index.jsx";
 const home = [41.2995, 69.2401]; // Tashkent
 
 const handleMapMove = (event) => {
@@ -222,12 +223,6 @@ const MapComponent = ({ changedMarker }) => {
       setMarkers([]);
     };
   }, []);
-  useEffect(() => {
-    console.log(markers, "markers changed");
-  }, [markers]);
-  useEffect(() => {
-    console.log(changedMarker, "changed marker");
-  }, [changedMarker]);
 
   const handleMarkerDragEnd = (id, type, event) => {
     const { lat, lng } = event.target.getLatLng();
@@ -339,9 +334,15 @@ const MapComponent = ({ changedMarker }) => {
           />
         </Control>
         {/* widgets */}
+        {/* user profile */}
+        <Control position="topright">
+          <UserInfoWidget />
+        </Control>
+        {/* weather */}
         <div className={widgets.weather ? "visible" : "invisible"}>
-          {" "}
-          <WeatherWidget />
+          <Control position="topright">
+            <WeatherWidget />
+          </Control>
         </div>
         <div className={widgets.bottomsection ? "visible" : "invisible"}>
           {" "}

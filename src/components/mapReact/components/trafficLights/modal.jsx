@@ -15,12 +15,11 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
   const [trafficSocketData, setTrafficSocketData] = useState(null);
 
   const getTrafficLights = async (id) => {
-    console.log(id, "gettrafficlights");
     setIsLoading(true);
     try {
       const res = await getTrafficLightsData(id);
       setIsLoading(false);
-      console.log(res, "traffic");
+
       setTrafficLights(res);
     } catch (error) {
       setIsLoading(false);
@@ -54,7 +53,7 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
       );
       trafficSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log(data, "raw data");
+
         onTrafficLightsDataReceived(data);
       };
       // setTimeout(() => {
@@ -72,7 +71,6 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
 
   useEffect(() => {
     if (isDialogOpen && trafficLights === null) {
-      console.log(light, "trafficLights id ");
       getTrafficLights(light.cid);
     }
     return () => {};

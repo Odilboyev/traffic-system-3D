@@ -72,7 +72,6 @@ const ConfigPanel = ({ config, setConfig }) => {
 
   const handleSubmit = () => {
     const jsonOutput = JSON.stringify(config, null, 2);
-    console.log("Crossroad Configuration:", jsonOutput);
   };
 
   return (
