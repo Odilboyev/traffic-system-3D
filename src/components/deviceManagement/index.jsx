@@ -10,6 +10,7 @@ import { t } from "i18next";
 import Dropright from "../dropright";
 import ModalTable from "../mapReact/components/modalTable";
 import {
+  addUser,
   deleteUser,
   getDevices,
   getErrorHistory,
@@ -30,6 +31,7 @@ const DeviceManagement = () => {
   // users
   const [userFilter, setUserFilter] = useState("list_active");
   const [userRoles, setUserRoles] = useState([]);
+  const [showNewUserModal, setShowNewUserModal] = useState(false);
 
   const fetchDeviceData = useCallback(async (type, current = 1) => {
     setDeviceLoading(true);
@@ -46,9 +48,6 @@ const DeviceManagement = () => {
     }
   }, []);
 
-  const createNewUser = (user) => {
-    // console.log(user);
-  };
   const fetchUserRoles = async () => {
     try {
       const roles = await getUserRoles();
@@ -61,6 +60,28 @@ const DeviceManagement = () => {
   useEffect(() => {
     fetchUserRoles();
   }, []);
+  const createNewUser = (bool) => {
+    setShowNewUserModal(bool); // Show the form modal when the button is clicked
+  };
+
+  const handleAddUserSubmit = async (newUserData) => {
+    console.log(newUserData);
+    try {
+      await addUser(newUserData); // You will need an API call to add a new user
+      toast.success(`User ${newUserData.name} created successfully!`, {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      setShowNewUserModal(false); // Close the modal after successful creation
+      fetchDeviceData("user/list_active"); // Refresh the user list
+    } catch (error) {
+      toast.error("Failed to create user. Please try again.", {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+    }
+  };
+
   const handleUserUpdate = async (updatedUserData) => {
     try {
       await updateUser(updatedUserData);
@@ -218,7 +239,7 @@ const DeviceManagement = () => {
           deviceType === "users"
             ? {
                 label: "create_new_user",
-                onClick: createNewUser,
+                onClick: (val) => createNewUser(val),
                 icon: <PlusIcon className="w-5 h-5 m-0" />,
               }
             : undefined
@@ -247,6 +268,8 @@ const DeviceManagement = () => {
         activateButtonCallback={(user) => handleUserStatus(user, "activate")}
         tableSelectOptions={userRoles}
         editButtonCallback={handleUserUpdate}
+        isFormOpen={showNewUserModal}
+        submitNewData={handleAddUserSubmit}
       />
     </>
   );

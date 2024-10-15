@@ -28,19 +28,16 @@ const TableRow = ({
   activateButtonCallback,
   tableSelectOptions,
 }) => {
-  const [options, setOptions] = useState(tableSelectOptions);
+  const [options, setOptions] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // Track editing state
   const [editedData, setEditedData] = useState({ ...item, password: "" }); // Track current input changes
   useEffect(() => {
     setOptions(
-      tableSelectOptions.map((item) => ({ name: item.name, value: item.name }))
+      tableSelectOptions.map((item) => ({
+        label: item.name,
+        value: item.name,
+      }))
     );
-    console.log(
-      tableSelectOptions.map((item) => ({ name: item.name, value: item.name }))
-    );
-    console.log("tableSelectOptions:", tableSelectOptions);
-    console.log("options:", options);
-    console.log("editedData.role:", editedData.role);
   }, [tableSelectOptions]);
 
   // Function to handle input change
@@ -54,15 +51,19 @@ const TableRow = ({
 
   const handleSave = () => {
     setIsEditing(false);
-    editButtonCallback(editedData); // Callback with updated data when save is clicked
+    try {
+      editButtonCallback(editedData); // Callback with updated data when save is clicked
+    } catch (error) {
+      setEditedData({ ...item, password: "" });
+    }
   };
 
   return (
-    <tr className="dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+    <tr className="dark:text-white !overflow-visible text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
       {columns.map((key, index) => (
         <td
           key={`${item.id}-${index}`} // Use a unique key for each row and column
-          className="px-4 py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white"
+          className="px-4  !overflow-y-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white"
         >
           {key === "statuserror" ? (
             <StatusBadge
@@ -73,8 +74,8 @@ const TableRow = ({
           ) : key === "role" ? (
             isEditing && options.length > 0 ? (
               <Select
-                contentEditable={false}
-                options={options} // Pass the options array
+                isSearchable={false}
+                options={options || tableSelectOptions} // Pass the options array
                 value={tableSelectOptions.find(
                   (option) => option.name === editedData.role
                 )} // Bind the current value to the selected role
@@ -84,6 +85,9 @@ const TableRow = ({
                 getOptionLabel={(option) => option.name} // Display the name as the label
                 getOptionValue={(option) => option.value} // Use name as the value
                 placeholder="Select Role" // Add placeholder text
+                styles={{ zIndex: 99 }}
+                menuPlacement="auto" // Ensure the dropdown opens
+                menuShouldBlockScroll={true} // Block scroll on dropdown open
               />
             ) : (
               <Typography>{item[key]}</Typography>
@@ -168,7 +172,12 @@ const TableRow = ({
                   <IconButton
                     color="red"
                     size="sm"
-                    onClick={() => setIsEditing(false)} // Cancel editing
+                    onClick={
+                      () => {
+                        setIsEditing(false);
+                        setEditedData({ ...item, password: "" });
+                      } // Cancel editing
+                    }
                   >
                     <MdCancel className="text-white" />
                   </IconButton>

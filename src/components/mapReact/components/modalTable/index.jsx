@@ -16,7 +16,9 @@ import { useSortedData } from "./useSortedData";
 import TableHeader from "./components/TableHeader";
 import TableRow from "./components/TableRow";
 import { ToastContainer } from "react-toastify";
+import { motion } from "framer-motion";
 
+import FormComponent from "./components/FormComponent";
 const ModalTable = ({
   open,
   showActions,
@@ -46,6 +48,8 @@ const ModalTable = ({
   activateButtonCallback,
   tableDataCallback,
   tableSelectOptions,
+  isFormOpen,
+  submitNewData,
 }) => {
   const encryptedRole = atob(localStorage.getItem("its_user_role"));
   const { theme } = useTheme();
@@ -111,7 +115,17 @@ const ModalTable = ({
           !shouldHideColumn(key, isSubPageOpen, selectedFilter, itemCallback)
       )
     : [];
+  const handleFormSubmit = (data) => {
+    submitNewData(data);
+    backButtonProps.onClick(false); // Return to table view after form submission
+  };
 
+  const slideAnimation = {
+    initial: { x: isFormOpen ? "100%" : "-100%" }, // Start outside the viewport
+    animate: { x: 0 }, // Slide in from the correct direction
+    exit: { x: isFormOpen ? "-100%" : "100%" }, // Exit animation
+    transition: { duration: 0.4 }, // Animation speed
+  };
   return (
     <Modal
       open={open}
@@ -124,104 +138,116 @@ const ModalTable = ({
       title={titleToShow}
       body={
         <>
-          <ToastContainer
-            position="bottom-right" // Set the position to bottom-right
-            autoClose={3000} // Auto close after 3 seconds
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            theme="colored"
-            pauseOnHover
-          />
-          <div className="flex justify-between w-full py-3 mb-2">
-            <div className={`flex ${itemCallback ? "w-2/6" : "w-4/6"} gap-5`}>
-              <Input
-                aria-label={t("search_input")}
-                color={theme === "dark" ? "white" : "black"}
-                label={t("search")}
-                value={searchTerm}
-                className="dark:focus:!border-b-white border-b-black"
-                icon={<MdSearch className="dark:text-white" />}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-
-              {!itemCallback || title === "users" ? (
-                <FilterTypes
-                  typeOptions={typeOptions}
-                  active={selectedFilter}
-                  valueKey="type"
-                  nameKey="type_name"
-                  onFilterChange={(selectedType) => {
-                    setSelectedFilter(selectedType);
-                    changePickFilter(selectedType);
-                    setCurrentPage(1);
-                    title == "users"
-                      ? fetchHandler("user/" + selectedType, 1)
-                      : fetchHandler(1, selectedType);
-                  }}
-                />
-              ) : null}
-            </div>
-            {isSubPageOpen || title === "users" ? (
-              <Button
-                color="blue"
-                onClick={
-                  backButtonProps.onClick
-                    ? backButtonProps.onClick
-                    : () => {
-                        setTitleToShow(t(title));
-                        fetchHandler(title, currentPage);
-                        setShowTableActions(true);
-                        setIsSubPageOpen(false);
-                      }
-                }
-                className="flex gap-2 items-center"
-              >
-                {backButtonProps.icon}
-                <p>{t(backButtonProps.label)}</p>
-              </Button>
-            ) : null}
-          </div>
-          {isLoading ? (
-            <Loader />
-          ) : sortedData.length > 0 ? (
-            <table className="w-full table-auto overflow-x-scroll border border-slate-400">
-              <TableHeader
-                columns={columns}
-                sortedColumn={sortedColumn}
-                isSubPageOpen={isSubPageOpen}
-                sortOrder={sortOrder}
-                onHeaderClick={handleHeader}
-              />
-              <tbody className="overflow-x-scroll font-bold">
-                {sortedData.map((item, i) => (
-                  <TableRow
-                    key={i}
-                    title={title}
-                    item={item}
-                    selectedFilter={selectedFilter}
-                    columns={columns}
-                    showActions={showTableActions}
-                    isSubPageOpen={isSubPageOpen}
-                    locationHandler={locationHandler}
-                    historyHandler={historyHandler}
-                    encryptedRole={encryptedRole}
-                    deleteButtonCallback={deleteButtonCallback}
-                    editButtonCallback={editButtonCallback}
-                    activateButtonCallback={activateButtonCallback}
-                    tableDataCallback={tableDataCallback}
-                    tableSelectOptions={tableSelectOptions}
-                  />
-                ))}
-              </tbody>
-            </table>
+          {isFormOpen ? (
+            <FormComponent
+              options={tableSelectOptions}
+              onSubmit={handleFormSubmit}
+              onCancel={() => backButtonProps.onClick(false)}
+            />
           ) : (
-            <div className="flex justify-center items-center h-[30vh]">
-              <Typography>{t("nodata")}</Typography>
-            </div>
+            <>
+              <ToastContainer
+                position="bottom-right" // Set the position to bottom-right
+                autoClose={3000} // Auto close after 3 seconds
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                theme="colored"
+                pauseOnHover
+              />
+              <div className="flex justify-between w-full py-3 mb-2">
+                <div
+                  className={`flex ${itemCallback ? "w-2/6" : "w-4/6"} gap-5`}
+                >
+                  <Input
+                    aria-label={t("search_input")}
+                    color={theme === "dark" ? "white" : "black"}
+                    label={t("search")}
+                    value={searchTerm}
+                    className="dark:focus:!border-b-white border-b-black"
+                    icon={<MdSearch className="dark:text-white" />}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+
+                  {!itemCallback || title === "users" ? (
+                    <FilterTypes
+                      typeOptions={typeOptions}
+                      active={selectedFilter}
+                      valueKey="type"
+                      nameKey="type_name"
+                      onFilterChange={(selectedType) => {
+                        setSelectedFilter(selectedType);
+                        changePickFilter(selectedType);
+                        setCurrentPage(1);
+                        title == "users"
+                          ? fetchHandler("user/" + selectedType, 1)
+                          : fetchHandler(1, selectedType);
+                      }}
+                    />
+                  ) : null}
+                </div>
+                {isSubPageOpen || title === "users" ? (
+                  <Button
+                    color="blue"
+                    onClick={
+                      backButtonProps.onClick
+                        ? () => backButtonProps.onClick(true)
+                        : () => {
+                            setTitleToShow(t(title));
+                            fetchHandler(title, currentPage);
+                            setShowTableActions(true);
+                            setIsSubPageOpen(false);
+                          }
+                    }
+                    className="flex gap-2 items-center"
+                  >
+                    {backButtonProps.icon}
+                    <p>{t(backButtonProps.label)}</p>
+                  </Button>
+                ) : null}
+              </div>
+              {isLoading ? (
+                <Loader />
+              ) : sortedData.length > 0 ? (
+                <table className="w-full table-auto overflow-x-scroll border border-slate-400">
+                  <TableHeader
+                    columns={columns}
+                    sortedColumn={sortedColumn}
+                    isSubPageOpen={isSubPageOpen}
+                    sortOrder={sortOrder}
+                    onHeaderClick={handleHeader}
+                  />
+                  <tbody className="overflow-x-scroll font-bold">
+                    {sortedData.map((item, i) => (
+                      <TableRow
+                        key={i}
+                        title={title}
+                        item={item}
+                        selectedFilter={selectedFilter}
+                        columns={columns}
+                        showActions={showTableActions}
+                        isSubPageOpen={isSubPageOpen}
+                        locationHandler={locationHandler}
+                        historyHandler={historyHandler}
+                        encryptedRole={encryptedRole}
+                        deleteButtonCallback={deleteButtonCallback}
+                        editButtonCallback={editButtonCallback}
+                        activateButtonCallback={activateButtonCallback}
+                        tableDataCallback={tableDataCallback}
+                        tableSelectOptions={tableSelectOptions}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="flex justify-center items-center h-[30vh]">
+                  <Typography>{t("nodata")}</Typography>
+                </div>
+              )}
+            </>
           )}
         </>
       }
