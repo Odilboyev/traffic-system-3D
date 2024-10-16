@@ -59,7 +59,7 @@ const UserInfoWidget = () => {
   }
 
   return (
-    <Card className="w-[15vw]  bg-transparent text-white shadow-xl rounded-xl bg-gradient-to-br from-blue-gray-900/60 to-black/80 backdrop-blur-md">
+    <Card className="w-[15vw]  bg-transparent text-white shadow-xl rounded-md bg-gradient-to-br from-blue-gray-900/60 to-black/80 backdrop-blur-md">
       <CardBody className="py-5 relative flex justify-between items-center overflow-visible">
         <div className="pl-5 mb-3 w-2/3">
           <Typography variant="h5" className="text-white font-bold">
