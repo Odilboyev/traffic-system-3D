@@ -4,8 +4,11 @@ import { MdPerson, MdEmail, MdLock, MdWork } from "react-icons/md";
 import PasswordInput from "../../../../PasswordInput";
 import Select from "react-select";
 import { t } from "i18next";
+import { useTheme } from "../../../../../customHooks/useTheme";
+import CustomSelect from "../../../../customSelect";
 
 const FormComponent = ({ options, onSubmit, onCancel }) => {
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,7 +22,7 @@ const FormComponent = ({ options, onSubmit, onCancel }) => {
         e.preventDefault();
         onSubmit(formData);
       }}
-      className="space-y-6 p-8 w-full my-20 max-w-lg mx-auto bg-white rounded-xl shadow-2xl dark:bg-gray-800"
+      className="space-y-6 p-8 w-full my-20 max-w-lg mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
     >
       <div className="flex flex-col gap-6">
         {/* Name Input */}
@@ -30,8 +33,8 @@ const FormComponent = ({ options, onSubmit, onCancel }) => {
             value={formData.name || ""}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="w-full dark:text-white"
-            color="blue-gray"
             required
+            color={theme === "light" ? "blue" : "white"}
           />
         </div>
 
@@ -45,8 +48,8 @@ const FormComponent = ({ options, onSubmit, onCancel }) => {
               setFormData({ ...formData, email: e.target.value })
             }
             className="w-full dark:text-white"
-            color="blue-gray"
             required
+            color={theme === "light" ? "blue" : "white"}
             type="email"
           />
         </div>
@@ -54,18 +57,18 @@ const FormComponent = ({ options, onSubmit, onCancel }) => {
         {/* Role Select */}
         <div className="flex items-center gap-2">
           <MdWork className=" text-gray-600 dark:text-gray-300" size={24} />
-          <Select
+          <CustomSelect
             label={t("role")}
             isSearchable={false}
-            options={options} // Pass the options array
-            value={options.find((option) => option.name === formData.role)} // Bind the current value to the selected role
+            options={options}
+            value={options.find((option) => option.name === formData.role)}
             onChange={(selectedOption) =>
               setFormData({ ...formData, role: selectedOption.name })
-            } // Handle the change event, use name as the value
-            getOptionLabel={(option) => option.name} // Display the name as the label
-            getOptionValue={(option) => option.name} // Use name as the value
+            }
+            getOptionLabel={(option) => option.name}
+            getOptionValue={(option) => option.name}
             placeholder="Select Role"
-            className="w-full dark:text-white"
+            className="w-full"
           />
         </div>
 
@@ -81,6 +84,7 @@ const FormComponent = ({ options, onSubmit, onCancel }) => {
             }
             className="w-full dark:text-white"
             required
+            color={theme === "light" ? "blue" : "white"}
           />
         </div>
 

@@ -15,9 +15,9 @@ const PasswordInput = ({ value, onChange, ...rest }) => {
   return (
     <div className="relative flex w-full">
       <Input
-        labelProps={{
-          className: "hidden",
-        }}
+        // labelProps={{
+        //   className: "hidden",
+        // }}
         {...rest}
         type={isPasswordVisible ? "text" : "password"}
         onChange={onChange}

@@ -134,6 +134,7 @@ const ModalTable = ({
         setIsSubPageOpen(false);
         setTitleToShow("");
         setCurrentPage(1);
+        backButtonProps.onClick(false);
       }}
       title={titleToShow}
       body={

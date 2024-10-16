@@ -12,6 +12,7 @@ import { LiaSearchLocationSolid } from "react-icons/lia";
 import moment from "moment/moment";
 import StatusBadge from "../../../../statusBadge";
 import Select from "react-select";
+import CustomSelect from "../../../../customSelect";
 
 const TableRow = ({
   title,
@@ -32,16 +33,19 @@ const TableRow = ({
   const [isEditing, setIsEditing] = useState(false); // Track editing state
   const [editedData, setEditedData] = useState({ ...item, password: "" }); // Track current input changes
   useEffect(() => {
-    setOptions(
-      tableSelectOptions.map((item) => ({
-        label: item.name,
-        value: item.name,
-      }))
-    );
+    tableSelectOptions.length > 0 &&
+      setOptions(
+        tableSelectOptions.map((item) => ({
+          label: item.name,
+          value: item.name,
+        }))
+      );
+    console.log(tableSelectOptions);
   }, [tableSelectOptions]);
-
+  console.log(options, "tableSelectOptions");
   // Function to handle input change
   const handleInputChange = (key, value) => {
+    console.log(key, value);
     setEditedData((prev) => ({
       ...prev,
       [key]: value,
@@ -63,7 +67,7 @@ const TableRow = ({
       {columns.map((key, index) => (
         <td
           key={`${item.id}-${index}`} // Use a unique key for each row and column
-          className="px-4  !overflow-y-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white"
+          className="px-4  !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white"
         >
           {key === "statuserror" ? (
             <StatusBadge
@@ -72,22 +76,20 @@ const TableRow = ({
               statusName={item.statuserror_name && item.statuserror_name}
             />
           ) : key === "role" ? (
-            isEditing && options.length > 0 ? (
-              <Select
+            isEditing && tableSelectOptions.length > 0 ? (
+              <CustomSelect
                 isSearchable={false}
-                options={options || tableSelectOptions} // Pass the options array
+                options={tableSelectOptions} // Pass the options array
                 value={tableSelectOptions.find(
-                  (option) => option.name === editedData.role
+                  (option) => option.value || option.name === editedData.role
                 )} // Bind the current value to the selected role
                 onChange={(selectedOption) =>
-                  handleInputChange("role", selectedOption.value)
+                  handleInputChange("role", selectedOption.name)
                 } // Handle the change event, use name as the value
                 getOptionLabel={(option) => option.name} // Display the name as the label
-                getOptionValue={(option) => option.value} // Use name as the value
+                getOptionValue={(option) => option.name} // Use name as the value
                 placeholder="Select Role" // Add placeholder text
-                styles={{ zIndex: 99 }}
-                menuPlacement="auto" // Ensure the dropdown opens
-                menuShouldBlockScroll={true} // Block scroll on dropdown open
+                styles={{}}
               />
             ) : (
               <Typography>{item[key]}</Typography>
@@ -97,10 +99,11 @@ const TableRow = ({
               // If in editing mode, change 'date_create' to a password field
               <Input
                 type="password"
+                label="password"
                 placeholder="Enter new password"
                 value={editedData["password"] || ""}
                 onChange={(e) => handleInputChange("password", e.target.value)} // Use password field
-                className="w-full dark:!text-white"
+                className="w-full dark:!text-white placeholder:text-gray-700"
               />
             ) : (
               <Typography>{item[key]}</Typography>
@@ -128,7 +131,9 @@ const TableRow = ({
 
       {showActions && !isSubPageOpen && (
         <td
-          className="p-2 flex gap-2 justify-start"
+          className={`p-2 ${
+            isEditing && "pb-3"
+          } flex gap-2 justify-start px-4 !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border border-spacing-0.5  dark:border-white border-blue-gray-900`}
           style={{ width: "160px", minWidth: "160px" }}
         >
           {title != "users" && selectedFilter != "list_deactive" && (
