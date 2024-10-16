@@ -6,6 +6,7 @@ const TableHeader = ({
   columns,
   sortedColumn,
   isSubPageOpen,
+  showActions,
   sortOrder,
   onHeaderClick,
 }) => {
@@ -26,12 +27,14 @@ const TableHeader = ({
             </div>
           </th>
         ))}
-        <th
-          className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white"
-          style={{ width: "160px", minWidth: "160px" }}
-        >
-          <Typography className="font-bold">{t("actions")}</Typography>
-        </th>
+        {showActions && (
+          <th
+            className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white"
+            style={{ width: "180px", minWidth: "180px" }}
+          >
+            <Typography className="font-bold">{t("actions")}</Typography>
+          </th>
+        )}
       </tr>
     </thead>
   );

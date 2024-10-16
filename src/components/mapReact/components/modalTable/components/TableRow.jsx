@@ -29,20 +29,9 @@ const TableRow = ({
   activateButtonCallback,
   tableSelectOptions,
 }) => {
-  const [options, setOptions] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // Track editing state
   const [editedData, setEditedData] = useState({ ...item, password: "" }); // Track current input changes
-  useEffect(() => {
-    tableSelectOptions.length > 0 &&
-      setOptions(
-        tableSelectOptions.map((item) => ({
-          label: item.name,
-          value: item.name,
-        }))
-      );
-    console.log(tableSelectOptions);
-  }, [tableSelectOptions]);
-  console.log(options, "tableSelectOptions");
+
   // Function to handle input change
   const handleInputChange = (key, value) => {
     console.log(key, value);
@@ -131,14 +120,13 @@ const TableRow = ({
 
       {showActions && !isSubPageOpen && (
         <td
-          className={`p-2 ${
-            isEditing && "pb-3"
-          } flex gap-2 justify-start px-4 !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border border-spacing-0.5  dark:border-white border-blue-gray-900`}
-          style={{ width: "160px", minWidth: "160px" }}
+          className={`px-4 gap-1 !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white`}
+          style={{ width: "180px", minWidth: "180px" }}
         >
           {title != "users" && selectedFilter != "list_deactive" && (
             <>
               <IconButton
+                className="mr-1"
                 color="amber"
                 size="sm"
                 onClick={() => historyHandler(item)}
@@ -146,6 +134,7 @@ const TableRow = ({
                 <MdHistory className="text-white" />
               </IconButton>
               <IconButton
+                className="mr-1"
                 color="green"
                 size="sm"
                 onClick={() => locationHandler(item.lat, item.lng)}
@@ -159,6 +148,7 @@ const TableRow = ({
             <>
               {!isEditing ? (
                 <IconButton
+                  className="mr-1"
                   color="blue"
                   size="sm"
                   onClick={() => setIsEditing(true)} // Enter edit mode
@@ -168,6 +158,7 @@ const TableRow = ({
               ) : (
                 <>
                   <IconButton
+                    className="mr-1"
                     color="green"
                     size="sm"
                     onClick={handleSave} // Save changes
@@ -175,6 +166,7 @@ const TableRow = ({
                     <MdSave className="text-white" />
                   </IconButton>
                   <IconButton
+                    className="mr-1"
                     color="red"
                     size="sm"
                     onClick={
@@ -189,6 +181,7 @@ const TableRow = ({
                 </>
               )}
               <IconButton
+                className="mr-1"
                 color="red"
                 size="sm"
                 onClick={() => deleteButtonCallback(item)}

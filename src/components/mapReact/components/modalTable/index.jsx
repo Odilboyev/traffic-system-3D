@@ -161,7 +161,7 @@ const ModalTable = ({
               />
               <div className="flex justify-between w-full py-3 mb-2">
                 <div
-                  className={`flex ${itemCallback ? "w-2/6" : "w-4/6"} gap-5`}
+                  className={`flex ${itemCallback ? "w-2/6" : "w-3/6"} gap-5`}
                 >
                   <Input
                     aria-label={t("search_input")}
@@ -172,24 +172,23 @@ const ModalTable = ({
                     icon={<MdSearch className="dark:text-white" />}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
-
-                  {!itemCallback || title === "users" ? (
-                    <FilterTypes
-                      typeOptions={typeOptions}
-                      active={selectedFilter}
-                      valueKey="type"
-                      nameKey="type_name"
-                      onFilterChange={(selectedType) => {
-                        setSelectedFilter(selectedType);
-                        changePickFilter(selectedType);
-                        setCurrentPage(1);
-                        title == "users"
-                          ? fetchHandler("user/" + selectedType, 1)
-                          : fetchHandler(1, selectedType);
-                      }}
-                    />
-                  ) : null}
                 </div>
+                {!itemCallback || title === "users" ? (
+                  <FilterTypes
+                    typeOptions={typeOptions}
+                    active={selectedFilter}
+                    valueKey="type"
+                    nameKey="type_name"
+                    onFilterChange={(selectedType) => {
+                      setSelectedFilter(selectedType);
+                      changePickFilter(selectedType);
+                      setCurrentPage(1);
+                      title == "users"
+                        ? fetchHandler("user/" + selectedType, 1)
+                        : fetchHandler(1, selectedType);
+                    }}
+                  />
+                ) : null}
                 {isSubPageOpen || title === "users" ? (
                   <Button
                     color="blue"
@@ -213,9 +212,10 @@ const ModalTable = ({
               {isLoading ? (
                 <Loader />
               ) : sortedData.length > 0 ? (
-                <table className="w-full table-auto overflow-x-scroll border border-slate-400">
+                <table className="w-full border-collapse table-auto overflow-x-scroll border border-slate-400">
                   <TableHeader
                     columns={columns}
+                    showActions={showTableActions}
                     sortedColumn={sortedColumn}
                     isSubPageOpen={isSubPageOpen}
                     sortOrder={sortOrder}
