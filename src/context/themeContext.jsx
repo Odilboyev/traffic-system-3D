@@ -1,10 +1,13 @@
 import { createContext, useState, useContext, useEffect } from "react";
+import baseLayers from "../configurations/mapLayers";
 
 export const ThemeContext = createContext();
 
 export const MyThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState("dark");
-
+  const [currentLayer, setCurrentLayer] = useState(
+    localStorage.getItem("selectedLayer") || baseLayers[0].name
+  );
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
@@ -25,7 +28,9 @@ export const MyThemeProvider = ({ children }) => {
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{ theme, toggleTheme, currentLayer, setCurrentLayer }}
+    >
       <div className={theme === "dark" ? "dark" : ""}>{children}</div>
     </ThemeContext.Provider>
   );

@@ -69,6 +69,7 @@ import useLocalStorageState from "../../customHooks/uselocalStorageState.jsx";
 import TrafficLightContainer from "./components/svetofor/managementLights.jsx";
 import SignsContainer from "./components/signs/index.jsx";
 import UserInfoWidget from "./components/userInfo/index.jsx";
+import TileChanger from "../tileChanger/index.jsx";
 const home = [41.2995, 69.2401]; // Tashkent
 
 const handleMapMove = (event) => {
@@ -102,15 +103,8 @@ const MapComponent = ({ changedMarker }) => {
   // language `-`
   const { t } = useTranslation();
   //theme
-  const { theme, toggleTheme } = useTheme();
-  //layers
-  const [selectedLayer, setSelectedLayer] = useState(
-    localStorage.getItem("selectedLayer") || baseLayers[0].name
-  );
-  const filteredLayers =
-    theme === "dark"
-      ? baseLayers.filter((layer) => layer.name.includes("Dark"))
-      : baseLayers.filter((layer) => !layer.name.includes("Dark"));
+  const { theme, toggleTheme, currentLayer } = useTheme();
+
   const center = JSON.parse(localStorage.getItem("mapCenter"))
     ? JSON.parse(localStorage.getItem("mapCenter"))
     : home;
@@ -118,7 +112,6 @@ const MapComponent = ({ changedMarker }) => {
     ? localStorage.getItem("mapZoom")
     : 13;
 
-  const currentLayer = baseLayers.find((layer) => layer.name === selectedLayer);
   const [fulscreen, setFullscreen] = useState(false);
 
   const toggleFullSceen = () => {
@@ -132,19 +125,6 @@ const MapComponent = ({ changedMarker }) => {
       }
     }
   };
-
-  const handleLayerChange = (layerName) => {
-    setSelectedLayer(layerName);
-    layerSave(layerName);
-  };
-
-  useEffect(() => {
-    if (theme === "dark") {
-      handleLayerChange("Dark");
-    } else {
-      handleLayerChange("Transport");
-    }
-  }, [theme]);
 
   //navigate
   const navigate = useNavigate();
@@ -294,7 +274,7 @@ const MapComponent = ({ changedMarker }) => {
       throw new Error(error);
     }
   };
-
+  const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
   return (
     <>
       <MapContainer
@@ -315,12 +295,12 @@ const MapComponent = ({ changedMarker }) => {
           changedMarker={changedMarker}
           fetchAlarmsData={fetchAlarmsData}
         />
-        {currentLayer && (
+        {currentLayerDetails && (
           <TileLayer
-            maxNativeZoom={currentLayer.maxNativeZoom}
-            url={currentLayer.url}
-            attribution={currentLayer.attribution}
-            key={currentLayer.name}
+            maxNativeZoom={currentLayerDetails.maxNativeZoom}
+            url={currentLayerDetails.url}
+            attribution={currentLayerDetails.attribution}
+            key={currentLayerDetails.name}
             maxZoom={22}
           />
         )}
@@ -333,6 +313,8 @@ const MapComponent = ({ changedMarker }) => {
             placement={"right"}
           />
         </Control>
+        {/* layerchanger */}
+        <TileChanger />
         {/* widgets */}
         {/* user profile */}
         <Control position="topright">
@@ -395,7 +377,7 @@ const MapComponent = ({ changedMarker }) => {
         </Control>
         {/* Device Management */}
         <Control position="topleft">
-          <DeviceManagement />
+          <DeviceManagement refreshHandler={getDataHandler} />
         </Control>
         <Control position="topleft">
           <IconButton
@@ -409,38 +391,6 @@ const MapComponent = ({ changedMarker }) => {
               <ArrowsPointingOutIcon className="w-8 h-8 p-1" />
             )}
           </IconButton>
-        </Control>
-        <Control position="topleft">
-          <SpeedDial placement="left">
-            <IconButton
-              // color={theme === "light" ? "black" : "white"}
-              size="lg"
-            >
-              <SpeedDialHandler className="w-10 h-10 cursor-pointer">
-                <MapIcon className="w-6 h-6 p-2" />
-              </SpeedDialHandler>
-            </IconButton>
-            <SpeedDialContent className="m-4">
-              <div className="flex flex-col p-3 mb-10 rounded-md bg-gray-900/80 text-blue-gray-900 backdrop-blur-md">
-                {filteredLayers.map((layer) => (
-                  <Radio
-                    key={layer.name}
-                    checked={selectedLayer === layer.name}
-                    className="checked:bg-white"
-                    variant={
-                      selectedLayer === layer.name ? "filled" : "outlined"
-                    }
-                    onChange={() => handleLayerChange(layer.name)}
-                    label={
-                      <Typography className="mr-3 text-white">
-                        {layer.name}
-                      </Typography>
-                    }
-                  />
-                ))}
-              </div>
-            </SpeedDialContent>
-          </SpeedDial>
         </Control>
         <LanguageSwitcher position={"topleft"} />
         <Control className="z-[999999]" position="topleft">
@@ -552,7 +502,7 @@ const MapComponent = ({ changedMarker }) => {
                   statuserror={marker.statuserror}
                   icon={L.icon({
                     iconUrl: `icons/${marker.icon}`,
-                    iconSize: [32, 32],
+                    iconSize: [40, 40],
                   })}
                   rotatedAngle={marker.type === 3 ? marker.rotated : 0}
                 >

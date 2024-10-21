@@ -61,12 +61,50 @@ const getNearbyTrafficLights = async (body) =>
 const getNearbySigns = async (body) =>
   postData(import.meta.env.VITE_NEARBYSIGNS, body);
 const getUserRoles = async () => getData(import.meta.env.VITE_USER_ROLES);
+
+// **New Dynamic API Caller**
+const fetchDataForManagement = async (method, type, options = {}) => {
+  let endpoint;
+  // Handle dynamic user endpoint customization
+  if (type?.startsWith("user")) {
+    const suffix = type.substring("user".length); // Extract suffix (e.g., '/active')
+    endpoint = `${import.meta.env.VITE_USERS}${suffix}`;
+  } else {
+    endpoint = endpointMap[type];
+  }
+
+  const url = `${endpoint}/${options.id ? `${options.id}` : ""}`;
+
+  // Merge isactive into params if provided
+  const params = { ...options.params };
+  if (typeof options.isactive !== "undefined") {
+    params.isactive = options.isactive; // Add isactive to params if provided
+  }
+
+  try {
+    const res = await config({
+      method: method.toUpperCase(),
+      url,
+      data:
+        method.toUpperCase() !== "PATCH" && method.toUpperCase() !== "DELETE"
+          ? options.data
+          : {},
+      params, // Pass merged params including isactive (if any)
+    });
+    return handleResponse(res);
+  } catch (error) {
+    console.error(`Failed to ${method.toUpperCase()} ${type}:`, error);
+    throw error;
+  }
+};
+
 // Devices API functions
 const endpointMap = {
   camera: import.meta.env.VITE_CAMERAS,
   svetofor: import.meta.env.VITE_TRAFFIC_LIGHTS,
   boxcontroller: import.meta.env.VITE_BOX_CONTROLLERS,
   crossroad: import.meta.env.VITE_CROSSROADS,
+  cameratraffic: import.meta.env.VITE_CAMERATRAFFIC,
   users: import.meta.env.VITE_USERS,
 };
 
@@ -147,6 +185,7 @@ export {
   getNearbyTrafficLights,
   getNearbySigns,
   getDevices,
+  fetchDataForManagement,
   getInfoAboutCurrentUser,
   listUsers,
   getUserRoles,

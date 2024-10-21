@@ -8,7 +8,15 @@ import {
 } from "@material-tailwind/react";
 import React, { memo } from "react";
 
-const Modal = ({ title, handleOpen, open, body, footer, ...rest }) => {
+const Modal = ({
+  title,
+  handleOpen,
+  open,
+  body,
+  footer,
+
+  ...rest
+}) => {
   return (
     <Dialog
       size="xxl"
@@ -45,7 +53,9 @@ const Modal = ({ title, handleOpen, open, body, footer, ...rest }) => {
           </svg>
         </IconButton>
       </DialogHeader>
-      <DialogBody className="overflow-y-scroll !px-5 py-0">{body}</DialogBody>
+      <DialogBody className="overflow-y-scroll overflow-x-hidden !px-5 py-0">
+        {body}
+      </DialogBody>
       <DialogFooter className="flex justify-center items-center mt-auto">
         {footer}
       </DialogFooter>

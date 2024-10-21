@@ -15,7 +15,7 @@ import Select from "react-select";
 import CustomSelect from "../../../../customSelect";
 
 const TableRow = ({
-  title,
+  type,
   item,
   selectedFilter,
   columns,
@@ -42,14 +42,14 @@ const TableRow = ({
     }));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    try {
-      editButtonCallback(editedData); // Callback with updated data when save is clicked
-    } catch (error) {
-      setEditedData({ ...item, password: "" });
-    }
-  };
+  // const handleSave = () => {
+  //   setIsEditing(false);
+  //   try {
+  //     editButtonCallback(editedData); // Callback with updated data when save is clicked
+  //   } catch (error) {
+  //     setEditedData({ ...item, password: "" });
+  //   }
+  // };
 
   return (
     <tr className="dark:text-white !overflow-visible text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
@@ -123,16 +123,18 @@ const TableRow = ({
           className={`px-4 gap-1 !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white`}
           style={{ width: "180px", minWidth: "180px" }}
         >
-          {title != "users" && selectedFilter != "list_deactive" && (
+          {type != "users" && selectedFilter != "list_deactive" && (
             <>
-              <IconButton
-                className="mr-1"
-                color="amber"
-                size="sm"
-                onClick={() => historyHandler(item)}
-              >
-                <MdHistory className="text-white" />
-              </IconButton>
+              {type != "crossroad" && (
+                <IconButton
+                  className="mr-1"
+                  color="amber"
+                  size="sm"
+                  onClick={() => historyHandler(item)}
+                >
+                  <MdHistory className="text-white" />
+                </IconButton>
+              )}
               <IconButton
                 className="mr-1"
                 color="green"
@@ -144,14 +146,14 @@ const TableRow = ({
             </>
           )}
 
-          {encryptedRole === "admin" && selectedFilter != "list_deactive" && (
+          {encryptedRole === "admin" && selectedFilter != 1 && (
             <>
               {!isEditing ? (
                 <IconButton
                   className="mr-1"
                   color="blue"
                   size="sm"
-                  onClick={() => setIsEditing(true)} // Enter edit mode
+                  onClick={() => editButtonCallback(item)} // Enter edit mode
                 >
                   <MdEdit className="text-white" />
                 </IconButton>
@@ -190,7 +192,7 @@ const TableRow = ({
               </IconButton>
             </>
           )}
-          {activateButtonCallback && selectedFilter == "list_deactive" && (
+          {activateButtonCallback && selectedFilter == 1 && (
             <IconButton
               color="green"
               size="sm"

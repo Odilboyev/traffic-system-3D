@@ -17,15 +17,16 @@ import TableHeader from "./components/TableHeader";
 import TableRow from "./components/TableRow";
 import { ToastContainer } from "react-toastify";
 import { motion } from "framer-motion";
-
 import FormComponent from "./components/FormComponent";
+
 const ModalTable = ({
   open,
   showActions,
-  title,
+  type,
   handleOpen,
   itemCallback,
   pickedFilter,
+  selectedFilter,
   changePickFilter,
   data = [],
   isLoading,
@@ -56,30 +57,31 @@ const ModalTable = ({
   const map = useMap();
 
   const [showTableActions, setShowTableActions] = useState(showActions);
-  const [titleToShow, setTitleToShow] = useState(t(title || "history"));
+  const [typeToShow, settypeToShow] = useState(t(type || "history"));
   const [subPageId, setSubPageId] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState(null);
+  // const [selectedFilter, setSelectedFilter] = useState(null);
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
 
+  const [editData, setEditData] = useState(null);
   const sortedData = useSortedData(
     data,
     sortedColumn,
     sortOrder,
     searchTerm,
-    title != "users" && selectedFilter
+    type != "users" && type != "crossroad" ? selectedFilter : undefined
   );
   useEffect(() => {
-    setTitleToShow(t(title));
-    setSelectedFilter(pickedFilter || typeOptions[0]?.type);
-  }, [title, open]);
+    settypeToShow(t(type));
+    // setSelectedFilter(pickedFilter || typeOptions[0]?.type);
+  }, [type, open]);
 
   useEffect(() => {
     if (open && isSubPageOpen) {
-      itemCallback(currentPage, title, subPageId);
+      itemCallback(currentPage, type, subPageId);
     }
   }, [currentPage, open, selectedFilter]);
 
@@ -96,7 +98,11 @@ const ModalTable = ({
   };
 
   const locationHandler = (lat, lng) => {
-    if (lat && lng) map.flyTo([lat, lng], 20);
+    if (lat && lng)
+      map.flyTo([lat, lng], 20, {
+        animate: true,
+        duration: 1,
+      });
     handleOpen();
   };
 
@@ -104,9 +110,9 @@ const ModalTable = ({
     setShowTableActions(false);
     setCurrentPage(1);
     setIsSubPageOpen(true);
-    itemCallback(1, title, item.id);
+    itemCallback(1, type, item.id);
     setSubPageId(item.id);
-    setTitleToShow(`${t("history")} - ${t(title)} ${"- " + item.name}`);
+    settypeToShow(`${t("history")} - ${t(type)} ${"- " + item.name}`);
   };
 
   const columns = data?.[0]
@@ -120,6 +126,12 @@ const ModalTable = ({
     backButtonProps.onClick(false); // Return to table view after form submission
   };
 
+  const editHandler = (data) => {
+    editButtonCallback(true);
+    backButtonProps.onClick(true);
+    setEditData(data);
+  };
+
   const slideAnimation = {
     initial: { x: isFormOpen ? "100%" : "-100%" }, // Start outside the viewport
     animate: { x: 0 }, // Slide in from the correct direction
@@ -129,18 +141,25 @@ const ModalTable = ({
   return (
     <Modal
       open={open}
-      handleOpen={() => {
-        handleOpen();
-        setIsSubPageOpen(false);
-        setTitleToShow("");
-        setCurrentPage(1);
-        backButtonProps.onClick(false);
-      }}
-      title={titleToShow}
+      handleOpen={
+        isFormOpen
+          ? () => backButtonProps.onClick(false)
+          : () => {
+              editButtonCallback(false);
+              setEditData(null);
+              handleOpen();
+              setIsSubPageOpen(false);
+              settypeToShow("");
+              setCurrentPage(1);
+            }
+      }
+      title={typeToShow}
       body={
         <>
           {isFormOpen ? (
             <FormComponent
+              type={type}
+              data={editData}
               options={tableSelectOptions}
               onSubmit={handleFormSubmit}
               onCancel={() => backButtonProps.onClick(false)}
@@ -173,39 +192,51 @@ const ModalTable = ({
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                {!itemCallback || title === "users" ? (
-                  <FilterTypes
-                    typeOptions={typeOptions}
-                    active={selectedFilter}
-                    valueKey="type"
-                    nameKey="type_name"
-                    onFilterChange={(selectedType) => {
-                      setSelectedFilter(selectedType);
-                      changePickFilter(selectedType);
-                      setCurrentPage(1);
-                      title == "users"
-                        ? fetchHandler("user/" + selectedType, 1)
-                        : fetchHandler(1, selectedType);
-                    }}
-                  />
-                ) : null}
-                {isSubPageOpen || title === "users" ? (
+
+                <FilterTypes
+                  typeOptions={typeOptions}
+                  active={selectedFilter}
+                  valueKey="type"
+                  nameKey="type_name"
+                  onFilterChange={(selectedType) => {
+                    changePickFilter(selectedType);
+                    setCurrentPage(1);
+                    type == "users"
+                      ? fetchHandler("user/" + selectedType, 1)
+                      : type == "crossroad"
+                      ? fetchHandler(type, 1, selectedType)
+                      : fetchHandler(1, selectedType);
+                  }}
+                />
+
+                {isSubPageOpen || type !== "camera" ? (
                   <Button
                     color="blue"
                     onClick={
-                      backButtonProps.onClick
+                      backButtonProps.onClick && !isSubPageOpen
                         ? () => backButtonProps.onClick(true)
                         : () => {
-                            setTitleToShow(t(title));
-                            fetchHandler(title, currentPage);
+                            settypeToShow(t(type));
+                            fetchHandler(type, currentPage);
                             setShowTableActions(true);
                             setIsSubPageOpen(false);
                           }
                     }
                     className="flex gap-2 items-center"
                   >
-                    {backButtonProps.icon}
-                    <p>{t(backButtonProps.label)}</p>
+                    {backButtonProps.onClick && !isSubPageOpen ? (
+                      <>
+                        {" "}
+                        {backButtonProps.icon}
+                        <p>{t(backButtonProps.label)}</p>
+                      </>
+                    ) : (
+                      <>
+                        {" "}
+                        <ChevronLeftIcon className="w-5 h-5 m-0" />
+                        {t("back")}
+                      </>
+                    )}
                   </Button>
                 ) : null}
               </div>
@@ -225,7 +256,7 @@ const ModalTable = ({
                     {sortedData.map((item, i) => (
                       <TableRow
                         key={i}
-                        title={title}
+                        type={type}
                         item={item}
                         selectedFilter={selectedFilter}
                         columns={columns}
@@ -235,7 +266,7 @@ const ModalTable = ({
                         historyHandler={historyHandler}
                         encryptedRole={encryptedRole}
                         deleteButtonCallback={deleteButtonCallback}
-                        editButtonCallback={editButtonCallback}
+                        editButtonCallback={editHandler}
                         activateButtonCallback={activateButtonCallback}
                         tableDataCallback={tableDataCallback}
                         tableSelectOptions={tableSelectOptions}
@@ -262,7 +293,7 @@ const ModalTable = ({
           />
         )
       }
-      titleColor={theme === "dark" ? "white" : "black"}
+      typeColor={theme === "dark" ? "white" : "black"}
     />
   );
 };
@@ -270,7 +301,7 @@ const ModalTable = ({
 ModalTable.propTypes = {
   open: PropTypes.bool.isRequired,
   showActions: PropTypes.bool,
-  title: PropTypes.string,
+  type: PropTypes.string,
   handleOpen: PropTypes.func.isRequired,
   itemCallback: PropTypes.func,
   data: PropTypes.arrayOf(PropTypes.object),

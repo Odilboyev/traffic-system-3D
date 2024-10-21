@@ -4,12 +4,12 @@ import { useTheme } from "../../customHooks/useTheme";
 
 const CustomSelect = ({ ...rest }) => {
   const { theme } = useTheme(); // Retrieve theme (light/dark)
-
+  console.log(theme, "Custom");
   // Custom styles for react-select component
   const customStyles = {
     control: (base, state) => ({
       ...base,
-      backgroundColor: theme === "dark" ? "rgb(66 66 66 / 100)" : "#fff", // Dark background for dark mode
+      backgroundColor: theme === "dark" ? "rgb(97 97 97)" : "rgb(250 250 250)", // Dark background for dark mode
       color: theme === "dark" ? "#fff" : "#000", // Adjust text color
       borderColor: state.isFocused
         ? theme === "dark"
@@ -25,7 +25,7 @@ const CustomSelect = ({ ...rest }) => {
     }),
     menu: (base) => ({
       ...base,
-      backgroundColor: theme === "dark" ? "rgb(66 66 66 / 100)" : "#fff", // Dark background for menu
+      backgroundColor: theme === "dark" ? "rgb(97 97 97 / 100)" : "#fff", // Dark background for menu
       color: theme === "dark" ? "#fff" : "#000", // Adjust text color
     }),
     option: (base, state) => ({

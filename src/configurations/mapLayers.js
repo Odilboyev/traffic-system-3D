@@ -3,7 +3,7 @@ const baseLayers = [
     name: "OpenStreetMap",
     checked: false,
     maxNativeZoom: 19,
-    url: "https://its.bgsoft.uz:8111/gettile/https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "OpenStreetMap",
   },
 
@@ -11,14 +11,14 @@ const baseLayers = [
     name: "Transport",
     checked: false,
     maxNativeZoom: 22,
-    url: "https://its.bgsoft.uz:8111/gettile/https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714",
+    url: "https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714",
     attribution: "Transport",
   },
   {
     name: "Transport Dark",
     checked: false,
     maxNativeZoom: 22,
-    url: "https://its.bgsoft.uz:8111/gettile/https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714",
+    url: "https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=d1a9e90db928407291e29bc3d1264714",
     attribution: "Transport Dark",
   },
   {
@@ -31,7 +31,7 @@ const baseLayers = [
     name: "Dark",
     checked: true,
     maxNativeZoom: 22,
-    url: "https://its.bgsoft.uz:8111/gettile/https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",
+    url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",
     attribution:
       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
   },

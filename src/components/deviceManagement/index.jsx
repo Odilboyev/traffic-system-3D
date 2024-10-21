@@ -12,6 +12,7 @@ import ModalTable from "../mapReact/components/modalTable";
 import {
   addUser,
   deleteUser,
+  fetchDataForManagement,
   getDevices,
   getErrorHistory,
   getUserRoles,
@@ -20,7 +21,7 @@ import {
 } from "../../api/api.handlers";
 import { toast, ToastContainer } from "react-toastify";
 
-const DeviceManagement = () => {
+const DeviceManagement = ({ refreshHandler }) => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
   const [deviceType, setDeviceType] = useState(""); // Default type
   const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
@@ -28,8 +29,11 @@ const DeviceManagement = () => {
   const [deviceData, setDeviceData] = useState([]);
   const [deviceLoading, setDeviceLoading] = useState(false);
   const [deviceTotalPages, setDeviceTotalPages] = useState(null);
+
+  // edit
+  const [isEditing, setIsEditing] = useState(null);
   // users
-  const [userFilter, setUserFilter] = useState("list_active");
+  const [filter, setFilter] = useState(0);
   const [userRoles, setUserRoles] = useState([]);
   const [showNewUserModal, setShowNewUserModal] = useState(false);
 
@@ -48,6 +52,74 @@ const DeviceManagement = () => {
     }
   }, []);
 
+  const fetchData = useCallback(
+    async (type = deviceType, page = 1, isactive = undefined) => {
+      console.log("GET Request:", { type, page, isactive });
+      setDeviceLoading(true);
+
+      try {
+        const res = await fetchDataForManagement("GET", type, {
+          params: { page, isactive },
+        });
+        setDeviceData(res.data);
+        setTotalItems(res.total_items);
+      } catch (error) {
+        console.error(error);
+        toast.error(
+          error.status_text
+            ? error.status_text
+            : `Failed to fetch ${type} data.`
+        );
+      } finally {
+        setDeviceLoading(false);
+      }
+    },
+    [deviceType]
+  );
+  const modifyData = useCallback(
+    async (method, type, body, isactive = undefined) => {
+      console.log(`${method} Request:`, { type, body, isactive });
+      // activation
+      if (["delete", "patch"].includes(method)) {
+        const confirmationMessage =
+          method === "delete"
+            ? `Are you sure you want to deactivate ${body.name}?`
+            : `Are you sure you want to activate ${body.name}?`;
+
+        if (!window.confirm(confirmationMessage)) {
+          return; // Exit if the user cancels
+        }
+      }
+
+      setDeviceLoading(true);
+      try {
+        const res = await fetchDataForManagement(method, type, {
+          data: body,
+          params: { isactive },
+          id: body.id,
+        });
+        console.log(res, `${method} Response`);
+        res.status_text
+          ? toast.success(res.status_text)
+          : toast.success(`${method} operation on ${type} succeeded.`);
+        // Optionally re-fetch data to update the UI
+        await fetchData(type);
+      } catch (error) {
+        console.error(error);
+        toast.error(
+          error.status_text ? error.status_text : `Failed to ${method} ${type}.`
+        );
+      } finally {
+        fetchData();
+        refreshHandler();
+        setFilter(0);
+      }
+    },
+    [fetchData]
+  );
+
+  // oldcode
+
   const fetchUserRoles = async () => {
     try {
       const roles = await getUserRoles();
@@ -59,6 +131,7 @@ const DeviceManagement = () => {
   };
   useEffect(() => {
     fetchUserRoles();
+    fetchData("crossroad");
   }, []);
   const createNewUser = (bool) => {
     setShowNewUserModal(bool); // Show the form modal when the button is clicked
@@ -132,8 +205,8 @@ const DeviceManagement = () => {
       });
       throw new Error(error);
     } finally {
-      console.log(userFilter);
-      await fetchDeviceData("user/" + userFilter); // Fetch active users by default after the operation
+      console.log(filter);
+      await fetchDeviceData("user/" + filter); // Fetch active users by default after the operation
     }
   };
 
@@ -165,6 +238,9 @@ const DeviceManagement = () => {
 
     if (type === "users") {
       fetchDeviceData("user/list_active"); // Fetch active users by default
+    } else if (type === "crossroad" || type === "cameratraffic") {
+      //  HOZIRCHAGA crossroad uchun qo'yilgan. Backend o'zgarganda hammasi uchun fetchDataForManagement qo'yamiz.
+      fetchData(type);
     } else {
       fetchDeviceData(type); // Fetch data for the selected type
     }
@@ -187,37 +263,25 @@ const DeviceManagement = () => {
         content={
           <div className="p-4 rounded-lg flex flex-col justify-center items-center">
             <Typography>{t("management_device")}</Typography>
-            <List className="text-white">
-              <ListItem
-                className="shadow-sm"
-                onClick={() => handleTypeChange("crossroad")}
-              >
-                {t("crossroad")}
-              </ListItem>
-              <ListItem
-                className="shadow-sm"
-                onClick={() => handleTypeChange("camera")}
-              >
-                {t("camera")}
-              </ListItem>
-              <ListItem
-                className="shadow-sm"
-                onClick={() => handleTypeChange("boxcontroller")}
-              >
-                {t("boxcontroller")}
-              </ListItem>
-              <ListItem
-                className="shadow-sm"
-                onClick={() => handleTypeChange("svetofor")}
-              >
-                {t("svetofor")}
-              </ListItem>
-              <ListItem
-                className="shadow-sm"
-                onClick={() => handleTypeChange("users")}
-              >
-                {t("users")}
-              </ListItem>
+            <List>
+              {[
+                "crossroad",
+                "cameratraffic",
+                "camera",
+                "boxcontroller",
+                "svetofor",
+                "users",
+              ].map((type) => (
+                <ListItem
+                  key={type}
+                  className="shadow-sm text-white"
+                  onClick={() => {
+                    handleTypeChange(type);
+                  }}
+                >
+                  {t(type)}
+                </ListItem>
+              ))}
             </List>
           </div>
         }
@@ -231,45 +295,62 @@ const DeviceManagement = () => {
         }}
         totalItems={totalItems}
         itemCallback={deviceType !== "users" ? fetchErrorHistory : null}
-        title={deviceType}
+        type={deviceType}
         data={deviceData}
-        pickedFilter={deviceType == "users" ? userFilter : null}
-        changePickFilter={setUserFilter}
+        pickedFilter={deviceType == "users" ? filter : null}
+        changePickFilter={setFilter}
         backButtonProps={
-          deviceType === "users"
+          deviceType === "users" ||
+          deviceType === "crossroad" ||
+          deviceType === "cameratraffic"
             ? {
-                label: "create_new_user",
+                label: `create_new_${deviceType}`,
                 onClick: (val) => createNewUser(val),
                 icon: <PlusIcon className="w-5 h-5 m-0" />,
               }
             : undefined
         }
         typeOptions={
-          deviceType === "users"
+          deviceType === "users" ||
+          deviceType === "crossroad" ||
+          deviceType === "cameratraffic"
             ? [
-                { type: "list_active", type_name: t("active_users") },
-                { type: "list_deactive", type_name: t("inactive_users") },
+                { type: 0, type_name: t(`active_${deviceType}`) },
+                {
+                  type: 1,
+                  type_name: t(`inactive_${deviceType}`),
+                },
               ]
             : undefined
         }
         showActions={true}
         isLoading={deviceLoading}
-        selectedFilter={userFilter}
-        fetchHandler={(type, page) =>
-          fetchDeviceData(
-            type,
-            page,
-            userFilter === "user/list_active"
-              ? "/list_active"
-              : "/list_deactive"
-          )
+        selectedFilter={filter}
+        fetchHandler={(type, page) => {
+          deviceType == "crossroad" || deviceType === "cameratraffic"
+            ? fetchData(type, page, filter)
+            : fetchDeviceData(
+                type,
+                page,
+                filter === "0" ? "/list_active" : "/list_deactive"
+              );
+        }}
+        deleteButtonCallback={
+          deviceType === "crossroad" || deviceType === "cameratraffic"
+            ? (data) => modifyData("delete", deviceType, data)
+            : (user) => handleUserStatus(user, "deactivate")
         }
-        deleteButtonCallback={(user) => handleUserStatus(user, "deactivate")}
-        activateButtonCallback={(user) => handleUserStatus(user, "activate")}
+        activateButtonCallback={
+          deviceType === "crossroad" || deviceType === "cameratraffic"
+            ? (data) => modifyData("patch", deviceType, data)
+            : (user) => handleUserStatus(user, "activate")
+        }
         tableSelectOptions={userRoles}
-        editButtonCallback={handleUserUpdate}
+        editButtonCallback={setIsEditing}
         isFormOpen={showNewUserModal}
-        submitNewData={handleAddUserSubmit}
+        submitNewData={(data) =>
+          modifyData(isEditing ? "PUT" : "POST", deviceType, data)
+        }
       />
     </>
   );
