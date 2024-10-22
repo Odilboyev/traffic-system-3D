@@ -299,41 +299,32 @@ const DeviceManagement = ({ refreshHandler }) => {
         data={deviceData}
         pickedFilter={deviceType == "users" ? filter : null}
         changePickFilter={setFilter}
-        backButtonProps={
-          deviceType === "users" ||
-          deviceType === "crossroad" ||
-          deviceType === "cameratraffic"
-            ? {
-                label: `create_new_${deviceType}`,
-                onClick: (val) => createNewUser(val),
-                icon: <PlusIcon className="w-5 h-5 m-0" />,
-              }
-            : undefined
-        }
-        typeOptions={
-          deviceType === "users" ||
-          deviceType === "crossroad" ||
-          deviceType === "cameratraffic"
-            ? [
-                { type: 0, type_name: t(`active_${deviceType}`) },
-                {
-                  type: 1,
-                  type_name: t(`inactive_${deviceType}`),
-                },
-              ]
-            : undefined
-        }
+        backButtonProps={{
+          label: `create_new_${deviceType}`,
+          onClick: (val) => createNewUser(val),
+          icon: <PlusIcon className="w-5 h-5 m-0" />,
+        }}
+        typeOptions={[
+          { type: 0, type_name: t(`active_${deviceType}`) },
+          {
+            type: 1,
+            type_name: t(`inactive_${deviceType}`),
+          },
+        ]}
         showActions={true}
         isLoading={deviceLoading}
         selectedFilter={filter}
+        // fetchHandler={(type, page) => {
+        //   deviceType == "crossroad" || deviceType === "cameratraffic"
+        //     ? fetchData(type, page, filter)
+        //     : fetchDeviceData(
+        //         type,
+        //         page,
+        //         filter === "0" ? "/list_active" : "/list_deactive"
+        //       );
+        // }}
         fetchHandler={(type, page) => {
-          deviceType == "crossroad" || deviceType === "cameratraffic"
-            ? fetchData(type, page, filter)
-            : fetchDeviceData(
-                type,
-                page,
-                filter === "0" ? "/list_active" : "/list_deactive"
-              );
+          fetchData(type, page, filter);
         }}
         deleteButtonCallback={
           deviceType === "crossroad" || deviceType === "cameratraffic"

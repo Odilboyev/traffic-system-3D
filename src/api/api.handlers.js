@@ -66,12 +66,12 @@ const getUserRoles = async () => getData(import.meta.env.VITE_USER_ROLES);
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
   // Handle dynamic user endpoint customization
-  if (type?.startsWith("user")) {
-    const suffix = type.substring("user".length); // Extract suffix (e.g., '/active')
-    endpoint = `${import.meta.env.VITE_USERS}${suffix}`;
-  } else {
-    endpoint = endpointMap[type];
-  }
+  // if (type?.startsWith("user")) {
+  //   const suffix = type.substring("user".length); // Extract suffix (e.g., '/active')
+  //   endpoint = `${import.meta.env.VITE_USERS}${suffix}`;
+  // } else {
+  endpoint = endpointMap[type];
+  // }
 
   const url = `${endpoint}/${options.id ? `${options.id}` : ""}`;
 

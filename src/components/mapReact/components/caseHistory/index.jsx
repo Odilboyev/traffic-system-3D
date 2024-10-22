@@ -45,7 +45,7 @@ const AlarmHistory = () => {
           setIsAlarmHistoryOpen(!isAlarmHistoryOpen);
         }}
         data={historyData}
-        title={t("history")}
+        type={"history"}
         totalItems={totalItems}
         isLoading={historyLoading}
         itemsPerPage={20}

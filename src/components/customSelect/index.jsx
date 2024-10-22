@@ -4,7 +4,7 @@ import { useTheme } from "../../customHooks/useTheme";
 
 const CustomSelect = ({ ...rest }) => {
   const { theme } = useTheme(); // Retrieve theme (light/dark)
-  console.log(theme, "Custom");
+
   // Custom styles for react-select component
   const customStyles = {
     control: (base, state) => ({
@@ -46,7 +46,7 @@ const CustomSelect = ({ ...rest }) => {
       color: theme === "dark" ? "#fff" : "#000", // Adjust single value color
     }),
   };
-
+  console.log(rest.value);
   return (
     <Select
       styles={{ ...customStyles, ...rest.styles }}

@@ -26,12 +26,16 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
       [key]: value,
     }));
   };
-
+  const handleCancel = () => {
+    setFormData(null);
+    onCancel();
+  };
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit(formData); // Submit form data
+        setFormData(null);
       }}
       className="space-y-6 p-8 w-full my-20 max-w-lg mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
     >
@@ -65,7 +69,7 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
           <div className="flex justify-end space-x-3 pt-4">
             <Button
               color="red"
-              onClick={onCancel}
+              onClick={handleCancel}
               className="font-semibold hover:bg-red-600 transition-all duration-300"
             >
               Cancel

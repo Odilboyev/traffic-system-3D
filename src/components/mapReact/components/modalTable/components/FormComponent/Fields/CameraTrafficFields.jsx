@@ -10,10 +10,7 @@ import { t } from "i18next";
 // CameraTraffic-specific fields
 const CameraTrafficFields = ({ formData, handleInputChange }) => {
   const [crossroads, setCrossroads] = useState(null);
-  const [selectedCrossroad, setSelectedCrossroad] = useState(
-    crossroads &&
-      (formData.crossroad_id ? formData.crossroad_id : crossroads[0].id)
-  );
+  const [selectedCrossroad, setSelectedCrossroad] = useState(null);
 
   const crossroadHandler = async () => {
     try {
@@ -22,7 +19,10 @@ const CameraTrafficFields = ({ formData, handleInputChange }) => {
       });
       console.log("Crossroads Data:", data.data);
       setCrossroads(data.data);
-      setSelectedCrossroad(data.data[0].id);
+      const defaultCrossroad = formData.crossroad_id
+        ? data.data.find((item) => item.id == formData.crossroad_id)
+        : data.data[0];
+      setSelectedCrossroad(defaultCrossroad);
     } catch (error) {
       console.error("Error fetching crossroads:", error);
       toast.error("Failed to fetch crossroads.");
@@ -32,6 +32,16 @@ const CameraTrafficFields = ({ formData, handleInputChange }) => {
   useEffect(() => {
     crossroadHandler();
   }, []);
+  const handleCrossroadChange = (selected) => {
+    console.log("Selected Crossroad:", selected);
+    setSelectedCrossroad(selected);
+    handleInputChange("crossroad_id", selected.id);
+    handleInputChange("lat", selected.lat);
+    handleInputChange("lng", selected.lng);
+  };
+  useEffect(() => {
+    console.log(selectedCrossroad, "cross");
+  }, [selectedCrossroad]);
 
   return (
     <>
@@ -47,55 +57,31 @@ const CameraTrafficFields = ({ formData, handleInputChange }) => {
       ].map((field) => (
         <InputField
           key={field}
+          isrequired
           icon={MdCameraAlt}
           label={t(field)}
           value={formData[field] || ""}
           onChange={(e) => handleInputChange(field, e.target.value)}
         />
       ))}
-      {crossroads && (
+      {crossroads != null && selectedCrossroad != null && (
         <SelectField
           icon={MdFlag}
           label={t("crossroad")}
           options={crossroads}
-          value={selectedCrossroad}
-          getOptionLabel={(option) => option.name}
+          value={crossroads.find((item) => item.id == selectedCrossroad?.id)}
+          getOptionLabel={(option) => option.name || ""}
           getOptionValue={(option) => option.id}
-          onChange={(selected) => {
-            console.log(selected);
-            console.log(
-              crossroads?.find((v) => v.id == selectedCrossroad)?.lat
-            );
-            setSelectedCrossroad(selected.id);
-            handleInputChange("crossroad_id", selected.id);
-            handleInputChange(
-              "lat",
-              crossroads?.find((v) => v.id == selected.id)?.lat
-            );
-            handleInputChange(
-              "lng",
-              crossroads?.find((v) => v.id == selected.id)?.lng
-            );
-          }}
+          onChange={handleCrossroadChange}
         />
       )}
       {crossroads && selectedCrossroad && (
         <LocationPicker
-          lat={
-            formData.lat
-              ? formData.lat
-              : crossroads?.find((v) => v.id == selectedCrossroad)?.lat ||
-                undefined
-          }
-          lng={
-            formData.lng
-              ? formData.lng
-              : crossroads?.find((v) => v.id == selectedCrossroad)?.lng ||
-                undefined
-          }
-          handleInputChange={(e) => {
-            handleInputChange("lat", e.lat);
-            handleInputChange("lng", e.lng);
+          lat={formData.lat || selectedCrossroad.lat}
+          lng={formData.lng || selectedCrossroad.lng}
+          handleInputChange={(latlng) => {
+            handleInputChange("lat", latlng.lat);
+            handleInputChange("lng", latlng.lng);
           }}
         />
       )}

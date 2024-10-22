@@ -24,7 +24,7 @@ const ModalTable = ({
   showActions,
   type,
   handleOpen,
-  itemCallback,
+  historyButtonCallback,
   pickedFilter,
   selectedFilter,
   changePickFilter,
@@ -57,7 +57,7 @@ const ModalTable = ({
   const map = useMap();
 
   const [showTableActions, setShowTableActions] = useState(showActions);
-  const [typeToShow, settypeToShow] = useState(t(type || "history"));
+  const [typeToShow, settypeToShow] = useState(t(type));
   const [subPageId, setSubPageId] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
@@ -72,22 +72,27 @@ const ModalTable = ({
     sortedColumn,
     sortOrder,
     searchTerm,
-    type != "users" && type != "crossroad" ? selectedFilter : undefined
+    type == "history" ? selectedFilter : undefined
   );
   useEffect(() => {
     settypeToShow(t(type));
     // setSelectedFilter(pickedFilter || typeOptions[0]?.type);
   }, [type, open]);
 
-  useEffect(() => {
-    if (open && isSubPageOpen) {
-      itemCallback(currentPage, type, subPageId);
-    }
-  }, [currentPage, open, selectedFilter]);
+  // useEffect(() => {
+  //   if (open && isSubPageOpen) {
+  //     historyButtonCallback(currentPage, type, subPageId);
+  //   }
+  // }, [currentPage, open, selectedFilter]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    fetchHandler(page, selectedFilter);
+
+    if (isSubPageOpen) {
+      historyButtonCallback(1, type, subPageId);
+    } else {
+      fetchHandler(page, selectedFilter);
+    }
   };
 
   const handleHeader = (keyName) => {
@@ -110,7 +115,7 @@ const ModalTable = ({
     setShowTableActions(false);
     setCurrentPage(1);
     setIsSubPageOpen(true);
-    itemCallback(1, type, item.id);
+    historyButtonCallback(1, type, item.id);
     setSubPageId(item.id);
     settypeToShow(`${t("history")} - ${t(type)} ${"- " + item.name}`);
   };
@@ -118,7 +123,12 @@ const ModalTable = ({
   const columns = data?.[0]
     ? Object.keys(data[0]).filter(
         (key) =>
-          !shouldHideColumn(key, isSubPageOpen, selectedFilter, itemCallback)
+          !shouldHideColumn(
+            key,
+            isSubPageOpen,
+            selectedFilter,
+            historyButtonCallback
+          )
       )
     : [];
   const handleFormSubmit = (data) => {
@@ -180,7 +190,9 @@ const ModalTable = ({
               />
               <div className="flex justify-between w-full py-3 mb-2">
                 <div
-                  className={`flex ${itemCallback ? "w-2/6" : "w-3/6"} gap-5`}
+                  className={`flex ${
+                    historyButtonCallback ? "w-2/6" : "w-3/6"
+                  } gap-5`}
                 >
                   <Input
                     aria-label={t("search_input")}
@@ -201,20 +213,26 @@ const ModalTable = ({
                   onFilterChange={(selectedType) => {
                     changePickFilter(selectedType);
                     setCurrentPage(1);
-                    type == "users"
-                      ? fetchHandler("user/" + selectedType, 1)
-                      : type == "crossroad"
-                      ? fetchHandler(type, 1, selectedType)
-                      : fetchHandler(1, selectedType);
+                    // type == "users"
+                    //   ? fetchHandler("user/" + selectedType, 1)
+                    //   : type == "crossroad"
+                    //   ? fetchHandler(type, 1, selectedType)
+                    //   : fetchHandler(1, selectedType);
+                    type === "history"
+                      ? fetchHandler(1, selectedType) // using historyhandler when using history
+                      : fetchHandler(type, 1, selectedType); // using fetchData when managing devices
                   }}
                 />
 
-                {isSubPageOpen || type !== "camera" ? (
+                {isSubPageOpen || type !== "history" ? (
                   <Button
                     color="blue"
                     onClick={
                       backButtonProps.onClick && !isSubPageOpen
-                        ? () => backButtonProps.onClick(true)
+                        ? () => {
+                            backButtonProps.onClick(true);
+                            setEditData(null);
+                          }
                         : () => {
                             settypeToShow(t(type));
                             fetchHandler(type, currentPage);
@@ -276,7 +294,7 @@ const ModalTable = ({
                 </table>
               ) : (
                 <div className="flex justify-center items-center h-[30vh]">
-                  <Typography>{t("nodata")}</Typography>
+                  <Typography>{t("No data available")}</Typography>
                 </div>
               )}
             </>
@@ -303,7 +321,7 @@ ModalTable.propTypes = {
   showActions: PropTypes.bool,
   type: PropTypes.string,
   handleOpen: PropTypes.func.isRequired,
-  itemCallback: PropTypes.func,
+  historyButtonCallback: PropTypes.func,
   data: PropTypes.arrayOf(PropTypes.object),
   isLoading: PropTypes.bool,
   totalItems: PropTypes.number,
