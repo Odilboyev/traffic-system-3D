@@ -4,6 +4,7 @@ import UserFields from "./Fields/UserFields";
 import CameraTrafficFields from "./Fields/CameraTrafficFields";
 import CrossroadFields from "./Fields/CrossroadFields";
 import { getInitialData } from "./utils";
+import BoxMonitorFields from "./Fields/BoxControllerFields";
 
 const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
   const [formData, setFormData] = useState(null);
@@ -12,7 +13,7 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
   useEffect(() => {
     if (data) {
       const { id, ...filteredData } = data; // Exclude 'id' from initial form data
-      setFormData(filteredData);
+      type === "boxmonitor" ? setFormData(data) : setFormData(filteredData);
     } else {
       const initialData = getInitialData(type);
       setFormData(initialData);
@@ -40,7 +41,7 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
       className="space-y-6 p-8 w-full my-20 max-w-lg mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
     >
       {formData && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 static">
           {/* Dynamic Fields Based on Type */}
           {type === "user" && (
             <>
@@ -54,6 +55,12 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
 
           {type === "cameratraffic" && (
             <CameraTrafficFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
+          )}
+          {type === "boxmonitor" && (
+            <BoxMonitorFields
               formData={formData}
               handleInputChange={handleInputChange}
             />

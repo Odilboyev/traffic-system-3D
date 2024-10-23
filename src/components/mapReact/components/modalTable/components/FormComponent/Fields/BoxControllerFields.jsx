@@ -4,14 +4,21 @@ import LocationPicker from "../components/LocationPicker";
 import SelectField from "../components/SelectField";
 import { fetchDataForManagement } from "../../../../../../../api/api.handlers";
 import { toast } from "react-toastify";
-import { MdCameraAlt, MdFlag } from "react-icons/md";
+import {
+  MdAllInbox,
+  MdFlag,
+  MdOutlineAllInbox,
+  MdSensors,
+} from "react-icons/md";
 import { t } from "i18next";
-import { crossroadHandler } from "../utils";
+import { crossroadHandler, fetchSingleBox } from "../utils";
 
-// CameraTraffic-specific fields
-const CameraTrafficFields = ({ formData, handleInputChange }) => {
+// BoxMonitorFields-specific fields
+const BoxMonitorFields = ({ formData, handleInputChange }) => {
   const [crossroads, setCrossroads] = useState(null);
   const [selectedCrossroad, setSelectedCrossroad] = useState(null);
+  const [sensors, setSensors] = useState(null);
+  const [selectedSensors, setSelectedSensors] = useState([]);
 
   useEffect(() => {
     crossroadHandler(
@@ -20,6 +27,13 @@ const CameraTrafficFields = ({ formData, handleInputChange }) => {
       setSelectedCrossroad,
       handleInputChange
     );
+    fetchSingleBox(
+      formData?.id,
+      setSensors,
+      setSelectedSensors,
+      handleInputChange
+    );
+    console.log(formData);
   }, []);
 
   const handleCrossroadChange = (selected) => {
@@ -29,28 +43,44 @@ const CameraTrafficFields = ({ formData, handleInputChange }) => {
     handleInputChange("lat", selected.lat);
     handleInputChange("lng", selected.lng);
   };
+  const handleSensorChange = (selected) => {
+    console.log("Selected sensors:", selected);
+    setSelectedSensors(selected);
 
+    // Update sensor status: 1 for selected, 0 for not selected
+    const updatedSensors = sensors.map((sensor) => ({
+      ...sensor,
+      status: selected.some((s) => s.sensor_id === sensor.sensor_id) ? 1 : 0,
+    }));
+
+    // Update form data with the modified sensors
+    handleInputChange("sensors", updatedSensors);
+  };
   return (
     <>
-      {[
-        "name",
-        "ip",
-        "login",
-        "password",
-        "rtsp_port",
-        "http_port",
-        "https_port",
-        "sdk_port",
-      ].map((field) => (
+      {["name", "sn", "ip"].map((field) => (
         <InputField
           key={field}
           required
-          icon={MdCameraAlt}
+          icon={MdOutlineAllInbox}
           label={t(field)}
           value={formData[field] || ""}
           onChange={(e) => handleInputChange(field, e.target.value)}
         />
       ))}
+      {sensors && (
+        <SelectField
+          isMulti
+          icon={MdSensors}
+          label={t("sensors")}
+          options={sensors}
+          value={selectedSensors}
+          getOptionLabel={(option) => option.name || ""}
+          getOptionValue={(option) => option.sensor_id.toString()}
+          onChange={handleSensorChange}
+          zIndex="99999999"
+        />
+      )}
       {crossroads != null && selectedCrossroad != null && (
         <SelectField
           icon={MdFlag}
@@ -76,4 +106,4 @@ const CameraTrafficFields = ({ formData, handleInputChange }) => {
   );
 };
 
-export default CameraTrafficFields;
+export default BoxMonitorFields;

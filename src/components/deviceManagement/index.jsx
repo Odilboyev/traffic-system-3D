@@ -238,7 +238,11 @@ const DeviceManagement = ({ refreshHandler }) => {
 
     if (type === "users") {
       fetchDeviceData("user/list_active"); // Fetch active users by default
-    } else if (type === "crossroad" || type === "cameratraffic") {
+    } else if (
+      type === "crossroad" ||
+      type === "cameratraffic" ||
+      type === "boxmonitor"
+    ) {
       //  HOZIRCHAGA crossroad uchun qo'yilgan. Backend o'zgarganda hammasi uchun fetchDataForManagement qo'yamiz.
       fetchData(type);
     } else {
@@ -268,7 +272,7 @@ const DeviceManagement = ({ refreshHandler }) => {
                 "crossroad",
                 "cameratraffic",
                 "camera",
-                "boxcontroller",
+                "boxmonitor",
                 "svetofor",
                 "users",
               ].map((type) => (
@@ -329,12 +333,16 @@ const DeviceManagement = ({ refreshHandler }) => {
           fetchData(type, page, filter);
         }}
         deleteButtonCallback={
-          deviceType === "crossroad" || deviceType === "cameratraffic"
+          deviceType === "crossroad" ||
+          deviceType === "cameratraffic" ||
+          deviceType === "boxmonitor"
             ? (data) => modifyData("delete", deviceType, data)
             : (user) => handleUserStatus(user, "deactivate")
         }
         activateButtonCallback={
-          deviceType === "crossroad" || deviceType === "cameratraffic"
+          deviceType === "crossroad" ||
+          deviceType === "cameratraffic" ||
+          deviceType === "boxmonitor"
             ? (data) => modifyData("patch", deviceType, data)
             : (user) => handleUserStatus(user, "activate")
         }

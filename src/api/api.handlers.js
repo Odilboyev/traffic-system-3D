@@ -64,13 +64,14 @@ const getUserRoles = async () => getData(import.meta.env.VITE_USER_ROLES);
 
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
+  console.log(type, "GET", options);
   let endpoint;
   // Handle dynamic user endpoint customization
   // if (type?.startsWith("user")) {
   //   const suffix = type.substring("user".length); // Extract suffix (e.g., '/active')
   //   endpoint = `${import.meta.env.VITE_USERS}${suffix}`;
   // } else {
-  endpoint = endpointMap[type];
+  endpoint = type;
   // }
 
   const url = `${endpoint}/${options.id ? `${options.id}` : ""}`;

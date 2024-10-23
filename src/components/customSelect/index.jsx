@@ -46,7 +46,7 @@ const CustomSelect = ({ ...rest }) => {
       color: theme === "dark" ? "#fff" : "#000", // Adjust single value color
     }),
   };
-  console.log(rest.value);
+
   return (
     <Select
       styles={{ ...customStyles, ...rest.styles }}
