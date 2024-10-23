@@ -27,7 +27,7 @@ const ModalTable = ({
   historyButtonCallback,
   pickedFilter,
   selectedFilter,
-  changePickFilter,
+  filterHandler,
   data = [],
   isLoading,
   totalItems = 0,
@@ -177,6 +177,7 @@ const ModalTable = ({
           ) : (
             <>
               <ToastContainer
+                containerId="modal"
                 position="bottom-right" // Set the position to bottom-right
                 autoClose={3000} // Auto close after 3 seconds
                 hideProgressBar={false}
@@ -205,25 +206,27 @@ const ModalTable = ({
                   />
                 </div>
 
-                <FilterTypes
-                  typeOptions={typeOptions}
-                  active={selectedFilter}
-                  valueKey="type"
-                  nameKey="type_name"
-                  onFilterChange={(selectedType) => {
-                    changePickFilter(selectedType);
-                    setCurrentPage(1);
-                    // type == "users"
-                    //   ? fetchHandler("user/" + selectedType, 1)
-                    //   : type == "crossroad"
-                    //   ? fetchHandler(type, 1, selectedType)
-                    //   : fetchHandler(1, selectedType);
-                    type === "history"
-                      ? fetchHandler(1, selectedType) // using historyhandler when using history
-                      : fetchHandler(type, 1, selectedType); // using fetchData when managing devices
-                  }}
-                />
-
+                {!isSubPageOpen && (
+                  <FilterTypes
+                    typeOptions={typeOptions}
+                    active={selectedFilter}
+                    valueKey="type"
+                    nameKey="type_name"
+                    onFilterChange={(selectedType) => {
+                      type === "history"
+                        ? fetchHandler(1, selectedType) // using historyhandler when using history
+                        : fetchHandler(type, 1, selectedType); // using fetchData when managing devices
+                      filterHandler(selectedType);
+                      console.log(selectedType, "type: " + selectedType);
+                      setCurrentPage(1);
+                      // type == "users"
+                      //   ? fetchHandler("user/" + selectedType, 1)
+                      //   : type == "crossroad"
+                      //   ? fetchHandler(type, 1, selectedType)
+                      //   : fetchHandler(1, selectedType);
+                    }}
+                  />
+                )}
                 {isSubPageOpen || type !== "history" ? (
                   <Button
                     color="blue"
@@ -329,7 +332,7 @@ ModalTable.propTypes = {
   totalPages: PropTypes.number,
   fetchHandler: PropTypes.func.isRequired,
   pickedFilter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  changePickFilter: PropTypes.func,
+  filterHandler: PropTypes.func,
   typeOptions: PropTypes.arrayOf(
     PropTypes.shape({
       type: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

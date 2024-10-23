@@ -13,7 +13,7 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
   useEffect(() => {
     if (data) {
       const { id, ...filteredData } = data; // Exclude 'id' from initial form data
-      type === "boxmonitor" ? setFormData(data) : setFormData(filteredData);
+      type === "boxmonitor" ? setFormData(data) : setFormData(data);
     } else {
       const initialData = getInitialData(type);
       setFormData(initialData);
@@ -37,6 +37,7 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
         e.preventDefault();
         onSubmit(formData); // Submit form data
         setFormData(null);
+        console.log(formData);
       }}
       className="space-y-6 p-8 w-full my-20 max-w-lg mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
     >

@@ -123,7 +123,7 @@ const TableRow = ({
           className={` !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white`}
           // style={{ width: "200px", minWidth: "200px" }}
         >
-          <div className="flex items-center justify-around h-full gap-2 w-full">
+          <div className="flex items-center justify-start h-full gap-2 w-full">
             {" "}
             {type != "users" && selectedFilter != "list_deactive" && (
               <>

@@ -33,7 +33,7 @@ const DeviceManagement = ({ refreshHandler }) => {
   // edit
   const [isEditing, setIsEditing] = useState(null);
   // users
-  const [filter, setFilter] = useState(0);
+  const [filter, setFilter] = useState(1);
   const [userRoles, setUserRoles] = useState([]);
   const [showNewUserModal, setShowNewUserModal] = useState(false);
 
@@ -53,8 +53,9 @@ const DeviceManagement = ({ refreshHandler }) => {
   }, []);
 
   const fetchData = useCallback(
-    async (type = deviceType, page = 1, isactive = 1) => {
+    async (type = deviceType, page = 1, isactive = filter) => {
       console.log("GET Request:", { type, page, isactive });
+      console.log(filter, "filter");
       setDeviceLoading(true);
 
       try {
@@ -112,11 +113,13 @@ const DeviceManagement = ({ refreshHandler }) => {
       } finally {
         fetchData();
         refreshHandler();
-        setFilter(0);
       }
     },
     [fetchData]
   );
+  useEffect(() => {
+    console.log(filter, "filter changed");
+  }, [filter]);
 
   // oldcode
 
@@ -304,7 +307,7 @@ const DeviceManagement = ({ refreshHandler }) => {
         type={deviceType}
         data={deviceData}
         pickedFilter={deviceType == "users" ? filter : null}
-        changePickFilter={setFilter}
+        filterHandler={setFilter}
         backButtonProps={{
           label: `create_new_${deviceType}`,
           onClick: (val) => createNewUser(val),
