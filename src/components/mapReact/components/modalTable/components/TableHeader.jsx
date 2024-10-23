@@ -29,8 +29,8 @@ const TableHeader = ({
         ))}
         {showActions && (
           <th
-            className="px-3 py-1 text-start border-separate border border-blue-gray-900 dark:border-white"
-            style={{ width: "180px", minWidth: "180px" }}
+            className=" py-1 text-start border-separate border border-blue-gray-900 dark:border-white"
+            // style={{ width: "250px", minWidth: "250px" }}
           >
             <Typography className="font-bold">{t("actions")}</Typography>
           </th>

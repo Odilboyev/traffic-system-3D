@@ -120,87 +120,83 @@ const TableRow = ({
 
       {showActions && !isSubPageOpen && (
         <td
-          className={`px-4 gap-1 !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white`}
-          style={{ width: "180px", minWidth: "180px" }}
+          className={` !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white`}
+          // style={{ width: "200px", minWidth: "200px" }}
         >
-          {type != "users" && selectedFilter != "list_deactive" && (
-            <>
-              {type != "crossroad" && (
+          <div className="flex items-center justify-around h-full gap-2 w-full">
+            {" "}
+            {type != "users" && selectedFilter != "list_deactive" && (
+              <>
+                {type != "crossroad" && (
+                  <IconButton
+                    className="mr-1"
+                    color="amber"
+                    onClick={() => historyHandler(item)}
+                  >
+                    <MdHistory className="text-white" />
+                  </IconButton>
+                )}
                 <IconButton
                   className="mr-1"
-                  color="amber"
-                  size="sm"
-                  onClick={() => historyHandler(item)}
+                  color="green"
+                  onClick={() => locationHandler(item.lat, item.lng)}
                 >
-                  <MdHistory className="text-white" />
+                  <LiaSearchLocationSolid className="text-white" />
                 </IconButton>
-              )}
+              </>
+            )}
+            {encryptedRole === "admin" && selectedFilter != 1 && (
+              <>
+                {!isEditing ? (
+                  <IconButton
+                    className="mr-1"
+                    color="blue"
+                    //
+                    onClick={() => editButtonCallback(item)} // Enter edit mode
+                  >
+                    <MdEdit className="text-white" />
+                  </IconButton>
+                ) : (
+                  <>
+                    <IconButton
+                      className="mr-1"
+                      color="green"
+                      onClick={handleSave} // Save changes
+                    >
+                      <MdSave className="text-white" />
+                    </IconButton>
+                    <IconButton
+                      className="mr-1"
+                      color="red"
+                      onClick={
+                        () => {
+                          setIsEditing(false);
+                          setEditedData({ ...item, password: "" });
+                        } // Cancel editing
+                      }
+                    >
+                      <MdCancel className="text-white" />
+                    </IconButton>
+                  </>
+                )}
+                <IconButton
+                  className="mr-1"
+                  color="red"
+                  onClick={() => deleteButtonCallback(item)}
+                >
+                  <MdDelete className="text-white" />
+                </IconButton>
+              </>
+            )}
+            {activateButtonCallback && selectedFilter == 1 && (
               <IconButton
-                className="mr-1"
                 color="green"
-                size="sm"
-                onClick={() => locationHandler(item.lat, item.lng)}
+                onClick={() => activateButtonCallback(item)}
               >
-                <LiaSearchLocationSolid className="text-white" />
+                <MdPowerSettingsNew className="text-white" />
               </IconButton>
-            </>
-          )}
-
-          {encryptedRole === "admin" && selectedFilter != 1 && (
-            <>
-              {!isEditing ? (
-                <IconButton
-                  className="mr-1"
-                  color="blue"
-                  size="sm"
-                  onClick={() => editButtonCallback(item)} // Enter edit mode
-                >
-                  <MdEdit className="text-white" />
-                </IconButton>
-              ) : (
-                <>
-                  <IconButton
-                    className="mr-1"
-                    color="green"
-                    size="sm"
-                    onClick={handleSave} // Save changes
-                  >
-                    <MdSave className="text-white" />
-                  </IconButton>
-                  <IconButton
-                    className="mr-1"
-                    color="red"
-                    size="sm"
-                    onClick={
-                      () => {
-                        setIsEditing(false);
-                        setEditedData({ ...item, password: "" });
-                      } // Cancel editing
-                    }
-                  >
-                    <MdCancel className="text-white" />
-                  </IconButton>
-                </>
-              )}
-              <IconButton
-                className="mr-1"
-                color="red"
-                size="sm"
-                onClick={() => deleteButtonCallback(item)}
-              >
-                <MdDelete className="text-white" />
-              </IconButton>
-            </>
-          )}
-          {activateButtonCallback && selectedFilter == 1 && (
-            <IconButton
-              color="green"
-              size="sm"
-              onClick={() => activateButtonCallback(item)}
-            >
-              <MdPowerSettingsNew className="text-white" />
-            </IconButton>
-          )}
+            )}
+          </div>{" "}
         </td>
       )}
     </tr>
