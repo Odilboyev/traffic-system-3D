@@ -56,7 +56,7 @@ const ModalTable = ({
   const { theme } = useTheme();
   const map = useMap();
 
-  const [showTableActions, setShowTableActions] = useState(showActions);
+  const [showTableActions, setShowTableActions] = useState(type !== "history");
   const [typeToShow, settypeToShow] = useState(t(type));
   const [subPageId, setSubPageId] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -232,10 +232,11 @@ const ModalTable = ({
                         ? () => {
                             backButtonProps.onClick(true);
                             setEditData(null);
+                            fetchHandler(type, currentPage, 1);
                           }
                         : () => {
                             settypeToShow(t(type));
-                            fetchHandler(type, currentPage);
+                            fetchHandler(type, currentPage, 1);
                             setShowTableActions(true);
                             setIsSubPageOpen(false);
                           }

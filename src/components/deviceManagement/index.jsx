@@ -25,7 +25,7 @@ const DeviceManagement = ({ refreshHandler }) => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
   const [deviceType, setDeviceType] = useState(""); // Default type
   const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
+  const [totalItems, setTotalItems] = useState(1);
   const [deviceData, setDeviceData] = useState([]);
   const [deviceLoading, setDeviceLoading] = useState(false);
   const [deviceTotalPages, setDeviceTotalPages] = useState(null);
@@ -53,7 +53,7 @@ const DeviceManagement = ({ refreshHandler }) => {
   }, []);
 
   const fetchData = useCallback(
-    async (type = deviceType, page = 1, isactive = undefined) => {
+    async (type = deviceType, page = 1, isactive = 1) => {
       console.log("GET Request:", { type, page, isactive });
       setDeviceLoading(true);
 
@@ -294,7 +294,9 @@ const DeviceManagement = ({ refreshHandler }) => {
           setIsAlarmDeviceOpen(false); // Correctly close the device modal
         }}
         totalItems={totalItems}
-        itemCallback={deviceType !== "users" ? fetchErrorHistory : null}
+        historyButtonCallback={
+          deviceType !== "users" ? fetchErrorHistory : null
+        }
         type={deviceType}
         data={deviceData}
         pickedFilter={deviceType == "users" ? filter : null}
