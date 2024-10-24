@@ -42,12 +42,12 @@ const toaster = (sensorData, map) => {
       map.flyTo([sensorData.lat, sensorData.lng], 18);
     }
   };
+  console.log(sensorData, "wokring");
 
   const toastOptions = {
     ...toastConfig,
     onClick: handleClick,
     icon: false,
-    containerId: "alarms",
   };
 
   switch (sensorData.statuserror) {
@@ -67,6 +67,7 @@ const toaster = (sensorData, map) => {
 };
 
 const toastConfig = {
+  containerId: "alarms",
   position: "top-right",
   autoClose: 10000,
   hideProgressBar: false,

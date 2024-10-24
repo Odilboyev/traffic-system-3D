@@ -57,7 +57,7 @@ const App = () => {
       }`}
     >
       {!isOnline && <WarningMessage />}
-      <ToastContainer className="z-[9998]" containerId="alarms" />
+
       <MonitoringMapReact changedMarker={changedMarker} />
     </div>
   );

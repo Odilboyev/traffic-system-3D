@@ -70,6 +70,7 @@ import TrafficLightContainer from "./components/svetofor/managementLights.jsx";
 import SignsContainer from "./components/signs/index.jsx";
 import UserInfoWidget from "./components/userInfo/index.jsx";
 import TileChanger from "../tileChanger/index.jsx";
+import { ToastContainer } from "react-toastify";
 const home = [41.2995, 69.2401]; // Tashkent
 
 const handleMapMove = (event) => {
@@ -286,6 +287,7 @@ const MapComponent = ({ changedMarker }) => {
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
       >
+        <ToastContainer containerId="alarms" className="z-[9998]" />
         {errorMessage && (
           <div className="w-[50vw] h-[20vh] z-[9999] rounded-md bg-blue-gray-900 backdrop-blur-md flex justify-center items-center text-white">
             {errorMessage}
