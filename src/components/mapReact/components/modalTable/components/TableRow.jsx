@@ -7,6 +7,7 @@ import {
   MdPowerSettingsNew,
   MdSave,
   MdCancel,
+  MdSearch,
 } from "react-icons/md";
 import { LiaSearchLocationSolid } from "react-icons/lia";
 import moment from "moment/moment";
@@ -52,7 +53,7 @@ const TableRow = ({
   // };
 
   return (
-    <tr className="dark:text-white !overflow-visible text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+    <tr className="dark:text-white  !overflow-visible text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
       {columns.map((key, index) => (
         <td
           key={`${item.id}-${index}`} // Use a unique key for each row and column
@@ -129,19 +130,21 @@ const TableRow = ({
               <>
                 {type != "crossroad" && (
                   <IconButton
+                    size="sm"
                     className="mr-1"
                     color="amber"
                     onClick={() => historyHandler(item)}
                   >
-                    <MdHistory className="text-white" />
+                    <MdHistory className="text-white text-xl" />
                   </IconButton>
                 )}
                 <IconButton
+                  size="sm"
                   className="mr-1"
                   color="green"
                   onClick={() => locationHandler(item.lat, item.lng)}
                 >
-                  <LiaSearchLocationSolid className="text-white" />
+                  <MdSearch className="text-white text-xl" />
                 </IconButton>
               </>
             )}
@@ -149,23 +152,26 @@ const TableRow = ({
               <>
                 {!isEditing ? (
                   <IconButton
+                    size="sm"
                     className="mr-1"
                     color="blue"
                     //
                     onClick={() => editButtonCallback(item)} // Enter edit mode
                   >
-                    <MdEdit className="text-white" />
+                    <MdEdit className="text-white text-xl" />
                   </IconButton>
                 ) : (
                   <>
                     <IconButton
+                      size="sm"
                       className="mr-1"
                       color="green"
                       onClick={handleSave} // Save changes
                     >
-                      <MdSave className="text-white" />
+                      <MdSave className="text-white text-xl" />
                     </IconButton>
                     <IconButton
+                      size="sm"
                       className="mr-1"
                       color="red"
                       onClick={
@@ -175,25 +181,27 @@ const TableRow = ({
                         } // Cancel editing
                       }
                     >
-                      <MdCancel className="text-white" />
+                      <MdCancel className="text-white text-xl" />
                     </IconButton>
                   </>
                 )}
                 <IconButton
+                  size="sm"
                   className="mr-1"
                   color="red"
                   onClick={() => deleteButtonCallback(item)}
                 >
-                  <MdDelete className="text-white" />
+                  <MdDelete className="text-white text-xl" />
                 </IconButton>
               </>
             )}
             {activateButtonCallback && selectedFilter == 1 && (
               <IconButton
+                size="sm"
                 color="green"
                 onClick={() => activateButtonCallback(item)}
               >
-                <MdPowerSettingsNew className="text-white" />
+                <MdPowerSettingsNew className="text-white text-xl" />
               </IconButton>
             )}
           </div>{" "}

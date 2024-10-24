@@ -22,7 +22,7 @@ const Modal = ({
       size="xxl"
       open={open}
       handler={handleOpen}
-      className="dark:bg-gray-900 dark:!text-white text-gray-900"
+      className="dark:bg-gray-900 dark:!text-white text-gray-900 overflow-hidden"
       {...rest}
     >
       <DialogHeader className="justify-between">
@@ -53,9 +53,7 @@ const Modal = ({
           </svg>
         </IconButton>
       </DialogHeader>
-      <DialogBody className="overflow-y-scroll overflow-x-auto py-0">
-        {body}
-      </DialogBody>
+      <DialogBody className="h-screen overflow-hidden py-0">{body}</DialogBody>
       <DialogFooter className="flex justify-center items-center mt-auto">
         {footer}
       </DialogFooter>

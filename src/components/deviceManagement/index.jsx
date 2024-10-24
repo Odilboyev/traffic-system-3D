@@ -32,8 +32,16 @@ const DeviceManagement = ({ refreshHandler }) => {
 
   // edit
   const [isEditing, setIsEditing] = useState(null);
-  // users
-  const [filter, setFilter] = useState(1);
+
+  const [filterOptions] = useState([
+    { type: 1, type_name: t(`active_${deviceType}`) },
+    {
+      type: 0,
+      type_name: t(`inactive_${deviceType}`),
+    },
+  ]);
+  const [filter, setFilter] = useState(filterOptions[0].type);
+  //users
   const [userRoles, setUserRoles] = useState([]);
   const [showNewUserModal, setShowNewUserModal] = useState(false);
 
@@ -53,9 +61,8 @@ const DeviceManagement = ({ refreshHandler }) => {
   }, []);
 
   const fetchData = useCallback(
-    async (type = deviceType, page = 1, isactive = filter) => {
+    async (type = deviceType, page = 1, isactive) => {
       console.log("GET Request:", { type, page, isactive });
-      console.log(filter, "filter");
       setDeviceLoading(true);
 
       try {
@@ -215,7 +222,8 @@ const DeviceManagement = ({ refreshHandler }) => {
 
   // fetchErrorHistory
   const fetchErrorHistory = async (current, type, id = null) => {
-    const dtype = type === "camera" ? 1 : type == "boxcontroller" ? 3 : 4;
+    const dtype =
+      type === "cameratraffic" ? 1 : type == "boxcontroller" ? 3 : 4;
     setDeviceLoading(true);
     try {
       const all = await getErrorHistory(current, {
@@ -247,10 +255,14 @@ const DeviceManagement = ({ refreshHandler }) => {
       type === "boxmonitor"
     ) {
       //  HOZIRCHAGA crossroad uchun qo'yilgan. Backend o'zgarganda hammasi uchun fetchDataForManagement qo'yamiz.
-      fetchData(type);
+      fetchData(type, 1, filter);
     } else {
       fetchDeviceData(type); // Fetch data for the selected type
     }
+  };
+  const handleFilterChange = (filter) => {
+    setFilter(filter);
+    fetchData(deviceType, 1, filter);
   };
 
   return (
@@ -307,19 +319,13 @@ const DeviceManagement = ({ refreshHandler }) => {
         type={deviceType}
         data={deviceData}
         pickedFilter={deviceType == "users" ? filter : null}
-        filterHandler={setFilter}
+        filterHandler={handleFilterChange}
         backButtonProps={{
           label: `create_new_${deviceType}`,
           onClick: (val) => createNewUser(val),
           icon: <PlusIcon className="w-5 h-5 m-0" />,
         }}
-        typeOptions={[
-          { type: 0, type_name: t(`active_${deviceType}`) },
-          {
-            type: 1,
-            type_name: t(`inactive_${deviceType}`),
-          },
-        ]}
+        filterOptions={filterOptions}
         showActions={true}
         isLoading={deviceLoading}
         selectedFilter={filter}

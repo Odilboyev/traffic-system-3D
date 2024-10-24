@@ -5,7 +5,7 @@ import { t } from "i18next";
 
 const FilterTypes = ({
   active,
-  typeOptions,
+  filterOptions,
   onFilterChange,
   valueKey = "type",
   nameKey = "type_name",
@@ -24,7 +24,7 @@ const FilterTypes = ({
 
   return (
     <div className="flex gap-3" {...rest}>
-      {typeOptions.map((option) => (
+      {filterOptions.map((option) => (
         <Button
           key={option[valueKey]}
           color={theme === "dark" ? "blue" : "black"}

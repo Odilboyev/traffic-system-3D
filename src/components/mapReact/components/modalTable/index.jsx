@@ -21,11 +21,9 @@ import FormComponent from "./components/FormComponent";
 
 const ModalTable = ({
   open,
-  showActions,
   type,
   handleOpen,
   historyButtonCallback,
-  pickedFilter,
   selectedFilter,
   filterHandler,
   data = [],
@@ -33,21 +31,16 @@ const ModalTable = ({
   totalItems = 0,
   totalPages,
   fetchHandler,
-  typeOptions = [
-    { type: null, type_name: "all" },
-    { type: 1, type_name: "camera" },
-    { type: 3, type_name: "boxcontroller" },
-    { type: 4, type_name: "svetofor" },
-  ],
+  filterOptions,
   backButtonProps = {
     label: "back",
     onClick: null,
     icon: <ChevronLeftIcon className="w-5 h-5 m-0" />,
   },
-  deleteButtonCallback,
-  editButtonCallback,
-  activateButtonCallback,
-  tableDataCallback,
+  deleteButtonCallback = () => {},
+  editButtonCallback = () => {},
+  activateButtonCallback = () => {},
+  tableDataCallback = () => {},
   tableSelectOptions,
   isFormOpen,
   submitNewData,
@@ -76,7 +69,7 @@ const ModalTable = ({
   );
   useEffect(() => {
     settypeToShow(t(type));
-    // setSelectedFilter(pickedFilter || typeOptions[0]?.type);
+    // setSelectedFilter(pickedFilter || filterOptions[0]?.type);
   }, [type, open]);
 
   // useEffect(() => {
@@ -155,9 +148,9 @@ const ModalTable = ({
         isFormOpen
           ? () => backButtonProps.onClick(false)
           : () => {
+              handleOpen();
               editButtonCallback(false);
               setEditData(null);
-              handleOpen();
               setIsSubPageOpen(false);
               settypeToShow("");
               setCurrentPage(1);
@@ -165,7 +158,7 @@ const ModalTable = ({
       }
       title={typeToShow}
       body={
-        <>
+        <div className="h-full w-full no-scrollbar overflow-auto">
           {isFormOpen ? (
             <FormComponent
               type={type}
@@ -192,7 +185,7 @@ const ModalTable = ({
               <div className="flex justify-between w-full py-3 mb-2">
                 <div
                   className={`flex ${
-                    historyButtonCallback ? "w-2/6" : "w-3/6"
+                    type !== "history" ? "w-2/6" : "w-3/6"
                   } gap-5`}
                 >
                   <Input
@@ -206,18 +199,15 @@ const ModalTable = ({
                   />
                 </div>
 
-                {!isSubPageOpen && (
+                {!isSubPageOpen && filterOptions && (
                   <FilterTypes
-                    typeOptions={typeOptions}
+                    filterOptions={filterOptions}
                     active={selectedFilter}
                     valueKey="type"
                     nameKey="type_name"
                     onFilterChange={(selectedType) => {
-                      type === "history"
-                        ? fetchHandler(1, selectedType) // using historyhandler when using history
-                        : fetchHandler(type, 1, selectedType); // using fetchData when managing devices
                       filterHandler(selectedType);
-                      console.log(selectedType, "type: " + selectedType);
+                      type === "history" && fetchHandler(1, selectedType); // using historyhandler when using history
                       setCurrentPage(1);
                       // type == "users"
                       //   ? fetchHandler("user/" + selectedType, 1)
@@ -265,37 +255,39 @@ const ModalTable = ({
               {isLoading ? (
                 <Loader />
               ) : sortedData.length > 0 ? (
-                <table className="w-full border-collapse table-auto overflow-x-scroll border border-slate-400">
-                  <TableHeader
-                    columns={columns}
-                    showActions={showTableActions}
-                    sortedColumn={sortedColumn}
-                    isSubPageOpen={isSubPageOpen}
-                    sortOrder={sortOrder}
-                    onHeaderClick={handleHeader}
-                  />
-                  <tbody className="overflow-x-scroll font-bold">
-                    {sortedData.map((item, i) => (
-                      <TableRow
-                        key={i}
-                        type={type}
-                        item={item}
-                        selectedFilter={selectedFilter}
-                        columns={columns}
-                        showActions={showTableActions}
-                        isSubPageOpen={isSubPageOpen}
-                        locationHandler={locationHandler}
-                        historyHandler={historyHandler}
-                        encryptedRole={encryptedRole}
-                        deleteButtonCallback={deleteButtonCallback}
-                        editButtonCallback={editHandler}
-                        activateButtonCallback={activateButtonCallback}
-                        tableDataCallback={tableDataCallback}
-                        tableSelectOptions={tableSelectOptions}
-                      />
-                    ))}
-                  </tbody>
-                </table>
+                <div className="min-w-full">
+                  <table className="w-full border-collapse table-auto  border border-slate-400">
+                    <TableHeader
+                      columns={columns}
+                      showActions={showTableActions}
+                      sortedColumn={sortedColumn}
+                      isSubPageOpen={isSubPageOpen}
+                      sortOrder={sortOrder}
+                      onHeaderClick={handleHeader}
+                    />
+                    <tbody className="overflow-x-scroll font-bold">
+                      {sortedData.map((item, i) => (
+                        <TableRow
+                          key={i}
+                          type={type}
+                          item={item}
+                          selectedFilter={selectedFilter}
+                          columns={columns}
+                          showActions={showTableActions}
+                          isSubPageOpen={isSubPageOpen}
+                          locationHandler={locationHandler}
+                          historyHandler={historyHandler}
+                          encryptedRole={encryptedRole}
+                          deleteButtonCallback={deleteButtonCallback}
+                          editButtonCallback={editHandler}
+                          activateButtonCallback={activateButtonCallback}
+                          tableDataCallback={tableDataCallback}
+                          tableSelectOptions={tableSelectOptions}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <div className="flex justify-center items-center h-[30vh]">
                   <Typography>{t("No data available")}</Typography>
@@ -303,7 +295,7 @@ const ModalTable = ({
               )}
             </>
           )}
-        </>
+        </div>
       }
       footer={
         totalPages > 1 && (
@@ -333,7 +325,7 @@ ModalTable.propTypes = {
   fetchHandler: PropTypes.func.isRequired,
   pickedFilter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   filterHandler: PropTypes.func,
-  typeOptions: PropTypes.arrayOf(
+  filterOptions: PropTypes.arrayOf(
     PropTypes.shape({
       type: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       type_name: PropTypes.string.isRequired,

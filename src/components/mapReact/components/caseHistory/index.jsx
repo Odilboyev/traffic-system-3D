@@ -11,6 +11,7 @@ const AlarmHistory = () => {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyTotalPages, setHistoryTotalPages] = useState(null);
   const [totalItems, setTotalItems] = useState(0);
+  const [selectedFilter, setSelectedFilter] = useState(null);
   // fetchErrorHistory
   const fetchErrorHistory = useCallback(async (current, type) => {
     setHistoryLoading(true);
@@ -44,6 +45,14 @@ const AlarmHistory = () => {
           setHistoryTotalPages(null);
           setIsAlarmHistoryOpen(!isAlarmHistoryOpen);
         }}
+        selectedFilter={selectedFilter}
+        filterOptions={[
+          { type: null, type_name: "all" },
+          { type: 1, type_name: "camera" },
+          { type: 3, type_name: "boxcontroller" },
+          { type: 4, type_name: "svetofor" },
+        ]}
+        filterHandler={setSelectedFilter}
         data={historyData}
         type={"history"}
         totalItems={totalItems}
