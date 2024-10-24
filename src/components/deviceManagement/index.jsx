@@ -20,6 +20,7 @@ import {
   updateUser,
 } from "../../api/api.handlers";
 import { toast, ToastContainer } from "react-toastify";
+import { modalToastConfig } from "../../tools/toastconfig";
 
 const DeviceManagement = ({ refreshHandler }) => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
@@ -76,7 +77,8 @@ const DeviceManagement = ({ refreshHandler }) => {
         toast.error(
           error.status_text
             ? error.status_text
-            : `Failed to fetch ${type} data.`
+            : `Failed to fetch ${type} data.`,
+          modalToastConfig
         );
       } finally {
         setDeviceLoading(false);
@@ -108,14 +110,20 @@ const DeviceManagement = ({ refreshHandler }) => {
         });
         console.log(res, `${method} Response`);
         res.status_text
-          ? toast.success(res.status_text)
-          : toast.success(`${method} operation on ${type} succeeded.`);
+          ? toast.success(res.status_text, modalToastConfig)
+          : toast.success(
+              `${method} operation on ${type} succeeded.`,
+              modalToastConfig
+            );
         // Optionally re-fetch data to update the UI
         await fetchData(type);
       } catch (error) {
         console.error(error);
         toast.error(
-          error.status_text ? error.status_text : `Failed to ${method} ${type}.`
+          error.status_text
+            ? error.status_text
+            : `Failed to ${method} ${type}.`,
+          modalToastConfig
         );
       } finally {
         fetchData();
@@ -151,34 +159,28 @@ const DeviceManagement = ({ refreshHandler }) => {
     console.log(newUserData);
     try {
       await addUser(newUserData); // You will need an API call to add a new user
-      toast.success(`User ${newUserData.name} created successfully!`, {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
+      toast.success(
+        `User ${newUserData.name} created successfully!`,
+        modalToastConfig
+      );
       setShowNewUserModal(false); // Close the modal after successful creation
       fetchDeviceData("user/list_active"); // Refresh the user list
     } catch (error) {
-      toast.error("Failed to create user. Please try again.", {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
+      toast.error("Failed to create user. Please try again.", modalToastConfig);
     }
   };
 
   const handleUserUpdate = async (updatedUserData) => {
     try {
       await updateUser(updatedUserData);
-      toast.success(`User ${updatedUserData.name} updated successfully!`, {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
+      toast.success(
+        `User ${updatedUserData.name} updated successfully!`,
+        modalToastConfig
+      );
       // Fetch the updated data to reflect changes in the table
       await fetchDeviceData("user/list_active");
     } catch (error) {
-      toast.error("Failed to update user. Please try again.", {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
+      toast.error("Failed to update user. Please try again.", modalToastConfig);
       throw new Error(error);
     }
   };
@@ -195,24 +197,24 @@ const DeviceManagement = ({ refreshHandler }) => {
     try {
       if (actionType === "deactivate") {
         await deleteUser(user.id);
-        toast.success(`User ${": " + user.name} successfully deactivated!`, {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
+        toast.success(
+          `User ${": " + user.name} successfully deactivated!`,
+          modalToastConfig
+        );
       } else if (actionType === "activate") {
         console.log(user.id, "deactivated");
         await recoverUser(user.id); // Assuming you have an activateUser function
-        toast.success(`User ${": " + user.name} successfully activated!`, {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
+        toast.success(
+          `User ${": " + user.name} successfully activated!`,
+          modalToastConfig
+        );
       }
     } catch (error) {
       // Show error toast in case of failure
-      toast.error(`Failed to ${actionType} user. Please try again.`, {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
+      toast.error(
+        `Failed to ${actionType} user. Please try again.`,
+        modalToastConfig
+      );
       throw new Error(error);
     } finally {
       console.log(filter);

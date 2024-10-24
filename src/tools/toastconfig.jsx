@@ -47,6 +47,7 @@ const toaster = (sensorData, map) => {
     ...toastConfig,
     onClick: handleClick,
     icon: false,
+    containerId: "alarms",
   };
 
   switch (sensorData.statuserror) {
@@ -75,6 +76,10 @@ const toastConfig = {
   progress: undefined,
   theme: "colored",
 };
-
+export const modalToastConfig = {
+  position: "bottom-right",
+  autoClose: 3000,
+  containerId: "modal",
+};
 export { toastConfig };
 export default toaster;

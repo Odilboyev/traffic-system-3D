@@ -171,13 +171,11 @@ const ModalTable = ({
             <>
               <ToastContainer
                 containerId="modal"
+                style={{ zIndex: 99999 }}
                 position="bottom-right" // Set the position to bottom-right
                 autoClose={3000} // Auto close after 3 seconds
                 hideProgressBar={false}
-                newestOnTop={false}
                 closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
                 draggable
                 theme="colored"
                 pauseOnHover
