@@ -34,10 +34,10 @@ const DeviceManagement = ({ refreshHandler }) => {
   const [isEditing, setIsEditing] = useState(null);
 
   const [filterOptions] = useState([
-    { type: 1, type_name: t(`active_${deviceType}`) },
+    { type: 1, type_name: t(`active`) },
     {
       type: 0,
-      type_name: t(`inactive_${deviceType}`),
+      type_name: t(`inactive`),
     },
   ]);
   const [filter, setFilter] = useState(filterOptions[0].type);

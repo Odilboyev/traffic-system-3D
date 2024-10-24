@@ -126,7 +126,7 @@ const TableRow = ({
         >
           <div className="flex items-center justify-start h-full gap-2 w-full">
             {" "}
-            {type != "users" && selectedFilter != "list_deactive" && (
+            {type != "users" && selectedFilter != 0 && (
               <>
                 {type != "crossroad" && (
                   <IconButton
@@ -148,43 +148,18 @@ const TableRow = ({
                 </IconButton>
               </>
             )}
-            {encryptedRole === "admin" && selectedFilter != 1 && (
+            {encryptedRole === "admin" && selectedFilter != 0 && (
               <>
-                {!isEditing ? (
-                  <IconButton
-                    size="sm"
-                    className="mr-1"
-                    color="blue"
-                    //
-                    onClick={() => editButtonCallback(item)} // Enter edit mode
-                  >
-                    <MdEdit className="text-white text-xl" />
-                  </IconButton>
-                ) : (
-                  <>
-                    <IconButton
-                      size="sm"
-                      className="mr-1"
-                      color="green"
-                      onClick={handleSave} // Save changes
-                    >
-                      <MdSave className="text-white text-xl" />
-                    </IconButton>
-                    <IconButton
-                      size="sm"
-                      className="mr-1"
-                      color="red"
-                      onClick={
-                        () => {
-                          setIsEditing(false);
-                          setEditedData({ ...item, password: "" });
-                        } // Cancel editing
-                      }
-                    >
-                      <MdCancel className="text-white text-xl" />
-                    </IconButton>
-                  </>
-                )}
+                <IconButton
+                  size="sm"
+                  className="mr-1"
+                  color="blue"
+                  //
+                  onClick={() => editButtonCallback(item)} // Enter edit mode
+                >
+                  <MdEdit className="text-white text-xl" />
+                </IconButton>
+
                 <IconButton
                   size="sm"
                   className="mr-1"
@@ -195,7 +170,7 @@ const TableRow = ({
                 </IconButton>
               </>
             )}
-            {activateButtonCallback && selectedFilter == 1 && (
+            {activateButtonCallback && selectedFilter == 0 && (
               <IconButton
                 size="sm"
                 color="green"
