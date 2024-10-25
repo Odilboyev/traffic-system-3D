@@ -19,7 +19,7 @@ import {
   recoverUser,
   updateUser,
 } from "../../api/api.handlers";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { modalToastConfig } from "../../tools/toastconfig";
 
 const DeviceManagement = ({ refreshHandler }) => {
@@ -251,20 +251,17 @@ const DeviceManagement = ({ refreshHandler }) => {
 
     if (type === "users") {
       fetchDeviceData("user/list_active"); // Fetch active users by default
-    } else if (
-      type === "crossroad" ||
-      type === "cameratraffic" ||
-      type === "boxmonitor"
-    ) {
-      //  HOZIRCHAGA crossroad uchun qo'yilgan. Backend o'zgarganda hammasi uchun fetchDataForManagement qo'yamiz.
-      fetchData(type, 1, filter);
     } else {
-      fetchDeviceData(type); // Fetch data for the selected type
+      fetchData(type, 1, filter);
     }
   };
   const handleFilterChange = (filter) => {
     setFilter(filter);
-    fetchData(deviceType, 1, filter);
+    deviceType === "users"
+      ? fetchDeviceData(
+          filter === 1 ? "user/list_active" : "user/list_deactive"
+        ) // fetch users
+      : fetchData(deviceType, 1, filter);
   };
 
   return (
@@ -288,7 +285,6 @@ const DeviceManagement = ({ refreshHandler }) => {
               {[
                 "crossroad",
                 "cameratraffic",
-                "camera",
                 "boxmonitor",
                 "svetofor",
                 "users",
@@ -331,29 +327,22 @@ const DeviceManagement = ({ refreshHandler }) => {
         showActions={true}
         isLoading={deviceLoading}
         selectedFilter={filter}
-        // fetchHandler={(type, page) => {
-        //   deviceType == "crossroad" || deviceType === "cameratraffic"
-        //     ? fetchData(type, page, filter)
-        //     : fetchDeviceData(
-        //         type,
-        //         page,
-        //         filter === "0" ? "/list_active" : "/list_deactive"
-        //       );
-        // }}
         fetchHandler={(type, page) => {
           fetchData(type, page, filter);
         }}
         deleteButtonCallback={
           deviceType === "crossroad" ||
           deviceType === "cameratraffic" ||
-          deviceType === "boxmonitor"
+          deviceType === "boxmonitor" ||
+          deviceType === "svetofor"
             ? (data) => modifyData("delete", deviceType, data)
             : (user) => handleUserStatus(user, "deactivate")
         }
         activateButtonCallback={
           deviceType === "crossroad" ||
           deviceType === "cameratraffic" ||
-          deviceType === "boxmonitor"
+          deviceType === "boxmonitor" ||
+          deviceType === "svetofor"
             ? (data) => modifyData("patch", deviceType, data)
             : (user) => handleUserStatus(user, "activate")
         }

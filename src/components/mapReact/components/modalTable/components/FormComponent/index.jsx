@@ -5,6 +5,7 @@ import CameraTrafficFields from "./Fields/CameraTrafficFields";
 import CrossroadFields from "./Fields/CrossroadFields";
 import { getInitialData } from "./utils";
 import BoxMonitorFields from "./Fields/BoxControllerFields";
+import TrafficLightsFields from "./Fields/TrafficLightsFields";
 
 const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
   const [formData, setFormData] = useState(null);
@@ -72,7 +73,12 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
               handleInputChange={handleInputChange}
             />
           )}
-
+          {type === "svetofor" && (
+            <TrafficLightsFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
+          )}
           {/* Action Buttons */}
           <div className="flex justify-end space-x-3 pt-4">
             <Button

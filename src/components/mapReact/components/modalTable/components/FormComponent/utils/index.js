@@ -31,6 +31,20 @@ export const getInitialData = (type) => {
         lat: "",
         lng: "",
       };
+    case "svetofor":
+      return {
+        name: "",
+        crossroad_id: "",
+        ip: "",
+        login: "",
+        password: "",
+        http_port: "",
+        ws_port: "",
+        sdk_port: "",
+        debug_port: "",
+        lat: "",
+        lng: "",
+      };
     default:
       return {};
   }

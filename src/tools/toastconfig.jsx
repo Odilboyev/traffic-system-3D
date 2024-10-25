@@ -42,7 +42,6 @@ const toaster = (sensorData, map) => {
       map.flyTo([sensorData.lat, sensorData.lng], 18);
     }
   };
-  console.log(sensorData, "wokring");
 
   const toastOptions = {
     ...toastConfig,
