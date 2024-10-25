@@ -326,11 +326,13 @@ const MapComponent = ({ changedMarker }) => {
           <UserInfoWidget />
         </Control>
         {/* weather */}
-        <div className={` ${widgets.weather ? "block" : "hidden"}`}>
-          <Control position="topright">
+        <Control position="topright">
+          {widgets.weather ? (
             <WeatherWidget />
-          </Control>
-        </div>
+          ) : (
+            <div style={{ display: "none" }}></div>
+          )}
+        </Control>
         {widgets.bottomsection && (
           <div className="visible">
             <BottomSection cardsInfoData={bottomSectionData} />
