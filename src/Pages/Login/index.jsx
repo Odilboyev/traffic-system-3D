@@ -7,6 +7,9 @@ import PasswordInput from "../../components/PasswordInput";
 import bg from "../../../public/images/back.jpg";
 import { useTheme } from "../../customHooks/useTheme";
 import { FaSpinner } from "react-icons/fa6";
+import InputField from "../../components/mapReact/components/modalTable/components/FormComponent/components/InputField";
+import { MdPassword, MdPerson } from "react-icons/md";
+import { t } from "i18next";
 export function SignIn() {
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -61,32 +64,24 @@ export function SignIn() {
       >
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">
-            <Typography className="font-medium text-xl ">Login</Typography>
             {error && (
               <div className="mb-2 text-red-500 text-center">{error}</div>
             )}
-            <Input
-              labelProps={{
-                className: "hidden",
-              }}
-              color={theme == "dark" ? "white" : "black"}
+            <InputField
+              label={"login"}
+              icon={MdPerson}
               value={loginName}
               name="login"
               placeholder="12345..."
               onChange={(e) => setLoginName(e.target.value)}
-              // onKeyDown={(evt) =>
-              //   ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
-              // }
               className={`!border-t-blue-gray-200 focus:!border-t-gray-900  mt-2`}
             />
-            <Typography className="mt-[5%] font-medium">Password</Typography>
-            <PasswordInput
-              labelProps={{
-                className: "hidden",
-              }}
-              color={theme == "dark" ? "white" : "black"}
+            <br />
+            <InputField
+              inputType="password"
+              label={"password"}
+              icon={MdPassword}
               name="password"
-              type="password"
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -105,7 +100,7 @@ export function SignIn() {
               <FaSpinner className="animate-spin mx-auto" />
             ) : (
               // Render "Sign In" text when loading is false
-              "Kirish"
+              t("enter")
             )}
           </Button>
 

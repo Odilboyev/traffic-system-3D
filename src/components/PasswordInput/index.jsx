@@ -5,6 +5,7 @@ import {
   EyeIcon,
   EyeSlashIcon,
 } from "@heroicons/react/24/solid";
+import { t } from "i18next";
 const PasswordInput = ({ value, onChange, ...rest }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -14,19 +15,16 @@ const PasswordInput = ({ value, onChange, ...rest }) => {
 
   return (
     <div className="relative flex w-full">
-      <Input
-        // labelProps={{
-        //   className: "hidden",
-        // }}
+      <input
         {...rest}
         type={isPasswordVisible ? "text" : "password"}
         onChange={onChange}
+        placeholder={t("password")}
         value={value}
-        className="pr-20"
-        containerProps={{
-          className: "min-w-0",
-        }}
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        required
       />
+
       <IconButton
         variant="text"
         color="gray"

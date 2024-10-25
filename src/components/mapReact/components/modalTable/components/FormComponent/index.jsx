@@ -45,7 +45,7 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
       {formData && (
         <div className="flex flex-col gap-6 static">
           {/* Dynamic Fields Based on Type */}
-          {type === "user" && (
+          {type === "users" && (
             <>
               <UserFields
                 formData={formData}

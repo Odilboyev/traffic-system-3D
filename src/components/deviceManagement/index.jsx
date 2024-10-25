@@ -15,7 +15,6 @@ import {
   fetchDataForManagement,
   getDevices,
   getErrorHistory,
-  getUserRoles,
   recoverUser,
   updateUser,
 } from "../../api/api.handlers";
@@ -42,9 +41,7 @@ const DeviceManagement = ({ refreshHandler }) => {
     },
   ]);
   const [filter, setFilter] = useState(filterOptions[0].type);
-  //users
-  const [userRoles, setUserRoles] = useState([]);
-  const [showNewUserModal, setShowNewUserModal] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
 
   const fetchDeviceData = useCallback(async (type, current = 1) => {
     setDeviceLoading(true);
@@ -132,56 +129,32 @@ const DeviceManagement = ({ refreshHandler }) => {
     },
     [fetchData]
   );
-  useEffect(() => {
-    console.log(filter, "filter changed");
-  }, [filter]);
 
-  // oldcode
-
-  const fetchUserRoles = async () => {
-    try {
-      const roles = await getUserRoles();
-      setUserRoles(roles.data);
-      console.log(roles.data);
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
-  useEffect(() => {
-    fetchUserRoles();
-    fetchData("crossroad");
-  }, []);
-  const createNewUser = (bool) => {
-    setShowNewUserModal(bool); // Show the form modal when the button is clicked
+  const createNewItem = (bool) => {
+    setShowFormModal(bool); // Show the form modal when the button is clicked
   };
 
-  const handleAddUserSubmit = async (newUserData) => {
-    console.log(newUserData);
+  const handleUserAction = async (userData, isUpdate = false) => {
+    const actionType = isUpdate ? "update" : "create";
     try {
-      await addUser(newUserData); // You will need an API call to add a new user
+      if (isUpdate) {
+        await updateUser(userData);
+      } else {
+        await addUser(userData);
+      }
       toast.success(
-        `User ${newUserData.name} created successfully!`,
+        `User ${userData.name} ${actionType}d successfully!`,
         modalToastConfig
       );
-      setShowNewUserModal(false); // Close the modal after successful creation
-      fetchDeviceData("user/list_active"); // Refresh the user list
+      await fetchDeviceData("user/list_active"); // Refresh the user list
     } catch (error) {
-      toast.error("Failed to create user. Please try again.", modalToastConfig);
-    }
-  };
-
-  const handleUserUpdate = async (updatedUserData) => {
-    try {
-      await updateUser(updatedUserData);
-      toast.success(
-        `User ${updatedUserData.name} updated successfully!`,
+      toast.error(
+        `Failed to ${actionType} user. Please try again.`,
         modalToastConfig
       );
-      // Fetch the updated data to reflect changes in the table
-      await fetchDeviceData("user/list_active");
-    } catch (error) {
-      toast.error("Failed to update user. Please try again.", modalToastConfig);
-      throw new Error(error);
+      console.error(`Error ${actionType}ing user:`, error);
+    } finally {
+      setShowFormModal(false); // Close the modal after the action
     }
   };
 
@@ -217,8 +190,7 @@ const DeviceManagement = ({ refreshHandler }) => {
       );
       throw new Error(error);
     } finally {
-      console.log(filter);
-      await fetchDeviceData("user/" + filter); // Fetch active users by default after the operation
+      fetchDeviceData(filter === 1 ? "user/list_active" : "user/list_deactive");
     }
   };
 
@@ -264,6 +236,13 @@ const DeviceManagement = ({ refreshHandler }) => {
       : fetchData(deviceType, 1, filter);
   };
 
+  const isDeviceType = [
+    "crossroad",
+    "cameratraffic",
+    "boxmonitor",
+    "svetofor",
+  ].includes(deviceType);
+
   return (
     <>
       <IconButton
@@ -308,7 +287,7 @@ const DeviceManagement = ({ refreshHandler }) => {
         handleOpen={() => {
           setDeviceTotalPages(null);
           setDeviceData([]);
-          setIsAlarmDeviceOpen(false); // Correctly close the device modal
+          setIsAlarmDeviceOpen(false);
         }}
         totalItems={totalItems}
         historyButtonCallback={
@@ -316,11 +295,10 @@ const DeviceManagement = ({ refreshHandler }) => {
         }
         type={deviceType}
         data={deviceData}
-        pickedFilter={deviceType == "users" ? filter : null}
         filterHandler={handleFilterChange}
         backButtonProps={{
           label: `create_new_${deviceType}`,
-          onClick: (val) => createNewUser(val),
+          onClick: (val) => createNewItem(val),
           icon: <PlusIcon className="w-5 h-5 m-0" />,
         }}
         filterOptions={filterOptions}
@@ -328,30 +306,30 @@ const DeviceManagement = ({ refreshHandler }) => {
         isLoading={deviceLoading}
         selectedFilter={filter}
         fetchHandler={(type, page) => {
-          fetchData(type, page, filter);
+          deviceType === "users"
+            ? fetchDeviceData(
+                type === 1 ? "user/list_active" : "user/list_deactive",
+                page
+              )
+            : fetchData(type, page, filter);
         }}
         deleteButtonCallback={
-          deviceType === "crossroad" ||
-          deviceType === "cameratraffic" ||
-          deviceType === "boxmonitor" ||
-          deviceType === "svetofor"
+          isDeviceType
             ? (data) => modifyData("delete", deviceType, data)
             : (user) => handleUserStatus(user, "deactivate")
         }
         activateButtonCallback={
-          deviceType === "crossroad" ||
-          deviceType === "cameratraffic" ||
-          deviceType === "boxmonitor" ||
-          deviceType === "svetofor"
+          isDeviceType
             ? (data) => modifyData("patch", deviceType, data)
             : (user) => handleUserStatus(user, "activate")
         }
-        tableSelectOptions={userRoles}
         editButtonCallback={setIsEditing}
-        isFormOpen={showNewUserModal}
-        submitNewData={(data) =>
-          modifyData(isEditing ? "PUT" : "POST", deviceType, data)
-        }
+        isFormOpen={showFormModal}
+        submitNewData={(data) => {
+          deviceType === "users"
+            ? handleUserAction(data, isEditing)
+            : modifyData(isEditing ? "PUT" : "POST", deviceType, data);
+        }}
       />
     </>
   );
