@@ -45,7 +45,6 @@ const ModalTable = ({
   isFormOpen,
   submitNewData,
 }) => {
-  const encryptedRole = atob(localStorage.getItem("its_user_role"));
   const { theme } = useTheme();
   const map = useMap();
 
@@ -275,7 +274,6 @@ const ModalTable = ({
                           isSubPageOpen={isSubPageOpen}
                           locationHandler={locationHandler}
                           historyHandler={historyHandler}
-                          encryptedRole={encryptedRole}
                           deleteButtonCallback={deleteButtonCallback}
                           editButtonCallback={editHandler}
                           activateButtonCallback={activateButtonCallback}

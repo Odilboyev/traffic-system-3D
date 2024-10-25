@@ -101,6 +101,9 @@ const MapEvents = ({ changedMarker, fetchAlarmsData }) => {
 };
 
 const MapComponent = ({ changedMarker }) => {
+  // user role
+  const role = atob(localStorage.getItem("its_user_role"));
+  const isPermitted = role === "admin" || role === "boss";
   // language `-`
   const { t } = useTranslation();
   //theme
@@ -323,15 +326,16 @@ const MapComponent = ({ changedMarker }) => {
           <UserInfoWidget />
         </Control>
         {/* weather */}
-        <div className={widgets.weather ? "visible" : "invisible"}>
+        <div className={` ${widgets.weather ? "block" : "hidden"}`}>
           <Control position="topright">
             <WeatherWidget />
           </Control>
         </div>
-        <div className={widgets.bottomsection ? "visible" : "invisible"}>
-          {" "}
-          <BottomSection cardsInfoData={bottomSectionData} />
-        </div>
+        {widgets.bottomsection && (
+          <div className="visible">
+            <BottomSection cardsInfoData={bottomSectionData} />
+          </div>
+        )}
         {/* lights */}
         {/* <Svetoforlar /> */}
         {filter.trafficlights && <TrafficLightContainer />}
@@ -378,9 +382,11 @@ const MapComponent = ({ changedMarker }) => {
           <AlarmHistory />
         </Control>
         {/* Device Management */}
-        <Control position="topleft">
-          <DeviceManagement refreshHandler={getDataHandler} />
-        </Control>
+        {isPermitted && (
+          <Control position="topleft">
+            <DeviceManagement refreshHandler={getDataHandler} />
+          </Control>
+        )}
         <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}

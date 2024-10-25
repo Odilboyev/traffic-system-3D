@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { MdCameraAlt, MdFlag } from "react-icons/md";
 import { t } from "i18next";
 import { crossroadHandler } from "../utils";
+import { LiaTrafficLightSolid } from "react-icons/lia";
 
 // TrafficLightsFields-specific fields
 const TrafficLightsFields = ({ formData, handleInputChange }) => {
@@ -45,7 +46,7 @@ const TrafficLightsFields = ({ formData, handleInputChange }) => {
         <InputField
           key={field}
           required
-          icon={MdCameraAlt}
+          icon={LiaTrafficLightSolid}
           label={t(field)}
           value={formData[field] || ""}
           onChange={(e) => handleInputChange(field, e.target.value)}

@@ -24,7 +24,7 @@ const TableRow = ({
   isSubPageOpen,
   locationHandler,
   historyHandler,
-  encryptedRole,
+  role,
   editButtonCallback,
   deleteButtonCallback,
   activateButtonCallback,
@@ -148,7 +148,7 @@ const TableRow = ({
                 </IconButton>
               </>
             )}
-            {encryptedRole === "admin" && selectedFilter != 0 && (
+            {selectedFilter != 0 && (
               <>
                 <IconButton
                   size="sm"
