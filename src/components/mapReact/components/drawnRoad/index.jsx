@@ -144,9 +144,9 @@ const RoadDrawing = ({ id }) => {
                     if (channelId && channelStatuses[channelId]) {
                       const status = channelStatuses[channelId].status;
                       newState[direction] =
-                        status === 0
+                        status === 1
                           ? "green"
-                          : status === 1
+                          : status === 9 || status === 3
                           ? "yellow"
                           : "red";
                     }
@@ -179,8 +179,7 @@ const RoadDrawing = ({ id }) => {
                   const channelId = dirConfig.cross_walk?.channel_id;
                   if (channelId && channelStatuses[channelId]) {
                     const status = channelStatuses[channelId].status;
-                    newState[direction] =
-                      status === 0 ? "green" : status === 1 ? "red" : "yellow";
+                    newState[direction] = status === 1 ? "green" : "red";
                   }
                 }
               });

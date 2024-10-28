@@ -1,5 +1,6 @@
 import {
   TbArrowBackUp,
+  TbArrowLeft,
   TbArrowRampLeft,
   TbArrowRampRight,
   TbArrowRight,
@@ -10,6 +11,7 @@ export const iconOptions = [
   { name: "Right Ramp", icon: <TbArrowRampRight />, value: "TbArrowRampRight" },
   { name: "Left Ramp", icon: <TbArrowRampLeft />, value: "TbArrowRampLeft" },
   { name: "Right Arrow", icon: <TbArrowRight />, value: "TbArrowRight" },
+  { name: "Left Arrow", icon: <TbArrowLeft />, value: "TbArrowLeft" },
   { name: "Arrow Up", icon: <TbArrowUp />, value: "TbArrowUp" },
   {
     name: "Arrow Back Up",
