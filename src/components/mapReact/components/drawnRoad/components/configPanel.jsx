@@ -1,5 +1,8 @@
 import { iconOptions } from "../utils";
 import Select from "react-select";
+import PropTypes from "prop-types";
+import Slider from "react-smooth-range-input";
+import CustomSelect from "../../../../customSelect";
 
 const ConfigPanel = ({ config, setConfig }) => {
   // Handles changes in road configuration for visibility or other fields
@@ -75,7 +78,7 @@ const ConfigPanel = ({ config, setConfig }) => {
   };
 
   return (
-    <div className="absolute max-w-[20vw] max-h-screen overflow-scroll top-0 left-0 p-6 border shadow-lg z-50 h-full bg-white rounded-lg space-y-6">
+    <div className="absolute max-w-[20vw] no-scrollbar max-h-screen overflow-scroll top-0 left-0 p-6 border shadow-lg z-50 h-full  rounded-lg space-y-6">
       {/* Angle Control */}
       <div className="flex items-center mb-6">
         <span className="text-sm font-medium mr-4">Rotation Angle:</span>
@@ -96,13 +99,16 @@ const ConfigPanel = ({ config, setConfig }) => {
       {["north", "south", "east", "west"].map((direction) => (
         <div
           key={direction}
-          className="p-4 bg-gray-100 rounded-lg border border-gray-200 mb-4 w-full"
+          className="p-4  rounded-lg border border-gray-200 mb-4 w-full"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="capitalize font-medium text-gray-700">
               {direction} Direction
             </span>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
+              <label htmlFor={"check" + direction} className="text-sm">
+                Visible
+              </label>
               <input
                 id={"check" + direction}
                 type="checkbox"
@@ -110,73 +116,75 @@ const ConfigPanel = ({ config, setConfig }) => {
                 onChange={(e) =>
                   handleRoadChange(direction, "visible", e.target.checked)
                 }
-                className="accent-blue-500"
+                className="accent-blue-500 "
               />
-              <label htmlFor={"check" + direction} className="ml-2 text-sm">
-                Visible
-              </label>
             </div>
           </div>
 
           {/* Lane Count Controls */}
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm">
+          <div className="flex flex-col mb-3 gap-2 w-full">
+            <label htmlFor={`lanesLeft-${direction}`} className="text-sm">
               Lanes Left:{" "}
               <span className="font-semibold">
                 {config[direction].lanesLeft.length}
               </span>
-            </span>
-            <input
-              type="range"
-              id="lanesLeft"
+            </label>
+            <Slider
+              id={`lanesLeft-${direction}`}
               min={1}
               max={5}
+              hasTickMarks={false}
+              barHeight={10}
+              shouldAnimateNumber={false}
               step={1}
               value={config[direction].lanesLeft.length}
-              onChange={(e) =>
-                updateLaneCount(direction, "lanesLeft", +e.target.value)
+              onChange={(value) =>
+                updateLaneCount(direction, "lanesLeft", value)
               }
-              className="w-2/3 accent-blue-gray-500"
+              className="w-full"
             />
           </div>
 
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm">
+          <div className="flex flex-col mb-3 gap-2 w-full">
+            <label htmlFor={`lanesRight-${direction}`} className="text-sm">
               Lanes Right:{" "}
               <span className="font-semibold">
                 {config[direction].lanesRight.length}
               </span>
-            </span>
-            <input
-              type="range"
-              id="lanesRight"
+            </label>
+            <Slider
+              id={`lanesRight-${direction}`}
               min={1}
               max={5}
               step={1}
+              hasTickMarks={false}
+              barHeight={10}
+              shouldAnimateNumber={false}
               value={config[direction].lanesRight.length}
-              onChange={(e) =>
-                updateLaneCount(direction, "lanesRight", +e.target.value)
+              onChange={(value) =>
+                updateLaneCount(direction, "lanesRight", value)
               }
-              className="w-2/3 accent-blue-gray-800"
+              className="w-full"
             />
           </div>
 
           {/* Lane Icon Controls */}
-          <div className="flex flex-wrap gap-3 mt-2">
-            <span className="text-sm">Lane Icons (Right):</span>
-            <div className="flex flex-wrap">
+          <div className="flex flex-col gap-3 mt-2">
+            <label className="text-sm">Lane Icons (Right):</label>
+            <div className="flex flex-wrap gap-1">
               {config[direction].lanesRight.map((lane, index) => (
-                <Select
-                  key={index}
-                  value={iconOptions.find(
-                    (option) => option.value === lane.icon
-                  )}
-                  onChange={(e) =>
-                    handleIconChange(direction, "lanesRight", index, e.value)
-                  }
-                  getOptionLabel={(option) => <>{option.icon}</>}
-                  options={iconOptions}
-                />
+                <div key={`${direction}-right-${index}`} className="w-1/4">
+                  <CustomSelect
+                    value={iconOptions.find(
+                      (option) => option.value === lane.icon
+                    )}
+                    onChange={(e) =>
+                      handleIconChange(direction, "lanesRight", index, e.value)
+                    }
+                    getOptionLabel={(option) => <>{option.icon}</>}
+                    options={iconOptions}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -191,6 +199,49 @@ const ConfigPanel = ({ config, setConfig }) => {
       </button>
     </div>
   );
+};
+
+ConfigPanel.propTypes = {
+  config: PropTypes.shape({
+    angle: PropTypes.number,
+    north: PropTypes.shape({
+      visible: PropTypes.bool,
+      lanesLeft: PropTypes.arrayOf(PropTypes.object),
+      lanesRight: PropTypes.arrayOf(
+        PropTypes.shape({
+          icon: PropTypes.string,
+        })
+      ),
+    }),
+    south: PropTypes.shape({
+      visible: PropTypes.bool,
+      lanesLeft: PropTypes.arrayOf(PropTypes.object),
+      lanesRight: PropTypes.arrayOf(
+        PropTypes.shape({
+          icon: PropTypes.string,
+        })
+      ),
+    }),
+    east: PropTypes.shape({
+      visible: PropTypes.bool,
+      lanesLeft: PropTypes.arrayOf(PropTypes.object),
+      lanesRight: PropTypes.arrayOf(
+        PropTypes.shape({
+          icon: PropTypes.string,
+        })
+      ),
+    }),
+    west: PropTypes.shape({
+      visible: PropTypes.bool,
+      lanesLeft: PropTypes.arrayOf(PropTypes.object),
+      lanesRight: PropTypes.arrayOf(
+        PropTypes.shape({
+          icon: PropTypes.string,
+        })
+      ),
+    }),
+  }).isRequired,
+  setConfig: PropTypes.func.isRequired,
 };
 
 export default ConfigPanel;

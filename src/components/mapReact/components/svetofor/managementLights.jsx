@@ -2,22 +2,7 @@ import React, { useEffect, useState } from "react";
 // import Svetoforlar from "./Svetoforlar"; // Adjust path as necessary
 import PhasesDisplay from "../crossroad/components/phases";
 import Svetoforlar from ".";
-function fixIncompleteJSON(message) {
-  // Check if message starts with "{" and doesn't end with "}"
-  if (message.startsWith("{") && !message.endsWith("}")) {
-    // Count opening and closing braces
-    const openBracesCount = (message.match(/{/g) || []).length;
-    const closeBracesCount = (message.match(/}/g) || []).length;
-
-    // If there are more opening braces than closing braces, add the missing closing braces
-    if (openBracesCount > closeBracesCount) {
-      const missingBraces = openBracesCount - closeBracesCount;
-      message += "}".repeat(missingBraces);
-    }
-  }
-
-  return message;
-}
+import { fixIncompleteJSON } from "./utils";
 
 const TrafficLightContainer = ({ isInModal }) => {
   const [trafficLights, setTrafficLights] = useState([]);

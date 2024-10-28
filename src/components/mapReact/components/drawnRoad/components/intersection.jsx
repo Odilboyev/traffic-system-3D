@@ -1,10 +1,5 @@
-import {
-  getCrosswalkWidth,
-  getIntersectionSize,
-  getLaneWidth,
-  getRoadWidth,
-} from "../utils";
-import Crosswalk from "./crosswalk";
+import PropTypes from "prop-types";
+import { getCrosswalkWidth, getIntersectionSize, getRoadWidth } from "../utils";
 import IntersectionArrows from "./intersectionArrows";
 import Lane from "./lane";
 
@@ -20,7 +15,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
     );
   };
 
-  const intersectionSize = getIntersectionSize(config) * 2;
+  const intersectionSize = getIntersectionSize(config);
 
   const renderLanes = (direction, roadName) =>
     config[roadName].visible && (
@@ -241,6 +236,18 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
       </div>
     </div>
   );
+};
+
+Intersection.propTypes = {
+  config: PropTypes.shape({
+    angle: PropTypes.number,
+    north: PropTypes.object,
+    south: PropTypes.object,
+    east: PropTypes.object,
+    west: PropTypes.object,
+  }).isRequired,
+  trafficLights: PropTypes.object.isRequired,
+  crosswalks: PropTypes.object.isRequired,
 };
 
 export default Intersection;

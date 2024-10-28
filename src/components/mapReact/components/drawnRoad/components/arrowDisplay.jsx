@@ -29,7 +29,7 @@ const ArrowDisplay = ({
   const isLeftmost = laneIndex === 0;
 
   const colorMappingText = {
-    green: "text-green",
+    green: "text-green-400",
     yellow: "text-yellow-400",
     red: "text-red-500",
   };

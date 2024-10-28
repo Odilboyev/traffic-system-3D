@@ -10,8 +10,8 @@ export const iconOptions = [
   },
 ];
 
-export const getLaneWidth = () => 60;
-export const getCrosswalkWidth = () => 30;
+export const getLaneWidth = () => 40;
+export const getCrosswalkWidth = () => 20;
 export const getRoadWidth = (roadConfig) => {
   return (
     (roadConfig.lanesLeft.length + roadConfig.lanesRight.length) *
@@ -19,26 +19,30 @@ export const getRoadWidth = (roadConfig) => {
   );
 };
 export const getIntersectionSize = (config) => {
-  // Helper function to calculate the full road width (lanes + crosswalks)
+  // Calculate the width needed for each direction
   const calculateRoadWidth = (roadConfig) => {
     if (!roadConfig.visible) return 0;
-    const maxLanes = Math.max(
-      roadConfig.lanesLeft.length,
-      roadConfig.lanesRight.length
-    );
-    return maxLanes * getLaneWidth() + getCrosswalkWidth();
+    const totalLanes =
+      roadConfig.lanesLeft.length + roadConfig.lanesRight.length;
+    return totalLanes * getLaneWidth();
   };
 
-  // Calculate the road widths for all four directions
-  const widthNorth = calculateRoadWidth(config.north);
-  const widthSouth = calculateRoadWidth(config.south);
-  const heightEast = calculateRoadWidth(config.east);
-  const heightWest = calculateRoadWidth(config.west);
+  // Get widths for all directions
+  const northWidth = calculateRoadWidth(config.north);
+  const southWidth = calculateRoadWidth(config.south);
+  const eastWidth = calculateRoadWidth(config.east);
+  const westWidth = calculateRoadWidth(config.west);
 
-  // Use the maximum of both widths and heights to ensure the intersection fits properly
-  const totalWidth = Math.max(widthNorth, widthSouth);
-  const totalHeight = Math.max(heightEast, heightWest);
+  // Use the maximum width between opposing directions
+  const verticalWidth = Math.max(northWidth, southWidth);
+  const horizontalWidth = Math.max(eastWidth, westWidth);
 
-  // Return the larger value between width and height
-  return Math.max(totalWidth, totalHeight);
+  // Base size should be enough to accommodate the wider of the two directions
+  const baseSize = Math.max(verticalWidth, horizontalWidth);
+
+  // Add just enough padding to ensure corners meet the roads
+  // The tangent of 45° is 1, so we need ~1.4 (√2) to ensure corners reach
+  const paddingFactor = 1.3;
+
+  return Math.ceil(baseSize * paddingFactor);
 };

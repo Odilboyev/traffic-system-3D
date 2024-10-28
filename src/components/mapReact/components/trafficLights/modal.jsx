@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import TrafficLights from ".";
 import { getTrafficLightsData } from "../../../../api/api.handlers";
+import { fixIncompleteJSON } from "../svetofor/utils";
 
 const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,11 +37,11 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
         return data?.channel.map((v) => {
           return {
             ...v,
-            lat: trafficLights.find((light) => v.id === light.link_id).lat,
-            lng: trafficLights.find((light) => v.id === light.link_id).lng,
+            lat: trafficLights.find((light) => v.id === light.link_id)?.lat,
+            lng: trafficLights.find((light) => v.id === light.link_id)?.lng,
             rotate: trafficLights.find((light) => v.id === light.link_id)
-              .rotate,
-            type: trafficLights.find((light) => v.id === light.link_id).type,
+              ?.rotate,
+            type: trafficLights.find((light) => v.id === light.link_id)?.type,
           };
         });
       });
@@ -52,9 +53,15 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
         import.meta.env.VITE_TRAFFIC_SOCKET + light?.cid
       );
       trafficSocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        onTrafficLightsDataReceived(data);
+        let message = event.data;
+        // Fix incomplete JSON message
+        message = fixIncompleteJSON(message);
+        try {
+          const data = JSON.parse(message);
+          onTrafficLightsDataReceived(data);
+        } catch (error) {
+          throw new Error(error);
+        }
       };
       // setTimeout(() => {
       //   trafficSocket.close();
