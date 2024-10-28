@@ -33,16 +33,54 @@ export const getIntersectionSize = (config) => {
   const eastWidth = calculateRoadWidth(config.east);
   const westWidth = calculateRoadWidth(config.west);
 
+  // Calculate lane differences and asymmetry
+  const verticalDiff = Math.abs(northWidth - southWidth);
+  const horizontalDiff = Math.abs(eastWidth - westWidth);
+
+  // Calculate lane distribution asymmetry within each road
+  const calculateAsymmetry = (roadConfig) => {
+    if (!roadConfig.visible) return 0;
+    return Math.abs(roadConfig.lanesLeft.length - roadConfig.lanesRight.length);
+  };
+
+  const northAsymmetry = calculateAsymmetry(config.north);
+  const southAsymmetry = calculateAsymmetry(config.south);
+  const eastAsymmetry = calculateAsymmetry(config.east);
+  const westAsymmetry = calculateAsymmetry(config.west);
+
   // Use the maximum width between opposing directions
   const verticalWidth = Math.max(northWidth, southWidth);
   const horizontalWidth = Math.max(eastWidth, westWidth);
-
-  // Base size should be enough to accommodate the wider of the two directions
   const baseSize = Math.max(verticalWidth, horizontalWidth);
 
-  // Add just enough padding to ensure corners meet the roads
-  // The tangent of 45° is 1, so we need ~1.4 (√2) to ensure corners reach
-  const paddingFactor = 1.3;
+  // Calculate dynamic padding factor
+  let paddingFactor = 1.25; // Start with minimum padding
+
+  // Adjust for width differences between opposing roads
+  const maxDiff = Math.max(verticalDiff, horizontalDiff) / getLaneWidth();
+  if (maxDiff > 0) {
+    paddingFactor += maxDiff * 0.03;
+  }
+
+  // Adjust for lane distribution asymmetry
+  const maxAsymmetry = Math.max(
+    northAsymmetry,
+    southAsymmetry,
+    eastAsymmetry,
+    westAsymmetry
+  );
+  if (maxAsymmetry > 1) {
+    paddingFactor += maxAsymmetry * 0.02;
+  }
+
+  // Adjust for total road width
+  const maxWidth = Math.max(verticalWidth, horizontalWidth) / getLaneWidth();
+  if (maxWidth > 6) {
+    paddingFactor += 0.05;
+  }
+
+  // Cap the padding factor
+  paddingFactor = Math.min(Math.max(paddingFactor, 1.25), 1.4);
 
   return Math.ceil(baseSize * paddingFactor);
 };

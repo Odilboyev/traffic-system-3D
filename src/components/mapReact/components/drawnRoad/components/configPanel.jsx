@@ -78,7 +78,7 @@ const ConfigPanel = ({ config, setConfig }) => {
   };
 
   return (
-    <div className="absolute max-w-[20vw] no-scrollbar max-h-screen overflow-scroll top-0 left-0 p-6 border shadow-lg z-50 h-full  rounded-lg space-y-6">
+    <div className="absolute max-w-[20vw] w-[20vw] no-scrollbar max-h-screen overflow-y-scroll top-0 left-0 p-6 border shadow-lg z-50 h-full  rounded-lg space-y-6">
       {/* Angle Control */}
       <div className="flex items-center mb-6">
         <span className="text-sm font-medium mr-4">Rotation Angle:</span>
@@ -99,7 +99,7 @@ const ConfigPanel = ({ config, setConfig }) => {
       {["north", "south", "east", "west"].map((direction) => (
         <div
           key={direction}
-          className="p-4  rounded-lg border border-gray-200 mb-4 w-full"
+          className="p-4  rounded-lg border border-gray-200 mb-4 w-full max-w-full"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="capitalize font-medium text-gray-700">
@@ -122,7 +122,7 @@ const ConfigPanel = ({ config, setConfig }) => {
           </div>
 
           {/* Lane Count Controls */}
-          <div className="flex flex-col mb-3 gap-2 w-full">
+          <div className="flex flex-col mb-3 gap-2 max-w-full">
             <label htmlFor={`lanesLeft-${direction}`} className="text-sm">
               Lanes Left:{" "}
               <span className="font-semibold">
@@ -135,17 +135,18 @@ const ConfigPanel = ({ config, setConfig }) => {
               max={5}
               hasTickMarks={false}
               barHeight={10}
+              style={{ maxWidth: "10vw" }}
+              className="max-w-full"
               shouldAnimateNumber={false}
               step={1}
               value={config[direction].lanesLeft.length}
               onChange={(value) =>
                 updateLaneCount(direction, "lanesLeft", value)
               }
-              className="w-full"
             />
           </div>
 
-          <div className="flex flex-col mb-3 gap-2 w-full">
+          <div className="flex flex-col mb-3 gap-2 ">
             <label htmlFor={`lanesRight-${direction}`} className="text-sm">
               Lanes Right:{" "}
               <span className="font-semibold">
@@ -164,7 +165,6 @@ const ConfigPanel = ({ config, setConfig }) => {
               onChange={(value) =>
                 updateLaneCount(direction, "lanesRight", value)
               }
-              className="w-full"
             />
           </div>
 
