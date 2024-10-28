@@ -1,7 +1,15 @@
-import { TbArrowBackUp, TbArrowRampRight, TbArrowUp } from "react-icons/tb";
+import {
+  TbArrowBackUp,
+  TbArrowRampLeft,
+  TbArrowRampRight,
+  TbArrowRight,
+  TbArrowUp,
+} from "react-icons/tb";
 
 export const iconOptions = [
   { name: "Right Ramp", icon: <TbArrowRampRight />, value: "TbArrowRampRight" },
+  { name: "Left Ramp", icon: <TbArrowRampLeft />, value: "TbArrowRampLeft" },
+  { name: "Right Arrow", icon: <TbArrowRight />, value: "TbArrowRight" },
   { name: "Arrow Up", icon: <TbArrowUp />, value: "TbArrowUp" },
   {
     name: "Arrow Back Up",

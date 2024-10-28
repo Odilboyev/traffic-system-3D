@@ -107,7 +107,7 @@ const ConfigPanel = ({ config, setConfig }) => {
   };
 
   return (
-    <div className="absolute max-w-[20vw] w-[20vw] no-scrollbar max-h-screen overflow-y-scroll top-0 left-0 p-6 border shadow-lg z-50 h-full rounded-lg space-y-6">
+    <div className=" no-scrollbar max-h-screen overflow-y-scroll p-6 border shadow-lg z-50 h-full rounded-lg space-y-6">
       {/* Angle Control */}
       <div className="flex items-center mb-6">
         <span className="text-sm font-medium mr-4">Rotation Angle:</span>

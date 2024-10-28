@@ -61,6 +61,8 @@ const getNearbyTrafficLights = async (body) =>
 const getNearbySigns = async (body) =>
   postData(import.meta.env.VITE_NEARBYSIGNS, body);
 const getUserRoles = async () => getData(import.meta.env.VITE_USER_ROLES);
+const getTrafficLightsConfig = async (id) =>
+  getData(import.meta.env.VITE_TRAFFIC_LIGHTS_CONFIG, id);
 
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
@@ -184,6 +186,7 @@ export {
   getWeatherData,
   getTexts,
   getNearbyTrafficLights,
+  getTrafficLightsConfig,
   getNearbySigns,
   getDevices,
   fetchDataForManagement,

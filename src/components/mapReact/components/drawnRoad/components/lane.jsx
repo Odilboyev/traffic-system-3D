@@ -1,5 +1,6 @@
 import { getLaneWidth } from "../utils";
 import ArrowDisplay from "./arrowDisplay";
+
 const Lane = ({
   angle,
   lanesLeft,
@@ -7,9 +8,20 @@ const Lane = ({
   direction,
   roadName = "",
   trafficLights,
+  seconds, // Add seconds prop
 }) => {
   const totalLanes = lanesLeft.length + lanesRight.length;
   const laneWidth = getLaneWidth();
+
+  const getColorClass = (status) => {
+    const colorMap = {
+      red: "text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]",
+      yellow: "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
+      green: "text-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]",
+    };
+    return colorMap[status] || colorMap.red;
+  };
+
   return (
     <div
       className={`relative z-20 flex ${
@@ -22,7 +34,7 @@ const Lane = ({
           : `${
               roadName.toLowerCase() === "north"
                 ? "flex-row-reverse"
-                : "flex-row "
+                : "flex-row"
             }`
       } ${direction === "vertical" ? "justify-center" : "items-center"}`}
       style={{
@@ -32,16 +44,6 @@ const Lane = ({
           direction === "horizontal" ? `${laneWidth * totalLanes}px` : "100%",
       }}
     >
-      <p
-        className={`text-xl font-bold absolute ${
-          roadName === "north" || roadName === "south"
-            ? "-left-20 top-10"
-            : "-top-10"
-        }`}
-        style={{ transform: `rotate(-${angle}deg)` }}
-      >
-        {roadName}
-      </p>
       {lanesLeft.map((lane, i) => (
         <ArrowDisplay
           key={`left-${i}`}
@@ -50,9 +52,9 @@ const Lane = ({
           laneWidth={laneWidth}
           totalLanes={totalLanes}
           laneIndex={i}
-          icon={lane.icon}
           roadName={roadName}
           trafficLights={trafficLights}
+          seconds={seconds}
         />
       ))}
       {lanesRight.map((lane, i) => (
@@ -66,6 +68,7 @@ const Lane = ({
           icon={lane.icon}
           roadName={roadName}
           trafficLights={trafficLights}
+          seconds={seconds}
         />
       ))}
     </div>

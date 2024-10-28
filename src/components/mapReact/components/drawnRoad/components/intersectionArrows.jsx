@@ -5,11 +5,12 @@ import {
   TbArrowUp,
 } from "react-icons/tb";
 import { HiArrowsUpDown } from "react-icons/hi2";
+import { useState, useEffect } from "react";
 
 const IntersectionArrows = ({ trafficLights }) => {
   return (
     <div
-      className="absolute flex flex-col items-center justify-center w-full h-full z-50 text-white"
+      className="absolute flex items-center justify-center w-full h-full z-50"
       style={{
         top: "50%",
         left: "50%",
@@ -34,4 +35,5 @@ const IntersectionArrows = ({ trafficLights }) => {
     </div>
   );
 };
+
 export default IntersectionArrows;

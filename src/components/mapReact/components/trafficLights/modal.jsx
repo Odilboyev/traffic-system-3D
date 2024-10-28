@@ -114,9 +114,10 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
 
         <DialogBody className="min-h-[90vh] max-h-[94vh] overflow-y-scroll dark:bg-blue-gray-900 dark:text-white">
           <TrafficLights
-            center={[light?.lat, light?.lng]}
-            lights={trafficLights}
-            lightsSocketData={trafficSocketData}
+            id={light?.cid}
+            // center={[light?.lat, light?.lng]}
+            // lights={trafficLights}
+            // lightsSocketData={trafficSocketData}
           />
         </DialogBody>
       </Dialog>

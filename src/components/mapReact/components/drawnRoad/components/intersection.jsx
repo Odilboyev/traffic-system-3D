@@ -3,7 +3,14 @@ import { getCrosswalkWidth, getIntersectionSize, getRoadWidth } from "../utils";
 import IntersectionArrows from "./intersectionArrows";
 import Lane from "./lane";
 
-const Intersection = ({ config, trafficLights, crosswalks }) => {
+const Intersection = ({
+  id,
+  config,
+  trafficLights,
+  crosswalks,
+  seconds = {},
+  crosswalkSeconds = {},
+}) => {
   const getMaxRoadWidth = () => {
     return (
       Math.max(
@@ -26,6 +33,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
         direction={direction}
         roadName={roadName}
         trafficLights={trafficLights}
+        seconds={seconds[roadName]} // Pass the seconds for this road
       />
     );
 
@@ -37,7 +45,6 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
     if (!roadConfig.visible) return null;
 
     let top, left;
-
     if (direction === "vertical") {
       top = roadName === "north" ? `calc(100% - ${crosswalkHeight}px)` : `0`;
       left = `calc(50% - ${crosswalkWidth / 2}px)`;
@@ -45,11 +52,40 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
       top = `calc(50% - ${crosswalkWidth / 2}px)`;
       left = roadName === "east" ? `0` : `calc(100% - ${crosswalkHeight}px)`;
     }
+
     const colorMappingBG = {
       green: "#4ade80",
       yellow: "#fde047",
       red: "#ef4444",
     };
+
+    const colorMappingText = {
+      green: "text-green-400",
+      yellow: "text-yellow-400",
+      red: "text-red-500",
+    };
+
+    const colorMappingGlow = {
+      green: "drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]",
+      yellow: "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
+      red: "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]",
+    };
+
+    // Calculate counter position based on direction and road name
+    let counterStyle = {};
+    if (direction === "vertical") {
+      counterStyle = {
+        left: `calc(100% + 10px)`,
+        top: "50%",
+        transform: "translateY(-50%)",
+      };
+    } else {
+      counterStyle = {
+        top: `calc(100% + 10px)`,
+        left: "50%",
+        transform: "translateX(-50%)",
+      };
+    }
 
     return (
       <div
@@ -72,7 +108,16 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
           } 5px, transparent 5px, transparent 10px)`,
           zIndex: 50,
         }}
-      />
+      >
+        <div
+          className={`absolute ${colorMappingText[crosswalks[roadName]]} ${
+            colorMappingGlow[crosswalks[roadName]]
+          } font-digital text-xl`}
+          style={counterStyle}
+        >
+          {crosswalkSeconds[roadName]}
+        </div>
+      </div>
     );
   };
   const roadWidthNorth = getRoadWidth(config.north);
@@ -167,7 +212,9 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
   const margin = calculateGlobalMargin();
   return (
     <div
-      className="relative w-2/3 ml-auto h-full flex items-center justify-center overflow-hidden"
+      className={`relative ${
+        id ? "w-full" : "w-2/3"
+      } h-full flex items-center justify-center overflow-hidden`}
       style={{ transform: `rotate(${config.angle}deg)` }}
     >
       <div
@@ -179,7 +226,12 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
           left: `calc(50% - ${intersectionSize / 2}px)`,
         }}
       >
-        <IntersectionArrows trafficLights={trafficLights} />
+        <IntersectionArrows
+          trafficLights={trafficLights}
+          currentDirection={
+            trafficLights.east === "green" ? "east-west" : "north-south"
+          }
+        />
         {renderIntersectionBoundary()}
       </div>
 
@@ -239,6 +291,7 @@ const Intersection = ({ config, trafficLights, crosswalks }) => {
 };
 
 Intersection.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   config: PropTypes.shape({
     angle: PropTypes.number,
     north: PropTypes.object,

@@ -11,6 +11,7 @@ const ArrowDisplay = ({
   icon,
   totalLanes,
   trafficLights,
+  seconds,
 }) => {
   // Rotation logic based on direction and roadName
   const getRotationAngle = () => {
@@ -34,6 +35,12 @@ const ArrowDisplay = ({
     red: "text-red-500",
   };
 
+  const colorMappingGlow = {
+    green: "drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]",
+    yellow: "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
+    red: "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]",
+  };
+
   return (
     <div
       className={`flex ${
@@ -55,18 +62,34 @@ const ArrowDisplay = ({
       }}
     >
       {icon && (
-        <span
-          className={`${
-            colorMappingText[trafficLights[roadName]]
-          } font-bolder text-2xl bg-white rounded-xl p-1`}
+        <div
+          className="flex flex-col items-center gap-1"
           style={{
             zIndex: 50,
             margin: direction === "vertical" ? "40px 0px" : "0px 40px",
-            transform: `rotate(${getRotationAngle()})`, // Apply rotation
+            transform: `rotate(${getRotationAngle()})`,
           }}
         >
-          {iconOptions.find((v) => v.value === icon)?.icon}
-        </span>
+          <span
+            className={`${colorMappingText[trafficLights[roadName]]} ${
+              colorMappingGlow[trafficLights[roadName]]
+            } font-bolder text-2xl`}
+          >
+            {iconOptions.find((v) => v.value === icon)?.icon}
+          </span>
+          <span
+            className={`${colorMappingText[trafficLights[roadName]]} ${
+              colorMappingGlow[trafficLights[roadName]]
+            } font-digital text-xl leading-none`}
+            style={{
+              transform: `rotate(${
+                roadName === "east" ? "90deg" : "-" + getRotationAngle()
+              })`,
+            }}
+          >
+            {seconds}
+          </span>
+        </div>
       )}
     </div>
   );
