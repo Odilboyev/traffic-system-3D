@@ -45,7 +45,7 @@ const Lane = ({
           laneIndex={i}
           roadName={roadName}
           trafficLights={trafficLights}
-          seconds={seconds[lane?.channel_id]}
+          seconds={seconds?.[lane?.channel_id]}
           channelId={lane?.channel_id}
           icon={lane?.icon}
         />
@@ -61,7 +61,7 @@ const Lane = ({
           icon={lane?.icon}
           roadName={roadName}
           trafficLights={trafficLights}
-          seconds={seconds[lane?.channel_id]}
+          seconds={seconds?.[lane?.channel_id]}
           channelId={lane?.channel_id}
         />
       ))}

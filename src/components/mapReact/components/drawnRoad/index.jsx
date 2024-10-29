@@ -148,37 +148,63 @@ const RoadDrawing = ({ id }) => {
                 return acc;
               }, {});
 
-              // Update traffic lights based on first lane's status
+              // Update traffic lights and seconds for each direction
               setTrafficLights((prevState) => {
                 const newState = { ...prevState };
+                const newSeconds = {}; // Create an object to store seconds for each direction
+
                 Object.entries(incomingConfig).forEach(
                   ([direction, dirConfig]) => {
-                    if (
-                      direction !== "angle" &&
-                      dirConfig.lanesRight.length > 0
-                    ) {
-                      const channelId = dirConfig.lanesRight[0].channel_id;
-                      if (channelId && channelStatuses[channelId]) {
-                        const status = channelStatuses[channelId].status;
-                        newState[direction] =
-                          status === 1
-                            ? "green"
-                            : status === 9 || status === 3
-                            ? "yellow"
-                            : "red";
+                    if (direction !== "angle") {
+                      // Handle right lanes
+                      if (dirConfig.lanesRight.length > 0) {
+                        // Get status from first lane for traffic light
+                        const firstChannelId =
+                          dirConfig.lanesRight[0].channel_id;
+                        if (firstChannelId && channelStatuses[firstChannelId]) {
+                          const status = channelStatuses[firstChannelId].status;
+                          newState[direction] =
+                            status === 1
+                              ? "green"
+                              : status === 9 || status === 3
+                              ? "yellow"
+                              : "red";
+                        }
+
+                        // Store countdown for each channel in the direction
+                        newSeconds[direction] = {};
+                        dirConfig.lanesRight.forEach((lane) => {
+                          if (
+                            lane.channel_id &&
+                            channelStatuses[lane.channel_id]
+                          ) {
+                            newSeconds[direction][lane.channel_id] =
+                              channelStatuses[lane.channel_id].countdown;
+                          }
+                        });
+                      }
+
+                      // Handle left lanes
+                      if (dirConfig.lanesLeft.length > 0) {
+                        dirConfig.lanesLeft.forEach((lane) => {
+                          if (
+                            lane.channel_id &&
+                            channelStatuses[lane.channel_id]
+                          ) {
+                            if (!newSeconds[direction])
+                              newSeconds[direction] = {};
+                            newSeconds[direction][lane.channel_id] =
+                              channelStatuses[lane.channel_id].countdown;
+                          }
+                        });
                       }
                     }
                   }
                 );
+
+                setSeconds(newSeconds); // Update seconds state
                 return newState;
               });
-
-              // Update seconds directly from channel data
-              setSeconds(
-                Object.fromEntries(
-                  data.channel.map((channel) => [channel.id, channel.countdown])
-                )
-              );
 
               // Update crosswalks and their countdowns
               setCrosswalks((prevState) => {

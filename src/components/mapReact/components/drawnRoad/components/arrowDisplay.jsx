@@ -78,7 +78,7 @@ const ArrowDisplay = ({
           >
             {iconOptions.find((v) => v.value === icon)?.icon}
           </span>
-          {channelId && (
+          {channelId && typeof seconds === "number" && (
             <span
               className={`${colorMappingText[trafficLights[roadName]]} ${
                 colorMappingGlow[trafficLights[roadName]]
@@ -89,7 +89,7 @@ const ArrowDisplay = ({
                 })`,
               }}
             >
-              {seconds ?? 0}
+              {seconds}
             </span>
           )}
         </div>

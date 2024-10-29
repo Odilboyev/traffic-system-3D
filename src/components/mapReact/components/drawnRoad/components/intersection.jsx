@@ -33,7 +33,7 @@ const Intersection = ({
         direction={direction}
         roadName={roadName}
         trafficLights={trafficLights}
-        seconds={seconds[roadName]} // Pass the seconds for this road
+        seconds={seconds[roadName]} // Pass the seconds for this specific road
       />
     );
 
