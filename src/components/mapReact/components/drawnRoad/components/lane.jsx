@@ -8,19 +8,10 @@ const Lane = ({
   direction,
   roadName = "",
   trafficLights,
-  seconds, // Add seconds prop
+  seconds,
 }) => {
   const totalLanes = lanesLeft.length + lanesRight.length;
   const laneWidth = getLaneWidth();
-
-  const getColorClass = (status) => {
-    const colorMap = {
-      red: "text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]",
-      yellow: "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
-      green: "text-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]",
-    };
-    return colorMap[status] || colorMap.red;
-  };
 
   return (
     <div
@@ -54,7 +45,9 @@ const Lane = ({
           laneIndex={i}
           roadName={roadName}
           trafficLights={trafficLights}
-          seconds={seconds}
+          seconds={seconds[lane?.channel_id]}
+          channelId={lane?.channel_id}
+          icon={lane?.icon}
         />
       ))}
       {lanesRight.map((lane, i) => (
@@ -65,10 +58,11 @@ const Lane = ({
           laneWidth={laneWidth}
           totalLanes={totalLanes}
           laneIndex={i + lanesLeft.length}
-          icon={lane.icon}
+          icon={lane?.icon}
           roadName={roadName}
           trafficLights={trafficLights}
-          seconds={seconds}
+          seconds={seconds[lane?.channel_id]}
+          channelId={lane?.channel_id}
         />
       ))}
     </div>

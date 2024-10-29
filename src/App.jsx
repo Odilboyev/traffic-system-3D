@@ -14,6 +14,7 @@ const App = () => {
   //
   const [changedMarker, setChangedMarker] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (!isSubscribed) {
@@ -25,15 +26,21 @@ const App = () => {
     setIsSubscribed(true);
     setChangedMarker(data.data);
 
-    const sound = new Audio();
-    if (data.data.statuserror === 1) {
-      sound.src = dangerSound;
-    } else if (data.data.statuserror === 0) {
-      sound.src = positiveSound;
-    } else if (data.data.statuserror === 2) {
-      sound.src = dangerSound;
+    if (!isPlaying) {
+      setIsPlaying(true);
+      const sound = new Audio();
+      if (data.data.statuserror === 1 || data.data.statuserror === 2) {
+        sound.src = dangerSound;
+      } else if (data.data.statuserror === 0) {
+        sound.src = positiveSound;
+      }
+
+      sound.play().then(() => {
+        sound.addEventListener("ended", () => {
+          setIsPlaying(false);
+        });
+      });
     }
-    sound.play();
   };
 
   //

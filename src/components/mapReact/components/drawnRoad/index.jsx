@@ -80,12 +80,7 @@ const RoadDrawing = ({ id }) => {
     west: "red",
   });
 
-  const [seconds, setSeconds] = useState({
-    north: 30,
-    south: 30,
-    east: 30,
-    west: 30,
-  });
+  const [seconds, setSeconds] = useState({});
 
   const [crosswalkSeconds, setCrosswalkSeconds] = useState({
     north: 30,
@@ -93,6 +88,9 @@ const RoadDrawing = ({ id }) => {
     east: 30,
     west: 30,
   });
+
+  const [wsConnectionStatus, setWsConnectionStatus] = useState("disconnected");
+  const [lastMessageTime, setLastMessageTime] = useState(null);
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -111,114 +109,146 @@ const RoadDrawing = ({ id }) => {
 
   useEffect(() => {
     if (id && incomingConfig) {
-      const socket = new WebSocket(
-        `${import.meta.env.VITE_TRAFFIC_SOCKET}/${id}`
-      );
+      const connectWebSocket = () => {
+        const socket = new WebSocket(
+          `${import.meta.env.VITE_TRAFFIC_SOCKET}/${id}`
+        );
 
-      socket.onmessage = (event) => {
-        let message = event.data;
-        message = fixIncompleteJSON(message);
+        socket.onopen = () => {
+          setWsConnectionStatus("connected");
+          console.log("WebSocket connected");
+        };
 
-        try {
-          const data = JSON.parse(message);
-          if (data?.channel) {
-            // Create a map of channel statuses for easier lookup
-            const channelStatuses = data.channel.reduce((acc, channel) => {
-              acc[channel.id] = {
-                status: channel.status,
-                countdown: channel.countdown,
-              };
-              return acc;
-            }, {});
+        socket.onclose = () => {
+          setWsConnectionStatus("disconnected");
+          console.log("WebSocket disconnected, attempting to reconnect...");
+          // Attempt to reconnect after 5 seconds
+          setTimeout(connectWebSocket, 5000);
+        };
 
-            // Update traffic lights and seconds based on channel IDs in config
-            setTrafficLights((prevState) => {
-              const newState = { ...prevState };
-              Object.entries(incomingConfig).forEach(
-                ([direction, dirConfig]) => {
-                  if (
-                    direction !== "angle" &&
-                    dirConfig.lanesRight.length > 0
-                  ) {
-                    const channelId = dirConfig.lanesRight[0].channel_id;
-                    if (channelId && channelStatuses[channelId]) {
-                      const status = channelStatuses[channelId].status;
-                      newState[direction] =
-                        status === 1
-                          ? "green"
-                          : status === 9 || status === 3
-                          ? "yellow"
-                          : "red";
+        socket.onerror = (error) => {
+          console.error("WebSocket error:", error);
+          setWsConnectionStatus("error");
+        };
+
+        socket.onmessage = (event) => {
+          setLastMessageTime(Date.now());
+          let message = event.data;
+          message = fixIncompleteJSON(message);
+
+          try {
+            const data = JSON.parse(message);
+            if (data?.channel) {
+              // Create a map of channel statuses
+              const channelStatuses = data.channel.reduce((acc, channel) => {
+                acc[channel.id] = {
+                  status: channel.status,
+                  countdown: channel.countdown,
+                };
+                return acc;
+              }, {});
+
+              // Update traffic lights based on first lane's status
+              setTrafficLights((prevState) => {
+                const newState = { ...prevState };
+                Object.entries(incomingConfig).forEach(
+                  ([direction, dirConfig]) => {
+                    if (
+                      direction !== "angle" &&
+                      dirConfig.lanesRight.length > 0
+                    ) {
+                      const channelId = dirConfig.lanesRight[0].channel_id;
+                      if (channelId && channelStatuses[channelId]) {
+                        const status = channelStatuses[channelId].status;
+                        newState[direction] =
+                          status === 1
+                            ? "green"
+                            : status === 9 || status === 3
+                            ? "yellow"
+                            : "red";
+                      }
                     }
                   }
-                }
+                );
+                return newState;
+              });
+
+              // Update seconds directly from channel data
+              setSeconds(
+                Object.fromEntries(
+                  data.channel.map((channel) => [channel.id, channel.countdown])
+                )
               );
-              return newState;
-            });
 
-            // Update seconds for each direction
-            setSeconds((prevSeconds) => {
-              const newSeconds = { ...prevSeconds };
-              Object.entries(config).forEach(([direction, dirConfig]) => {
-                if (direction !== "angle" && dirConfig.lanesRight.length > 0) {
-                  const channelId = dirConfig.lanesRight[0].channel_id;
-                  if (channelId && channelStatuses[channelId]) {
-                    newSeconds[direction] =
-                      channelStatuses[channelId].countdown;
+              // Update crosswalks and their countdowns
+              setCrosswalks((prevState) => {
+                const newState = { ...prevState };
+                Object.entries(config).forEach(([direction, dirConfig]) => {
+                  if (direction !== "angle") {
+                    const channelId = dirConfig.cross_walk?.channel_id;
+                    if (channelId && channelStatuses[channelId]) {
+                      const status = channelStatuses[channelId].status;
+                      newState[direction] = status === 1 ? "green" : "red";
+                    }
                   }
-                }
+                });
+                return newState;
               });
-              return newSeconds;
-            });
 
-            // Update crosswalks and their countdowns
-            setCrosswalks((prevState) => {
-              const newState = { ...prevState };
-              Object.entries(config).forEach(([direction, dirConfig]) => {
-                if (direction !== "angle") {
-                  const channelId = dirConfig.cross_walk?.channel_id;
-                  if (channelId && channelStatuses[channelId]) {
-                    const status = channelStatuses[channelId].status;
-                    newState[direction] = status === 1 ? "green" : "red";
+              // Update crosswalk seconds
+              setCrosswalkSeconds((prevSeconds) => {
+                const newSeconds = { ...prevSeconds };
+                Object.entries(config).forEach(([direction, dirConfig]) => {
+                  if (direction !== "angle") {
+                    const channelId = dirConfig.cross_walk?.channel_id;
+                    if (channelId && channelStatuses[channelId]) {
+                      newSeconds[direction] =
+                        channelStatuses[channelId].countdown;
+                    }
                   }
-                }
+                });
+                return newSeconds;
               });
-              return newState;
-            });
-
-            // Update crosswalk seconds
-            setCrosswalkSeconds((prevSeconds) => {
-              const newSeconds = { ...prevSeconds };
-              Object.entries(config).forEach(([direction, dirConfig]) => {
-                if (direction !== "angle") {
-                  const channelId = dirConfig.cross_walk?.channel_id;
-                  if (channelId && channelStatuses[channelId]) {
-                    newSeconds[direction] =
-                      channelStatuses[channelId].countdown;
-                  }
-                }
-              });
-              return newSeconds;
-            });
+            }
+          } catch (error) {
+            console.error("Error parsing WebSocket message:", error);
           }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
+        };
+
+        setTrafficSocket(socket);
+        return socket;
       };
 
-      setTrafficSocket(socket);
+      const socket = connectWebSocket();
+
+      // Check for stale connection every 10 seconds
+      const intervalId = setInterval(() => {
+        if (lastMessageTime && Date.now() - lastMessageTime > 10000) {
+          // No message received in last 10 seconds
+          console.log("No messages received recently, reconnecting...");
+          socket.close(); // This will trigger reconnection
+        }
+      }, 10000);
 
       return () => {
+        clearInterval(intervalId);
         if (socket) {
           socket.close();
         }
       };
     }
-  }, [id, incomingConfig, config]);
+  }, [id, incomingConfig]);
 
   // Remove the interval-based useEffect
   return (
     <div className="relative h-[90vh] flex items-center justify-center overflow-hidden">
+      {wsConnectionStatus !== "connected" && (
+        <div className="absolute top-4 right-4 px-4 py-2 rounded-md text-white bg-red-500">
+          {wsConnectionStatus === "disconnected"
+            ? "Disconnected - Reconnecting..."
+            : "Connection Error"}
+        </div>
+      )}
       {(!incomingConfig || showConfig) && (
         <div className="max-w-[20vw] w-[20vw]">
           {!incomingConfig && (

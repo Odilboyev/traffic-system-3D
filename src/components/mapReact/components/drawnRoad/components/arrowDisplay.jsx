@@ -12,6 +12,7 @@ const ArrowDisplay = ({
   totalLanes,
   trafficLights,
   seconds,
+  channelId,
 }) => {
   // Rotation logic based on direction and roadName
   const getRotationAngle = () => {
@@ -77,18 +78,20 @@ const ArrowDisplay = ({
           >
             {iconOptions.find((v) => v.value === icon)?.icon}
           </span>
-          <span
-            className={`${colorMappingText[trafficLights[roadName]]} ${
-              colorMappingGlow[trafficLights[roadName]]
-            } font-digital text-xl leading-none`}
-            style={{
-              transform: `rotate(${
-                roadName === "east" ? "90deg" : "-" + getRotationAngle()
-              })`,
-            }}
-          >
-            {seconds}
-          </span>
+          {channelId && (
+            <span
+              className={`${colorMappingText[trafficLights[roadName]]} ${
+                colorMappingGlow[trafficLights[roadName]]
+              } font-digital text-xl leading-none`}
+              style={{
+                transform: `rotate(${
+                  roadName === "east" ? "90deg" : "-" + getRotationAngle()
+                })`,
+              }}
+            >
+              {seconds ?? 0}
+            </span>
+          )}
         </div>
       )}
     </div>

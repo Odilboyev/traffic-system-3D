@@ -49,7 +49,7 @@ const DeviceManagement = ({ refreshHandler }) => {
     try {
       const all = await getDevices(type, current);
       setDeviceData(all.data);
-      setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
+      setDeviceTotalPages(all.total_pages ?? 1);
       setTotalItems(all.total_items);
     } catch (err) {
       throw new Error(err);
@@ -68,6 +68,7 @@ const DeviceManagement = ({ refreshHandler }) => {
           params: { page, isactive },
         });
         setDeviceData(res.data);
+        setDeviceTotalPages(res.total_pages ?? 1);
         setTotalItems(res.total_items);
       } catch (error) {
         console.error(error);
@@ -294,6 +295,7 @@ const DeviceManagement = ({ refreshHandler }) => {
           deviceType !== "users" ? fetchErrorHistory : null
         }
         type={deviceType}
+        totalPages={deviceTotalPages}
         data={deviceData}
         filterHandler={handleFilterChange}
         backButtonProps={{
