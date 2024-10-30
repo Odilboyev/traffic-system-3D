@@ -23,7 +23,6 @@ const DraggableMarker = ({ position, setPosition }) => {
     });
   }, position);
 
-  console.log(position, "DraggableMark");
   return (
     <Marker
       position={position}
@@ -61,7 +60,8 @@ const LocationPicker = ({
         <DraggableMarker
           position={[lat, lng]}
           setPosition={(latlng) => {
-            handleInputChange(latlng);
+            handleInputChange("lat", latlng.lat);
+            handleInputChange("lng", latlng.lng);
           }}
         />
       </MapContainer>
