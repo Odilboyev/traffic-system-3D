@@ -66,10 +66,7 @@ const TrafficLightsFields = ({ formData, handleInputChange }) => {
         <LocationPicker
           lat={formData.lat || selectedCrossroad.lat}
           lng={formData.lng || selectedCrossroad.lng}
-          handleInputChange={(latlng) => {
-            handleInputChange("lat", latlng.lat);
-            handleInputChange("lng", latlng.lng);
-          }}
+          handleInputChange={handleInputChange}
         />
       )}
     </>

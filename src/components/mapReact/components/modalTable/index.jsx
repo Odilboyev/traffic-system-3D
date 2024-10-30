@@ -296,7 +296,8 @@ const ModalTable = ({
         </div>
       }
       footer={
-        totalPages > 1 && (
+        totalPages > 1 &&
+        !isFormOpen && (
           <Pagination
             totalItems={totalItems}
             currentPage={currentPage}
