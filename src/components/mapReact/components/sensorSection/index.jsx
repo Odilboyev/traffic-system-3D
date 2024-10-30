@@ -40,7 +40,7 @@ const SensorSection = ({
       </Typography>
       <FilterTypes
         active={selectedSensorId}
-        typeOptions={sensor_data}
+        filterOptions={sensor_data}
         valueKey="sensor_id"
         nameKey="sensor_name"
         onFilterChange={(selectedSensor) => {
