@@ -37,7 +37,7 @@ const SensorCard = ({
             </Typography>
             <Typography className="font-semibold text-3xl absolute bottom-5 left-5">
               {[2, 3, 16].includes(sensor_id) &&
-                `${sensor_value}${sensor_id === 2 ? "°C" : ""}`}
+                `${sensor_value ?? 0}${sensor_id === 2 ? "°C" : ""}`}
             </Typography>
           </div>
           <div className="w-1/4">
