@@ -35,7 +35,6 @@ const TableRow = ({
 
   // Function to handle input change
   const handleInputChange = (key, value) => {
-    console.log(key, value);
     setEditedData((prev) => ({
       ...prev,
       [key]: value,

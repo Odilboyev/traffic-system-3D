@@ -1,10 +1,17 @@
 import PropTypes from "prop-types";
-import { getCrosswalkWidth, getIntersectionSize, getRoadWidth } from "../utils";
+import {
+  getCrosswalkWidth,
+  getIntersectionSize,
+  getRoadWidth,
+  getLaneWidth,
+} from "../utils";
 import IntersectionArrows from "./intersectionArrows";
 import Lane from "./lane";
+import renderCrosswalks from "./crosswalk";
 
 const Intersection = ({
   id,
+  isInModal,
   config,
   trafficLights,
   crosswalks,
@@ -14,15 +21,16 @@ const Intersection = ({
   const getMaxRoadWidth = () => {
     return (
       Math.max(
-        getRoadWidth(config.north),
-        getRoadWidth(config.south),
-        getRoadWidth(config.east),
-        getRoadWidth(config.west)
-      ) + 20
+        getRoadWidth(config.north, isInModal),
+        getRoadWidth(config.south, isInModal),
+        getRoadWidth(config.east, isInModal),
+        getRoadWidth(config.west, isInModal)
+      ) + (isInModal ? 12 : 20)
     );
   };
 
-  const intersectionSize = getIntersectionSize(config);
+  const intersectionSize = getIntersectionSize(config, isInModal);
+  const laneWidth = getLaneWidth(isInModal);
 
   const renderLanes = (direction, roadName) =>
     config[roadName].visible && (
@@ -33,97 +41,15 @@ const Intersection = ({
         direction={direction}
         roadName={roadName}
         trafficLights={trafficLights}
-        seconds={seconds[roadName]} // Pass the seconds for this specific road
+        seconds={seconds[roadName]}
+        isInModal={isInModal}
       />
     );
 
-  const renderCrosswalks = (roadConfig, direction, roadName) => {
-    const laneWidth = getCrosswalkWidth();
-    const crosswalkWidth = getRoadWidth(roadConfig);
-    const crosswalkHeight = laneWidth / 2;
-
-    if (!roadConfig.visible) return null;
-
-    let top, left;
-    if (direction === "vertical") {
-      top = roadName === "north" ? `calc(100% - ${crosswalkHeight}px)` : `0`;
-      left = `calc(50% - ${crosswalkWidth / 2}px)`;
-    } else {
-      top = `calc(50% - ${crosswalkWidth / 2}px)`;
-      left = roadName === "east" ? `0` : `calc(100% - ${crosswalkHeight}px)`;
-    }
-
-    const colorMappingBG = {
-      green: "#4ade80",
-      yellow: "#fde047",
-      red: "#ef4444",
-    };
-
-    const colorMappingText = {
-      green: "text-green-400",
-      yellow: "text-yellow-400",
-      red: "text-red-500",
-    };
-
-    const colorMappingGlow = {
-      green: "drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]",
-      yellow: "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
-      red: "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]",
-    };
-
-    // Calculate counter position based on direction and road name
-    let counterStyle = {};
-    if (direction === "vertical") {
-      counterStyle = {
-        left: `calc(100% + 10px)`,
-        top: "50%",
-        transform: "translateY(-50%)",
-      };
-    } else {
-      counterStyle = {
-        top: `calc(100% + 10px)`,
-        left: "50%",
-        transform: "translateX(-50%)",
-      };
-    }
-
-    return (
-      <div
-        className={`absolute`}
-        style={{
-          width:
-            direction === "vertical"
-              ? `${crosswalkWidth}px`
-              : `${crosswalkHeight}px`,
-          height:
-            direction === "vertical"
-              ? `${crosswalkHeight}px`
-              : `${crosswalkWidth}px`,
-          top,
-          left,
-          backgroundImage: `repeating-linear-gradient(${
-            direction === "vertical" ? "90deg" : "0"
-          }, ${colorMappingBG[crosswalks[roadName]]}, ${
-            colorMappingBG[crosswalks[roadName]]
-          } 5px, transparent 5px, transparent 10px)`,
-          zIndex: 50,
-        }}
-      >
-        <div
-          className={`absolute ${colorMappingText[crosswalks[roadName]]} ${
-            colorMappingGlow[crosswalks[roadName]]
-          } font-digital text-xl`}
-          style={counterStyle}
-        >
-          {crosswalkSeconds[roadName]}
-        </div>
-      </div>
-    );
-  };
-  const roadWidthNorth = getRoadWidth(config.north);
-  const roadWidthSouth = getRoadWidth(config.south);
-  const roadWidthEast = getRoadWidth(config.east);
-  const roadWidthWest = getRoadWidth(config.west);
+  const roadWidthNorth = getRoadWidth(config.north, isInModal);
+  const roadWidthSouth = getRoadWidth(config.south, isInModal);
+  const roadWidthEast = getRoadWidth(config.east, isInModal);
+  const roadWidthWest = getRoadWidth(config.west, isInModal);
 
   const centerX = intersectionSize / 2;
   const centerY = intersectionSize / 2;
@@ -172,7 +98,6 @@ const Intersection = ({
         width={intersectionSize}
         height={intersectionSize}
       >
-        {/* Fill the intersection area */}
         <polygon points={pointsString} className="fill-blue-gray-700" />
       </svg>
     );
@@ -183,46 +108,61 @@ const Intersection = ({
     const roads = [config.north, config.south, config.east, config.west];
     let totalMargin = 0;
     let samelengthCount = 0;
+
+    // Base margin value adjusted for modal
+    const baseMargin = isInModal ? -24 : -40;
+    // Lane difference multiplier adjusted for modal
+    const laneMultiplier = isInModal ? 6 : 10;
+
     // Loop through all roads
     for (const road of roads) {
       const lanesLeft = road.lanesLeft.length;
       const lanesRight = road.lanesRight.length;
 
-      // If lanes are equal, return 0 immediately
       if (lanesLeft === lanesRight) {
         samelengthCount += 1;
       }
       if (samelengthCount >= 3) return 0;
 
       if (lanesLeft >= 3 && lanesRight >= 3) {
-        // Check if lanes are uneven
         if (Math.abs(lanesLeft - lanesRight) >= 2) {
-          // Set the margin based on the difference
-          totalMargin = -(Math.abs(lanesLeft - lanesRight) * 10 + 40);
+          // Set the margin based on the difference, scaled for modal
+          totalMargin = -(
+            Math.abs(lanesLeft - lanesRight) * laneMultiplier +
+            Math.abs(baseMargin)
+          );
         } else {
-          totalMargin = -40;
+          totalMargin = baseMargin;
         }
       }
     }
-
     return totalMargin;
   };
 
   // Calculate margin once
   const margin = calculateGlobalMargin();
+
+  // Add a scale factor only for vertical roads in modal
+  const verticalRoadLengthScale = isInModal ? 0.6 : 1; // Changed from 0.6 to 0.4
+  const verticalSpacingScale = isInModal ? 0.7 : 1; // Changed from 0.7 to 0.5
+
   return (
     <div
       className={`relative ${
         id ? "w-full" : "w-2/3"
       } h-full flex items-center justify-center overflow-hidden`}
-      style={{ transform: `rotate(${config.angle}deg)` }}
+      style={{
+        transform: `rotate(${config.angle}deg)`,
+      }}
     >
       <div
         className="absolute overflow-hidden"
         style={{
           width: `${intersectionSize}px`,
           height: `${intersectionSize}px`,
-          top: `calc(50% - ${intersectionSize / 2}px)`,
+          top: isInModal
+            ? `calc(30% - ${intersectionSize / 2}px)` // Changed from 35% to 30%
+            : `calc(50% - ${intersectionSize / 2}px)`, // Center normally
           left: `calc(50% - ${intersectionSize / 2}px)`,
         }}
       >
@@ -235,56 +175,99 @@ const Intersection = ({
         {renderIntersectionBoundary()}
       </div>
 
-      {/* Rendering North and South Roads */}
+      {/* Rendering North and South Roads - with scaled length and adjusted spacing */}
       <div
         className="absolute flex flex-col items-center"
         style={{
-          width: `${getRoadWidth(config.north)}px`,
-          height: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-          top: margin,
-          left: `calc(50% - ${getRoadWidth(config.north) / 2}px)`,
+          width: `${getRoadWidth(config.north, isInModal)}px`,
+          height: `calc(${verticalRoadLengthScale * 50}% - ${
+            getMaxRoadWidth() / 2
+          }px)`,
+          top: isInModal
+            ? `calc(30% - ${intersectionSize / 2}px - ${
+                getMaxRoadWidth() / 2
+              }px)` // Changed from 35% to 30%
+            : `${margin * verticalSpacingScale}px`,
+          left: `calc(50% - ${getRoadWidth(config.north, isInModal) / 2}px)`,
         }}
       >
         {renderLanes("vertical", "north")}
-        {renderCrosswalks(config.north, "vertical", "north")}
+        {renderCrosswalks(
+          config.north,
+          "vertical",
+          "north",
+          crosswalks,
+          crosswalkSeconds,
+          isInModal
+        )}
       </div>
       <div
         className="absolute flex flex-col items-center"
         style={{
-          width: `${getRoadWidth(config.south)}px`,
-          height: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
-          bottom: margin,
-          left: `calc(50% - ${getRoadWidth(config.south) / 2}px)`,
+          width: `${getRoadWidth(config.south, isInModal)}px`,
+          height: `calc(${verticalRoadLengthScale * 50}% - ${
+            getMaxRoadWidth() / 2
+          }px)`,
+          top: isInModal
+            ? `calc(30% + ${intersectionSize / 2}px)` // Changed from 35% to 30%
+            : `auto`,
+          bottom: isInModal ? "auto" : `${margin * verticalSpacingScale}px`,
+          left: `calc(50% - ${getRoadWidth(config.south, isInModal) / 2}px)`,
         }}
       >
         {renderLanes("vertical", "south")}
-        {renderCrosswalks(config.south, "vertical", "south")}
+        {renderCrosswalks(
+          config.south,
+          "vertical",
+          "south",
+          crosswalks,
+          crosswalkSeconds,
+          isInModal
+        )}
       </div>
 
-      {/* Rendering East and West Roads */}
+      {/* Rendering East and West Roads - unchanged length */}
       <div
         className="absolute flex flex-col items-center"
         style={{
-          height: `${getRoadWidth(config.west)}px`,
+          height: `${getRoadWidth(config.west, isInModal)}px`,
           width: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
           left: margin,
-          top: `calc(50% - ${getRoadWidth(config.west) / 2}px)`,
+          top: isInModal
+            ? `calc(30% - ${getRoadWidth(config.west, isInModal) / 2}px)` // Changed from 35% to 30%
+            : `calc(50% - ${getRoadWidth(config.west, isInModal) / 2}px)`,
         }}
       >
         {renderLanes("horizontal", "west")}
-        {renderCrosswalks(config.west, "horizontal", "west")}
+        {renderCrosswalks(
+          config.west,
+          "horizontal",
+          "west",
+          crosswalks,
+          crosswalkSeconds,
+          isInModal
+        )}
       </div>
       <div
         className="absolute flex flex-col items-center"
         style={{
-          height: `${getRoadWidth(config.east)}px`,
+          height: `${getRoadWidth(config.east, isInModal)}px`,
           width: `calc(50% - ${getMaxRoadWidth() / 2}px)`,
           right: margin,
-          top: `calc(50% - ${getRoadWidth(config.east) / 2}px)`,
+          top: isInModal
+            ? `calc(30% - ${getRoadWidth(config.east, isInModal) / 2}px)` // Changed from 35% to 30%
+            : `calc(50% - ${getRoadWidth(config.east, isInModal) / 2}px)`,
         }}
       >
         {renderLanes("horizontal", "east")}
-        {renderCrosswalks(config.east, "horizontal", "east")}
+        {renderCrosswalks(
+          config.east,
+          "horizontal",
+          "east",
+          crosswalks,
+          crosswalkSeconds,
+          isInModal
+        )}
       </div>
     </div>
   );

@@ -7,6 +7,9 @@ import {
   TbArrowUp,
 } from "react-icons/tb";
 
+// Add modal size multiplier
+const MODAL_SIZE_MULTIPLIER = 0.6;
+
 export const iconOptions = [
   { name: "Right Ramp", icon: <TbArrowRampRight />, value: "TbArrowRampRight" },
   { name: "Left Ramp", icon: <TbArrowRampLeft />, value: "TbArrowRampLeft" },
@@ -20,21 +23,26 @@ export const iconOptions = [
   },
 ];
 
-export const getLaneWidth = () => 40;
-export const getCrosswalkWidth = () => 20;
-export const getRoadWidth = (roadConfig) => {
+export const getLaneWidth = (isInModal = false) =>
+  isInModal ? Math.floor(40 * MODAL_SIZE_MULTIPLIER) : 40;
+
+export const getCrosswalkWidth = (isInModal = false) =>
+  isInModal ? Math.floor(20 * MODAL_SIZE_MULTIPLIER) : 20;
+
+export const getRoadWidth = (roadConfig, isInModal = false) => {
   return (
     (roadConfig.lanesLeft.length + roadConfig.lanesRight.length) *
-    getLaneWidth()
+    getLaneWidth(isInModal)
   );
 };
-export const getIntersectionSize = (config) => {
+
+export const getIntersectionSize = (config, isInModal = false) => {
   // Calculate the width needed for each direction
   const calculateRoadWidth = (roadConfig) => {
     if (!roadConfig.visible) return 0;
     const totalLanes =
       roadConfig.lanesLeft.length + roadConfig.lanesRight.length;
-    return totalLanes * getLaneWidth();
+    return totalLanes * getLaneWidth(isInModal);
   };
 
   // Get widths for all directions
@@ -67,7 +75,8 @@ export const getIntersectionSize = (config) => {
   let paddingFactor = 1.25; // Start with minimum padding
 
   // Adjust for width differences between opposing roads
-  const maxDiff = Math.max(verticalDiff, horizontalDiff) / getLaneWidth();
+  const maxDiff =
+    Math.max(verticalDiff, horizontalDiff) / getLaneWidth(isInModal);
   if (maxDiff > 0) {
     paddingFactor += maxDiff * 0.03;
   }
@@ -84,7 +93,8 @@ export const getIntersectionSize = (config) => {
   }
 
   // Adjust for total road width
-  const maxWidth = Math.max(verticalWidth, horizontalWidth) / getLaneWidth();
+  const maxWidth =
+    Math.max(verticalWidth, horizontalWidth) / getLaneWidth(isInModal);
   if (maxWidth > 6) {
     paddingFactor += 0.05;
   }

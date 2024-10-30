@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CrossroadStats from "./newChart";
 import { getCrossRoadStats } from "../../../../../api/api.handlers";
+import { TbLoader } from "react-icons/tb";
 
 const CrossroadDashboard = ({ marker }) => {
   const [crossroadStats, setCrossroadStats] = useState(null);
@@ -25,7 +26,9 @@ const CrossroadDashboard = ({ marker }) => {
       {crossroadStats ? (
         <CrossroadStats crossroadStats={crossroadStats} />
       ) : (
-        <p>Loading...</p>
+        <p>
+          <TbLoader className="animate animate-spin" /> Loading...
+        </p>
       )}
     </div>
   );

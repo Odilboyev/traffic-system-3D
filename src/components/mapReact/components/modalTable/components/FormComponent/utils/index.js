@@ -60,7 +60,7 @@ export const crossroadHandler = async (
     const data = await fetchDataForManagement("GET", "crossroad", {
       params: { limit: 0 }, // Optional: Fetch only active crossroads
     });
-    console.log("Crossroads Data:", data.data);
+
     setCrossroads(data.data);
     if (formData.crossroad_id) {
       setSelectedCrossroad(
@@ -85,7 +85,7 @@ export const fetchSingleBox = async (
 ) => {
   try {
     const data = await fetchDataForManagement("GET", "boxmonitor", { id });
-    console.log("sinfle box Data:", data.data);
+
     setSensors(data.data.sensors);
     setSelectedSensors(
       data.data.sensors.filter((sensor) => sensor.status === 1)

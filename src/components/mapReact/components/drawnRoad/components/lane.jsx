@@ -9,9 +9,10 @@ const Lane = ({
   roadName = "",
   trafficLights,
   seconds,
+  isInModal,
 }) => {
   const totalLanes = lanesLeft.length + lanesRight.length;
-  const laneWidth = getLaneWidth();
+  const laneWidth = getLaneWidth(isInModal);
 
   return (
     <div
@@ -48,6 +49,7 @@ const Lane = ({
           seconds={seconds?.[lane?.channel_id]}
           channelId={lane?.channel_id}
           icon={lane?.icon}
+          isInModal={isInModal}
         />
       ))}
       {lanesRight.map((lane, i) => (
@@ -63,6 +65,7 @@ const Lane = ({
           trafficLights={trafficLights}
           seconds={seconds?.[lane?.channel_id]}
           channelId={lane?.channel_id}
+          isInModal={isInModal}
         />
       ))}
     </div>

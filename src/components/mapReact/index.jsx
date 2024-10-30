@@ -71,33 +71,42 @@ import SignsContainer from "./components/signs/index.jsx";
 import UserInfoWidget from "./components/userInfo/index.jsx";
 import TileChanger from "../tileChanger/index.jsx";
 import { ToastContainer } from "react-toastify";
+import PropTypes from "prop-types";
 const home = [41.2995, 69.2401]; // Tashkent
-
-const handleMapMove = (event) => {
-  // Save center and zoom values to localStorage
-  const newCenter = event.target.getCenter();
-  const newZoom = event.target.getZoom();
-
-  localStorage.setItem("mapCenter", JSON.stringify(newCenter));
-  localStorage.setItem("mapZoom", newZoom);
-};
-//
 
 const MapEvents = ({ changedMarker, fetchAlarmsData }) => {
   const map = useMap();
 
-  useMapEvents({
-    moveend: handleMapMove, // Assuming you have a handleMapMove function defined
-  });
+  useEffect(() => {
+    if (!map) return;
+
+    const moveEndHandler = () => {
+      const newCenter = map.getCenter();
+      const newZoom = map.getZoom();
+      localStorage.setItem("mapCenter", JSON.stringify(newCenter));
+      localStorage.setItem("mapZoom", newZoom);
+    };
+
+    map.on("moveend", moveEndHandler);
+
+    return () => {
+      map.off("moveend", moveEndHandler);
+    };
+  }, [map]);
 
   useEffect(() => {
     if (changedMarker) {
       fetchAlarmsData();
-      toaster(changedMarker, map); // Pass the map instance if necessary
+      toaster(changedMarker, map);
     }
-  }, [changedMarker, map]);
+  }, [changedMarker, map, fetchAlarmsData]);
 
-  return null; // This component does not render anything
+  return null;
+};
+
+MapEvents.propTypes = {
+  changedMarker: PropTypes.object,
+  fetchAlarmsData: PropTypes.func.isRequired,
 };
 
 const MapComponent = ({ changedMarker }) => {
@@ -129,9 +138,6 @@ const MapComponent = ({ changedMarker }) => {
       }
     }
   };
-
-  //navigate
-  const navigate = useNavigate();
   //variables
   //error message
   const [errorMessage, setErrorMessage] = useState(null);
@@ -575,6 +581,10 @@ const MapComponent = ({ changedMarker }) => {
       />
     </>
   );
+};
+
+MapComponent.propTypes = {
+  changedMarker: PropTypes.object,
 };
 
 export default MapComponent;

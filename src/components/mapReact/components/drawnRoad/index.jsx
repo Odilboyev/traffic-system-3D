@@ -5,8 +5,9 @@ import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 import { getTrafficLightsConfig } from "../../../../api/api.handlers";
 import { TbPencil } from "react-icons/tb";
 import { fixIncompleteJSON } from "../svetofor/utils";
+import PropTypes from "prop-types";
 
-const RoadDrawing = ({ id }) => {
+const RoadDrawing = ({ id, isInModal }) => {
   const role = atob(localStorage.getItem("its_user_role"));
   const [showConfig, setShowConfig] = useState(false);
   const [incomingConfig, setIncomingConfig] = useState(null);
@@ -267,7 +268,9 @@ const RoadDrawing = ({ id }) => {
 
   // Remove the interval-based useEffect
   return (
-    <div className="relative h-[90vh] flex items-center justify-center overflow-hidden">
+    <div
+      className={`relative h-[90vh] flex items-center justify-center overflow-hidden`}
+    >
       {wsConnectionStatus !== "connected" && (
         <div className="absolute top-4 right-4 px-4 py-2 rounded-md text-white bg-red-500">
           {wsConnectionStatus === "disconnected"
@@ -282,7 +285,7 @@ const RoadDrawing = ({ id }) => {
               <div className="text-red-500 mb-2">
                 No traffic light data found
               </div>
-              {(role === "admin" || role === "boss") && (
+              {(role === "admin" || role === "boss") && !isInModal && (
                 <button
                   onClick={() => setShowConfig(true)}
                   className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
@@ -299,6 +302,7 @@ const RoadDrawing = ({ id }) => {
       {(showConfig || incomingConfig) && (
         <Intersection
           id={id}
+          isInModal={isInModal}
           config={config}
           trafficLights={trafficLights}
           crosswalks={crosswalks}
@@ -317,6 +321,15 @@ const RoadDrawing = ({ id }) => {
       )}
     </div>
   );
+};
+
+RoadDrawing.propTypes = {
+  id: PropTypes.string.isRequired,
+  isInModal: PropTypes.bool,
+};
+
+RoadDrawing.defaultProps = {
+  isInModal: false,
 };
 
 export default RoadDrawing;

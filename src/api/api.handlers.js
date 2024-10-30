@@ -66,7 +66,6 @@ const getTrafficLightsConfig = async (id) =>
 
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
-  console.log(type, "GET", options);
   let endpoint;
   // Handle dynamic user endpoint customization
   // if (type?.startsWith("user")) {

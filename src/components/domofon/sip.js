@@ -9588,7 +9588,7 @@ class LoggerFactory {
                 break;
             case _levels_js__WEBPACK_IMPORTED_MODULE_0__.Levels.log:
                 // eslint-disable-next-line no-console
-                console.log(content);
+            
                 break;
             case _levels_js__WEBPACK_IMPORTED_MODULE_0__.Levels.debug:
                 // eslint-disable-next-line no-console

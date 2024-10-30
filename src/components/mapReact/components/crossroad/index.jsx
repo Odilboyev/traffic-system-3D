@@ -190,46 +190,33 @@ const CrossroadModal = ({ open, handleOpen, marker }) => {
             </div>
           </FullscreenBox>
           <FullscreenBox>
-            {" "}
-            <div className="relative w-full h-full">
-              <MapContainer
-                id="monitoring"
-                attributionControl={false}
-                center={[marker?.lat, marker?.lng]}
-                zoom={20}
-                zoomControl={false}
-                zoomDelta={0.6}
-                style={{ height: "100%", width: "100%" }}
-              >
-                <ZoomControl theme={theme} position={"bottomleft"} />{" "}
-                {currentLayer && (
-                  <TileLayer
-                    maxNativeZoom={currentLayer.maxNativeZoom}
-                    url={currentLayer.url}
-                    attribution={currentLayer.attribution}
-                    key={currentLayer.name}
-                    maxZoom={22}
-                  />
-                )}
-                <TrafficLightContainer isInModal={true} />
-              </MapContainer>
+            <div className="h-full w-full">
+              <TrafficLights id={marker?.cid} isInModal={true} />
             </div>
+            {/* <MapContainer
+              id="monitoring"
+              attributionControl={false}
+              center={[Number(marker?.lat), Number(marker?.lng)]}
+              zoom={20}
+              zoomControl={false}
+              zoomDelta={0.6}
+              style={{ height: "100%", width: "100%" }}
+            >
+              <ZoomControl theme={theme} position={"bottomleft"} />{" "}
+              {currentLayer && (
+                <TileLayer
+                  maxNativeZoom={currentLayer.maxNativeZoom}
+                  url={currentLayer.url}
+                  attribution={currentLayer.attribution}
+                  key={currentLayer.name}
+                  maxZoom={22}
+                />
+              )}
+              <TrafficLightContainer isInModal={true} />
+            </MapContainer> */}
           </FullscreenBox>
           <FullscreenBox>
             <CrossroadDashboard marker={marker} />
-            {/* {isChartLoading ? (
-              <TbLoader className="animate animate-spin" />
-            ) : chartData && chartData.length > 0 ? (
-              <ModalCharts
-                directions={chartData}
-                interval={interval}
-                handleInterval={setInterval}
-                time={chartDate}
-                handleTime={handleDate}
-              />
-            ) : (
-              <Typography>No Chart Data</Typography>
-            )} */}
           </FullscreenBox>
         </div>
       </DialogBody>

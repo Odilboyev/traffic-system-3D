@@ -38,7 +38,6 @@ const UserInfoWidget = () => {
   const handleChangePassword = async () => {
     try {
       if (newPassword) {
-        console.log("password changed");
         toast.success("Password changed successfully!");
         setIsPasswordChangeOpen(false); // Close the password change field
         setNewPassword(""); // Clear the input field

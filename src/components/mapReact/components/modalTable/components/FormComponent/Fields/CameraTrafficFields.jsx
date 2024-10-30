@@ -23,7 +23,6 @@ const CameraTrafficFields = ({ formData, handleInputChange }) => {
   }, []);
 
   const handleCrossroadChange = (selected) => {
-    console.log("Selected Crossroad:", selected);
     setSelectedCrossroad(selected);
     handleInputChange("crossroad_id", selected.id);
     handleInputChange("lat", selected.lat);

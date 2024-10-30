@@ -13,7 +13,6 @@ const UserFields = ({ formData, handleInputChange }) => {
     try {
       const roles = await getUserRoles();
       setUserRoles(roles.data);
-      console.log(roles.data);
     } catch (error) {
       throw new Error(error);
     }

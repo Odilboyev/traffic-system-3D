@@ -33,18 +33,15 @@ const BoxMonitorFields = ({ formData, handleInputChange }) => {
       setSelectedSensors,
       handleInputChange
     );
-    console.log(formData);
   }, []);
 
   const handleCrossroadChange = (selected) => {
-    console.log("Selected Crossroad:", selected);
     setSelectedCrossroad(selected);
     handleInputChange("crossroad_id", selected.id);
     handleInputChange("lat", selected.lat);
     handleInputChange("lng", selected.lng);
   };
   const handleSensorChange = (selected) => {
-    console.log("Selected sensors:", selected);
     setSelectedSensors(selected);
 
     // Update sensor status: 1 for selected, 0 for not selected

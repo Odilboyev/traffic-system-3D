@@ -13,6 +13,7 @@ const ArrowDisplay = ({
   trafficLights,
   seconds,
   channelId,
+  isInModal,
 }) => {
   // Rotation logic based on direction and roadName
   const getRotationAngle = () => {
@@ -42,6 +43,13 @@ const ArrowDisplay = ({
     red: "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]",
   };
 
+  // Add size classes based on isInModal
+  const iconSizeClass = isInModal ? "text-lg" : "text-2xl";
+  const numberSizeClass = isInModal ? "text-base" : "text-xl";
+
+  // Adjust margins for modal
+  const marginSize = isInModal ? "24px" : "40px";
+
   return (
     <div
       className={`flex ${
@@ -67,14 +75,17 @@ const ArrowDisplay = ({
           className="flex flex-col items-center gap-1"
           style={{
             zIndex: 50,
-            margin: direction === "vertical" ? "40px 0px" : "0px 40px",
+            margin:
+              direction === "vertical"
+                ? `${marginSize} 0px`
+                : `0px ${marginSize}`,
             transform: `rotate(${getRotationAngle()})`,
           }}
         >
           <span
             className={`${colorMappingText[trafficLights[roadName]]} ${
               colorMappingGlow[trafficLights[roadName]]
-            } font-bolder text-2xl`}
+            } font-bolder ${iconSizeClass}`}
           >
             {iconOptions.find((v) => v.value === icon)?.icon}
           </span>
@@ -82,7 +93,7 @@ const ArrowDisplay = ({
             <span
               className={`${colorMappingText[trafficLights[roadName]]} ${
                 colorMappingGlow[trafficLights[roadName]]
-              } font-digital text-xl leading-none`}
+              } font-digital ${numberSizeClass} leading-none`}
               style={{
                 transform: `rotate(${
                   roadName === "east" ? "90deg" : "-" + getRotationAngle()

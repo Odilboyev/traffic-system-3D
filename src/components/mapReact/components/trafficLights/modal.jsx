@@ -5,86 +5,11 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
 import TrafficLights from ".";
-import { getTrafficLightsData } from "../../../../api/api.handlers";
-import { fixIncompleteJSON } from "../svetofor/utils";
+import PropTypes from "prop-types";
 
 const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [trafficLights, setTrafficLights] = useState(null);
-  const [trafficSocketData, setTrafficSocketData] = useState(null);
-
-  const getTrafficLights = async (id) => {
-    setIsLoading(true);
-    try {
-      const res = await getTrafficLightsData(id);
-      setIsLoading(false);
-
-      setTrafficLights(res);
-    } catch (error) {
-      setIsLoading(false);
-
-      throw new Error(error);
-    }
-  };
-
-  const onTrafficLightsDataReceived = (data) => {
-    // console.log(data, "traffic with socket");
-    // console.log(trafficSocketData, "old traffic data");
-    if (light)
-      setTrafficSocketData((light) => {
-        return data?.channel.map((v) => {
-          return {
-            ...v,
-            lat: trafficLights.find((light) => v.id === light.link_id)?.lat,
-            lng: trafficLights.find((light) => v.id === light.link_id)?.lng,
-            rotate: trafficLights.find((light) => v.id === light.link_id)
-              ?.rotate,
-            type: trafficLights.find((light) => v.id === light.link_id)?.type,
-          };
-        });
-      });
-  };
-  useEffect(() => {
-    let trafficSocket;
-    if (isDialogOpen && trafficLights) {
-      trafficSocket = new WebSocket(
-        import.meta.env.VITE_TRAFFIC_SOCKET + light?.cid
-      );
-      trafficSocket.onmessage = (event) => {
-        let message = event.data;
-        // Fix incomplete JSON message
-        message = fixIncompleteJSON(message);
-        try {
-          const data = JSON.parse(message);
-          onTrafficLightsDataReceived(data);
-        } catch (error) {
-          throw new Error(error);
-        }
-      };
-      // setTimeout(() => {
-      //   trafficSocket.close();
-      // }, 5000);
-    }
-
-    return () => {
-      // Clean up the socket connection when the dialog is closed
-      if (trafficSocket) {
-        trafficSocket.close();
-      }
-    };
-  }, [isDialogOpen, trafficLights]);
-
-  useEffect(() => {
-    if (isDialogOpen && trafficLights === null) {
-      getTrafficLights(light.cid);
-    }
-    return () => {};
-  }, [isDialogOpen, trafficLights]);
-
   const handleClose = () => {
-    setTrafficLights(null);
     handler();
   };
   return (
@@ -94,7 +19,7 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
           <div>
             <Typography variant="h5">{light?.cname || ""}</Typography>
           </div>
-          <IconButton size="sm" variant="text" onClick={handler}>
+          <IconButton size="sm" onClick={handler}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -113,16 +38,20 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
         </DialogHeader>
 
         <DialogBody className="min-h-[90vh] max-h-[94vh] overflow-y-scroll dark:bg-blue-gray-900 dark:text-white">
-          <TrafficLights
-            id={light?.cid}
-            // center={[light?.lat, light?.lng]}
-            // lights={trafficLights}
-            // lightsSocketData={trafficSocketData}
-          />
+          <TrafficLights id={light?.cid} />
         </DialogBody>
       </Dialog>
     </>
   );
+};
+
+TrafficLightsModal.propTypes = {
+  light: PropTypes.shape({
+    cname: PropTypes.string,
+    cid: PropTypes.string,
+  }),
+  isDialogOpen: PropTypes.bool.isRequired,
+  handler: PropTypes.func.isRequired,
 };
 
 export default TrafficLightsModal;

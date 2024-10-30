@@ -1,11 +1,11 @@
 import { memo } from "react";
 import RoadDrawing from "../drawnRoad";
 // import RoadDrawing from "../../../canvasRoad/canvasVersion";
-const TrafficLights = ({ id }) => {
+const TrafficLights = ({ id, isInModal }) => {
   return (
-    <div>
-      <RoadDrawing id={id} />
-    </div>
+    <>
+      <RoadDrawing id={id} isInModal={isInModal} />
+    </>
   );
 };
 

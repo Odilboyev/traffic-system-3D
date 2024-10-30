@@ -60,7 +60,6 @@ const DeviceManagement = ({ refreshHandler }) => {
 
   const fetchData = useCallback(
     async (type = deviceType, page = 1, isactive) => {
-      console.log("GET Request:", { type, page, isactive });
       setDeviceLoading(true);
 
       try {
@@ -86,7 +85,6 @@ const DeviceManagement = ({ refreshHandler }) => {
   );
   const modifyData = useCallback(
     async (method, type, body, isactive = undefined) => {
-      console.log(`${method} Request:`, { type, body, isactive });
       // activation
       if (["delete", "patch"].includes(method)) {
         const confirmationMessage =
@@ -106,7 +104,7 @@ const DeviceManagement = ({ refreshHandler }) => {
           params: { isactive },
           id: body.id,
         });
-        console.log(res, `${method} Response`);
+
         res.status_text
           ? toast.success(res.status_text, modalToastConfig)
           : toast.success(
@@ -176,7 +174,6 @@ const DeviceManagement = ({ refreshHandler }) => {
           modalToastConfig
         );
       } else if (actionType === "activate") {
-        console.log(user.id, "deactivated");
         await recoverUser(user.id); // Assuming you have an activateUser function
         toast.success(
           `User ${": " + user.name} successfully activated!`,
