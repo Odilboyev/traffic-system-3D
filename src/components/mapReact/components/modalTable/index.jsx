@@ -83,7 +83,9 @@ const ModalTable = ({
     if (isSubPageOpen) {
       historyButtonCallback(1, type, subPageId);
     } else {
-      fetchHandler(page, selectedFilter);
+      type === "history"
+        ? fetchHandler(page, selectedFilter)
+        : fetchHandler(type, page, selectedFilter);
     }
   };
 

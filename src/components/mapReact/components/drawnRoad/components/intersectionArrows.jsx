@@ -22,7 +22,7 @@ const IntersectionArrows = ({ trafficLights }) => {
           trafficLights.east === "green" ? "flex-col" : "flex-row"
         }`}
       >
-        {trafficLights.east === "green" ? (
+        {/* {trafficLights.east === "green" ? (
           <>
             <HiArrowsUpDown className="rotate-90" />
           </>
@@ -30,7 +30,7 @@ const IntersectionArrows = ({ trafficLights }) => {
           <>
             <HiArrowsUpDown />
           </>
-        )}
+        )} */}
       </div>
     </div>
   );
