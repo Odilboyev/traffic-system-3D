@@ -85,7 +85,6 @@ const DeviceManagement = ({ refreshHandler }) => {
   );
   const modifyData = useCallback(
     async (method, type, body, isactive = filter) => {
-      // activation
       if (["delete", "patch"].includes(method)) {
         const confirmationMessage =
           method === "delete"
@@ -93,7 +92,7 @@ const DeviceManagement = ({ refreshHandler }) => {
             : `Are you sure you want to activate ${body.name}?`;
 
         if (!window.confirm(confirmationMessage)) {
-          return; // Exit if the user cancels
+          return;
         }
       }
 
@@ -111,7 +110,6 @@ const DeviceManagement = ({ refreshHandler }) => {
               `${method} operation on ${type} succeeded.`,
               modalToastConfig
             );
-        // Optionally re-fetch data to update the UI
       } catch (error) {
         console.error(error);
         toast.error(
@@ -121,7 +119,9 @@ const DeviceManagement = ({ refreshHandler }) => {
           modalToastConfig
         );
       } finally {
-        fetchData();
+        const newFilter =
+          method === "delete" ? 1 : method === "patch" ? 0 : filter;
+        fetchData(type, 1, newFilter);
         refreshHandler();
       }
     },
