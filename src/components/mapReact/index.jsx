@@ -526,7 +526,11 @@ const MapComponent = ({ changedMarker }) => {
                   })}
                   rotatedAngle={marker.type === 3 ? marker.rotated : 0}
                 >
-                  {marker.type === 1 && <CustomPopUp marker={marker} />}
+                  {marker.type === 1 ||
+                  marker.type === 5 ||
+                  marker.type === 6 ? (
+                    <CustomPopUp marker={marker} />
+                  ) : null}
                   <Tooltip direction="top" className="rounded-md">
                     {marker.type == 1 ? (
                       <div
