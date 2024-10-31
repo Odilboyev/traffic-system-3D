@@ -165,7 +165,7 @@ const MapComponent = ({ changedMarker }) => {
     signs: true,
     camera: true,
     cameraview: true,
-    cameratraffic: true,
+    camerapdd: true,
   });
   const [widgets, setWidgets] = useLocalStorageState("traffic_widgets", {
     bottomsection: true,
@@ -488,7 +488,9 @@ const MapComponent = ({ changedMarker }) => {
               (marker.type === 1 && !filter.camera) ||
               (marker.type === 2 && !filter.crossroad) ||
               (marker.type === 3 && !filter.box) ||
-              (marker.type === 4 && !filter.trafficlights)
+              (marker.type === 4 && !filter.trafficlights) ||
+              (marker.type === 6 && !filter.camerapdd) ||
+              (marker.type === 5 && !filter.cameraview)
             ) {
               return null;
             }
@@ -532,7 +534,9 @@ const MapComponent = ({ changedMarker }) => {
                     <CustomPopUp marker={marker} />
                   ) : null}
                   <Tooltip direction="top" className="rounded-md">
-                    {marker.type == 1 ? (
+                    {marker.type == 1 ||
+                    marker.type == 5 ||
+                    marker.type == 6 ? (
                       <div
                         style={{
                           width: "8vw",
