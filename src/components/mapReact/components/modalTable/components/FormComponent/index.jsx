@@ -6,6 +6,7 @@ import CrossroadFields from "./Fields/CrossroadFields";
 import { getInitialData } from "./utils";
 import BoxMonitorFields from "./Fields/BoxControllerFields";
 import TrafficLightsFields from "./Fields/TrafficLightsFields";
+import CameraViewFields from "./Fields/CameraViewFields";
 
 const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
   const [formData, setFormData] = useState(null);
@@ -56,6 +57,12 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
 
           {type === "cameratraffic" && (
             <CameraTrafficFields
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
+          )}
+          {type === "cameraview" && (
+            <CameraViewFields
               formData={formData}
               handleInputChange={handleInputChange}
             />

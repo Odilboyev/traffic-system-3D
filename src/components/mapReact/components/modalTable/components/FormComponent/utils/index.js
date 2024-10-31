@@ -19,8 +19,8 @@ export const getInitialData = (type) => {
         http_port: 80,
         https_port: 443,
         sdk_port: 8000,
-        lat: 41.2995,
-        lng: 69.2401,
+        lat: "",
+        lng: "",
       };
     case "cameraview":
       return {
@@ -33,8 +33,8 @@ export const getInitialData = (type) => {
         http_port: 80,
         https_port: 443,
         sdk_port: 8000,
-        lat: 41.2995,
-        lng: 69.2401,
+        lat: "",
+        lng: "",
       };
     case "boxmonitor":
       return {
@@ -80,7 +80,9 @@ export const crossroadHandler = async (
     setCrossroads(data.data);
     if (formData.crossroad_id) {
       setSelectedCrossroad(
-        data.data.find((item) => item.id == formData.crossroad_id)
+        formData.crossroad_id
+          ? data.data.find((item) => item.id == formData.crossroad_id)
+          : data.data[0]
       );
     } else {
       setSelectedCrossroad(data.data[0]);

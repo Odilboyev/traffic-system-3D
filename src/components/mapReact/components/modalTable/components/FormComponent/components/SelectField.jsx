@@ -5,25 +5,28 @@ const SelectField = ({
   icon: Icon,
   label,
   options,
-  selected,
+  value,
   onChange,
   ...rest
-}) => (
-  <div
-    className={`flex flex-col relative`}
-    style={{ zIndex: rest.zIndex ?? 5000 }}
-  >
-    <div className="flex items-center gap-2 mb-2">
-      <Icon className="text-gray-600 dark:text-gray-300" size={24} />
-      <label>{t(label)}</label>
+}) => {
+  console.log(value, "selected - SelectField");
+  return (
+    <div
+      className={`flex flex-col relative`}
+      style={{ zIndex: rest.zIndex ?? 5000 }}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <Icon className="text-gray-600 dark:text-gray-300" size={24} />
+        <label>{t(label)}</label>
+      </div>
+      <CustomSelect
+        label={label}
+        options={options}
+        value={value}
+        onChange={onChange}
+        {...rest}
+      />
     </div>
-    <CustomSelect
-      label={label}
-      options={options}
-      value={selected}
-      onChange={onChange}
-      {...rest}
-    />
-  </div>
-);
+  );
+};
 export default SelectField;
