@@ -36,6 +36,20 @@ export const getInitialData = (type) => {
         lat: "",
         lng: "",
       };
+    case "camerapdd":
+      return {
+        name: "",
+        crossroad_id: "",
+        ip: "",
+        login: "",
+        password: "",
+        rtsp_port: 554,
+        http_port: 80,
+        https_port: 443,
+        sdk_port: 8000,
+        lat: "",
+        lng: "",
+      };
     case "boxmonitor":
       return {
         name: "",

@@ -263,6 +263,7 @@ const DeviceManagement = ({ refreshHandler }) => {
                 "crossroad",
                 "cameratraffic",
                 "cameraview",
+                "camerapdd",
                 "boxmonitor",
                 "svetofor",
                 "users",

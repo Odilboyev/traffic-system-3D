@@ -164,6 +164,8 @@ const MapComponent = ({ changedMarker }) => {
     crossroad: true,
     trafficlights: true,
     signs: true,
+    camerapdd: true,
+    cameraview: true,
   });
   const [widgets, setWidgets] = useLocalStorageState("traffic_widgets", {
     bottomsection: true,

@@ -9,7 +9,6 @@ const SelectField = ({
   onChange,
   ...rest
 }) => {
-  console.log(value, "selected - SelectField");
   return (
     <div
       className={`flex flex-col relative`}

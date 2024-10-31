@@ -14,7 +14,9 @@ const FilterControl = ({ placement, changeFilter, filter }) => {
   const filterOptions = [
     { type: "all", label: t("all") },
     { type: "box", label: t("boxcontroller") },
-    { type: "camera", label: t("camera") },
+    { type: "cameratraffic", label: t("cameratraffic") },
+    { type: "cameraview", label: t("cameraview") },
+    { type: "camerapdd", label: t("camerapdd") },
     { type: "crossroad", label: t("crossroad") },
     { type: "trafficlights", label: t("svetofor") },
     { type: "signs", label: t("signs") },
@@ -54,7 +56,9 @@ const FilterControl = ({ placement, changeFilter, filter }) => {
               checked={
                 type === "all"
                   ? filter.box &&
-                    filter.camera &&
+                    filter.cameratraffic &&
+                    filter.cameraview &&
+                    filter.camerapdd &&
                     filter.crossroad &&
                     filter.trafficlights &&
                     filter.signs

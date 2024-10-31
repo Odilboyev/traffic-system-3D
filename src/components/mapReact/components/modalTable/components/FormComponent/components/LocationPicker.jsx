@@ -35,12 +35,10 @@ const DraggableMarker = ({ position, setPosition }) => {
 };
 // Location picker for crossroads
 const LocationPicker = ({
-  selectedCrossroad,
   lat = 41.2995,
   lng = 69.2401,
   handleInputChange,
 }) => {
-  console.log(selectedCrossroad, "selectedCrossroad - LocationPicker");
   const { currentLayer } = useTheme();
   const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
   return (
