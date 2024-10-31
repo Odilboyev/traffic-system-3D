@@ -11,7 +11,7 @@ import Modal from "../../../modal";
 import { t } from "i18next";
 import FilterTypes from "./filterTypes";
 import { ChevronLeftIcon } from "@heroicons/react/16/solid";
-import { shouldHideColumn } from "./utils";
+import { shouldHideColumn, getOrderedColumns } from "./utils";
 import { useSortedData } from "./useSortedData";
 import TableHeader from "./components/TableHeader";
 import TableRow from "./components/TableRow";
@@ -115,14 +115,16 @@ const ModalTable = ({
   };
 
   const columns = data?.[0]
-    ? Object.keys(data[0]).filter(
-        (key) =>
-          !shouldHideColumn(
-            key,
-            isSubPageOpen,
-            selectedFilter,
-            historyButtonCallback
-          )
+    ? getOrderedColumns(
+        Object.keys(data[0]).filter(
+          (key) =>
+            !shouldHideColumn(
+              key,
+              isSubPageOpen,
+              selectedFilter,
+              historyButtonCallback
+            )
+        )
       )
     : [];
   const handleFormSubmit = (data) => {

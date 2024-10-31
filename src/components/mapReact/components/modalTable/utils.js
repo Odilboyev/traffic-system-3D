@@ -24,7 +24,15 @@ export const shouldHideColumn = (
   selectedFilter,
   itemCallback
 ) => {
-  const hiddenKeys = ["lat", "lng", "location", "statuserror_name"];
+  const hiddenKeys = [
+    "lat",
+    "lng",
+    "location",
+    "statuserror_name",
+    "crossroad_id",
+    "vendor_id",
+    "device_id",
+  ];
   const hiddenOnSubPageKeys = ["type", "type_name", "device_id"];
   const hiddenOnAllHistory = [
     "type",
@@ -37,4 +45,18 @@ export const shouldHideColumn = (
     (isSubPageOpen && hiddenOnSubPageKeys.includes(key)) ||
     (!itemCallback && hiddenOnAllHistory.includes(key))
   );
+};
+
+export const getOrderedColumns = (columns) => {
+  const columnOrder = ["id", "name", "crossroad_name"];
+
+  return columns.sort((a, b) => {
+    const indexA = columnOrder.indexOf(a);
+    const indexB = columnOrder.indexOf(b);
+
+    if (indexA === -1 && indexB === -1) return 0;
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
 };
