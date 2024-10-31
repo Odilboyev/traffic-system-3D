@@ -59,7 +59,7 @@ const DeviceManagement = ({ refreshHandler }) => {
   }, []);
 
   const fetchData = useCallback(
-    async (type = deviceType, page = 1, isactive) => {
+    async (type = deviceType, page = 1, isactive = filter) => {
       setDeviceLoading(true);
 
       try {
@@ -84,7 +84,7 @@ const DeviceManagement = ({ refreshHandler }) => {
     [deviceType]
   );
   const modifyData = useCallback(
-    async (method, type, body, isactive = undefined) => {
+    async (method, type, body, isactive = filter) => {
       // activation
       if (["delete", "patch"].includes(method)) {
         const confirmationMessage =
@@ -112,7 +112,6 @@ const DeviceManagement = ({ refreshHandler }) => {
               modalToastConfig
             );
         // Optionally re-fetch data to update the UI
-        await fetchData(type);
       } catch (error) {
         console.error(error);
         toast.error(
@@ -237,6 +236,8 @@ const DeviceManagement = ({ refreshHandler }) => {
   const isDeviceType = [
     "crossroad",
     "cameratraffic",
+    "cameraview",
+    "camerapdd",
     "boxmonitor",
     "svetofor",
   ].includes(deviceType);
