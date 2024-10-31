@@ -160,12 +160,12 @@ const MapComponent = ({ changedMarker }) => {
   const [areMarkersLoading, setAreMarkersLoading] = useState(false);
   const [filter, setFilter] = useLocalStorageState("traffic_filter", {
     box: true,
-    camera: true,
     crossroad: true,
     trafficlights: true,
     signs: true,
-    camerapdd: true,
+    camera: true,
     cameraview: true,
+    cameratraffic: true,
   });
   const [widgets, setWidgets] = useLocalStorageState("traffic_widgets", {
     bottomsection: true,
