@@ -35,83 +35,85 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
     onCancel();
   };
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSubmit(formData); // Submit form data
-        setFormData(null);
-      }}
-      className="space-y-6 p-8 w-full my-20 max-w-lg mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
-    >
-      {formData && (
-        <div className="flex flex-col gap-6 static">
-          {/* Dynamic Fields Based on Type */}
-          {type === "users" && (
-            <>
-              <UserFields
+    <div className="flex justify-center items-center h-full w-full">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit(formData); // Submit form data
+          setFormData(null);
+        }}
+        className="p-8 w-full max-w-[80vw] mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
+      >
+        {formData && (
+          <div className="flex flex-col gap-6 static">
+            {/* Dynamic Fields Based on Type */}
+            {type === "users" && (
+              <>
+                <UserFields
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  options={options}
+                />
+              </>
+            )}
+
+            {type === "cameratraffic" && (
+              <CameraTrafficFields
                 formData={formData}
                 handleInputChange={handleInputChange}
-                options={options}
               />
-            </>
-          )}
-
-          {type === "cameratraffic" && (
-            <CameraTrafficFields
-              formData={formData}
-              handleInputChange={handleInputChange}
-            />
-          )}
-          {type === "cameraview" && (
-            <CameraViewFields
-              formData={formData}
-              handleInputChange={handleInputChange}
-            />
-          )}
-          {type === "camerapdd" && (
-            <CameraPddFields
-              formData={formData}
-              handleInputChange={handleInputChange}
-            />
-          )}
-          {type === "boxmonitor" && (
-            <BoxMonitorFields
-              formData={formData}
-              handleInputChange={handleInputChange}
-            />
-          )}
-          {type === "crossroad" && (
-            <CrossroadFields
-              formData={formData}
-              handleInputChange={handleInputChange}
-            />
-          )}
-          {type === "svetofor" && (
-            <TrafficLightsFields
-              formData={formData}
-              handleInputChange={handleInputChange}
-            />
-          )}
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              color="red"
-              onClick={handleCancel}
-              className="font-semibold hover:bg-red-600 transition-all duration-300"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              color="green"
-              className="font-semibold hover:bg-green-600 transition-all duration-300"
-            >
-              Save
-            </Button>
+            )}
+            {type === "cameraview" && (
+              <CameraViewFields
+                formData={formData}
+                handleInputChange={handleInputChange}
+              />
+            )}
+            {type === "camerapdd" && (
+              <CameraPddFields
+                formData={formData}
+                handleInputChange={handleInputChange}
+              />
+            )}
+            {type === "boxmonitor" && (
+              <BoxMonitorFields
+                formData={formData}
+                handleInputChange={handleInputChange}
+              />
+            )}
+            {type === "crossroad" && (
+              <CrossroadFields
+                formData={formData}
+                handleInputChange={handleInputChange}
+              />
+            )}
+            {type === "svetofor" && (
+              <TrafficLightsFields
+                formData={formData}
+                handleInputChange={handleInputChange}
+              />
+            )}
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button
+                color="red"
+                onClick={handleCancel}
+                className="font-semibold hover:bg-red-600 transition-all duration-300"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                color="green"
+                className="font-semibold hover:bg-green-600 transition-all duration-300"
+              >
+                Save
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
-    </form>
+        )}
+      </form>
+    </div>
   );
 };
 

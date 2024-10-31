@@ -54,49 +54,55 @@ const BoxMonitorFields = ({ formData, handleInputChange }) => {
     handleInputChange("sensors", updatedSensors);
   };
   return (
-    <>
-      {["name", "sn", "ip"].map((field) => (
-        <InputField
-          key={field}
-          required
-          icon={MdOutlineAllInbox}
-          label={t(field)}
-          value={formData[field] || ""}
-          onChange={(e) => handleInputChange(field, e.target.value)}
-        />
-      ))}
-      {sensors && (
-        <SelectField
-          isMulti
-          icon={MdSensors}
-          label={t("sensors")}
-          options={sensors}
-          value={selectedSensors}
-          getOptionLabel={(option) => option.name || ""}
-          getOptionValue={(option) => option.sensor_id.toString()}
-          onChange={handleSensorChange}
-          zIndex="99999999"
-        />
-      )}
-      {crossroads != null && selectedCrossroad != null && (
-        <SelectField
-          icon={MdFlag}
-          label={t("crossroad")}
-          options={crossroads}
-          value={crossroads.find((item) => item.id == selectedCrossroad?.id)}
-          getOptionLabel={(option) => option.name || ""}
-          getOptionValue={(option) => option.id}
-          onChange={handleCrossroadChange}
-        />
-      )}
-      {crossroads && selectedCrossroad && (
-        <LocationPicker
-          lat={formData.lat || selectedCrossroad.lat}
-          lng={formData.lng || selectedCrossroad.lng}
-          handleInputChange={handleInputChange}
-        />
-      )}
-    </>
+    <div className="flex gap-10 h-full ">
+      <div className="flex flex-col gap-8 w-1/3 ">
+        {["name", "sn", "ip"].map((field) => (
+          <InputField
+            key={field}
+            required
+            icon={MdOutlineAllInbox}
+            label={t(field)}
+            value={formData[field] || ""}
+            onChange={(e) => handleInputChange(field, e.target.value)}
+          />
+        ))}
+        {sensors && (
+          <SelectField
+            isMulti
+            icon={MdSensors}
+            label={t("sensors")}
+            options={sensors}
+            value={selectedSensors}
+            getOptionLabel={(option) => option.name || ""}
+            getOptionValue={(option) => option.sensor_id.toString()}
+            onChange={handleSensorChange}
+            zIndex="99999999"
+          />
+        )}{" "}
+        {crossroads != null && selectedCrossroad != null && (
+          <SelectField
+            icon={MdFlag}
+            label={t("crossroad")}
+            options={crossroads}
+            value={crossroads.find((item) => item.id == selectedCrossroad?.id)}
+            getOptionLabel={(option) => option.name || ""}
+            getOptionValue={(option) => option.id}
+            onChange={handleCrossroadChange}
+          />
+        )}
+      </div>
+      <div className="flex flex-col gap-3 w-2/3 min-h-[70vh]">
+        {crossroads && selectedCrossroad && (
+          <div className="flex-grow">
+            <LocationPicker
+              lat={formData.lat || selectedCrossroad.lat}
+              lng={formData.lng || selectedCrossroad.lng}
+              handleInputChange={handleInputChange}
+            />
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
