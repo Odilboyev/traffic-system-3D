@@ -11,6 +11,17 @@ import { LiaTrafficLightSolid } from "react-icons/lia";
 
 // TrafficLightsFields-specific fields
 const TrafficLightsFields = ({ formData, handleInputChange }) => {
+  const [vendors, setVendors] = useState([
+    {
+      id: 1,
+      name: "HIKVISION",
+    },
+    {
+      id: 2,
+      name: "FAMA",
+    },
+  ]);
+  const [selectedVendor, setSelectedVendor] = useState(null);
   const [crossroads, setCrossroads] = useState(null);
   const [selectedCrossroad, setSelectedCrossroad] = useState(null);
 
@@ -29,7 +40,10 @@ const TrafficLightsFields = ({ formData, handleInputChange }) => {
     handleInputChange("lat", selected.lat);
     handleInputChange("lng", selected.lng);
   };
-
+  const handleVendorChange = (selected) => {
+    setSelectedVendor(selected);
+    handleInputChange("vendor_id", selected.id);
+  };
   return (
     <>
       {[
@@ -41,6 +55,7 @@ const TrafficLightsFields = ({ formData, handleInputChange }) => {
         "ws_port",
         "sdk_port",
         "debug_port",
+        "udp_port",
       ].map((field) => (
         <InputField
           key={field}
@@ -51,6 +66,18 @@ const TrafficLightsFields = ({ formData, handleInputChange }) => {
           onChange={(e) => handleInputChange(field, e.target.value)}
         />
       ))}
+      {vendors && (
+        <SelectField
+          icon={MdFlag}
+          label={t("vendor")}
+          options={vendors}
+          value={vendors.find((item) => item.id == selectedVendor?.id)}
+          getOptionLabel={(option) => option.name || ""}
+          getOptionValue={(option) => option.id}
+          onChange={handleVendorChange}
+          zIndex={6000}
+        />
+      )}
       {crossroads != null && selectedCrossroad != null && (
         <SelectField
           icon={MdFlag}

@@ -36,6 +36,12 @@ const generateToastContent = (sensorData) => (
 );
 
 const toaster = (sensorData, map) => {
+  const toastId = `${sensorData.sensor_name}-${sensorData.eventdate}`;
+
+  if (toast.isActive(toastId)) {
+    return null;
+  }
+
   const toastContent = generateToastContent(sensorData);
   const handleClick = () => {
     if (sensorData.lat && sensorData.lng) {
@@ -47,6 +53,7 @@ const toaster = (sensorData, map) => {
     ...toastConfig,
     onClick: handleClick,
     icon: false,
+    toastId: toastId,
   };
 
   switch (sensorData.statuserror) {

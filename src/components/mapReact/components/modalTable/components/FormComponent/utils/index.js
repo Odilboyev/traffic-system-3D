@@ -22,6 +22,20 @@ export const getInitialData = (type) => {
         lat: 41.2995,
         lng: 69.2401,
       };
+    case "cameraview":
+      return {
+        name: "",
+        crossroad_id: "",
+        ip: "",
+        login: "",
+        password: "",
+        rtsp_port: 554,
+        http_port: 80,
+        https_port: 443,
+        sdk_port: 8000,
+        lat: 41.2995,
+        lng: 69.2401,
+      };
     case "boxmonitor":
       return {
         name: "",
@@ -38,10 +52,12 @@ export const getInitialData = (type) => {
         ip: "",
         login: "",
         password: "",
-        http_port: "",
-        ws_port: "",
-        sdk_port: "",
-        debug_port: "",
+        http_port: "80",
+        ws_port: "80",
+        sdk_port: "8000",
+        debug_port: "8081",
+        udp_port: "4050",
+        vendor_id: "1",
         lat: "",
         lng: "",
       };

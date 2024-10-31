@@ -14,7 +14,6 @@ const App = () => {
   //
   const [changedMarker, setChangedMarker] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (!isSubscribed) {
@@ -23,24 +22,22 @@ const App = () => {
   }, [isSubscribed]);
 
   const onWSDataReceived = (data) => {
+    // Prevent duplicate processing of the same data
+    if (changedMarker?.eventdate === data.data.eventdate) {
+      return;
+    }
     setIsSubscribed(true);
     setChangedMarker(data.data);
-
-    if (!isPlaying) {
-      setIsPlaying(true);
-      const sound = new Audio();
-      if (data.data.statuserror === 1 || data.data.statuserror === 2) {
-        sound.src = dangerSound;
-      } else if (data.data.statuserror === 0) {
-        sound.src = positiveSound;
-      }
-
-      sound.play().then(() => {
-        sound.addEventListener("ended", () => {
-          setIsPlaying(false);
-        });
-      });
+    const sound = new Audio();
+    if (data.data.statuserror === 1) {
+      sound.src = dangerSound;
+    } else if (data.data.statuserror === 0) {
+      sound.src = positiveSound;
+    } else if (data.data.statuserror === 2) {
+      sound.src = dangerSound;
     }
+    sound.play();
+    console.log(data, "socket");
   };
 
   //

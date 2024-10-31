@@ -76,6 +76,7 @@ const home = [41.2995, 69.2401]; // Tashkent
 
 const MapEvents = ({ changedMarker, fetchAlarmsData }) => {
   const map = useMap();
+  const lastToastRef = useRef(null);
 
   useEffect(() => {
     if (!map) return;
@@ -95,9 +96,10 @@ const MapEvents = ({ changedMarker, fetchAlarmsData }) => {
   }, [map]);
 
   useEffect(() => {
-    if (changedMarker) {
+    if (changedMarker && lastToastRef.current !== changedMarker.eventdate) {
       fetchAlarmsData();
       toaster(changedMarker, map);
+      lastToastRef.current = changedMarker.eventdate;
     }
   }, [changedMarker, map, fetchAlarmsData]);
 
