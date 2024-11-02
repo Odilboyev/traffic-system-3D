@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signIn } from "../../api/api.handlers";
 import login from "../../Auth";
-import PasswordInput from "../../components/PasswordInput";
 import bg from "../../../public/images/back.jpg";
 import { useTheme } from "../../customHooks/useTheme";
 import { FaSpinner } from "react-icons/fa6";
@@ -12,7 +11,7 @@ import { MdPassword, MdPerson } from "react-icons/md";
 import { t } from "i18next";
 export function SignIn() {
   const navigate = useNavigate();
-  const { theme } = useTheme();
+  console.log("page login");
   const [loginName, setLoginName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // Added state for error message
@@ -48,7 +47,7 @@ export function SignIn() {
       }
     }
   };
-
+  console.log("loginName");
   return (
     <section
       className="h-screen flex justify-center items-center gap-4"
@@ -93,15 +92,10 @@ export function SignIn() {
             className="mt-6"
             fullWidth
             type="submit"
-            disabled={loading || !loginName} // Disable the button when loading is true or login/password is empty
+            disabled={loading || !loginName} // Keep the disable logic
           >
-            {loading ? (
-              // Render loading icon when loading is true
-              <FaSpinner className="animate-spin mx-auto" />
-            ) : (
-              // Render "Sign In" text when loading is false
-              t("enter")
-            )}
+            {loading && <FaSpinner className="animate-spin mx-auto" />}{" "}
+            {t("enter")}
           </Button>
 
           {/* ---------Forgot Password --------- */}

@@ -1,10 +1,16 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useState } from "react";
 import { Popup } from "react-leaflet";
 import SingleRecord from "../singleRecord";
 import L from "leaflet";
+import {
+  ArrowsPointingInIcon,
+  ArrowsPointingOutIcon,
+} from "@heroicons/react/16/solid";
+import "./popup.style.css";
 
 const DraggablePopup = memo(function DraggablePopup({ marker = {} }) {
-  const popupRef = useRef(null);
+  const [isZoomed, setIsZoomed] = useState(false);
+
   return (
     <Popup
       eventHandlers={{
@@ -14,18 +20,34 @@ const DraggablePopup = memo(function DraggablePopup({ marker = {} }) {
           draggable.enable();
         },
       }}
-      ref={popupRef}
-      // eventHandlers={{ close: onClose }}
-      maxWidth={"100%"}
-      minHeight={"100%"}
-      interactive
-      closeOnClick={false}
-      autoClose={false}
-      keepInView={false} // Change this to false
-      autoPan={false}
-      className="m-0 !p-0 z-[50000000] select-none "
+      style={{
+        margin: 0,
+        padding: 0,
+        zIndex: 50000000,
+      }}
     >
-      <SingleRecord mselink={marker?.mselink} cname={marker?.cname} />
+      <div className="relative w-full h-full transition-all duration-300 ease-in-out">
+        <div className="absolute top-2 left-2 z-[11]">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsZoomed(!isZoomed);
+            }}
+            className="rounded-full text-xs hover:bg-transparent"
+          >
+            {isZoomed ? (
+              <ArrowsPointingInIcon className="w-5 h-5" />
+            ) : (
+              <ArrowsPointingOutIcon className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+        <SingleRecord
+          mselink={marker?.mselink}
+          cname={marker?.cname}
+          isZoomed={isZoomed}
+        />
+      </div>
     </Popup>
   );
 });

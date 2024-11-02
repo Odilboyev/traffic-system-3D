@@ -14,7 +14,7 @@ const InputField = ({
     <div className="flex items-center gap-2 mb-2">
       <Icon className="text-gray-600 dark:text-gray-300" size={24} />
       <label>{t(label)}</label>
-    </div>{" "}
+    </div>
     {inputType && inputType == "password" ? (
       <PasswordInput label={t(label)} value={value} onChange={onChange} />
     ) : (
