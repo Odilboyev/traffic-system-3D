@@ -324,12 +324,8 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
 };
 
 TrafficLightDashboard.propTypes = {
-  id: PropTypes.string.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isInModal: PropTypes.bool,
-};
-
-TrafficLightDashboard.defaultProps = {
-  isInModal: false,
 };
 
 export default TrafficLightDashboard;

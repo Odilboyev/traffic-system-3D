@@ -1,4 +1,5 @@
 import { t } from "i18next";
+import PropTypes from "prop-types";
 import PasswordInput from "./PasswordInput";
 
 // Reusable input field component
@@ -30,4 +31,14 @@ const InputField = ({
     )}
   </div>
 );
+
+InputField.propTypes = {
+  icon: PropTypes.elementType,
+  label: PropTypes.string,
+  inputType: PropTypes.string,
+  type: PropTypes.string,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 export default InputField;

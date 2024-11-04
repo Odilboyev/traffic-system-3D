@@ -45,10 +45,7 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
 };
 
 TrafficLightsModal.propTypes = {
-  light: PropTypes.shape({
-    cname: PropTypes.string,
-    cid: PropTypes.string,
-  }),
+  light: PropTypes.object,
   isDialogOpen: PropTypes.bool.isRequired,
   handler: PropTypes.func.isRequired,
 };

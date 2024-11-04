@@ -7,7 +7,6 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import PropTypes from "prop-types";
-import Videos from "./subPages/videos";
 import { useEffect, useState } from "react";
 import {
   getBoxData,
@@ -16,13 +15,14 @@ import {
   getTrafficLightsData,
 } from "../../../../api/api.handlers";
 import FullscreenBox from "./components/fullscreen";
+import Videos from "./subPages/videos";
 // import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";
-import { useTheme } from "../../../../customHooks/useTheme";
 import baseLayers from "../../../../configurations/mapLayers";
-import CrossroadDashboard from "./subPages/crossroadDash";
-import TrafficLightDashboard from "../trafficLightsModal/components/trafficLightDashboard";
+import { useTheme } from "../../../../customHooks/useTheme";
 import SensorPartWrapper from "../box/components/sensorSection/wrapper";
+import TrafficLightDashboard from "../trafficLightsModal/components/trafficLightDashboard";
+import CrossroadDashboard from "./subPages/crossroadDash";
 
 // Helper function to transform chart data
 function transformDataForCharts(data) {
@@ -219,12 +219,7 @@ const CrossroadModal = ({ open, handleOpen, marker }) => {
 CrossroadModal.propTypes = {
   open: PropTypes.bool.isRequired,
   handleOpen: PropTypes.func.isRequired,
-  marker: PropTypes.shape({
-    cid: PropTypes.number,
-    cname: PropTypes.string,
-    lat: PropTypes.number,
-    lng: PropTypes.number,
-  }),
+  marker: PropTypes.object,
 };
 
 export default CrossroadModal;

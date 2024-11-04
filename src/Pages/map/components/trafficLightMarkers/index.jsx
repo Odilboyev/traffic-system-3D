@@ -85,7 +85,7 @@ TrafficLightMarkers.propTypes = {
   setWssLink: PropTypes.func.isRequired,
   setCurrentSvetoforId: PropTypes.func.isRequired,
   setTrafficSocket: PropTypes.func.isRequired,
-  currentSvetoforId: PropTypes.string,
+  currentSvetoforId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   wssLink: PropTypes.string,
   setLastSuccessfulLocation: PropTypes.func.isRequired,
   trafficSocket: PropTypes.object,

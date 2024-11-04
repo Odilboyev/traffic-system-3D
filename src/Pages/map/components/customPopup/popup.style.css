@@ -1,12 +1,12 @@
-.leaflet-popup-close-button {
+/* .leaflet-popup-close-button {
   z-index: 50000000;
-}
+} */
 
 .custom-popup .leaflet-popup-content {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
 }
-
+/* 
 .custom-popup .leaflet-popup-content-wrapper {
   padding: 0;
   margin: 0;
@@ -26,4 +26,4 @@
 .custom-popup.zoomed .leaflet-popup-content-wrapper,
 .custom-popup.zoomed .leaflet-popup-content {
   transition: all 0.3s ease-in-out;
-}
+} */

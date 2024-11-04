@@ -13,7 +13,7 @@ import {
 } from "@material-tailwind/react";
 import L from "leaflet";
 import PropTypes from "prop-types";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import { useTranslation } from "react-i18next";
 import { IoMdSunny } from "react-icons/io";
@@ -141,7 +141,7 @@ const MapComponent = ({ changedMarker }) => {
 
   const [isLightsModalOpen, setIsLightsModalOpen] = useState(false);
   const [isLightsLoading, setIsLightsLoading] = useState(false);
-  const [activeLight, setActiveLight] = useState(26);
+  const [activeLight, setActiveLight] = useState(null);
 
   const [markers, setMarkers] = useState([]);
   const [bottomSectionData, setBottomSectionData] = useState(null);
@@ -445,110 +445,101 @@ const MapComponent = ({ changedMarker }) => {
           //   opacity: 1,
           // }}
           iconCreateFunction={(e) => ClusterIcon(e, changedMarker)}
-        >
-          <Marker
-            markerId={"34"}
-            position={[41.34104414093939, 69.2542765849464]}
-            icon={L.icon({
-              iconUrl: `icons/box1.png`,
-              iconSize: [32, 32],
-            })}
-          ></Marker>
-          <Marker
-            markerId={"39"}
-            position={[41.3410441409394, 69.2542765849485]}
-            icon={L.icon({
-              iconUrl: `icons/box2.png`,
-              iconSize: [32, 32],
-            })}
-          ></Marker>
-          <Marker
-            markerId={"30"}
-            position={[41.34104414093941, 69.2542765849466]}
-            icon={L.icon({
-              iconUrl: `icons/box0.png`,
-              iconSize: [32, 32],
-            })}
-          ></Marker>
-          {markers?.map((marker, i) => {
-            if (
-              (marker.type === 1 && !filter.camera) ||
-              (marker.type === 2 && !filter.crossroad) ||
-              (marker.type === 3 && !filter.box) ||
-              (marker.type === 4 && !filter.trafficlights) ||
-              (marker.type === 6 && !filter.camerapdd) ||
-              (marker.type === 5 && !filter.cameraview)
-            ) {
-              return null;
-            }
+        ></MarkerClusterGroup>
+        <Marker
+          markerId={"34"}
+          position={[41.34104414093939, 69.2542765849464]}
+          icon={L.icon({
+            iconUrl: `icons/box1.png`,
+            iconSize: [32, 32],
+          })}
+        ></Marker>
+        <Marker
+          markerId={"39"}
+          position={[41.3410441409394, 69.2542765849485]}
+          icon={L.icon({
+            iconUrl: `icons/box2.png`,
+            iconSize: [32, 32],
+          })}
+        ></Marker>
+        <Marker
+          markerId={"30"}
+          position={[41.34104414093941, 69.2542765849466]}
+          icon={L.icon({
+            iconUrl: `icons/box0.png`,
+            iconSize: [32, 32],
+          })}
+        ></Marker>
+        {markers?.map((marker) => {
+          if (
+            (marker.type === 1 && !filter.camera) ||
+            (marker.type === 2 && !filter.crossroad) ||
+            (marker.type === 3 && !filter.box) ||
+            (marker.type === 4 && !filter.trafficlights) ||
+            (marker.type === 6 && !filter.camerapdd) ||
+            (marker.type === 5 && !filter.cameraview)
+          ) {
+            return null;
+          }
 
-            // Skip mapping the marker if lat or lng is undefined
-            if (isNaN(Number(marker.lat)) || isNaN(Number(marker.lng))) {
-              return null;
-            }
+          if (isNaN(Number(marker.lat)) || isNaN(Number(marker.lng))) {
+            return null;
+          }
 
-            return (
-              <>
-                <Marker
-                  key={i}
-                  markerId={marker.cid}
-                  markerType={marker.type}
-                  position={[marker.lat, marker.lng]}
-                  draggable={isDraggable}
-                  rotationAngle={marker.rotated}
-                  eventHandlers={{
-                    click:
-                      marker.type == 2
-                        ? () => handleMonitorCrossroad(marker)
-                        : marker.type == 3
-                        ? () => handleBoxModalOpen(marker)
-                        : marker.type == 4
-                        ? () => handleLightsModalOpen(marker)
-                        : null,
-                    dragend: (event) =>
-                      handleMarkerDragEnd(marker.cid, marker.type, event),
-                  }}
-                  statuserror={marker.statuserror}
-                  icon={L.icon({
-                    iconUrl: `icons/${marker.icon}`,
-                    iconSize: [40, 40],
-                  })}
-                  rotatedAngle={marker.type === 3 ? marker.rotated : 0}
-                >
-                  {marker.type === 1 ||
-                  marker.type === 5 ||
-                  marker.type === 6 ? (
-                    <CustomPopup marker={marker} />
-                  ) : null}
-                  <Tooltip direction="top" className="rounded-md">
-                    {marker.type == 1 ||
-                    marker.type == 5 ||
-                    marker.type == 6 ? (
-                      <div
-                        style={{
-                          width: "8vw",
-                          height: "6vw",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <img
-                          src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
-                          className="w-full"
-                          alt=""
-                        />
-                        <Typography className="my-0">
-                          {marker?.cname}
-                        </Typography>
-                      </div>
-                    ) : (
+          return (
+            <Fragment key={`${marker.cid}-${marker.type}`}>
+              <Marker
+                markerId={marker.cid}
+                markerType={marker.type}
+                position={[marker.lat, marker.lng]}
+                draggable={isDraggable}
+                rotationAngle={marker.rotated}
+                eventHandlers={{
+                  click:
+                    marker.type == 2
+                      ? () => handleMonitorCrossroad(marker)
+                      : marker.type == 3
+                      ? () => handleBoxModalOpen(marker)
+                      : marker.type == 4
+                      ? () => handleLightsModalOpen(marker)
+                      : null,
+                  dragend: (event) =>
+                    handleMarkerDragEnd(marker.cid, marker.type, event),
+                }}
+                statuserror={marker.statuserror}
+                icon={L.icon({
+                  iconUrl: `icons/${marker.icon}`,
+                  iconSize: [40, 40],
+                })}
+                rotatedAngle={marker.type === 3 ? marker.rotated : 0}
+              >
+                {marker.type === 1 || marker.type === 5 || marker.type === 6 ? (
+                  <CustomPopup marker={marker} />
+                ) : null}
+                <Tooltip direction="top" className="rounded-md">
+                  {marker.type == 1 || marker.type == 5 || marker.type == 6 ? (
+                    <div
+                      style={{
+                        width: "8vw",
+                        height: "6vw",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <img
+                        src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
+                        className="w-full"
+                        alt=""
+                      />
                       <Typography className="my-0">{marker?.cname}</Typography>
-                    )}
-                  </Tooltip>
-                </Marker>
-              </>
-            );
-          })}{" "}
-        </MarkerClusterGroup>
+                    </div>
+                  ) : (
+                    <Typography className="my-0">{marker?.cname}</Typography>
+                  )}
+                </Tooltip>
+              </Marker>
+            </Fragment>
+          );
+        })}{" "}
       </MapContainer>
       {isbigMonitorOpen && (
         <CrossroadModal
@@ -587,6 +578,7 @@ MapComponent.propTypes = {
 };
 
 export default MapComponent;
+
 const ClusterIcon = (cluster) => {
   const childMarkers = cluster.getAllChildMarkers();
   const statusCounts = {};
