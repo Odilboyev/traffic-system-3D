@@ -1,14 +1,13 @@
+import PropTypes from "prop-types";
 import {
   IconButton,
   List,
   ListItem,
   Typography,
 } from "@material-tailwind/react";
-import { CogIcon, PlusCircleIcon, PlusIcon } from "@heroicons/react/16/solid";
-import { useState, useCallback, memo, useEffect } from "react";
+import { CogIcon, PlusIcon } from "@heroicons/react/16/solid";
+import { useState, useCallback, memo } from "react";
 import { t } from "i18next";
-import Dropright from "../../components/dropright";
-import ModalTable from "../map/components/modalTable";
 import {
   addUser,
   deleteUser,
@@ -17,9 +16,11 @@ import {
   getErrorHistory,
   recoverUser,
   updateUser,
-} from "../../api/api.handlers";
+} from "../../../../api/api.handlers";
 import { toast } from "react-toastify";
-import { modalToastConfig } from "../../tools/toastconfig";
+import { modalToastConfig } from "../../../../tools/toastconfig";
+import SidePanel from "../../../../components/sidePanel";
+import ModalTable from "../../components/modalTable";
 
 const DeviceManagement = ({ refreshHandler }) => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
@@ -251,7 +252,7 @@ const DeviceManagement = ({ refreshHandler }) => {
         <CogIcon className="w-6 h-6 " />
       </IconButton>
 
-      <Dropright
+      <SidePanel
         wrapperClass="relative inline-block text-left"
         sndWrapperClass="ml-3 -top-8 absolute rounded-md bg-gray-900/70 !text-white backdrop-blur-md"
         isOpen={isDroprightOpen}
@@ -335,6 +336,10 @@ const DeviceManagement = ({ refreshHandler }) => {
       />
     </>
   );
+};
+
+DeviceManagement.propTypes = {
+  refreshHandler: PropTypes.func.isRequired,
 };
 
 export default memo(DeviceManagement);

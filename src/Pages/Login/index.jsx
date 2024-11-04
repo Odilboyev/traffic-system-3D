@@ -6,9 +6,9 @@ import login from "../../Auth";
 import bg from "../../../public/images/back.jpg";
 import { useTheme } from "../../customHooks/useTheme";
 import { FaSpinner } from "react-icons/fa6";
-import InputField from "../../components/mapReact/components/modalTable/components/FormComponent/components/InputField";
 import { MdPassword, MdPerson } from "react-icons/md";
 import { t } from "i18next";
+import InputField from "../../components/InputField";
 export function SignIn() {
   const navigate = useNavigate();
   console.log("page login");

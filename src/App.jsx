@@ -1,12 +1,11 @@
 import { useContext, useState, useEffect } from "react";
-import MonitoringMapReact from "./components/mapReact";
-import { ToastContainer } from "react-toastify";
 import dangerSound from "../src/assets/audio/danger.mp3";
 import positiveSound from "../src/assets/audio/positive.mp3";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeContext } from "./context/themeContext.jsx";
 import { subscribeToCurrentAlarms } from "./api/api.handlers.js";
 import WarningMessage from "./components/offlineWarning/index.jsx";
+import MapComponent from "./Pages/map/index.jsx";
 
 const App = () => {
   const { theme } = useContext(ThemeContext);
@@ -62,7 +61,7 @@ const App = () => {
     >
       {!isOnline && <WarningMessage />}
 
-      <MonitoringMapReact changedMarker={changedMarker} />
+      <MapComponent changedMarker={changedMarker} />
     </div>
   );
 };
