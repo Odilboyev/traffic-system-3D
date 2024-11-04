@@ -23,7 +23,6 @@ import {
   getBoxData,
   getCurrentAlarms,
   getInfoForCards,
-  getMarkerData,
   markerHandler,
 } from "../../api/api.handlers.js";
 import Control from "../../components/customControl/index.jsx";
@@ -52,7 +51,7 @@ import LanguageSwitcher from "./sections/langSwitcher/index.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
 
-const MapEvents = ({ changedMarker, fetchAlarmsData }) => {
+const MapEvents = ({ changedMarker, fetchAlarmsData, setZoom }) => {
   const map = useMap();
   const lastToastRef = useRef(null);
 
@@ -64,6 +63,7 @@ const MapEvents = ({ changedMarker, fetchAlarmsData }) => {
       const newZoom = map.getZoom();
       localStorage.setItem("mapCenter", JSON.stringify(newCenter));
       localStorage.setItem("mapZoom", newZoom);
+      setZoom(newZoom);
     };
 
     map.on("moveend", moveEndHandler);
@@ -87,6 +87,7 @@ const MapEvents = ({ changedMarker, fetchAlarmsData }) => {
 MapEvents.propTypes = {
   changedMarker: PropTypes.object,
   fetchAlarmsData: PropTypes.func.isRequired,
+  setZoom: PropTypes.func.isRequired,
 };
 
 const MapComponent = ({ changedMarker }) => {
@@ -101,9 +102,9 @@ const MapComponent = ({ changedMarker }) => {
   const center = JSON.parse(localStorage.getItem("mapCenter"))
     ? JSON.parse(localStorage.getItem("mapCenter"))
     : home;
-  const zoom = localStorage.getItem("mapZoom")
-    ? localStorage.getItem("mapZoom")
-    : 13;
+  const [zoom, setZoom] = useState(
+    localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
+  );
 
   const [fulscreen, setFullscreen] = useState(false);
 
@@ -169,17 +170,14 @@ const MapComponent = ({ changedMarker }) => {
     setAreMarkersLoading(true);
     try {
       setAreMarkersLoading(false);
-      const [myData, bottomData] = await Promise.all([
-        getMarkerData(),
-        getInfoForCards(),
-      ]);
-      setMarkers(
-        myData.data.map((marker) => ({
-          ...marker,
-          isPopupOpen: false,
-        }))
-      );
+      const bottomData = await getInfoForCards();
       setBottomSectionData(bottomData);
+      // setMarkers(
+      //   myData.data.map((marker) => ({
+      //     ...marker,
+      //     isPopupOpen: false,
+      //   }))
+      // );
     } catch (error) {
       setAreMarkersLoading(false);
       if (error.code === "ERR_NETWORK") {
@@ -189,7 +187,7 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
   useEffect(() => {
-    // getDataHandler();
+    getDataHandler();
     fetchAlarmsData();
   }, []);
 
@@ -275,6 +273,7 @@ const MapComponent = ({ changedMarker }) => {
         <MapEvents
           changedMarker={changedMarker}
           fetchAlarmsData={fetchAlarmsData}
+          setZoom={setZoom}
         />
         {currentLayerDetails && (
           <TileLayer
@@ -287,6 +286,11 @@ const MapComponent = ({ changedMarker }) => {
         )}
         {/* zoomcontrol */}
         <ZoomControl theme={theme} />{" "}
+        <Control position="bottomleft">
+          <div className="bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded">
+            Zoom: {zoom}
+          </div>
+        </Control>
         <Control position="topleft">
           <FilterControl
             filter={filter}
@@ -309,10 +313,10 @@ const MapComponent = ({ changedMarker }) => {
             <div style={{ display: "none" }}></div>
           )}
         </Control>
-        {widgets.bottomsection && (
-          <div className="visible">
-            <BottomSection cardsInfoData={bottomSectionData} />
-          </div>
+        {widgets.bottomsection ? (
+          <BottomSection cardsInfoData={bottomSectionData} />
+        ) : (
+          <div style={{ display: "none" }}></div>
         )}
         {/* lights */}
         {filter.trafficlights && <TrafficLightContainer />}

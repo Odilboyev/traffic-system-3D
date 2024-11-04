@@ -39,8 +39,9 @@ const MarkerComponent = ({
     fetchData: fetchMarkers,
     onClearData: clearMarkers,
     onNewData: updateMarkers,
-    minZoom: 8, // Adjust this value based on your needs
-    fetchDistanceThreshold: 1000, // Adjust this value based on your needs
+    minZoom: 5, // Adjust this value based on your needs
+    fetchDistanceThreshold: 500, // Adjust this value based on your needs
+    useDistanceThreshold: true,
   });
 
   return (

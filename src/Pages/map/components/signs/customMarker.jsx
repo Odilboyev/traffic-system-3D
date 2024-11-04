@@ -1,7 +1,7 @@
-import { Marker } from "react-leaflet";
 import L from "leaflet";
 import { useEffect, useRef } from "react";
 import { renderToString } from "react-dom/server";
+import { Marker } from "react-leaflet";
 import SignIcon from "./icon";
 
 const CustomMarker = ({ position, v, handleSignClick, children }) => {
@@ -25,35 +25,35 @@ const CustomMarker = ({ position, v, handleSignClick, children }) => {
     markerRef.current.setIcon(customIcon);
 
     // Function to attach click events to rendered content
-    const attachClickEvents = () => {
-      const iconElement = markerRef.current?.getElement();
-      if (iconElement) {
-        iconElement
-          .querySelectorAll(".custom-marker-content .sign")
-          .forEach((element, idx) => {
-            element.addEventListener("click", () => {
-              if (v.sings_data && v.sings_data[idx]) {
-                handleSignClick({ ...v.sings_data[idx], index: idx }, position);
-              }
-            });
-          });
-      }
-    };
+    // const attachClickEvents = () => {
+    //   const iconElement = markerRef.current?.getElement();
+    //   if (iconElement) {
+    //     iconElement
+    //       .querySelectorAll(".custom-marker-content .sign")
+    //       .forEach((element, idx) => {
+    //         element.addEventListener("click", () => {
+    //         if (v.sings_data && v.sings_data[idx]) {
+    //           handleSignClick({ ...v.sings_data[idx], index: idx }, position);
+    //         }
+    //       });
+    //     });
+    // }
+    // };
 
     // Attach click events after ensuring the DOM is ready
-    setTimeout(attachClickEvents, 0);
+    // setTimeout(attachClickEvents, 0);
 
     // Cleanup to avoid memory leaks
-    return () => {
-      const iconElement = markerRef.current?.getElement();
-      if (iconElement) {
-        iconElement
-          .querySelectorAll(".custom-marker-content div")
-          .forEach((element) => {
-            element.removeEventListener("click", handleSignClick);
-          });
-      }
-    };
+    // return () => {
+    // //   const iconElement = markerRef.current?.getElement();
+    // //   if (iconElement) {
+    // //     iconElement
+    // //       .querySelectorAll(".custom-marker-content div")
+    // //       .forEach((element) => {
+    // // //         element.removeEventListener("click", handleSignClick);
+    // //       });
+    // //   }
+    // };
   }, [v, handleSignClick]);
 
   return <Marker ref={markerRef} position={position} />;

@@ -8,6 +8,7 @@ const useMapDataFetcher = ({
   onNewData, // function to handle new data
   minZoom = 19, // optional minimum zoom level to trigger fetch
   fetchDistanceThreshold = 100, // optional distance threshold (in meters) for fetching data
+  useDistanceThreshold = true, // New prop with default value true
 }) => {
   const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
   const map = useMap();
@@ -19,9 +20,10 @@ const useMapDataFetcher = ({
     const currentLocation = L.latLng(center.lat, center.lng);
 
     if (zoom >= minZoom) {
-      // Fetch data if zoom level meets the requirement
+      // Modified condition to check useDistanceThreshold prop
       if (
         !lastSuccessfulLocation ||
+        !useDistanceThreshold ||
         currentLocation.distanceTo(lastSuccessfulLocation) >
           fetchDistanceThreshold
       ) {

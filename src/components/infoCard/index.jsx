@@ -1,5 +1,5 @@
-import TrafficLightsCard from "./singleCard";
 import PropTypes from "prop-types";
+import TrafficLightsCard from "./singleCard";
 const BottomSection = ({ cardsInfoData = [] }) => {
   return (
     <div className="max-w-[80%] px-5 mx-auto left-0 right-0 r absolute bottom-1 z-[999] min-h-[10vh] flex justify-center items-center gap-10 ">
@@ -15,6 +15,6 @@ const BottomSection = ({ cardsInfoData = [] }) => {
   );
 };
 BottomSection.propTypes = {
-  cardsInfoData: PropTypes.array,
+  cardsInfoData: PropTypes.any,
 };
 export default BottomSection;
