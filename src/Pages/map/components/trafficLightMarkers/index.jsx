@@ -1,5 +1,4 @@
 import L from "leaflet";
-import PropTypes from "prop-types";
 import { renderToString } from "react-dom/server";
 import { Marker } from "react-leaflet";
 import { getNearbyTrafficLights } from "../../../../api/api.handlers";
@@ -7,12 +6,16 @@ import NeonIcon from "../../../../components/neonIcon";
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
 import iconSelector from "./iconSelector";
 
-const TrafficLightMarkers = ({
+const TrafficlightMarkers = ({
   trafficLights,
   setTrafficLights,
   setWssLink,
   setCurrentSvetoforId,
+  setTrafficSocket,
   currentSvetoforId,
+  wssLink,
+  setLastSuccessfulLocation,
+  trafficSocket,
   clearTrafficLights,
   updateTrafficLights,
 }) => {
@@ -51,7 +54,7 @@ const TrafficLightMarkers = ({
 
   return (
     <>
-      {trafficLights?.map((v, i) => (
+      {trafficLights.map((v, i) => (
         <Marker
           key={i}
           position={[v.lat, v.lng]}
@@ -79,18 +82,4 @@ const TrafficLightMarkers = ({
   );
 };
 
-TrafficLightMarkers.propTypes = {
-  trafficLights: PropTypes.array.isRequired,
-  setTrafficLights: PropTypes.func.isRequired,
-  setWssLink: PropTypes.func.isRequired,
-  setCurrentSvetoforId: PropTypes.func.isRequired,
-  setTrafficSocket: PropTypes.func.isRequired,
-  currentSvetoforId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  wssLink: PropTypes.string,
-  setLastSuccessfulLocation: PropTypes.func.isRequired,
-  trafficSocket: PropTypes.object,
-  clearTrafficLights: PropTypes.func.isRequired,
-  updateTrafficLights: PropTypes.func.isRequired,
-};
-
-export default TrafficLightMarkers;
+export default TrafficlightMarkers;

@@ -40,7 +40,9 @@ const NeonIcon = ({ icon: Icon, iconStyle, isRounded, text, status }) => {
           {Icon}
         </div>
       ) : (
-        <p className={`mx-2 min-w-4 font-bold text-2xl ${textShadowClass}`}>
+        <p
+          className={`px-3 py-1 min-w-4 font-bold text-2xl ${textShadowClass}`}
+        >
           {text}
         </p>
       )}
@@ -52,7 +54,7 @@ NeonIcon.propTypes = {
   icon: PropTypes.node, // Changed to node to accommodate div components
   text: PropTypes.any,
   iconStyle: PropTypes.object,
-  status: PropTypes.oneOf([0, 1, 2, 3, 4]),
+  status: PropTypes.number,
   isRounded: PropTypes.bool, // Ensure this prop is defined
 };
 

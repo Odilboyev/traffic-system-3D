@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // import Svetoforlar from "./Svetoforlar"; // Adjust path as necessary
+import TrafficlightMarkers from ".";
 import PhasesDisplay from "../crossroad/components/phases";
-import Svetoforlar from ".";
 import { fixIncompleteJSON } from "./utils";
 
 const TrafficLightContainer = ({ isInModal }) => {
@@ -74,7 +74,7 @@ const TrafficLightContainer = ({ isInModal }) => {
 
   return (
     <>
-      <Svetoforlar
+      <TrafficlightMarkers
         trafficLights={trafficLights}
         setTrafficLights={setTrafficLights}
         setCurrentSvetoforId={setCurrentSvetoforId}

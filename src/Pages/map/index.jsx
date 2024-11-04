@@ -11,23 +11,13 @@ import {
   SpeedDialHandler,
   Typography,
 } from "@material-tailwind/react";
-import L from "leaflet";
 import PropTypes from "prop-types";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { renderToString } from "react-dom/server";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IoMdSunny } from "react-icons/io";
 import { MdBedtime } from "react-icons/md";
 import { TbBell, TbBellRinging } from "react-icons/tb";
-import {
-  MapContainer,
-  Marker,
-  TileLayer,
-  Tooltip,
-  useMap,
-} from "react-leaflet";
-import MarkerClusterGroup from "react-leaflet-cluster";
-import { PieChart } from "react-minimal-pie-chart";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import { ToastContainer } from "react-toastify";
 import {
   getBoxData,
@@ -49,7 +39,7 @@ import FilterControl from "./components/controls/filterControl/index.jsx";
 import WidgetControl from "./components/controls/widgetControl/index.jsx";
 import CrossroadModal from "./components/crossroad/index.jsx";
 import CurrentAlarms from "./components/currentAlarms/index.jsx";
-import CustomPopup from "./components/customPopup/index.jsx";
+import MarkerComponent from "./components/genericMarkers";
 import SignsContainer from "./components/signs/index.jsx";
 import TileChanger from "./components/tileChanger/index.jsx";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
@@ -164,16 +154,16 @@ const MapComponent = ({ changedMarker }) => {
     false
   );
 
-  useEffect(() => {
-    changedMarker &&
-      setMarkers((markers) => {
-        markers.map(
-          (marker) =>
-            marker.cid == changedMarker.cid && marker.type == changedMarker.type
-        );
-        return markers;
-      });
-  }, [changedMarker]);
+  // useEffect(() => {
+  //   changedMarker &&
+  //     setMarkers((markers) => {
+  //       markers.map(
+  //         (marker) =>
+  //           marker.cid == changedMarker.cid && marker.type == changedMarker.type
+  //       );
+  //       return markers;
+  //     });
+  // }, [changedMarker]);
 
   const getDataHandler = async () => {
     setAreMarkersLoading(true);
@@ -199,11 +189,8 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
   useEffect(() => {
-    getDataHandler();
+    // getDataHandler();
     fetchAlarmsData();
-    return () => {
-      setMarkers([]);
-    };
   }, []);
 
   const handleMarkerDragEnd = (id, type, event) => {
@@ -216,26 +203,6 @@ const MapComponent = ({ changedMarker }) => {
       getDataHandler();
     }
   };
-  const [markerUpdate, setMarkerUpdate] = useState(0);
-  const clusterRef = useRef(null);
-
-  const updateMarker = (updatedMarker) => {
-    setMarkers((prevMarkers) =>
-      prevMarkers.map((m) => {
-        if (m.cid === updatedMarker.cid && m.type === updatedMarker.type) {
-          return updatedMarker;
-        }
-        return m;
-      })
-    );
-    setMarkerUpdate(markerUpdate + 1);
-  };
-
-  useEffect(() => {
-    if (changedMarker) {
-      updateMarker(changedMarker);
-    }
-  }, [changedMarker]);
 
   const handleMonitorCrossroad = (marker) => {
     setActiveMarker(marker);
@@ -277,6 +244,17 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
   const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
+
+  const clearMarkers = () => {
+    setMarkers([]);
+  };
+
+  const updateMarkers = (data) => {
+    if (data) {
+      setMarkers(data);
+    }
+  };
+
   return (
     <>
       <MapContainer
@@ -431,115 +409,16 @@ const MapComponent = ({ changedMarker }) => {
             )}
           </IconButton>
         </Control>
-        <MarkerClusterGroup
-          key={markerUpdate}
-          ref={clusterRef}
-          spiderfyOnMaxZoom={false}
-          showCoverageOnHover={false}
-          disableClusteringAtZoom={15}
-          zoomToBoundsOnClick={true}
-          animate={true}
-          animateAddingMarkers={false}
-          // spiderLegPolylineOptions={{
-          //   weight: 5,
-          //   opacity: 1,
-          // }}
-          iconCreateFunction={(e) => ClusterIcon(e, changedMarker)}
-        ></MarkerClusterGroup>
-        <Marker
-          markerId={"34"}
-          position={[41.34104414093939, 69.2542765849464]}
-          icon={L.icon({
-            iconUrl: `icons/box1.png`,
-            iconSize: [32, 32],
-          })}
-        ></Marker>
-        <Marker
-          markerId={"39"}
-          position={[41.3410441409394, 69.2542765849485]}
-          icon={L.icon({
-            iconUrl: `icons/box2.png`,
-            iconSize: [32, 32],
-          })}
-        ></Marker>
-        <Marker
-          markerId={"30"}
-          position={[41.34104414093941, 69.2542765849466]}
-          icon={L.icon({
-            iconUrl: `icons/box0.png`,
-            iconSize: [32, 32],
-          })}
-        ></Marker>
-        {markers?.map((marker) => {
-          if (
-            (marker.type === 1 && !filter.camera) ||
-            (marker.type === 2 && !filter.crossroad) ||
-            (marker.type === 3 && !filter.box) ||
-            (marker.type === 4 && !filter.trafficlights) ||
-            (marker.type === 6 && !filter.camerapdd) ||
-            (marker.type === 5 && !filter.cameraview)
-          ) {
-            return null;
-          }
-
-          if (isNaN(Number(marker.lat)) || isNaN(Number(marker.lng))) {
-            return null;
-          }
-
-          return (
-            <Fragment key={`${marker.cid}-${marker.type}`}>
-              <Marker
-                markerId={marker.cid}
-                markerType={marker.type}
-                position={[marker.lat, marker.lng]}
-                draggable={isDraggable}
-                rotationAngle={marker.rotated}
-                eventHandlers={{
-                  click:
-                    marker.type == 2
-                      ? () => handleMonitorCrossroad(marker)
-                      : marker.type == 3
-                      ? () => handleBoxModalOpen(marker)
-                      : marker.type == 4
-                      ? () => handleLightsModalOpen(marker)
-                      : null,
-                  dragend: (event) =>
-                    handleMarkerDragEnd(marker.cid, marker.type, event),
-                }}
-                statuserror={marker.statuserror}
-                icon={L.icon({
-                  iconUrl: `icons/${marker.icon}`,
-                  iconSize: [40, 40],
-                })}
-                rotatedAngle={marker.type === 3 ? marker.rotated : 0}
-              >
-                {marker.type === 1 || marker.type === 5 || marker.type === 6 ? (
-                  <CustomPopup marker={marker} />
-                ) : null}
-                <Tooltip direction="top" className="rounded-md">
-                  {marker.type == 1 || marker.type == 5 || marker.type == 6 ? (
-                    <div
-                      style={{
-                        width: "8vw",
-                        height: "6vw",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <img
-                        src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
-                        className="w-full"
-                        alt=""
-                      />
-                      <Typography className="my-0">{marker?.cname}</Typography>
-                    </div>
-                  ) : (
-                    <Typography className="my-0">{marker?.cname}</Typography>
-                  )}
-                </Tooltip>
-              </Marker>
-            </Fragment>
-          );
-        })}{" "}
+        <MarkerComponent
+          handleMonitorCrossroad={handleMonitorCrossroad}
+          handleBoxModalOpen={handleBoxModalOpen}
+          handleLightsModalOpen={handleLightsModalOpen}
+          handleMarkerDragEnd={handleMarkerDragEnd}
+          markers={markers}
+          setMarkers={setMarkers}
+          clearMarkers={clearMarkers}
+          updateMarkers={updateMarkers}
+        />
       </MapContainer>
       {isbigMonitorOpen && (
         <CrossroadModal
@@ -578,82 +457,3 @@ MapComponent.propTypes = {
 };
 
 export default MapComponent;
-
-const ClusterIcon = (cluster) => {
-  const childMarkers = cluster.getAllChildMarkers();
-  const statusCounts = {};
-  let isHighlighted = false;
-
-  childMarkers.forEach((marker) => {
-    const status = marker.options.statuserror;
-    statusCounts[status] = (statusCounts[status] || 0) + 1;
-    // if (
-    //   marker.options.cid === changedMarker?.cid &&
-    //   marker.options.type === changedMarker?.type
-    // ) {
-    //   isHighlighted = true;
-    // }
-  });
-
-  const pieChartData = Object.entries(statusCounts).map(([status, count]) => ({
-    status: parseInt(status),
-    count,
-  }));
-
-  const pieChartIcon = L.divIcon({
-    className: `cluster !bg-transparent `,
-    iconSize: L.point(50, 50),
-    html: renderToString(
-      <div
-        className={`w-20 h-20 !bg-transparent  group-has-[div]:!bg-transparent  ${
-          isHighlighted ? "animate-pulse" : ""
-        }`}
-      >
-        <PieChart
-          data={pieChartData.map((datam, key) => ({
-            value: datam.count,
-            title: datam.status,
-            color: getStatusColor(datam.status),
-            key,
-          }))}
-          style={{
-            filter: `drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))`,
-            background: "transparent !important",
-          }}
-          segmentsStyle={{
-            transition: "stroke .3s",
-            cursor: "pointer",
-            // filter: "drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))",
-          }}
-          segmentsShift={1}
-          radius={42}
-          labelStyle={{
-            fill: "#fff",
-            fontSize: "0.9rem",
-            fontWeight: "bold",
-            pointerEvents: "none",
-          }}
-          tooltip={({ dataEntry }) => `${dataEntry.title}: ${dataEntry.value}`}
-          label={(props) => {
-            return props.dataEntry.value;
-          }}
-        />
-      </div>
-    ),
-  });
-
-  return pieChartIcon;
-};
-
-const getStatusColor = (status) => {
-  switch (status) {
-    case 1:
-      return "#FFD700"; // orange
-    case 2:
-      return "#FF4500"; // red
-    case 3:
-      return "#FFC0CB"; // pink
-    default:
-      return "#4682B4"; // green
-  }
-};

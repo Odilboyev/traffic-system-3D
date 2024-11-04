@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
+import { useEffect, useState } from "react";
+import { useMap, useMapEvents } from "react-leaflet";
 
 const useMapDataFetcher = ({
   fetchData, // function to fetch data

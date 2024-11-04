@@ -1,6 +1,6 @@
+import axios from "axios";
 import login from "../Auth";
 import config from "./api.config";
-import axios from "axios";
 
 // Helper function to handle responses
 const handleResponse = (res) => {
@@ -63,7 +63,8 @@ const getNearbySigns = async (body) =>
 const getUserRoles = async () => getData(import.meta.env.VITE_USER_ROLES);
 const getTrafficLightsConfig = async (id) =>
   getData(import.meta.env.VITE_TRAFFIC_LIGHTS_CONFIG, id);
-
+const getAllMarkers = async (body) =>
+  postData(import.meta.env.VITE_ALL_MARKERS, body);
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -169,31 +170,32 @@ const subscribeToCurrentAlarms = (onDataReceived) => {
 
 // Export functions
 export {
-  subscribeToCurrentAlarms,
-  signIn,
-  getMarkerData,
+  addUser,
+  deleteUser,
+  fetchDataForManagement,
+  getAllMarkers,
   getBoxData,
-  getCrossRoadData,
-  getTrafficLightsData,
   getBoxSensorChart,
   getCrossRoadChart,
+  getCrossRoadData,
   getCrossRoadStats,
-  markerHandler,
   getCurrentAlarms,
-  getErrorHistory,
-  getInfoForCards,
-  getWeatherData,
-  getTexts,
-  getNearbyTrafficLights,
-  getTrafficLightsConfig,
-  getNearbySigns,
   getDevices,
-  fetchDataForManagement,
+  getErrorHistory,
   getInfoAboutCurrentUser,
-  listUsers,
+  getInfoForCards,
+  getMarkerData,
+  getNearbySigns,
+  getNearbyTrafficLights,
+  getTexts,
+  getTrafficLightsConfig,
+  getTrafficLightsData,
   getUserRoles,
-  addUser,
-  updateUser,
-  deleteUser,
+  getWeatherData,
+  listUsers,
+  markerHandler,
   recoverUser,
+  signIn,
+  subscribeToCurrentAlarms,
+  updateUser,
 };
