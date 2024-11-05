@@ -10,17 +10,17 @@ import Loader from "../../../../components/loader";
 import useSensorErrorHistory from "../../../../customHooks/useSensorHistory";
 import SensorPartWrapper from "./components/sensorSection/wrapper";
 
-const DeviceModal = ({ isDialogOpen, handler, isLoading, device }) => {
+const DeviceModal = ({ isOpen, onClose, isLoading, device }) => {
   const { filteredData } = useSensorErrorHistory();
   return (
     <Dialog
       size="xxl"
-      open={isDialogOpen}
-      handler={handler}
+      open={isOpen}
+      onClose={onClose}
       className="dark:bg-blue-gray-900 dark:text-white"
     >
       <DialogHeader className="justify-end">
-        <IconButton size="sm" onClick={handler}>
+        <IconButton size="sm" onClick={onClose}>
           <IoMdClose className="w-5 h-5 p-1" />
         </IconButton>
       </DialogHeader>

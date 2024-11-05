@@ -44,7 +44,7 @@ function transformDataForCharts(data) {
   });
 }
 
-const CrossroadModal = ({ open, handleOpen, marker }) => {
+const CrossroadModal = ({ isOpen, onClose, marker }) => {
   const { theme } = useTheme();
   const currentLayer = baseLayers.find(
     (layer) => layer.name === localStorage.getItem("selectedLayer")
@@ -125,17 +125,21 @@ const CrossroadModal = ({ open, handleOpen, marker }) => {
   };
 
   useEffect(() => {
-    if (open) {
-      if (!data) fetchData(marker?.cid);
-      if (data && !device && data?.box_device) {
-        fetchSensorData(data.box_device?.id);
-      }
+    if (isOpen && marker?.cid) {
+      setData(null);
+      setDevice(null);
+      fetchData(marker.cid);
     }
-    return () => {};
-  }, [open, data]);
+  }, [isOpen, marker]);
 
   useEffect(() => {
-    if (open) fetchChartData();
+    if (data?.box_device?.id) {
+      fetchSensorData(data.box_device.id);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (isOpen) fetchChartData();
     return () => setChartData(null);
   }, [chartDate, interval]);
 
@@ -144,14 +148,14 @@ const CrossroadModal = ({ open, handleOpen, marker }) => {
     setDevice(null);
     setChartData(null);
     setTrafficLights(null);
-    handleOpen();
+    onClose();
   };
-
+  console.log(isOpen, "isOpen");
   return (
     <Dialog
       size="xxl"
       className="dark:!bg-blue-gray-800 dark:text-white"
-      open={open}
+      open={isOpen}
       handler={handleClose}
     >
       <DialogHeader className="justify-between p-2 dark:!bg-blue-gray-900 dark:text-white">
@@ -161,7 +165,7 @@ const CrossroadModal = ({ open, handleOpen, marker }) => {
           color="blue-gray"
           size="sm"
           variant="text"
-          onClick={handleOpen}
+          onClick={onClose}
           aria-label="Close dialog"
         >
           <XMarkIcon className="w-5 h-5" />
@@ -217,8 +221,8 @@ const CrossroadModal = ({ open, handleOpen, marker }) => {
 };
 
 CrossroadModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  handleOpen: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
   marker: PropTypes.object,
 };
 

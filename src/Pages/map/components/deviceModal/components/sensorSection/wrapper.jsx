@@ -13,12 +13,14 @@ const hiddenCols = ["type", "type_name", "device_id", "statuserror_name"];
 const SensorPartWrapper = ({ device, isInCrossroad }) => {
   const { device_data = {}, sensor_data = [] } = device || {};
   const [chartData, setChartData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedSensorId, setSelectedSensorId] = useState(null);
 
-  const { errorHistory, filteredData } = useSensorErrorHistory(
-    device_data?.id,
-    selectedSensorId
-  );
+  const {
+    errorHistory,
+    filteredData,
+    isLoading: isErrorLoading,
+  } = useSensorErrorHistory(device_data?.id, selectedSensorId);
 
   useEffect(() => {
     if (sensor_data?.length > 0) {
@@ -28,8 +30,11 @@ const SensorPartWrapper = ({ device, isInCrossroad }) => {
 
   const handleSensorSelection = async (sensorId) => {
     if ([2, 3, 16].includes(sensorId)) {
+      setIsLoading(true);
       await fetchChartData(sensorId);
+      setIsLoading(false);
     } else {
+      setIsLoading(false);
       setChartData(null); // Clear chart data if sensorId is not allowed
     }
     setSelectedSensorId(sensorId);
@@ -95,6 +100,7 @@ const SensorPartWrapper = ({ device, isInCrossroad }) => {
         // locationHandler={locationHandler}
       />
       <SensorSection
+        isLoading={isLoading || isErrorLoading}
         sensor_data={sensor_data}
         chartData={chartData}
         selectedSensorId={selectedSensorId}

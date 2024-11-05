@@ -7,18 +7,18 @@ import {
 } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import TrafficLightDashboard from "./components/trafficLightDashboard";
-const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
+const TrafficLightsModal = ({ light, isOpen, onClose }) => {
   const handleClose = () => {
-    handler();
+    onClose();
   };
   return (
     <>
-      <Dialog size="xxl" open={isDialogOpen} handler={handleClose}>
+      <Dialog size="xxl" open={isOpen} onClose={handleClose}>
         <DialogHeader className="justify-between dark:bg-blue-gray-900 dark:text-white">
           <div>
             <Typography variant="h5">{light?.cname || ""}</Typography>
           </div>
-          <IconButton size="sm" onClick={handler}>
+          <IconButton size="sm" onClick={onClose}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -46,8 +46,8 @@ const TrafficLightsModal = ({ light, isDialogOpen, handler }) => {
 
 TrafficLightsModal.propTypes = {
   light: PropTypes.object,
-  isDialogOpen: PropTypes.bool.isRequired,
-  handler: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default TrafficLightsModal;

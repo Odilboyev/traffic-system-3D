@@ -4,7 +4,9 @@ import TrafficLightsModal from "../trafficLightsModal";
 
 const MapModals = ({
   crossroadModal,
+  isBoxLoading,
   deviceModal,
+  isLightsLoading,
   trafficLightsModal,
   onClose,
 }) => {
@@ -18,11 +20,13 @@ const MapModals = ({
       <DeviceModal
         isOpen={deviceModal.isOpen}
         device={deviceModal.device}
+        isLoading={isBoxLoading}
         onClose={onClose.device}
       />
       <TrafficLightsModal
         isOpen={trafficLightsModal.isOpen}
         light={trafficLightsModal.light}
+        isLoading={isLightsLoading}
         onClose={onClose.trafficLights}
       />
     </>

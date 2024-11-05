@@ -2,6 +2,7 @@ import { Card, CardBody, Typography } from "@material-tailwind/react";
 import Chart from "react-apexcharts";
 import { FiAlertCircle } from "react-icons/fi";
 
+import Loader from "../../../../../../components/loader";
 import FilterTypes from "../../../modalTable/filterTypes";
 import SensorCard from "../sensorCard";
 
@@ -16,6 +17,7 @@ const SensorSection = ({
   headerGroups,
   rows,
   prepareRow,
+  isLoading,
 }) => (
   <div
     className={`p-2 no-scrollbar dark:text-white border-none shadow-none overflow-y-auto  ${
@@ -53,38 +55,44 @@ const SensorSection = ({
 
     {/* Handle Chart Data */}
     {chartData && [2, 3, 16].includes(selectedSensorId) && (
-      <div className="w-[90%] no-scrollbar mx-auto py-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-        <Chart
-          height={350}
-          options={{
-            chart: {
-              id: "basic-bar",
-              type: "area",
-              animations: { enabled: false },
-              toolbar: {
-                show: true,
-                tools: {
-                  download: false,
-                  selection: true,
-                  zoom: true,
-                  zoomin: true,
-                  zoomout: true,
+      <div className="w-[90%] mb-2 no-scrollbar mx-auto py-4 bg-white dark:bg-gray-800 rounded-lg ">
+        {isLoading ? (
+          <div className="flex justify-center items-center w-full h-full">
+            <Loader />
+          </div>
+        ) : (
+          <Chart
+            height={350}
+            options={{
+              chart: {
+                id: "basic-bar",
+                type: "area",
+                animations: { enabled: false },
+                toolbar: {
+                  show: true,
+                  tools: {
+                    download: false,
+                    selection: true,
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                  },
+                },
+                zoom: {
+                  enabled: true,
+                  type: "x",
+                  autoScaleYaxis: true,
                 },
               },
-              zoom: {
-                enabled: true,
-                type: "x",
-                autoScaleYaxis: true,
-              },
-            },
-            fill: { opacity: 0.4 },
-            dataLabels: { enabled: false },
-            tooltip: { x: { format: "dd MMM yyyy HH:mm:ss" } },
-            xaxis: { type: "datetime" },
-          }}
-          series={chartData}
-          type="area"
-        />
+              fill: { opacity: 0.4 },
+              dataLabels: { enabled: false },
+              tooltip: { x: { format: "dd MMM yyyy HH:mm:ss" } },
+              xaxis: { type: "datetime" },
+            }}
+            series={chartData}
+            type="area"
+          />
+        )}
       </div>
     )}
     <Card className="px-0 no-scrollbar  dark:bg-blue-gray-900 dark:text-white border-t border-blue-gray-50 p-4 shadow-md rounded-lg">
@@ -110,7 +118,11 @@ const SensorSection = ({
           </thead>
 
           <tbody {...getTableBodyProps()}>
-            {rows?.length > 0 ? (
+            {isLoading ? (
+              <div className="flex justify-center items-center w-full h-full">
+                <Loader />
+              </div>
+            ) : rows?.length > 0 ? (
               rows.map((row, i) => {
                 prepareRow(row);
                 return (

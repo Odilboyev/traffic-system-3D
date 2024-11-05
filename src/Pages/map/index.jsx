@@ -123,8 +123,12 @@ const MapComponent = ({ changedMarker }) => {
 
   const handleMonitorCrossroad = (marker) => {
     setActiveMarker(marker);
-    setIsbigMonitorOpen(!isbigMonitorOpen);
+    setIsbigMonitorOpen(true);
+    console.log(marker);
   };
+  useEffect(() => {
+    console.log(activeMarker, "activeMarker");
+  }, [activeMarker]);
   const handleBoxModalOpen = async (box) => {
     if (box) {
       setIsBoxLoading(true);
@@ -407,7 +411,9 @@ const MapComponent = ({ changedMarker }) => {
       </MapContainer>
       <MapModals
         crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}
+        isBoxLoading={isBoxLoading}
         deviceModal={{ isOpen: isBoxModalOpen, device: activeBox }}
+        isLightsLoading={isLightsLoading}
         trafficLightsModal={{ isOpen: isLightsModalOpen, light: activeLight }}
         onClose={{
           crossroad: handleCloseCrossroadModal,
