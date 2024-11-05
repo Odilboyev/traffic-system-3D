@@ -122,9 +122,7 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
 
         socket.onclose = () => {
           setWsConnectionStatus("disconnected");
-          console.log("WebSocket disconnected, attempting to reconnect...");
-          // Attempt to reconnect after 5 seconds
-          setTimeout(connectWebSocket, 5000);
+          console.log("WebSocket disconnected");
         };
 
         socket.onerror = (error) => {
@@ -251,16 +249,18 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
       // Check for stale connection every 10 seconds
       const intervalId = setInterval(() => {
         if (lastMessageTime && Date.now() - lastMessageTime > 10000) {
-          // No message received in last 10 seconds
           console.log("No messages received recently, reconnecting...");
-          socket.close(); // This will trigger reconnection
+          socket.close();
         }
       }, 10000);
 
+      // Cleanup function
       return () => {
+        console.log("Cleaning up WebSocket connection");
         clearInterval(intervalId);
         if (socket) {
           socket.close();
+          setTrafficSocket(null);
         }
       };
     }
@@ -271,7 +271,7 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
     <div
       className={`relative h-[90vh] flex items-center justify-center overflow-hidden`}
     >
-      {wsConnectionStatus !== "connected" && (
+      {wsConnectionStatus !== "connected" && incomingConfig && (
         <div className="absolute top-4 right-4 px-4 py-2 rounded-md text-white bg-red-500">
           {wsConnectionStatus === "disconnected"
             ? "Disconnected - Reconnecting..."

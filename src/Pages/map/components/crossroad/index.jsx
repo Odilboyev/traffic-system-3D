@@ -18,6 +18,7 @@ import FullscreenBox from "./components/fullscreen";
 import Videos from "./subPages/videos";
 // import SensorSection from "./subPages/sensor";
 import { format } from "date-fns";
+import Loader from "../../../../components/loader";
 import baseLayers from "../../../../configurations/mapLayers";
 import { useTheme } from "../../../../customHooks/useTheme";
 import SensorPartWrapper from "../deviceModal/components/sensorSection/wrapper";
@@ -50,8 +51,9 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
     (layer) => layer.name === localStorage.getItem("selectedLayer")
   );
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isChartLoading, setChartLoading] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [isDeviceLoading, setIsDeviceLoading] = useState(false);
+  const [isChartLoading, setIsChartLoading] = useState(false);
   const [data, setData] = useState(null);
   const [trafficLights, setTrafficLights] = useState(null);
   const [chartData, setChartData] = useState(null);
@@ -66,7 +68,7 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
   };
 
   const fetchData = async (id) => {
-    setIsLoading(true);
+    setIsVideoLoading(true);
     try {
       const crossroadData = await getCrossRoadData(id);
       setData(crossroadData?.data);
@@ -74,26 +76,23 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
     } catch (error) {
       console.error("Failed to fetch crossroad data:", error);
     } finally {
-      setIsLoading(false);
+      setIsVideoLoading(false);
     }
   };
 
   const fetchTrafficLights = async (id) => {
     if (!id) return;
-    setIsLoading(true);
     try {
       const trafficLightsData = await getTrafficLightsData(id);
       setTrafficLights(trafficLightsData);
     } catch (error) {
       console.error("Failed to fetch traffic lights data:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const fetchSensorData = async (id) => {
     if (!id) return;
-    setIsLoading(true);
+    setIsDeviceLoading(true);
     try {
       const sensorData = await getBoxData(id);
       setDevice({
@@ -103,12 +102,12 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
     } catch (error) {
       console.error("Failed to fetch sensor data:", error);
     } finally {
-      setIsLoading(false);
+      setIsDeviceLoading(false);
     }
   };
 
   const fetchChartData = async () => {
-    setChartLoading(true);
+    setIsChartLoading(true);
     try {
       const res = await getCrossRoadChart({
         crossroad_id: marker?.cid,
@@ -120,7 +119,7 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
     } catch (error) {
       console.error("Failed to fetch chart data:", error);
     } finally {
-      setChartLoading(false);
+      setIsChartLoading(false);
     }
   };
 
@@ -150,7 +149,6 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
     setTrafficLights(null);
     onClose();
   };
-  console.log(isOpen, "isOpen");
   return (
     <Dialog
       size="xxl"
@@ -174,12 +172,26 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
       <DialogBody className="h-[90vh] overflow-auto py-0 dark:bg-blue-gray-900 no-scrollbar">
         <div className="grid grid-cols-2 grid-rows-2 h-full">
           <FullscreenBox>
-            <Videos videos={data?.camera} />
+            {isVideoLoading ? (
+              <div className="flex justify-center items-center w-full h-full">
+                <Loader minHeight="10vh" />
+              </div>
+            ) : (
+              <Videos videos={data?.camera} />
+            )}
           </FullscreenBox>
           <FullscreenBox>
             <div className="overflow-y-scroll no-scrollbar">
-              {device ? (
-                <SensorPartWrapper device={device} isInCrossroad={true} />
+              {isDeviceLoading ? (
+                <div className="flex justify-center items-center w-full h-full">
+                  <Loader />
+                </div>
+              ) : device ? (
+                <SensorPartWrapper
+                  device={device}
+                  isInCrossroad={true}
+                  isLoading={isDeviceLoading}
+                />
               ) : (
                 <Typography>No Sensor data</Typography>
               )}
@@ -212,7 +224,13 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
             </MapContainer> */}
           </FullscreenBox>
           <FullscreenBox>
-            <CrossroadDashboard marker={marker} />
+            {isChartLoading ? (
+              <div className="flex justify-center items-center w-full h-full">
+                <Loader />
+              </div>
+            ) : (
+              <CrossroadDashboard marker={marker} />
+            )}
           </FullscreenBox>
         </div>
       </DialogBody>
