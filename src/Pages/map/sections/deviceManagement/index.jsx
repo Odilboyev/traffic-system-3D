@@ -1,13 +1,9 @@
-import PropTypes from "prop-types";
-import {
-  IconButton,
-  List,
-  ListItem,
-  Typography,
-} from "@material-tailwind/react";
 import { CogIcon, PlusIcon } from "@heroicons/react/16/solid";
-import { useState, useCallback, memo } from "react";
+import { IconButton, List, ListItem } from "@material-tailwind/react";
 import { t } from "i18next";
+import PropTypes from "prop-types";
+import { memo, useCallback, useState } from "react";
+import { toast } from "react-toastify";
 import {
   addUser,
   deleteUser,
@@ -17,13 +13,15 @@ import {
   recoverUser,
   updateUser,
 } from "../../../../api/api.handlers";
-import { toast } from "react-toastify";
-import { modalToastConfig } from "../../../../tools/toastconfig";
 import SidePanel from "../../../../components/sidePanel";
+import { modalToastConfig } from "../../../../tools/toastconfig";
 import ModalTable from "../../components/modalTable";
 
-const DeviceManagement = ({ refreshHandler }) => {
-  const [isDroprightOpen, setIsDroprightOpen] = useState(false);
+const DeviceManagement = ({
+  refreshHandler,
+  activeSidePanel,
+  setActiveSidePanel,
+}) => {
   const [deviceType, setDeviceType] = useState(""); // Default type
   const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(1);
@@ -216,7 +214,7 @@ const DeviceManagement = ({ refreshHandler }) => {
   // Handler for changing the device type
   const handleTypeChange = (type) => {
     setDeviceType(type); // Update device type
-    setIsDroprightOpen(false); // Close the dropdown
+    setActiveSidePanel(null); // Close the dropdown
     setIsAlarmDeviceOpen(true); // Open the device modal
 
     if (type === "users") {
@@ -246,42 +244,44 @@ const DeviceManagement = ({ refreshHandler }) => {
   return (
     <>
       <IconButton
-        onClick={() => setIsDroprightOpen(!isDroprightOpen)}
+        onClick={() =>
+          setActiveSidePanel(
+            activeSidePanel === "deviceManagement" ? null : "deviceManagement"
+          )
+        }
         size="lg"
       >
         <CogIcon className="w-6 h-6 " />
       </IconButton>
 
       <SidePanel
+        title={t("management_device")}
         wrapperClass="relative inline-block text-left"
         sndWrapperClass="ml-3 -top-8 absolute rounded-md bg-gray-900/70 !text-white backdrop-blur-md"
-        isOpen={isDroprightOpen}
-        setIsOpen={setIsDroprightOpen}
+        isOpen={activeSidePanel === "deviceManagement"}
+        setIsOpen={() => setActiveSidePanel("deviceManagement")}
         content={
-          <div className="p-4 rounded-lg flex flex-col justify-center items-center">
-            <Typography>{t("management_device")}</Typography>
-            <List>
-              {[
-                "crossroad",
-                "cameratraffic",
-                "cameraview",
-                "camerapdd",
-                "boxmonitor",
-                "svetofor",
-                "users",
-              ].map((type) => (
-                <ListItem
-                  key={type}
-                  className="shadow-sm text-white"
-                  onClick={() => {
-                    handleTypeChange(type);
-                  }}
-                >
-                  {t(type)}
-                </ListItem>
-              ))}
-            </List>
-          </div>
+          <List>
+            {[
+              "crossroad",
+              "cameratraffic",
+              "cameraview",
+              "camerapdd",
+              "boxmonitor",
+              "svetofor",
+              "users",
+            ].map((type) => (
+              <ListItem
+                key={type}
+                className="shadow-sm text-sm text-white"
+                onClick={() => {
+                  handleTypeChange(type);
+                }}
+              >
+                {t(type)}
+              </ListItem>
+            ))}
+          </List>
         }
       />
       <ModalTable

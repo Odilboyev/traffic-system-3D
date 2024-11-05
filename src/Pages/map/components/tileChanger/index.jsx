@@ -1,19 +1,13 @@
 import { MapIcon } from "@heroicons/react/16/solid";
-import {
-  IconButton,
-  Radio,
-  SpeedDial,
-  SpeedDialContent,
-  SpeedDialHandler,
-  Typography,
-} from "@material-tailwind/react";
+import { IconButton, Radio, Typography } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import Control from "../../../../components/customControl";
+import SidePanel from "../../../../components/sidePanel";
 import baseLayers, { layerSave } from "../../../../configurations/mapLayers";
 import { useTheme } from "../../../../customHooks/useTheme";
 
-const TileChanger = () => {
-  const { theme, currentLayer, setCurrentLayer } = useTheme();
+const TileChanger = ({ activeSidePanel, setActiveSidePanel }) => {
+  const { theme, setCurrentLayer } = useTheme();
 
   //layers
 
@@ -40,34 +34,43 @@ const TileChanger = () => {
   }, [theme]);
   return (
     <Control position="topleft">
-      <SpeedDial placement="left">
+      <div className="relative">
         <IconButton
-          // color={theme === "light" ? "black" : "white"}
           size="lg"
+          onClick={() =>
+            setActiveSidePanel(
+              activeSidePanel === "tileChanger" ? null : "tileChanger"
+            )
+          }
         >
-          <SpeedDialHandler className="w-10 h-10 cursor-pointer">
-            <MapIcon className="w-6 h-6 p-2" />
-          </SpeedDialHandler>
+          <MapIcon className="w-6 h-6 " />
         </IconButton>
-        <SpeedDialContent className="m-4">
-          <div className="flex flex-col p-3 mb-10 rounded-md bg-gray-900/80 text-blue-gray-900 backdrop-blur-md">
-            {filteredLayers.map((layer) => (
-              <Radio
-                key={layer.name}
-                checked={selectedLayer === layer.name}
-                className="checked:bg-white"
-                variant={selectedLayer === layer.name ? "filled" : "outlined"}
-                onChange={() => handleLayerChange(layer.name)}
-                label={
-                  <Typography className="mr-3 text-white">
-                    {layer.name}
-                  </Typography>
-                }
-              />
-            ))}
-          </div>
-        </SpeedDialContent>
-      </SpeedDial>
+
+        <SidePanel
+          title="Map Style"
+          isOpen={activeSidePanel === "tileChanger"}
+          setIsOpen={setActiveSidePanel}
+          sndWrapperClass="absolute left-2 min-w-[15vw]"
+          content={
+            <div className="flex rounded-b-lg flex-col p-3 bg-gray-900/80 text-blue-gray-900">
+              {filteredLayers.map((layer) => (
+                <Radio
+                  key={layer.name}
+                  checked={selectedLayer === layer.name}
+                  className="checked:bg-white"
+                  variant={selectedLayer === layer.name ? "filled" : "outlined"}
+                  onChange={() => handleLayerChange(layer.name)}
+                  label={
+                    <Typography className="mr-3 text-white">
+                      {layer.name}
+                    </Typography>
+                  }
+                />
+              ))}
+            </div>
+          }
+        />
+      </div>
     </Control>
   );
 };

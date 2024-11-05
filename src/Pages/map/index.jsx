@@ -3,17 +3,11 @@ import {
   ArrowsPointingOutIcon,
   Cog8ToothIcon,
 } from "@heroicons/react/16/solid";
-import {
-  Checkbox,
-  IconButton,
-  SpeedDial,
-  SpeedDialContent,
-  SpeedDialHandler,
-  Typography,
-} from "@material-tailwind/react";
+import { Checkbox, IconButton, Typography } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { FaLocationDot } from "react-icons/fa6";
 import { IoMdSunny } from "react-icons/io";
 import { MdBedtime } from "react-icons/md";
 import { TbBell, TbBellRinging } from "react-icons/tb";
@@ -50,6 +44,12 @@ import DeviceManagement from "./sections/deviceManagement/index.jsx";
 import LanguageSwitcher from "./sections/langSwitcher/index.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
+
+const provinces = {
+  tashkent: { name: "Tashkent", coords: [41.2995, 69.2401] },
+  samarkand: { name: "Samarkand", coords: [39.6547, 66.9597] },
+  andijan: { name: "Andijan", coords: [40.7821, 72.3442] },
+};
 
 const MapEvents = ({ changedMarker, fetchAlarmsData, setZoom }) => {
   const map = useMap();
@@ -253,9 +253,23 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
 
+  const handleProvinceChange = (value) => {
+    const selectedProvince = provinces[value];
+    if (selectedProvince && map.current) {
+      map.current.flyTo(selectedProvince.coords, 10, {
+        duration: 1,
+      });
+    }
+  };
+
+  const map = useRef(null);
+
+  const [activeSidePanel, setActiveSidePanel] = useState(null);
+
   return (
     <>
       <MapContainer
+        ref={map}
         id="monitoring"
         attributionControl={false}
         center={center}
@@ -293,13 +307,49 @@ const MapComponent = ({ changedMarker }) => {
         </Control>
         <Control position="topleft">
           <FilterControl
+            activeSidePanel={activeSidePanel}
+            setActiveSidePanel={setActiveSidePanel}
             filter={filter}
             changeFilter={setFilter}
-            placement={"right"}
+          />
+        </Control>
+        <Control className="z-[999999]" position="topleft">
+          <IconButton
+            size="lg"
+            onClick={() =>
+              setActiveSidePanel(activeSidePanel === "region" ? null : "region")
+            }
+          >
+            <FaLocationDot className="w-5 h-5" />
+          </IconButton>
+          <SidePanel
+            title={t("selectProvince")}
+            sndWrapperClass="min-w-[15vw]  absolute left-2 "
+            isOpen={activeSidePanel === "region"}
+            setIsOpen={() => setActiveSidePanel(null)}
+            content={
+              <div className="rounded-lg flex flex-col gap-2">
+                {Object.entries(provinces).map(([key, province]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      handleProvinceChange(key);
+                      setActiveSidePanel(null);
+                    }}
+                    className="text-left px-3 py-2 hover:bg-gray-800/50 rounded-none transition-colors"
+                  >
+                    {province.name}
+                  </button>
+                ))}
+              </div>
+            }
           />
         </Control>
         {/* layerchanger */}
-        <TileChanger />
+        <TileChanger
+          activeSidePanel={activeSidePanel}
+          setActiveSidePanel={setActiveSidePanel}
+        />
         {/* widgets */}
         {/* user profile */}
         <Control position="topright">
@@ -324,30 +374,33 @@ const MapComponent = ({ changedMarker }) => {
         {<SignsContainer isVisible={filter.signs} />}
         {/* settings */}
         <Control position="topleft">
-          <SpeedDial placement="right">
-            <IconButton
-              // color={theme === "light" ? "black" : "white"}
-              size="lg"
-            >
-              <SpeedDialHandler className="rounded w-10 h-10 cursor-pointer">
-                <Cog8ToothIcon className="w-5 h-5 p-2" />
-              </SpeedDialHandler>
-            </IconButton>
-            <SpeedDialContent className="ml-4 rounded-md bg-gray-900/80 text-white backdrop-blur-md">
-              <div className="p-4 rounded-lg flex flex-col">
-                <Typography className="text-sm ">{t("markers")}</Typography>
+          <IconButton
+            size="lg"
+            onClick={() =>
+              setActiveSidePanel(
+                activeSidePanel === "settings" ? null : "settings"
+              )
+            }
+          >
+            <Cog8ToothIcon className="w-5 h-5" />
+          </IconButton>
+          <SidePanel
+            title={t("markers")}
+            sndWrapperClass="top-0 left-0 no-scrollbar absolute ml-5 max-h-[80vh] overflow-y-scroll w-[20vw] "
+            isOpen={activeSidePanel === "settings"}
+            setIsOpen={() => setActiveSidePanel(null)}
+            content={
+              <div className="p-4 flex flex-col">
+                <Typography className="text-sm mb-2">
+                  {t("settings")}
+                </Typography>
                 <Checkbox
-                  label={
-                    <Typography className="text-white">
-                      {/* {isDraggable ? "Editable" : "Not Editable"} */}
-                      {t("draggable")}
-                    </Typography>
-                  }
+                  label={<Typography className="">{t("draggable")}</Typography>}
                   ripple={false}
                   checked={isDraggable}
                   onChange={(e) => setIsDraggable(e.target.checked)}
-                />{" "}
-                <div className="border-t border-y-gray-800 w-full my-2"></div>
+                />
+                <div className="text-sm mb-2"></div>
                 <Typography className=" text-sm">{t("widgets")}</Typography>
                 <WidgetControl
                   filter={widgets}
@@ -355,17 +408,24 @@ const MapComponent = ({ changedMarker }) => {
                   placement={"right"}
                 />
               </div>
-            </SpeedDialContent>
-          </SpeedDial>
+            }
+          />
         </Control>
         {/* aalarm history */}
         <Control position="topleft">
-          <DeviceErrorHistory />
+          <DeviceErrorHistory
+            activeSidePanel={activeSidePanel}
+            setActiveSidePanel={setActiveSidePanel}
+          />
         </Control>
         {/* Device Management */}
         {isPermitted && (
           <Control position="topleft">
-            <DeviceManagement refreshHandler={getDataHandler} />
+            <DeviceManagement
+              refreshHandler={getDataHandler}
+              activeSidePanel={activeSidePanel}
+              setActiveSidePanel={setActiveSidePanel}
+            />
           </Control>
         )}
         <Control position="topleft">
@@ -381,22 +441,29 @@ const MapComponent = ({ changedMarker }) => {
             )}
           </IconButton>
         </Control>
-        <LanguageSwitcher position={"topleft"} />
-        <Control className="z-[999999]" position="topleft">
+        <LanguageSwitcher
+          activeSidePanel={activeSidePanel}
+          setActiveSidePanel={setActiveSidePanel}
+        />
+        <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
             size="lg"
-            onClick={() => setIsAlarmsOpen(!isAlarmsOpen)}
+            onClick={() =>
+              setActiveSidePanel(activeSidePanel === "alarms" ? null : "alarms")
+            }
           >
-            {isAlarmsOpen ? (
+            {activeSidePanel === "alarms" ? (
               <TbBell className="w-6 h-6" />
             ) : (
               <TbBellRinging className="w-6 h-6" />
             )}
           </IconButton>
           <SidePanel
-            isOpen={isAlarmsOpen}
-            setIsOpen={setIsAlarmsOpen}
+            title={t("alarms")}
+            wrapperClass="fixed top-5 ml-2 inline-block text-left"
+            isOpen={activeSidePanel === "alarms"}
+            setIsOpen={() => setActiveSidePanel(null)}
             content={<CurrentAlarms data={currentAlarms} />}
           />
         </Control>

@@ -1,33 +1,43 @@
+import { IconButton, Typography } from "@material-tailwind/react";
 import PropTypes from "prop-types";
-import { IconButton } from "@material-tailwind/react";
 import { IoMdClose } from "react-icons/io";
 
 const SidePanel = ({
+  title,
   isOpen,
   content,
   setIsOpen,
-  wrapperClass = "fixed top-5 inline-block text-left",
-  sndWrapperClass = "top-0 left-0 no-scrollbar absolute ml-5 max-h-[80vh] overflow-y-scroll w-[50vw] rounded-md shadow-lg  ring-1 ring-black ring-opacity-5",
+  wrapperClass = "absolute inline-block text-left",
+  sndWrapperClass = "absolute left-full ml-2 no-scrollbar max-h-[80vh] overflow-y-scroll w-[50vw] ",
 }) => {
   return (
     <div className={wrapperClass}>
       {isOpen && (
         <div
-          className={sndWrapperClass}
+          className={`${sndWrapperClass} rounded-md backdrop-blur-md  shadow-lg ring-1 ring-black ring-opacity-5`}
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
-          {" "}
-          <IconButton
-            size="sm"
-            // color={theme === "dark" ? "black" : "white"}
-            onClick={() => setIsOpen(false)}
-            className=" absolute right-0 top-0 z-50 "
+          <div
+            className={`rounded-lg rounded-b-none flex justify-between items-center gap-2 p-1 border-b border-gray-700 `}
           >
-            <IoMdClose className="w-5 h-5 p-1" />
-          </IconButton>
-          {content}
+            <Typography className="text-sm ml-2 font-medium">
+              {title}
+            </Typography>
+            <IconButton
+              size="sm"
+              variant="text"
+              // color={theme === "dark" ? "black" : "white"}
+              onClick={() => setIsOpen(false)}
+              className=""
+            >
+              <IoMdClose className="w-5 h-5 p-1" />
+            </IconButton>
+          </div>{" "}
+          <div className="bg-gray-900/50 backdrop-blur-md rounded-b-lg">
+            {content}
+          </div>
         </div>
       )}
     </div>
@@ -35,11 +45,13 @@ const SidePanel = ({
 };
 
 SidePanel.propTypes = {
+  title: PropTypes.string,
   isOpen: PropTypes.bool.isRequired,
   content: PropTypes.node.isRequired,
   setIsOpen: PropTypes.func.isRequired,
   wrapperClass: PropTypes.string,
   sndWrapperClass: PropTypes.string,
+  padding: PropTypes.string,
 };
 
 export default SidePanel;

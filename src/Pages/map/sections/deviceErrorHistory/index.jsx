@@ -1,12 +1,10 @@
 import { IconButton } from "@material-tailwind/react";
-import { useState, useCallback, memo, useEffect } from "react";
+import { memo, useCallback, useState } from "react";
 import { MdHistory } from "react-icons/md";
-import ModalTable from "../../components/modalTable";
 import { getErrorHistory } from "../../../../api/api.handlers";
-import { t } from "i18next";
+import ModalTable from "../../components/modalTable";
 
-const DeviceErrorHistory = () => {
-  const [isAlarmHistoryOpen, setIsAlarmHistoryOpen] = useState(false);
+const DeviceErrorHistory = ({ activeSidePanel, setActiveSidePanel }) => {
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyTotalPages, setHistoryTotalPages] = useState(null);
@@ -31,7 +29,11 @@ const DeviceErrorHistory = () => {
     <>
       <IconButton
         onClick={() => {
-          setIsAlarmHistoryOpen(!isAlarmHistoryOpen);
+          setActiveSidePanel(
+            activeSidePanel === "deviceErrorHistory"
+              ? null
+              : "deviceErrorHistory"
+          );
           fetchErrorHistory(1);
         }}
         size="lg"
@@ -39,11 +41,15 @@ const DeviceErrorHistory = () => {
         <MdHistory className="w-6 h-6 " />
       </IconButton>
       <ModalTable
-        open={isAlarmHistoryOpen}
+        open={activeSidePanel === "deviceErrorHistory"}
         handleOpen={() => {
           setHistoryData([]);
           setHistoryTotalPages(null);
-          setIsAlarmHistoryOpen(!isAlarmHistoryOpen);
+          setActiveSidePanel(
+            activeSidePanel === "deviceErrorHistory"
+              ? null
+              : "deviceErrorHistory"
+          );
         }}
         selectedFilter={selectedFilter}
         filterOptions={[
