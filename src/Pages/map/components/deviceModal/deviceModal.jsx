@@ -6,8 +6,8 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { IoMdClose } from "react-icons/io";
-import useSensorErrorHistory from "../../../../customHooks/useSensorHistory";
 import Loader from "../../../../components/loader";
+import useSensorErrorHistory from "../../../../customHooks/useSensorHistory";
 import SensorPartWrapper from "./components/sensorSection/wrapper";
 
 const DeviceModal = ({ isDialogOpen, handler, isLoading, device }) => {

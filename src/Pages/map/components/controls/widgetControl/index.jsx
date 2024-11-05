@@ -24,7 +24,7 @@ const WidgetControl = ({ filter, changeFilter }) => {
       {filterOptions.map(({ type, label }) => (
         <Checkbox
           key={type}
-          label={<Typography className="">{label}</Typography>}
+          label={<Typography className="text-white">{label}</Typography>}
           ripple={false}
           className="m-0 p-0"
           checked={

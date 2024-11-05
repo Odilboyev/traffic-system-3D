@@ -1,5 +1,6 @@
 import { LanguageIcon } from "@heroicons/react/16/solid";
 import { IconButton, Radio, Typography } from "@material-tailwind/react";
+import { t } from "i18next";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import Control from "../../../../components/customControl";
@@ -24,11 +25,18 @@ const LanguageSwitch = ({ activeSidePanel, setActiveSidePanel }) => {
   return (
     <Control position="topleft">
       <div>
-        <IconButton size="lg" onClick={() => setActiveSidePanel("language")}>
+        <IconButton
+          size="lg"
+          onClick={() =>
+            setActiveSidePanel(
+              activeSidePanel === "language" ? null : "language"
+            )
+          }
+        >
           <LanguageIcon className="w-6 h-6" />
         </IconButton>
         <SidePanel
-          title="Language"
+          title={t("language")}
           sndWrapperClass="min-w-[15vw] ml-2"
           isOpen={activeSidePanel === "language"}
           setIsOpen={() => setActiveSidePanel(null)}

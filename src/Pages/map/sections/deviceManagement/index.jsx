@@ -256,8 +256,7 @@ const DeviceManagement = ({
 
       <SidePanel
         title={t("management_device")}
-        wrapperClass="relative inline-block text-left"
-        sndWrapperClass="ml-3 -top-8 absolute rounded-md bg-gray-900/70 !text-white backdrop-blur-md"
+        sndWrapperClass=" rounded-md !text-white backdrop-blur-md"
         isOpen={activeSidePanel === "deviceManagement"}
         setIsOpen={() => setActiveSidePanel("deviceManagement")}
         content={

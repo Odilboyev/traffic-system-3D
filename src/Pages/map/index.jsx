@@ -11,86 +11,59 @@ import { FaLocationDot } from "react-icons/fa6";
 import { IoMdSunny } from "react-icons/io";
 import { MdBedtime } from "react-icons/md";
 import { TbBell, TbBellRinging } from "react-icons/tb";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 import { ToastContainer } from "react-toastify";
-import {
-  getBoxData,
-  getCurrentAlarms,
-  getInfoForCards,
-  markerHandler,
-} from "../../api/api.handlers.js";
+import { getBoxData, markerHandler } from "../../api/api.handlers.js";
 import Control from "../../components/customControl/index.jsx";
 import BottomSection from "../../components/infoCard/index.jsx";
 import SidePanel from "../../components/sidePanel/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import { useTheme } from "../../customHooks/useTheme.jsx";
-import useLocalStorageState from "../../customHooks/uselocalStorageState.jsx";
-import toaster from "../../tools/toastconfig.jsx";
-import DeviceModal from "./components/box/deviceModal.jsx";
+import MapEvents from "./components/MapEvents/index.jsx";
+import MapModals from "./components/MapModals/index.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import FilterControl from "./components/controls/filterControl/index.jsx";
 import WidgetControl from "./components/controls/widgetControl/index.jsx";
-import CrossroadModal from "./components/crossroad/index.jsx";
 import CurrentAlarms from "./components/currentAlarms/index.jsx";
-import MarkerComponent from "./components/genericMarkers";
+import MarkerComponent from "./components/markers/index.jsx";
 import SignsContainer from "./components/signs/index.jsx";
 import TileChanger from "./components/tileChanger/index.jsx";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
-import TrafficLightsModal from "./components/trafficLightsModal/index.jsx";
-import UserInfoWidget from "./components/userInfo/index.jsx";
-import WeatherWidget from "./components/weather/index.jsx";
+import { PROVINCES } from "./constants/provinces.js";
+import { useMapAlarms } from "./hooks/useMapAlarms.js";
+import { useMapControls } from "./hooks/useMapControls.js";
+import { useMapMarkers } from "./hooks/useMapMarkers.js";
 import DeviceErrorHistory from "./sections/deviceErrorHistory/index.jsx";
 import DeviceManagement from "./sections/deviceManagement/index.jsx";
 import LanguageSwitcher from "./sections/langSwitcher/index.jsx";
+import UserInfoWidget from "./sections/userInfo/index.jsx";
+import WeatherWidget from "./sections/weather/index.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
 
-const provinces = {
-  tashkent: { name: "Tashkent", coords: [41.2995, 69.2401] },
-  samarkand: { name: "Samarkand", coords: [39.6547, 66.9597] },
-  andijan: { name: "Andijan", coords: [40.7821, 72.3442] },
-};
-
-const MapEvents = ({ changedMarker, fetchAlarmsData, setZoom }) => {
-  const map = useMap();
-  const lastToastRef = useRef(null);
-
-  useEffect(() => {
-    if (!map) return;
-
-    const moveEndHandler = () => {
-      const newCenter = map.getCenter();
-      const newZoom = map.getZoom();
-      localStorage.setItem("mapCenter", JSON.stringify(newCenter));
-      localStorage.setItem("mapZoom", newZoom);
-      setZoom(newZoom);
-    };
-
-    map.on("moveend", moveEndHandler);
-
-    return () => {
-      map.off("moveend", moveEndHandler);
-    };
-  }, [map]);
-
-  useEffect(() => {
-    if (changedMarker && lastToastRef.current !== changedMarker.eventdate) {
-      fetchAlarmsData();
-      toaster(changedMarker, map);
-      lastToastRef.current = changedMarker.eventdate;
-    }
-  }, [changedMarker, map, fetchAlarmsData]);
-
-  return null;
-};
-
-MapEvents.propTypes = {
-  changedMarker: PropTypes.object,
-  fetchAlarmsData: PropTypes.func.isRequired,
-  setZoom: PropTypes.func.isRequired,
-};
-
 const MapComponent = ({ changedMarker }) => {
+  const {
+    markers,
+    setMarkers,
+    bottomSectionData,
+    getDataHandler,
+    clearMarkers,
+    updateMarkers,
+  } = useMapMarkers();
+
+  const { currentAlarms, fetchAlarmsData } = useMapAlarms();
+
+  const {
+    activeSidePanel,
+    setActiveSidePanel,
+    filter,
+    setFilter,
+    widgets,
+    setWidgets,
+    isDraggable,
+    setIsDraggable,
+  } = useMapControls();
+
   // user role
   const role = atob(localStorage.getItem("its_user_role"));
   const isPermitted = role === "admin" || role === "boss";
@@ -120,8 +93,6 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
   //variables
-  //error message
-  const [errorMessage, setErrorMessage] = useState(null);
   /// ----------------------------------------------------------------
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
@@ -134,58 +105,6 @@ const MapComponent = ({ changedMarker }) => {
   const [isLightsLoading, setIsLightsLoading] = useState(false);
   const [activeLight, setActiveLight] = useState(null);
 
-  const [markers, setMarkers] = useState([]);
-  const [bottomSectionData, setBottomSectionData] = useState(null);
-  const [areMarkersLoading, setAreMarkersLoading] = useState(false);
-  const [filter, setFilter] = useLocalStorageState("traffic_filter", {
-    box: true,
-    crossroad: true,
-    trafficlights: true,
-    signs: true,
-    camera: true,
-    cameraview: true,
-    camerapdd: true,
-  });
-  const [widgets, setWidgets] = useLocalStorageState("traffic_widgets", {
-    bottomsection: true,
-    weather: true,
-  });
-  const [isDraggable, setIsDraggable] = useLocalStorageState(
-    "traffic_isDraggable",
-    false
-  );
-
-  // useEffect(() => {
-  //   changedMarker &&
-  //     setMarkers((markers) => {
-  //       markers.map(
-  //         (marker) =>
-  //           marker.cid == changedMarker.cid && marker.type == changedMarker.type
-  //       );
-  //       return markers;
-  //     });
-  // }, [changedMarker]);
-
-  const getDataHandler = async () => {
-    setAreMarkersLoading(true);
-    try {
-      setAreMarkersLoading(false);
-      const bottomData = await getInfoForCards();
-      setBottomSectionData(bottomData);
-      // setMarkers(
-      //   myData.data.map((marker) => ({
-      //     ...marker,
-      //     isPopupOpen: false,
-      //   }))
-      // );
-    } catch (error) {
-      setAreMarkersLoading(false);
-      if (error.code === "ERR_NETWORK") {
-        setErrorMessage("You are offline. Please try again");
-      }
-      throw new Error(error);
-    }
-  };
   useEffect(() => {
     getDataHandler();
     fetchAlarmsData();
@@ -228,33 +147,11 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
   // ----------------------------------------------------------------
-  /// alarms
-  const [currentAlarms, setCurrentAlarms] = useState(null);
-  const [isAlarmsOpen, setIsAlarmsOpen] = useState(false);
 
-  const fetchAlarmsData = async () => {
-    try {
-      const alarmsRes = await getCurrentAlarms();
-      setCurrentAlarms(alarmsRes.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      throw new Error(error);
-    }
-  };
   const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
 
-  const clearMarkers = () => {
-    setMarkers([]);
-  };
-
-  const updateMarkers = (data) => {
-    if (data) {
-      setMarkers(data);
-    }
-  };
-
   const handleProvinceChange = (value) => {
-    const selectedProvince = provinces[value];
+    const selectedProvince = PROVINCES[value];
     if (selectedProvince && map.current) {
       map.current.flyTo(selectedProvince.coords, 10, {
         duration: 1,
@@ -264,8 +161,22 @@ const MapComponent = ({ changedMarker }) => {
 
   const map = useRef(null);
 
-  const [activeSidePanel, setActiveSidePanel] = useState(null);
+  const handleCloseCrossroadModal = () => {
+    setIsbigMonitorOpen(false);
+    setActiveMarker(null);
+  };
 
+  const handleCloseDeviceModal = () => {
+    setIsBoxModalOpen(false);
+    setActiveBox(null);
+    setIsBoxLoading(false);
+  };
+
+  const handleCloseTrafficLightsModal = () => {
+    setIsLightsModalOpen(false);
+    setActiveLight(null);
+    setIsLightsLoading(false);
+  };
   return (
     <>
       <MapContainer
@@ -279,11 +190,6 @@ const MapComponent = ({ changedMarker }) => {
         zoomControl={false}
       >
         <ToastContainer containerId="alarms" className="z-[9998]" />
-        {errorMessage && (
-          <div className="w-[50vw] h-[20vh] z-[9999] rounded-md bg-blue-gray-900 backdrop-blur-md flex justify-center items-center text-white">
-            {errorMessage}
-          </div>
-        )}
         <MapEvents
           changedMarker={changedMarker}
           fetchAlarmsData={fetchAlarmsData}
@@ -329,7 +235,7 @@ const MapComponent = ({ changedMarker }) => {
             setIsOpen={() => setActiveSidePanel(null)}
             content={
               <div className="rounded-lg flex flex-col gap-2">
-                {Object.entries(provinces).map(([key, province]) => (
+                {Object.entries(PROVINCES).map(([key, province]) => (
                   <button
                     key={key}
                     onClick={() => {
@@ -386,22 +292,28 @@ const MapComponent = ({ changedMarker }) => {
           </IconButton>
           <SidePanel
             title={t("markers")}
-            sndWrapperClass="top-0 left-0 no-scrollbar absolute ml-5 max-h-[80vh] overflow-y-scroll w-[20vw] "
+            sndWrapperClass="absolute left-full ml-2 no-scrollbar overflow-y-scroll w-[15vw] "
             isOpen={activeSidePanel === "settings"}
             setIsOpen={() => setActiveSidePanel(null)}
             content={
               <div className="p-4 flex flex-col">
-                <Typography className="text-sm mb-2">
+                <Typography className="text-sm mb-2 text-white ">
                   {t("settings")}
                 </Typography>
                 <Checkbox
-                  label={<Typography className="">{t("draggable")}</Typography>}
+                  label={
+                    <Typography className="text-white ">
+                      {t("draggable")}
+                    </Typography>
+                  }
                   ripple={false}
                   checked={isDraggable}
                   onChange={(e) => setIsDraggable(e.target.checked)}
                 />
                 <div className="text-sm mb-2"></div>
-                <Typography className=" text-sm">{t("widgets")}</Typography>
+                <Typography className=" text-sm text-white ">
+                  {t("widgets")}
+                </Typography>
                 <WidgetControl
                   filter={widgets}
                   changeFilter={setWidgets}
@@ -461,7 +373,7 @@ const MapComponent = ({ changedMarker }) => {
           </IconButton>
           <SidePanel
             title={t("alarms")}
-            wrapperClass="fixed top-5 ml-2 inline-block text-left"
+            wrapperClass="fixed top-5  inline-block text-left"
             isOpen={activeSidePanel === "alarms"}
             setIsOpen={() => setActiveSidePanel(null)}
             content={<CurrentAlarms data={currentAlarms} />}
@@ -486,37 +398,21 @@ const MapComponent = ({ changedMarker }) => {
           handleLightsModalOpen={handleLightsModalOpen}
           handleMarkerDragEnd={handleMarkerDragEnd}
           markers={markers}
+          filter={filter}
+          isDraggable={isDraggable}
           setMarkers={setMarkers}
           clearMarkers={clearMarkers}
           updateMarkers={updateMarkers}
         />
       </MapContainer>
-      {isbigMonitorOpen && (
-        <CrossroadModal
-          marker={activeMarker}
-          open={isbigMonitorOpen}
-          handleOpen={() => {
-            setIsbigMonitorOpen(false);
-            setActiveMarker(null);
-          }}
-        />
-      )}
-      <DeviceModal
-        device={activeBox}
-        isDialogOpen={isBoxModalOpen}
-        isLoading={isBoxLoading}
-        handler={() => {
-          setIsBoxModalOpen(false);
-          setActiveBox(null);
-        }}
-      />
-      <TrafficLightsModal
-        light={activeLight}
-        isDialogOpen={isLightsModalOpen}
-        isLoading={isLightsLoading}
-        handler={() => {
-          setIsLightsModalOpen(false);
-          setActiveLight(null);
+      <MapModals
+        crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}
+        deviceModal={{ isOpen: isBoxModalOpen, device: activeBox }}
+        trafficLightsModal={{ isOpen: isLightsModalOpen, light: activeLight }}
+        onClose={{
+          crossroad: handleCloseCrossroadModal,
+          device: handleCloseDeviceModal,
+          trafficLights: handleCloseTrafficLightsModal,
         }}
       />
     </>

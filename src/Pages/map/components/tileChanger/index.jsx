@@ -50,7 +50,7 @@ const TileChanger = ({ activeSidePanel, setActiveSidePanel }) => {
           title="Map Style"
           isOpen={activeSidePanel === "tileChanger"}
           setIsOpen={setActiveSidePanel}
-          sndWrapperClass="absolute left-2 min-w-[15vw]"
+          sndWrapperClass="min-w-[15vw]"
           content={
             <div className="flex rounded-b-lg flex-col p-3 bg-gray-900/80 text-blue-gray-900">
               {filteredLayers.map((layer) => (

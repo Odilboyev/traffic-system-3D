@@ -42,7 +42,7 @@ const FilterControl = ({
       {filterOptions.map(({ type, label }) => (
         <Checkbox
           key={type}
-          label={<Typography className="text-white">{label}</Typography>}
+          label={<Typography className="text-white">{t(label)}</Typography>}
           ripple={false}
           className="m-0 p-0"
           checked={
@@ -73,7 +73,7 @@ const FilterControl = ({
         <ListBulletIcon className="w-5 h-5" />
       </IconButton>
       <SidePanel
-        sndWrapperClass="min-w-[15vw] ml-2"
+        sndWrapperClass="min-w-[15vw]"
         title={t("filters")}
         isOpen={activeSidePanel === "filter"}
         setIsOpen={() => setActiveSidePanel(null)}

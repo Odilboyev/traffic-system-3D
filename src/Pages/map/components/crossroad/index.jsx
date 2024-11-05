@@ -20,7 +20,7 @@ import Videos from "./subPages/videos";
 import { format } from "date-fns";
 import baseLayers from "../../../../configurations/mapLayers";
 import { useTheme } from "../../../../customHooks/useTheme";
-import SensorPartWrapper from "../box/components/sensorSection/wrapper";
+import SensorPartWrapper from "../deviceModal/components/sensorSection/wrapper";
 import TrafficLightDashboard from "../trafficLightsModal/components/trafficLightDashboard";
 import CrossroadDashboard from "./subPages/crossroadDash";
 
