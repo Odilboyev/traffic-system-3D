@@ -11,7 +11,7 @@ const SelectField = ({
 }) => {
   return (
     <div
-      className={`flex flex-col relative`}
+      className={`flex flex-col relative w-full`}
       style={{ zIndex: rest.zIndex ?? 5000 }}
     >
       <div className="flex items-center gap-2 mb-2">

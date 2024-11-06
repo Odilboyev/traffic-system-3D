@@ -28,6 +28,11 @@ const getData = async (endpoint, id = "") => {
   return handleResponse(res);
 };
 
+const getDataWithParams = async (endpoint, params) => {
+  const res = await config.get(endpoint, { params });
+  return handleResponse(res);
+};
+
 const postData = async (endpoint, body) => {
   const res = await config.post(endpoint, body);
   return handleResponse(res);
@@ -65,6 +70,9 @@ const getTrafficLightsConfig = async (id) =>
   getData(import.meta.env.VITE_TRAFFIC_LIGHTS_CONFIG, id);
 const getAllMarkers = async (body) =>
   postData(import.meta.env.VITE_ALL_MARKERS, body);
+const getDistricts = async (region_id) =>
+  getDataWithParams(import.meta.env.VITE_DISTRICTS, { region_id });
+const getRegions = async () => getData(import.meta.env.VITE_REGIONS);
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -181,12 +189,14 @@ export {
   getCrossRoadStats,
   getCurrentAlarms,
   getDevices,
+  getDistricts,
   getErrorHistory,
   getInfoAboutCurrentUser,
   getInfoForCards,
   getMarkerData,
   getNearbySigns,
   getNearbyTrafficLights,
+  getRegions,
   getTexts,
   getTrafficLightsConfig,
   getTrafficLightsData,
