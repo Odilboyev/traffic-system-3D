@@ -258,7 +258,11 @@ const DeviceManagement = ({
         title={t("management_device")}
         sndWrapperClass=" rounded-md !text-white backdrop-blur-md"
         isOpen={activeSidePanel === "deviceManagement"}
-        setIsOpen={() => setActiveSidePanel("deviceManagement")}
+        setIsOpen={() =>
+          setActiveSidePanel(
+            activeSidePanel === "deviceManagement" ? null : "deviceManagement"
+          )
+        }
         content={
           <List>
             {[

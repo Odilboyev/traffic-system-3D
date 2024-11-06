@@ -157,7 +157,9 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
       handler={handleClose}
     >
       <DialogHeader className="justify-between p-2 dark:!bg-blue-gray-900 dark:text-white">
-        <Typography className="text-2xl font-bold">{marker?.cname}</Typography>
+        <Typography className="text-2xl font-bold">
+          {marker?.cname || "Crossroad"}
+        </Typography>
         <IconButton
           className="m-1"
           color="blue-gray"

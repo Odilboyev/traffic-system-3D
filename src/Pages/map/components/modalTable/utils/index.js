@@ -31,6 +31,8 @@ export const shouldHideColumn = (
     "statuserror_name",
     "crossroad_id",
     "vendor_id",
+    "region_id",
+    "district_id",
     "device_id",
   ];
   const hiddenOnSubPageKeys = ["type", "type_name", "device_id"];
@@ -48,7 +50,13 @@ export const shouldHideColumn = (
 };
 
 export const getOrderedColumns = (columns) => {
-  const columnOrder = ["id", "name", "crossroad_name"];
+  const columnOrder = [
+    "id",
+    "name",
+    "crossroad_name",
+    "region_name",
+    "district_name",
+  ];
 
   return columns.sort((a, b) => {
     const indexA = columnOrder.indexOf(a);

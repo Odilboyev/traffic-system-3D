@@ -3,11 +3,16 @@ import {
   ArrowsPointingOutIcon,
   Cog8ToothIcon,
 } from "@heroicons/react/16/solid";
-import { Checkbox, IconButton, Typography } from "@material-tailwind/react";
+import {
+  Checkbox,
+  IconButton,
+  Radio,
+  Typography,
+} from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaLocationDot } from "react-icons/fa6";
+import { FaLocationDot, FaRegMap } from "react-icons/fa6";
 import { IoMdSunny } from "react-icons/io";
 import { MdBedtime } from "react-icons/md";
 import { TbBell, TbBellRinging } from "react-icons/tb";
@@ -25,7 +30,8 @@ import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import FilterControl from "./components/controls/filterControl/index.jsx";
 import WidgetControl from "./components/controls/widgetControl/index.jsx";
 import CurrentAlarms from "./components/currentAlarms/index.jsx";
-import MarkerComponent from "./components/markers/index.jsx";
+import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
+import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import SignsContainer from "./components/signs/index.jsx";
 import TileChanger from "./components/tileChanger/index.jsx";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
@@ -105,6 +111,14 @@ const MapComponent = ({ changedMarker }) => {
   const [isLightsLoading, setIsLightsLoading] = useState(false);
   const [activeLight, setActiveLight] = useState(null);
 
+  const [useClusteredMarkers, setUseClusteredMarkers] = useState(
+    role === "boss"
+      ? "clustered"
+      : role === "operator"
+      ? "dynamic"
+      : "clustered_dynamically"
+  );
+
   useEffect(() => {
     getDataHandler();
     fetchAlarmsData();
@@ -181,6 +195,20 @@ const MapComponent = ({ changedMarker }) => {
     setActiveLight(null);
     setIsLightsLoading(false);
   };
+
+  // Add useEffect to handle changedMarker updates
+  useEffect(() => {
+    if (changedMarker) {
+      setMarkers((prevMarkers) =>
+        prevMarkers.map((marker) =>
+          marker.cid === changedMarker.cid && marker.type === changedMarker.type
+            ? changedMarker
+            : marker
+        )
+      );
+    }
+  }, [changedMarker]);
+
   return (
     <>
       <MapContainer
@@ -396,18 +424,81 @@ const MapComponent = ({ changedMarker }) => {
             )}
           </IconButton>
         </Control>
-        <MarkerComponent
-          handleMonitorCrossroad={handleMonitorCrossroad}
-          handleBoxModalOpen={handleBoxModalOpen}
-          handleLightsModalOpen={handleLightsModalOpen}
-          handleMarkerDragEnd={handleMarkerDragEnd}
-          markers={markers}
-          filter={filter}
-          isDraggable={isDraggable}
-          setMarkers={setMarkers}
-          clearMarkers={clearMarkers}
-          updateMarkers={updateMarkers}
-        />
+        <Control position="topleft">
+          <IconButton
+            size="lg"
+            onClick={() => {
+              setActiveSidePanel(
+                activeSidePanel === "markers" ? null : "markers"
+              );
+            }}
+          >
+            <FaRegMap className="w-5 h-5" />
+          </IconButton>
+          <SidePanel
+            title={t("markers")}
+            wrapperClass="absolute -top-28  inline-block text-left"
+            sndWrapperClass="absolute left-full ml-2 no-scrollbar overflow-y-scroll w-[15vw] "
+            isOpen={activeSidePanel === "markers"}
+            setIsOpen={() => setActiveSidePanel(null)}
+            content={
+              <div className="flex rounded-b-lg flex-col p-3 bg-gray-900/80 text-blue-gray-900">
+                {["clustered", "clustered_dynamically", "dynamic"].map(
+                  (type) => (
+                    <Radio
+                      key={type}
+                      checked={useClusteredMarkers === type}
+                      className="checked:bg-white"
+                      value={type === useClusteredMarkers}
+                      onChange={() => {
+                        setUseClusteredMarkers(type);
+                        type !== "dynamic" ? getDataHandler() : setMarkers([]);
+                      }}
+                      label={
+                        <Typography className="mr-3 text-white">
+                          {t(type)}
+                        </Typography>
+                      }
+                    />
+                  )
+                )}
+              </div>
+            }
+          />
+        </Control>
+        {useClusteredMarkers === "clustered" ||
+        useClusteredMarkers === "clustered_dynamically" ? (
+          <ClusteredMarkers
+            usePieChartForClusteredMarkers={
+              useClusteredMarkers === "clustered_dynamically"
+            }
+            key={useClusteredMarkers}
+            handleMonitorCrossroad={handleMonitorCrossroad}
+            handleBoxModalOpen={handleBoxModalOpen}
+            handleLightsModalOpen={handleLightsModalOpen}
+            handleMarkerDragEnd={handleMarkerDragEnd}
+            markers={markers}
+            filter={filter}
+            isDraggable={isDraggable}
+            setMarkers={setMarkers}
+            clearMarkers={clearMarkers}
+            updateMarkers={updateMarkers}
+            changedMarker={changedMarker}
+          />
+        ) : (
+          <DynamicMarkers
+            handleMonitorCrossroad={handleMonitorCrossroad}
+            handleBoxModalOpen={handleBoxModalOpen}
+            handleLightsModalOpen={handleLightsModalOpen}
+            handleMarkerDragEnd={handleMarkerDragEnd}
+            markers={markers}
+            filter={filter}
+            isDraggable={isDraggable}
+            setMarkers={setMarkers}
+            clearMarkers={clearMarkers}
+            updateMarkers={updateMarkers}
+          />
+        )}
       </MapContainer>
       <MapModals
         crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}

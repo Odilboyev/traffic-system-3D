@@ -7,7 +7,8 @@ import { getAllMarkers } from "../../../../api/api.handlers"; // You'll need to 
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
 import CustomPopup from "../customPopup";
 
-const MarkerComponent = ({
+// Rename from MarkerComponent to DynamicMarkerComponent
+const DynamicMarkers = ({
   markers,
   filter,
   isDraggable,
@@ -123,7 +124,7 @@ const MarkerComponent = ({
   );
 };
 
-MarkerComponent.propTypes = {
+DynamicMarkers.propTypes = {
   markers: PropTypes.array.isRequired,
   filter: PropTypes.object.isRequired,
   isDraggable: PropTypes.bool.isRequired,
@@ -136,4 +137,4 @@ MarkerComponent.propTypes = {
   handleMarkerDragEnd: PropTypes.func.isRequired,
 };
 
-export default MarkerComponent;
+export default DynamicMarkers;

@@ -20,13 +20,22 @@ const useMapDataFetcher = ({
     const currentLocation = L.latLng(center.lat, center.lng);
 
     if (zoom >= minZoom) {
-      // Modified condition to check useDistanceThreshold prop
+      // Calculate distance only if we have a last location
+      const distance = lastSuccessfulLocation
+        ? currentLocation.distanceTo(lastSuccessfulLocation)
+        : Infinity;
+
+      // Debug logging
+      console.log("Distance moved:", distance);
+      console.log("Threshold:", fetchDistanceThreshold);
+      console.log("Last location:", lastSuccessfulLocation);
+
       if (
         !lastSuccessfulLocation ||
         !useDistanceThreshold ||
-        currentLocation.distanceTo(lastSuccessfulLocation) >
-          fetchDistanceThreshold
+        distance > fetchDistanceThreshold
       ) {
+        console.log("Fetching new data...");
         fetchData({
           lat: center.lat,
           lng: center.lng,
@@ -37,9 +46,7 @@ const useMapDataFetcher = ({
     } else {
       // If zoom is lower than minZoom, clear the data and reset last location
       onClearData();
-      if (lastSuccessfulLocation !== null) {
-        setLastSuccessfulLocation(null); // Only clear if it's not already null
-      }
+      setLastSuccessfulLocation(null);
     }
   };
 

@@ -1,19 +1,32 @@
 import { useState } from "react";
-import { getInfoForCards } from "../../../api/api.handlers";
+import { getInfoForCards, getMarkerData } from "../../../api/api.handlers";
 
 export const useMapMarkers = () => {
   const [markers, setMarkers] = useState([]);
   const [areMarkersLoading, setAreMarkersLoading] = useState(false);
   const [bottomSectionData, setBottomSectionData] = useState(null);
-
+  const [errorMessage, setErrorMessage] = useState(null);
   const getDataHandler = async () => {
     setAreMarkersLoading(true);
     try {
-      const bottomData = await getInfoForCards();
-      setBottomSectionData(bottomData);
       setAreMarkersLoading(false);
+      const [myData, bottomData] = await Promise.all([
+        getMarkerData(),
+        getInfoForCards(),
+      ]);
+      setMarkers(
+        myData.data.map((marker) => ({
+          ...marker,
+          isPopupOpen: false,
+        }))
+      );
+      console.log(markers, "markers");
+      setBottomSectionData(bottomData);
     } catch (error) {
       setAreMarkersLoading(false);
+      if (error.code === "ERR_NETWORK") {
+        setErrorMessage("You are offline. Please try again");
+      }
       throw new Error(error);
     }
   };
@@ -26,6 +39,7 @@ export const useMapMarkers = () => {
     setMarkers,
     areMarkersLoading,
     bottomSectionData,
+    errorMessage,
     getDataHandler,
     clearMarkers,
     updateMarkers,

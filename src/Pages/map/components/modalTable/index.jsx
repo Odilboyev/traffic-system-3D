@@ -1,22 +1,22 @@
 // ModalTable.js
-import { memo, useEffect, useState } from "react";
-import PropTypes from "prop-types";
+import Pagination from "@/components/pagination";
+import { ChevronLeftIcon } from "@heroicons/react/16/solid";
 import { Button, Input, Typography } from "@material-tailwind/react";
-import { useTheme } from "../../../../customHooks/useTheme";
+import { t } from "i18next";
+import PropTypes from "prop-types";
+import { memo, useEffect, useState } from "react";
 import { MdSearch } from "react-icons/md";
 import { useMap } from "react-leaflet";
-import Pagination from "@/components/pagination";
-import { t } from "i18next";
-import FilterTypes from "./filterTypes";
-import { ChevronLeftIcon } from "@heroicons/react/16/solid";
-import { shouldHideColumn, getOrderedColumns } from "./utils";
-import { useSortedData } from "./useSortedData";
-import TableHeader from "./components/TableHeader";
-import TableRow from "./components/TableRow";
 import { ToastContainer } from "react-toastify";
-import FormComponent from "./components/FormComponent";
 import Loader from "../../../../components/loader";
 import Modal from "../../../../components/modal";
+import { useTheme } from "../../../../customHooks/useTheme";
+import FormComponent from "./components/FormComponent";
+import TableHeader from "./components/TableHeader";
+import TableRow from "./components/TableRow";
+import FilterTypes from "./filterTypes";
+import { useSortedData } from "./useSortedData";
+import { getOrderedColumns, shouldHideColumn } from "./utils";
 
 const ModalTable = ({
   open,

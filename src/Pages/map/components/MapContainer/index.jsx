@@ -3,7 +3,7 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import { ToastContainer } from "react-toastify";
 import MapControls from "../MapControls";
 import MapEvents from "../MapEvents";
-import MarkerComponent from "../markers";
+import MarkerComponent from "../markers/DynamicMarkers";
 
 const MapContainerComponent = ({
   map,
