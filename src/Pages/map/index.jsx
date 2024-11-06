@@ -12,7 +12,7 @@ import {
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaLocationDot, FaRegMap } from "react-icons/fa6";
+import { FaRegMap } from "react-icons/fa6";
 import { IoMdSunny } from "react-icons/io";
 import { MdBedtime } from "react-icons/md";
 import { TbBell, TbBellRinging } from "react-icons/tb";
@@ -27,11 +27,11 @@ import MapEvents from "./components/MapEvents/index.jsx";
 import MapModals from "./components/MapModals/index.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import FilterControl from "./components/controls/filterControl/index.jsx";
+import RegionControl from "./components/controls/regionControl";
 import WidgetControl from "./components/controls/widgetControl/index.jsx";
 import CurrentAlarms from "./components/currentAlarms/index.jsx";
 import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
-import SignsContainer from "./components/signs/index.jsx";
 import TileChanger from "./components/tileChanger/index.jsx";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
 import { PROVINCES } from "./constants/provinces.js";
@@ -251,38 +251,11 @@ const MapComponent = ({ changedMarker }) => {
             changeFilter={setFilter}
           />
         </Control>
-        <Control className="z-[999999]" position="topleft">
-          <IconButton
-            size="lg"
-            onClick={() =>
-              setActiveSidePanel(activeSidePanel === "region" ? null : "region")
-            }
-          >
-            <FaLocationDot className="w-5 h-5" />
-          </IconButton>
-          <SidePanel
-            title={t("selectProvince")}
-            sndWrapperClass="min-w-[15vw]  absolute left-2 "
-            isOpen={activeSidePanel === "region"}
-            setIsOpen={() => setActiveSidePanel(null)}
-            content={
-              <div className="rounded-lg flex flex-col gap-2">
-                {Object.entries(PROVINCES).map(([key, province]) => (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      handleProvinceChange(key);
-                      setActiveSidePanel(null);
-                    }}
-                    className="text-left px-3 py-2 hover:bg-gray-800/50 rounded-none transition-colors"
-                  >
-                    {province.name}
-                  </button>
-                ))}
-              </div>
-            }
-          />
-        </Control>
+        <RegionControl
+          activeSidePanel={activeSidePanel}
+          setActiveSidePanel={setActiveSidePanel}
+          handleProvinceChange={handleProvinceChange}
+        />
         {/* layerchanger */}
         <TileChanger
           activeSidePanel={activeSidePanel}
@@ -308,7 +281,7 @@ const MapComponent = ({ changedMarker }) => {
         {/* lights */}
         {filter.trafficlights && <TrafficLightContainer />}
         {/* signs  */}
-        {<SignsContainer isVisible={filter.signs} />}
+        {/* {<SignsContainer isVisible={filter.signs} />} */}
         {/* settings */}
         <Control position="topleft">
           <IconButton

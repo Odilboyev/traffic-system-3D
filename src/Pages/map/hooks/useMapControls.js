@@ -8,7 +8,7 @@ export const useMapControls = () => {
     box: true,
     crossroad: true,
     trafficlights: true,
-    signs: true,
+    // signs: true,
     camera: true,
     cameraview: true,
     camerapdd: true,
