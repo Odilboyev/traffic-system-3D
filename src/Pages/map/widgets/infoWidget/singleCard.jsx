@@ -1,11 +1,10 @@
 import { CameraIcon } from "@heroicons/react/16/solid";
 import { Card, CardHeader, Typography } from "@material-tailwind/react";
-import React from "react";
 import { useTranslation } from "react-i18next";
 import { LiaTrafficLightSolid } from "react-icons/lia";
 import { MdOutlineSensorWindow } from "react-icons/md";
 import NeonIcon from "../../../../components/neonIcon";
-const TrafficLightsCard = ({ data = [], length }) => {
+const InfoWidgetCard = ({ data = [], length = 0 }) => {
   const { t } = useTranslation();
   const total = data.count_all;
   const onlineCount = data.data.find((item) => item.status === 0)?.count || 0;
@@ -67,7 +66,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
   );
 };
 
-export default TrafficLightsCard;
+export default InfoWidgetCard;
 const iconSwitcher = (type) => {
   const IconComponent = (() => {
     switch (type) {

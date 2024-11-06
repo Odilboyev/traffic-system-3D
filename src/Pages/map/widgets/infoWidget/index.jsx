@@ -1,20 +1,25 @@
 import PropTypes from "prop-types";
-import TrafficLightsCard from "./singleCard";
-const BottomSection = ({ cardsInfoData = [] }) => {
+import InfoWidgetCard from "./singleCard";
+
+const InfoWidget = ({ cardsInfoData = [] }) => {
   return (
-    <div className="max-w-[80%] px-5 mx-auto left-0 right-0 r absolute bottom-1 z-[999] min-h-[10vh] flex justify-center items-center gap-10 ">
-      {cardsInfoData?.length > 0 &&
-        cardsInfoData.map((item, index) => (
-          <TrafficLightsCard
-            key={index}
-            data={item}
-            length={cardsInfoData.length}
-          />
-        ))}
+    <div className="fixed bottom-1 left-0 right-0 z-[999] px-5 mx-auto">
+      <div className="max-w-[80%] mx-auto flex justify-center items-center gap-10">
+        {cardsInfoData?.length > 0 &&
+          cardsInfoData.map((item, index) => (
+            <InfoWidgetCard
+              key={index}
+              data={item}
+              length={cardsInfoData.length}
+            />
+          ))}
+      </div>
     </div>
   );
 };
-BottomSection.propTypes = {
-  cardsInfoData: PropTypes.any,
+
+InfoWidget.propTypes = {
+  cardsInfoData: PropTypes.array,
 };
-export default BottomSection;
+
+export default InfoWidget;

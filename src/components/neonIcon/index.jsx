@@ -1,3 +1,4 @@
+import { Typography } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 
 const statusStyles = {
@@ -40,11 +41,11 @@ const NeonIcon = ({ icon: Icon, iconStyle, isRounded, text, status }) => {
           {Icon}
         </div>
       ) : (
-        <p
-          className={`px-3 py-1 min-w-4 font-bold text-2xl ${textShadowClass}`}
+        <Typography
+          className={`mx-2 min-w-4 font-bold text-2xl ${textShadowClass}`}
         >
           {text}
-        </p>
+        </Typography>
       )}
     </div>
   );
@@ -54,7 +55,7 @@ NeonIcon.propTypes = {
   icon: PropTypes.node, // Changed to node to accommodate div components
   text: PropTypes.any,
   iconStyle: PropTypes.object,
-  status: PropTypes.number,
+  status: PropTypes.oneOf([0, 1, 2, 3, 4]).isRequired,
   isRounded: PropTypes.bool, // Ensure this prop is defined
 };
 

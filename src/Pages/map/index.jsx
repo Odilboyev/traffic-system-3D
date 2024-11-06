@@ -40,7 +40,7 @@ import { useMapMarkers } from "./hooks/useMapMarkers.js";
 import DeviceErrorHistory from "./sections/deviceErrorHistory/index.jsx";
 import DeviceManagement from "./sections/deviceManagement/index.jsx";
 import LanguageSwitcher from "./sections/langSwitcher/index.jsx";
-import BottomSection from "./widgets/infoWidget/index.jsx";
+import InfoWidget from "./widgets/infoWidget/index.jsx";
 import UserInfoWidget from "./widgets/userInfo/index.jsx";
 import WeatherWidget from "./widgets/weather/index.jsx";
 
@@ -267,12 +267,12 @@ const MapComponent = ({ changedMarker }) => {
           ) : (
             <div style={{ display: "none" }}></div>
           )}
+        </Control>{" "}
+        <Control position="bottomcenter">
+          {widgets.bottomsection && (
+            <InfoWidget cardsInfoData={bottomSectionData} />
+          )}
         </Control>
-        {widgets.bottomsection ? (
-          <BottomSection cardsInfoData={bottomSectionData} />
-        ) : (
-          <div style={{ display: "none" }}></div>
-        )}
         {/* lights */}
         {filter.trafficlights && <TrafficLightContainer />}
         {/* signs  */}
