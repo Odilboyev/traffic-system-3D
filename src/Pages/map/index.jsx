@@ -20,7 +20,6 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import { ToastContainer } from "react-toastify";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
 import Control from "../../components/customControl/index.jsx";
-import BottomSection from "../../components/infoCard/index.jsx";
 import SidePanel from "../../components/sidePanel/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import { useTheme } from "../../customHooks/useTheme.jsx";
@@ -42,8 +41,9 @@ import { useMapMarkers } from "./hooks/useMapMarkers.js";
 import DeviceErrorHistory from "./sections/deviceErrorHistory/index.jsx";
 import DeviceManagement from "./sections/deviceManagement/index.jsx";
 import LanguageSwitcher from "./sections/langSwitcher/index.jsx";
-import UserInfoWidget from "./sections/userInfo/index.jsx";
-import WeatherWidget from "./sections/weather/index.jsx";
+import BottomSection from "./widgets/infoWidget/index.jsx";
+import UserInfoWidget from "./widgets/userInfo/index.jsx";
+import WeatherWidget from "./widgets/weather/index.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
 
