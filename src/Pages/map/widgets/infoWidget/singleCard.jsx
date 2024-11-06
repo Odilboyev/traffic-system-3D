@@ -13,8 +13,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
 
   return (
     <Card
-      className={`w-1/${length} px-4 xl:px-3 bg-gray-900/70 backdrop-blur-xl text-white shadow-lg 
-      hover:shadow-2xl hover:bg-gray-800/70 transition-all duration-300  `}
+      className={`w-1/${length} px-4 xl:px-3 backdrop-blur-md bg-gray-900/80 text-white shadow-lg hover:shadow-2xl hover:bg-gray-800/70 transition-all duration-300  `}
     >
       <CardHeader className=" bg-gray-800 text-white p-3 rounded-lg mb-4 border-b border-gray-700">
         <Typography
@@ -31,7 +30,7 @@ const TrafficLightsCard = ({ data = [], length }) => {
               (value, i) =>
                 value.status !== 1 && (
                   <div
-                    className="flex items-center gap-3 bg-gray-800/50 p-3 rounded-lg"
+                    className="flex items-center gap-3 from-blue-gray-900/60 to-black/50 backdrop-blur-xl p-3 rounded-lg"
                     key={i}
                   >
                     <NeonIcon

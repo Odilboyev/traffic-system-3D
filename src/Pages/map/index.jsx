@@ -233,7 +233,7 @@ const MapComponent = ({ changedMarker }) => {
             url={currentLayerDetails.url}
             attribution={currentLayerDetails.attribution}
             key={currentLayerDetails.name}
-            maxZoom={22}
+            maxZoom={20}
           />
         )}
         {/* zoomcontrol */}
@@ -288,7 +288,6 @@ const MapComponent = ({ changedMarker }) => {
           activeSidePanel={activeSidePanel}
           setActiveSidePanel={setActiveSidePanel}
         />
-        {/* widgets */}
         {/* user profile */}
         <Control position="topright">
           <UserInfoWidget />
@@ -413,19 +412,6 @@ const MapComponent = ({ changedMarker }) => {
         </Control>
         <Control position="topleft">
           <IconButton
-            // color={theme === "light" ? "black" : "white"}
-            size="lg"
-            onClick={() => toggleTheme()}
-          >
-            {theme === "light" ? (
-              <MdBedtime className="w-7 h-7 p-1" />
-            ) : (
-              <IoMdSunny className="w-7 h-7 p-1" />
-            )}
-          </IconButton>
-        </Control>
-        <Control position="topleft">
-          <IconButton
             size="lg"
             onClick={() => {
               setActiveSidePanel(
@@ -465,6 +451,19 @@ const MapComponent = ({ changedMarker }) => {
               </div>
             }
           />
+        </Control>
+        <Control position="topleft">
+          <IconButton
+            // color={theme === "light" ? "black" : "white"}
+            size="lg"
+            onClick={() => toggleTheme()}
+          >
+            {theme === "light" ? (
+              <MdBedtime className="w-7 h-7 p-1" />
+            ) : (
+              <IoMdSunny className="w-7 h-7 p-1" />
+            )}
+          </IconButton>
         </Control>
         {useClusteredMarkers === "clustered" ||
         useClusteredMarkers === "clustered_dynamically" ? (

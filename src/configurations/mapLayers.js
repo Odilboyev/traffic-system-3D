@@ -6,7 +6,24 @@ const baseLayers = [
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "OpenStreetMap",
   },
-
+  {
+    name: "Cesium",
+    checked: false,
+    maxNativeZoom: 19,
+    url: "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  },
+  {
+    name: "Cesium Dark",
+    checked: false,
+    maxNativeZoom: 19,
+    url: "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  },
+  {
+    name: "Light",
+    checked: false,
+    maxNativeZoom: 19,
+    url: "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+  },
   {
     name: "Transport",
     checked: false,

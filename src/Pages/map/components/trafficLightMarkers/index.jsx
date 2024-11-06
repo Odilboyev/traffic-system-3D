@@ -48,7 +48,7 @@ const TrafficlightMarkers = ({
     fetchData: fetchTrafficLights,
     onClearData: clearTrafficLights,
     onNewData: updateTrafficLights,
-    minZoom: 19,
+    minZoom: 20,
     fetchDistanceThreshold: 100,
   });
 
