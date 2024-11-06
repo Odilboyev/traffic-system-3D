@@ -50,3 +50,7 @@ input[type="number"] {
     @apply rounded-br-md;
   }
 }
+/* traffic light marker was 12px so we need to set it to auto */
+.leaflet-marker-icon {
+  width: auto !important;
+}
