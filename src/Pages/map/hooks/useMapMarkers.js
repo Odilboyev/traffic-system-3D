@@ -20,7 +20,6 @@ export const useMapMarkers = () => {
           isPopupOpen: false,
         }))
       );
-      console.log(markers, "markers");
       setBottomSectionData(bottomData);
     } catch (error) {
       setAreMarkersLoading(false);

@@ -54,6 +54,8 @@ const CrossroadFields = ({ formData, handleInputChange }) => {
   const handleRegionChange = (selected) => {
     setSelectedRegion(selected);
     setSelectedDistrict(null);
+    handleInputChange("lat", JSON.parse(selected.location).lat);
+    handleInputChange("lng", JSON.parse(selected.location).lng);
     handleInputChange("region_id", selected.id);
     handleInputChange("district_id", null);
   };
@@ -61,6 +63,8 @@ const CrossroadFields = ({ formData, handleInputChange }) => {
   const handleDistrictChange = (selected) => {
     setSelectedDistrict(selected);
     handleInputChange("district_id", selected.id);
+    handleInputChange("lat", JSON.parse(selected.location).lat);
+    handleInputChange("lng", JSON.parse(selected.location).lng);
   };
 
   return (
@@ -89,9 +93,7 @@ const CrossroadFields = ({ formData, handleInputChange }) => {
           icon={MdFlag}
           label={t("district")}
           options={districts}
-          value={districts.find(
-            (district) => district.id === formData.district_id
-          )}
+          value={selectedDistrict}
           getOptionLabel={(option) => option.name}
           getOptionValue={(option) => option.id}
           onChange={handleDistrictChange}

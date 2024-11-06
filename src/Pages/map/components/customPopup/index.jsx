@@ -5,6 +5,7 @@ import SingleRecord from "../singleRecord";
 import "./popup.style.css";
 const CustomPopup = memo(function CustomPopup({ marker = {} }) {
   const popupRef = useRef(null);
+
   return (
     <Popup
       eventHandlers={{

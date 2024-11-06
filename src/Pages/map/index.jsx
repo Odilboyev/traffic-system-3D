@@ -34,7 +34,6 @@ import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import TileChanger from "./components/tileChanger/index.jsx";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
-import { PROVINCES } from "./constants/provinces.js";
 import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapControls } from "./hooks/useMapControls.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.js";
@@ -140,9 +139,6 @@ const MapComponent = ({ changedMarker }) => {
     setIsbigMonitorOpen(true);
     console.log(marker);
   };
-  useEffect(() => {
-    console.log(activeMarker, "activeMarker");
-  }, [activeMarker]);
   const handleBoxModalOpen = async (box) => {
     if (box) {
       setIsBoxLoading(true);
@@ -169,9 +165,8 @@ const MapComponent = ({ changedMarker }) => {
   const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
 
   const handleProvinceChange = (value) => {
-    const selectedProvince = PROVINCES[value];
-    if (selectedProvince && map.current) {
-      map.current.flyTo(selectedProvince.coords, 10, {
+    if (value && map.current) {
+      map.current.flyTo(JSON.parse(value.location), 10, {
         duration: 1,
       });
     }

@@ -15,7 +15,7 @@ const RegionControl = ({
   const { t } = useTranslation();
   const [regions, setRegions] = useState([]);
   const [districts, setDistricts] = useState({});
-  const [selectedRegion, setSelectedRegion] = useState(null);
+  const [hoveredRegion, setHoveredRegion] = useState(null);
 
   useEffect(() => {
     const fetchRegions = async () => {
@@ -31,12 +31,12 @@ const RegionControl = ({
 
   useEffect(() => {
     const fetchDistricts = async () => {
-      if (selectedRegion) {
+      if (hoveredRegion && !districts[hoveredRegion]) {
         try {
-          const data = await getDistricts(selectedRegion);
+          const data = await getDistricts(hoveredRegion);
           setDistricts((prev) => ({
             ...prev,
-            [selectedRegion]: data,
+            [hoveredRegion]: data,
           }));
         } catch (error) {
           console.error("Error fetching districts:", error);
@@ -44,7 +44,15 @@ const RegionControl = ({
       }
     };
     fetchDistricts();
-  }, [selectedRegion]);
+  }, [hoveredRegion]);
+
+  const handleMouseEnter = (regionId) => {
+    setHoveredRegion(regionId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredRegion(null);
+  };
 
   return (
     <Control className="z-[999999]" position="topleft">
@@ -62,29 +70,34 @@ const RegionControl = ({
         isOpen={activeSidePanel === "region"}
         setIsOpen={() => setActiveSidePanel(null)}
         content={
-          <div className="rounded-lg flex flex-col gap-2">
+          <div className="rounded-lg flex flex-col gap-2 relative">
             {regions.map((region) => (
-              <div key={region.id}>
-                <button
-                  onClick={() => setSelectedRegion(region.id)}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-800/50 rounded-none transition-colors font-medium"
-                >
+              <div
+                key={region.id}
+                className="relative"
+                onClick={() => handleProvinceChange(region)}
+                onMouseEnter={() => handleMouseEnter(region.id)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button className="w-full text-left px-3 py-2 hover:bg-gray-800/50 rounded-none transition-colors font-medium">
                   {region.name}
                 </button>
-                {selectedRegion === region.id && districts[region.id] && (
-                  <div className="ml-4 flex flex-col">
-                    {districts[region.id].map((district) => (
-                      <button
-                        key={district.id}
-                        onClick={() => {
-                          handleProvinceChange(district.id);
-                          setActiveSidePanel(null);
-                        }}
-                        className="text-left px-3 py-1.5 hover:bg-gray-800/50 rounded-none transition-colors text-sm"
-                      >
-                        {district.name}
-                      </button>
-                    ))}
+                {hoveredRegion === region.id && districts[region.id] && (
+                  <div className="absolute left-full top-0 ml-2 bg-gray-900 rounded-lg shadow-lg min-w-[200px] z-50">
+                    <div className="py-2">
+                      {districts[region.id].map((district) => (
+                        <button
+                          key={district.id}
+                          onClick={() => {
+                            handleProvinceChange(district);
+                            setActiveSidePanel(null);
+                          }}
+                          className="w-full text-left px-4 py-1.5 hover:bg-gray-800/50 transition-colors text-sm"
+                        >
+                          {district.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

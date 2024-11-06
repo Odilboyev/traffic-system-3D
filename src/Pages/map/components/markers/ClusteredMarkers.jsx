@@ -21,7 +21,6 @@ const ClusteredMarkers = ({
 }) => {
   const clusterRef = useRef(null);
   const markerUpdate = markers?.length || 0;
-  console.log(usePieChartForClusteredMarkers, "mrkers");
   return (
     <div>
       <MarkerClusterGroup
