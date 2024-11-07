@@ -17,6 +17,7 @@ export const useMapControls = () => {
   const [widgets, setWidgets] = useLocalStorageState("traffic_widgets", {
     bottomsection: true,
     weather: true,
+    crossroad: false,
   });
 
   const [isDraggable, setIsDraggable] = useLocalStorageState(

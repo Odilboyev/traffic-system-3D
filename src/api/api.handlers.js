@@ -120,7 +120,7 @@ const endpointMap = {
 };
 
 // Fetch device or user data
-const getDevices = async (type, current) => {
+const getDevices = async (type) => {
   let endpoint;
 
   // Check if the type contains 'user' and customize the endpoint if necessary
@@ -133,7 +133,7 @@ const getDevices = async (type, current) => {
     endpoint = endpointMap[type];
   }
 
-  return getData(endpoint, `/${current}`);
+  return getData(endpoint);
 };
 
 // User-specific functions

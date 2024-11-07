@@ -27,8 +27,6 @@ const ModalTable = ({
   filterHandler,
   data = [],
   isLoading,
-  totalItems = 0,
-  totalPages,
   fetchHandler,
   filterOptions,
   backButtonProps = {
@@ -82,9 +80,7 @@ const ModalTable = ({
     if (isSubPageOpen) {
       historyButtonCallback(1, type, subPageId);
     } else {
-      type === "history"
-        ? fetchHandler(page, selectedFilter)
-        : fetchHandler(type, page, selectedFilter);
+      type === "history" && fetchHandler(selectedFilter);
     }
   };
 
@@ -135,6 +131,23 @@ const ModalTable = ({
     editButtonCallback(true);
     backButtonProps.onClick(true);
     setEditData(data);
+  };
+
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Calculate paginated data
+  const getPaginatedData = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return sortedData.slice(startIndex, endIndex);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    console.log(newItemsPerPage);
+
+    // Reset to first page when changing items per page
+    setCurrentPage(1);
   };
 
   return (
@@ -219,7 +232,7 @@ const ModalTable = ({
                         ? () => {
                             backButtonProps.onClick(true);
                             setEditData(null);
-                            fetchHandler(type, currentPage, 1);
+                            fetchHandler(type, 1);
                           }
                         : () => {
                             settypeToShow(t(type));
@@ -260,7 +273,7 @@ const ModalTable = ({
                       onHeaderClick={handleHeader}
                     />
                     <tbody className="overflow-x-scroll font-bold">
-                      {sortedData.map((item, i) => (
+                      {getPaginatedData().map((item, i) => (
                         <TableRow
                           key={i}
                           type={type}
@@ -291,12 +304,12 @@ const ModalTable = ({
         </div>
       }
       footer={
-        totalPages > 1 &&
         !isFormOpen && (
           <Pagination
-            totalItems={totalItems}
+            totalItems={sortedData.length}
             currentPage={currentPage}
-            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            handleItemsPerPageChange={handleItemsPerPageChange}
             onPageChange={handlePageChange}
           />
         )
@@ -314,8 +327,6 @@ ModalTable.propTypes = {
   historyButtonCallback: PropTypes.func,
   data: PropTypes.arrayOf(PropTypes.object),
   isLoading: PropTypes.bool,
-  totalItems: PropTypes.number,
-  totalPages: PropTypes.number,
   fetchHandler: PropTypes.func.isRequired,
   pickedFilter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   filterHandler: PropTypes.func,

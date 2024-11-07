@@ -1,15 +1,13 @@
 import { IconButton } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { FaLocationDot } from "react-icons/fa6";
 import { useMap } from "react-leaflet";
 import { getDistricts, getRegions } from "../../../../../api/api.handlers";
 import Control from "../../../../../components/customControl";
 import SidePanel from "../../../../../components/sidePanel";
 
-const RegionControl = ({ activeSidePanel, setActiveSidePanel }) => {
-  const { t } = useTranslation();
+const RegionControl = ({ activeSidePanel, setActiveSidePanel, t }) => {
   const [regions, setRegions] = useState([]);
   const [districts, setDistricts] = useState({});
   const [hoveredRegion, setHoveredRegion] = useState(null);

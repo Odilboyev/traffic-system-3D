@@ -1,14 +1,8 @@
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
-  Cog8ToothIcon,
 } from "@heroicons/react/16/solid";
-import {
-  Checkbox,
-  IconButton,
-  Radio,
-  Typography,
-} from "@material-tailwind/react";
+import { IconButton, Radio, Typography } from "@material-tailwind/react";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -28,7 +22,7 @@ import MapModals from "./components/MapModals/index.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import FilterControl from "./components/controls/filterControl/index.jsx";
 import RegionControl from "./components/controls/regionControl";
-import WidgetControl from "./components/controls/widgetControl/index.jsx";
+import WidgetControl from "./components/controls/widgetControl";
 import CurrentAlarms from "./components/currentAlarms/index.jsx";
 import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
@@ -40,6 +34,7 @@ import { useMapMarkers } from "./hooks/useMapMarkers.js";
 import DeviceErrorHistory from "./sections/deviceErrorHistory/index.jsx";
 import DeviceManagement from "./sections/deviceManagement/index.jsx";
 import LanguageSwitcher from "./sections/langSwitcher/index.jsx";
+import CrossroadWidget from "./widgets/crossroadData";
 import InfoWidget from "./widgets/infoWidget/index.jsx";
 import UserInfoWidget from "./widgets/userInfo/index.jsx";
 import WeatherWidget from "./widgets/weather/index.jsx";
@@ -241,6 +236,17 @@ const MapComponent = ({ changedMarker }) => {
         <RegionControl
           activeSidePanel={activeSidePanel}
           setActiveSidePanel={setActiveSidePanel}
+          t={t}
+        />
+        {/* settings */}
+        <WidgetControl
+          activeSidePanel={activeSidePanel}
+          setActiveSidePanel={setActiveSidePanel}
+          isDraggable={isDraggable}
+          setIsDraggable={setIsDraggable}
+          widgets={widgets}
+          setWidgets={setWidgets}
+          t={t}
         />
         {/* layerchanger */}
         <TileChanger
@@ -254,11 +260,18 @@ const MapComponent = ({ changedMarker }) => {
         {/* weather */}
         <Control position="topright">
           {widgets.weather ? (
-            <WeatherWidget />
+            <WeatherWidget t={t} />
           ) : (
             <div style={{ display: "none" }}></div>
           )}
         </Control>{" "}
+        <Control position="topright">
+          {widgets.crossroad ? (
+            <CrossroadWidget />
+          ) : (
+            <div style={{ display: "none" }}></div>
+          )}
+        </Control>
         <Control position="bottomcenter">
           {widgets.bottomsection && (
             <InfoWidget cardsInfoData={bottomSectionData} />
@@ -268,51 +281,6 @@ const MapComponent = ({ changedMarker }) => {
         {filter.trafficlights && <TrafficLightContainer />}
         {/* signs  */}
         {/* {<SignsContainer isVisible={filter.signs} />} */}
-        {/* settings */}
-        <Control position="topleft">
-          <IconButton
-            size="lg"
-            onClick={() =>
-              setActiveSidePanel(
-                activeSidePanel === "settings" ? null : "settings"
-              )
-            }
-          >
-            <Cog8ToothIcon className="w-5 h-5" />
-          </IconButton>
-          <SidePanel
-            title={t("markers")}
-            sndWrapperClass="absolute left-full ml-2 no-scrollbar overflow-y-scroll w-[15vw] "
-            isOpen={activeSidePanel === "settings"}
-            setIsOpen={() => setActiveSidePanel(null)}
-            content={
-              <div className="p-4 flex flex-col">
-                <Typography className="text-sm mb-2 text-white ">
-                  {t("settings")}
-                </Typography>
-                <Checkbox
-                  label={
-                    <Typography className="text-white ">
-                      {t("draggable")}
-                    </Typography>
-                  }
-                  ripple={false}
-                  checked={isDraggable}
-                  onChange={(e) => setIsDraggable(e.target.checked)}
-                />
-                <div className="text-sm mb-2"></div>
-                <Typography className=" text-sm text-white ">
-                  {t("widgets")}
-                </Typography>
-                <WidgetControl
-                  filter={widgets}
-                  changeFilter={setWidgets}
-                  placement={"right"}
-                />
-              </div>
-            }
-          />
-        </Control>
         {/* aalarm history */}
         <Control position="topleft">
           <DeviceErrorHistory

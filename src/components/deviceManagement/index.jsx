@@ -1,14 +1,13 @@
+import { CogIcon, PlusIcon } from "@heroicons/react/16/solid";
 import {
   IconButton,
   List,
   ListItem,
   Typography,
 } from "@material-tailwind/react";
-import { CogIcon, PlusCircleIcon, PlusIcon } from "@heroicons/react/16/solid";
-import { useState, useCallback, memo, useEffect } from "react";
 import { t } from "i18next";
-import Dropright from "../../components/dropright";
-import ModalTable from "../map/components/modalTable";
+import { memo, useCallback, useState } from "react";
+import { toast } from "react-toastify";
 import {
   addUser,
   deleteUser,
@@ -18,17 +17,16 @@ import {
   recoverUser,
   updateUser,
 } from "../../api/api.handlers";
-import { toast } from "react-toastify";
+import Dropright from "../../components/dropright";
 import { modalToastConfig } from "../../tools/toastconfig";
+import ModalTable from "../map/components/modalTable";
 
 const DeviceManagement = ({ refreshHandler }) => {
   const [isDroprightOpen, setIsDroprightOpen] = useState(false);
   const [deviceType, setDeviceType] = useState(""); // Default type
   const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
-  const [totalItems, setTotalItems] = useState(1);
   const [deviceData, setDeviceData] = useState([]);
   const [deviceLoading, setDeviceLoading] = useState(false);
-  const [deviceTotalPages, setDeviceTotalPages] = useState(null);
 
   // edit
   const [isEditing, setIsEditing] = useState(null);
@@ -43,14 +41,12 @@ const DeviceManagement = ({ refreshHandler }) => {
   const [filter, setFilter] = useState(filterOptions[0].type);
   const [showFormModal, setShowFormModal] = useState(false);
 
-  const fetchDeviceData = useCallback(async (type, current = 1) => {
+  const fetchDeviceData = useCallback(async (type) => {
     setDeviceLoading(true);
     setDeviceData([]); // Clear existing data before fetching new data
     try {
-      const all = await getDevices(type, current);
+      const all = await getDevices(type);
       setDeviceData(all.data);
-      setDeviceTotalPages(all.total_pages ?? 1);
-      setTotalItems(all.total_items);
     } catch (err) {
       throw new Error(err);
     } finally {
@@ -59,16 +55,14 @@ const DeviceManagement = ({ refreshHandler }) => {
   }, []);
 
   const fetchData = useCallback(
-    async (type = deviceType, page = 1, isactive = filter) => {
+    async (type = deviceType, isactive = filter) => {
       setDeviceLoading(true);
 
       try {
         const res = await fetchDataForManagement("GET", type, {
-          params: { page, isactive },
+          params: { isactive },
         });
         setDeviceData(res.data);
-        setDeviceTotalPages(res.total_pages ?? 1);
-        setTotalItems(res.total_items);
       } catch (error) {
         console.error(error);
         toast.error(
@@ -121,7 +115,7 @@ const DeviceManagement = ({ refreshHandler }) => {
       } finally {
         const newFilter =
           method === "delete" ? 1 : method === "patch" ? 0 : filter;
-        fetchData(type, 1, newFilter);
+        fetchData(type, newFilter);
         refreshHandler();
       }
     },
@@ -203,8 +197,6 @@ const DeviceManagement = ({ refreshHandler }) => {
       });
 
       setDeviceData(all.data);
-      setDeviceTotalPages(all.total_pages ? all.total_pages : 1);
-      setTotalItems(all.total_items);
     } catch (err) {
       console.err("Error fetching error history. Please try again.", err);
     } finally {
@@ -221,7 +213,7 @@ const DeviceManagement = ({ refreshHandler }) => {
     if (type === "users") {
       fetchDeviceData("user/list_active"); // Fetch active users by default
     } else {
-      fetchData(type, 1, filter);
+      fetchData(type, filter);
     }
   };
   const handleFilterChange = (filter) => {
@@ -230,7 +222,7 @@ const DeviceManagement = ({ refreshHandler }) => {
       ? fetchDeviceData(
           filter === 1 ? "user/list_active" : "user/list_deactive"
         ) // fetch users
-      : fetchData(deviceType, 1, filter);
+      : fetchData(deviceType, filter);
   };
 
   const isDeviceType = [
@@ -286,16 +278,13 @@ const DeviceManagement = ({ refreshHandler }) => {
       <ModalTable
         open={isAlarmDeviceOpen}
         handleOpen={() => {
-          setDeviceTotalPages(null);
           setDeviceData([]);
           setIsAlarmDeviceOpen(false);
         }}
-        totalItems={totalItems}
         historyButtonCallback={
           deviceType !== "users" ? fetchErrorHistory : null
         }
         type={deviceType}
-        totalPages={deviceTotalPages}
         data={deviceData}
         filterHandler={handleFilterChange}
         backButtonProps={{
@@ -307,13 +296,12 @@ const DeviceManagement = ({ refreshHandler }) => {
         showActions={true}
         isLoading={deviceLoading}
         selectedFilter={filter}
-        fetchHandler={(type, page) => {
+        fetchHandler={(type) => {
           deviceType === "users"
             ? fetchDeviceData(
-                type === 1 ? "user/list_active" : "user/list_deactive",
-                page
+                filter === 1 ? "user/list_active" : "user/list_deactive"
               )
-            : fetchData(type, page, filter);
+            : fetchData(type, filter);
         }}
         deleteButtonCallback={
           isDeviceType
