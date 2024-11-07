@@ -53,8 +53,8 @@ const Modal = ({
           </svg>
         </IconButton>
       </DialogHeader>
-      <DialogBody className="h-screen overflow-hidden py-0">{body}</DialogBody>
-      <DialogFooter className="flex justify-center items-center mt-auto">
+      <DialogBody className="h-screen overflow-hidden py-0 ">{body}</DialogBody>
+      <DialogFooter className="flex justify-center items-center mt-auto backdrop-blur-lg bg-white/20 dark:bg-gray-900/50 absolute bottom-0 w-full">
         {footer}
       </DialogFooter>
     </Dialog>

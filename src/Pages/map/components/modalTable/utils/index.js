@@ -1,3 +1,5 @@
+import { t } from "i18next";
+
 // utils.js
 export const sortData = (data, sortedColumn, sortOrder) => {
   return [...data].sort((a, b) => {
@@ -67,4 +69,34 @@ export const getOrderedColumns = (columns) => {
     if (indexB === -1) return -1;
     return indexA - indexB;
   });
+};
+
+export const filterableColumns = [
+  "crossroad_name",
+  "region_name",
+  "district_name",
+];
+// Add this new function to get unique values for select options
+export const getUniqueColumnValues = (data, column) => {
+  const baseColumn = column.replace("_name", "");
+  const idColumn = `${baseColumn}_id`;
+
+  const uniqueItems = new Map();
+
+  data.forEach((item) => {
+    const value = item[idColumn];
+    const label = item[column];
+    if (label && !uniqueItems.has(value)) {
+      uniqueItems.set(value, label);
+    }
+  });
+
+  // Convert Map to array and add "All" option
+  const options = Array.from(uniqueItems.entries()).map(([value, label]) => ({
+    value,
+    label,
+  }));
+  options.unshift({ value: null, label: t(baseColumn) });
+
+  return options;
 };

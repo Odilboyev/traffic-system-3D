@@ -50,18 +50,22 @@ const ModalTable = ({
   const [subPageId, setSubPageId] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
+  const [itemsPerPage, setItemsPerPage] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   // const [selectedFilter, setSelectedFilter] = useState(null);
   const [isSubPageOpen, setIsSubPageOpen] = useState(false);
 
   const [editData, setEditData] = useState(null);
+  const [columnFilters, setColumnFilters] = useState({});
+
   const sortedData = useSortedData(
     data,
     sortedColumn,
     sortOrder,
     searchTerm,
-    type == "history" ? selectedFilter : undefined
+    type == "history" ? selectedFilter : undefined,
+    columnFilters
   );
   useEffect(() => {
     settypeToShow(t(type));
@@ -133,8 +137,6 @@ const ModalTable = ({
     setEditData(data);
   };
 
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-
   // Calculate paginated data
   const getPaginatedData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -150,6 +152,13 @@ const ModalTable = ({
     setCurrentPage(1);
   };
 
+  const handleFilterChange = (column, value) => {
+    setColumnFilters((prev) => ({
+      ...prev,
+      [column]: value,
+    }));
+  };
+
   return (
     <Modal
       open={open}
@@ -158,6 +167,7 @@ const ModalTable = ({
           ? () => backButtonProps.onClick(false)
           : () => {
               handleOpen();
+
               editButtonCallback(false);
               setEditData(null);
               setIsSubPageOpen(false);
@@ -167,7 +177,7 @@ const ModalTable = ({
       }
       title={typeToShow}
       body={
-        <div className="h-full w-full no-scrollbar overflow-auto">
+        <div className="h-full w-full no-scrollbar overflow-auto pb-20">
           {isFormOpen ? (
             <FormComponent
               type={type}
@@ -266,11 +276,13 @@ const ModalTable = ({
                   <table className="w-full border-collapse table-auto  border border-slate-400">
                     <TableHeader
                       columns={columns}
+                      data={data}
                       showActions={showTableActions}
                       sortedColumn={sortedColumn}
                       isSubPageOpen={isSubPageOpen}
                       sortOrder={sortOrder}
                       onHeaderClick={handleHeader}
+                      onFilterChange={handleFilterChange}
                     />
                     <tbody className="overflow-x-scroll font-bold">
                       {getPaginatedData().map((item, i) => (
