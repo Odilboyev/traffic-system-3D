@@ -190,12 +190,13 @@ const ClusterIcon = (cluster) => {
 const getStatusColor = (status) => {
   switch (status) {
     case 1:
-      return "#FFD700"; // orange
+      return "#FFD54F"; // Warm amber/gold
     case 2:
-      return "#FF4500"; // red
+      return "#FF5252"; // Vibrant coral red
     case 3:
-      return "#FFC0CB"; // pink
+      return "#FF4081"; // Bright pink/magenta
+    case 0:
     default:
-      return "#4682B4"; // green
+      return "#66BB6A"; // Fresh green
   }
 };

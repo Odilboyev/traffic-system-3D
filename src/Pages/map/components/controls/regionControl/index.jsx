@@ -3,19 +3,19 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaLocationDot } from "react-icons/fa6";
+import { useMap } from "react-leaflet";
 import { getDistricts, getRegions } from "../../../../../api/api.handlers";
 import Control from "../../../../../components/customControl";
 import SidePanel from "../../../../../components/sidePanel";
 
-const RegionControl = ({
-  activeSidePanel,
-  setActiveSidePanel,
-  handleProvinceChange,
-}) => {
+const RegionControl = ({ activeSidePanel, setActiveSidePanel }) => {
   const { t } = useTranslation();
   const [regions, setRegions] = useState([]);
   const [districts, setDistricts] = useState({});
   const [hoveredRegion, setHoveredRegion] = useState(null);
+  const [hoverTimeout, setHoverTimeout] = useState(null);
+  const [activeRegion, setActiveRegion] = useState(null);
+  const [activeDistrict, setActiveDistrict] = useState(null);
 
   useEffect(() => {
     const fetchRegions = async () => {
@@ -47,11 +47,26 @@ const RegionControl = ({
   }, [hoveredRegion]);
 
   const handleMouseEnter = (regionId) => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
     setHoveredRegion(regionId);
   };
 
   const handleMouseLeave = () => {
-    setHoveredRegion(null);
+    const timeout = setTimeout(() => {
+      setHoveredRegion(null);
+    }, 300);
+    setHoverTimeout(timeout);
+  };
+
+  const map = useMap();
+  const handleProvinceChange = (value) => {
+    if (value) {
+      setActiveDistrict(value.id);
+      setActiveRegion(hoveredRegion);
+      map.flyTo(JSON.parse(value.location), 15, {
+        duration: 1,
+      });
+    }
   };
 
   return (
@@ -74,16 +89,26 @@ const RegionControl = ({
             {regions.map((region) => (
               <div
                 key={region.id}
-                className="relative"
-                onClick={() => handleProvinceChange(region)}
+                className="relative group"
                 onMouseEnter={() => handleMouseEnter(region.id)}
                 onMouseLeave={handleMouseLeave}
               >
-                <button className="w-full text-left px-3 py-2 hover:bg-gray-800/50 rounded-none transition-colors font-medium">
+                <button
+                  className={`w-full text-left px-3 py-2 hover:bg-gray-800/50 rounded-none transition-colors font-medium
+                    ${
+                      activeRegion === region.id
+                        ? "bg-gray-800 text-blue-500"
+                        : ""
+                    }`}
+                >
                   {region.name}
                 </button>
                 {hoveredRegion === region.id && districts[region.id] && (
-                  <div className="absolute left-full top-0 ml-2 bg-gray-900 rounded-lg shadow-lg min-w-[200px] z-50">
+                  <div
+                    className="absolute left-full top-0 ml-2 bg-gray-900 rounded-lg shadow-lg min-w-[200px] z-50"
+                    onMouseEnter={() => handleMouseEnter(region.id)}
+                    onMouseLeave={handleMouseLeave}
+                  >
                     <div className="py-2">
                       {districts[region.id].map((district) => (
                         <button
@@ -92,7 +117,12 @@ const RegionControl = ({
                             handleProvinceChange(district);
                             setActiveSidePanel(null);
                           }}
-                          className="w-full text-left px-4 py-1.5 hover:bg-gray-800/50 transition-colors text-sm"
+                          className={`w-full text-left px-4 py-1.5 hover:bg-gray-800/50 transition-colors text-sm
+                            ${
+                              activeDistrict === district.id
+                                ? "bg-gray-800 text-blue-500"
+                                : ""
+                            }`}
                         >
                           {district.name}
                         </button>
@@ -110,9 +140,8 @@ const RegionControl = ({
 };
 
 RegionControl.propTypes = {
-  activeSidePanel: PropTypes.string,
+  activeSidePanel: PropTypes.any,
   setActiveSidePanel: PropTypes.func.isRequired,
-  handleProvinceChange: PropTypes.func.isRequired,
 };
 
 export default RegionControl;

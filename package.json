@@ -56,7 +56,7 @@
     "react-table": "^7.8.0",
     "react-toastify": "^10.0.5",
     "react-zoom-pan-pinch": "^3.6.1",
-    "recharts": "^2.12.7",
+    "recharts": "^2.13.3",
     "sip": "^0.0.6",
     "sip.js": "^0.21.2",
     "undici": "^6.19.8"

@@ -164,14 +164,6 @@ const MapComponent = ({ changedMarker }) => {
 
   const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
 
-  const handleProvinceChange = (value) => {
-    if (value && map.current) {
-      map.current.flyTo(JSON.parse(value.location), 10, {
-        duration: 1,
-      });
-    }
-  };
-
   const map = useRef(null);
 
   const handleCloseCrossroadModal = () => {
@@ -249,7 +241,6 @@ const MapComponent = ({ changedMarker }) => {
         <RegionControl
           activeSidePanel={activeSidePanel}
           setActiveSidePanel={setActiveSidePanel}
-          handleProvinceChange={handleProvinceChange}
         />
         {/* layerchanger */}
         <TileChanger

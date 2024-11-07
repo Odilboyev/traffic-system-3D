@@ -27,9 +27,9 @@ const TileChanger = ({ activeSidePanel, setActiveSidePanel }) => {
 
   useEffect(() => {
     if (theme === "dark") {
-      handleLayerChange("Dark");
+      !selectedLayer.includes("Dark") && handleLayerChange("Dark");
     } else {
-      handleLayerChange("Transport");
+      !selectedLayer.includes("Transport") && handleLayerChange("Transport");
     }
   }, [theme]);
   return (
