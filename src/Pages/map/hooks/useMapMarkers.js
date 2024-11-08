@@ -1,26 +1,22 @@
 import { useState } from "react";
-import { getInfoForCards, getMarkerData } from "../../../api/api.handlers";
+import { getMarkerData } from "../../../api/api.handlers";
 
 export const useMapMarkers = () => {
   const [markers, setMarkers] = useState([]);
   const [areMarkersLoading, setAreMarkersLoading] = useState(false);
-  const [bottomSectionData, setBottomSectionData] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const getDataHandler = async () => {
     setAreMarkersLoading(true);
     try {
       setAreMarkersLoading(false);
-      const [myData, bottomData] = await Promise.all([
-        getMarkerData(),
-        getInfoForCards(),
-      ]);
+      const myData = await getMarkerData();
+
       setMarkers(
         myData.data.map((marker) => ({
           ...marker,
           isPopupOpen: false,
         }))
       );
-      setBottomSectionData(bottomData);
     } catch (error) {
       setAreMarkersLoading(false);
       if (error.code === "ERR_NETWORK") {
@@ -29,7 +25,6 @@ export const useMapMarkers = () => {
       throw new Error(error);
     }
   };
-
   const clearMarkers = () => setMarkers([]);
   const updateMarkers = (data) => data && setMarkers(data);
 
@@ -37,7 +32,6 @@ export const useMapMarkers = () => {
     markers,
     setMarkers,
     areMarkersLoading,
-    bottomSectionData,
     errorMessage,
     getDataHandler,
     clearMarkers,

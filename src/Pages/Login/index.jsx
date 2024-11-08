@@ -1,10 +1,9 @@
-import { Input, Button, Typography } from "@material-tailwind/react";
+import { Button } from "@material-tailwind/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signIn } from "../../api/api.handlers";
 import login from "../../Auth";
-import bg from "../../../public/images/back.jpg";
-import { useTheme } from "../../customHooks/useTheme";
+import bg from "../../assets/images/back.jpg";
 import { FaSpinner } from "react-icons/fa6";
 import { MdPassword, MdPerson } from "react-icons/md";
 import { t } from "i18next";

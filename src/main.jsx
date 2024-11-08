@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
-import "../public/tailwind.css";
+import "../tailwind.css";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import PrivateRoutes from "./private.router.jsx";
 import "react-toastify/dist/ReactToastify.css";

@@ -6,6 +6,7 @@ import { subscribeToCurrentAlarms } from "./api/api.handlers.js";
 import WarningMessage from "./components/offlineWarning/index.jsx";
 import { ThemeContext } from "./context/themeContext.jsx";
 import MapComponent from "./Pages/map/index.jsx";
+import Sidebar from "./components/sidebar/index.jsx";
 
 const App = () => {
   const { theme } = useContext(ThemeContext);
@@ -51,15 +52,26 @@ const App = () => {
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
   return (
     <div
       className={`min-h-screen app-container relative ${
         theme === "dark" ? "bg-gray-900 text-white" : "text-black"
       }`}
     >
-      {!isOnline && <WarningMessage />}
+      {/* <button
+        onClick={toggleSidebar}
+        className="fixed z-[10000000000000] top-4 left-4 p-2 bg-blue-500 text-white rounded-md shadow-lg focus:outline-none"
+      >
+        {isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}
+      </button> */}
 
+      {!isOnline && <WarningMessage />}
+      {/* <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} /> */}
       <MapComponent changedMarker={changedMarker} />
     </div>
   );

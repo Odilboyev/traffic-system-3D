@@ -38,6 +38,9 @@ import CrossroadWidget from "./widgets/crossroadData";
 import InfoWidget from "./widgets/infoWidget/index.jsx";
 import UserInfoWidget from "./widgets/userInfo/index.jsx";
 import WeatherWidget from "./widgets/weather/index.jsx";
+import DynamicWidgets from "./widgets/DynamicWidgets.jsx";
+import Sidebar from "../../components/sidebar/index.jsx";
+import toaster from "../../tools/toastconfig.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
 
@@ -181,6 +184,7 @@ const MapComponent = ({ changedMarker }) => {
   // Add useEffect to handle changedMarker updates
   useEffect(() => {
     if (changedMarker) {
+      toaster(changedMarker, map);
       setMarkers((prevMarkers) =>
         prevMarkers.map((marker) =>
           marker.cid === changedMarker.cid && marker.type === changedMarker.type
@@ -220,7 +224,7 @@ const MapComponent = ({ changedMarker }) => {
         )}
         {/* zoomcontrol */}
         <ZoomControl theme={theme} />{" "}
-        <Control position="bottomleft">
+        <Control position="bottomright">
           <div className="bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded">
             Zoom: {zoom}
           </div>
@@ -253,11 +257,6 @@ const MapComponent = ({ changedMarker }) => {
           activeSidePanel={activeSidePanel}
           setActiveSidePanel={setActiveSidePanel}
         />
-        {/* user profile */}
-        <Control position="topright">
-          <UserInfoWidget />
-        </Control>
-        {/* weather */}
         <Control position="topright">
           {widgets.weather ? (
             <WeatherWidget t={t} />
@@ -277,6 +276,7 @@ const MapComponent = ({ changedMarker }) => {
             <InfoWidget cardsInfoData={bottomSectionData} />
           )}
         </Control>
+        {/* <DynamicWidgets widgets={widgets} t={t} /> */}
         {/* lights */}
         {filter.trafficlights && <TrafficLightContainer />}
         {/* signs  */}
@@ -426,6 +426,7 @@ const MapComponent = ({ changedMarker }) => {
           />
         )}
       </MapContainer>
+
       <MapModals
         crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}
         isBoxLoading={isBoxLoading}

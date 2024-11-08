@@ -10,6 +10,7 @@ import { useMap } from "react-leaflet";
 import { ToastContainer } from "react-toastify";
 import Loader from "../../../../components/loader";
 import Modal from "../../../../components/modal";
+import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 import { useTheme } from "../../../../customHooks/useTheme";
 import FormComponent from "./components/FormComponent";
 import TableHeader from "./components/TableHeader";
@@ -50,7 +51,10 @@ const ModalTable = ({
   const [subPageId, setSubPageId] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
-  const [itemsPerPage, setItemsPerPage] = useState(50);
+  const [itemsPerPage, setItemsPerPage] = useLocalStorageState(
+    "itemsPerPage",
+    50
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   // const [selectedFilter, setSelectedFilter] = useState(null);

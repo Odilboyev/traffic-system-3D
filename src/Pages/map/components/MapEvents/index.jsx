@@ -30,16 +30,6 @@ const MapEvents = ({ changedMarker, fetchAlarmsData, setZoom }) => {
     return () => clearInterval(alarmInterval);
   }, [fetchAlarmsData]);
 
-  // Handle marker updates
-  useEffect(() => {
-    if (changedMarker) {
-      const { lat, lng } = changedMarker;
-      map.flyTo([lat, lng], map.getZoom(), {
-        duration: 1,
-      });
-    }
-  }, [changedMarker, map]);
-
   return null; // This component doesn't render anything
 };
 
