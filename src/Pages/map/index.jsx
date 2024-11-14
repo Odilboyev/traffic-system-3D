@@ -169,7 +169,7 @@ const MapComponent = ({ changedMarker, t }) => {
       >
         <Sidebar
           t={t}
-          mapRef={map}
+          // mapRef={map}
           isVisible={isSidebarVisible}
           setIsVisible={setIsSidebarVisible}
         />
