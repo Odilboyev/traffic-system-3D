@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useMap, useMapEvents } from "react-leaflet";
 
-const MapEvents = ({ changedMarker, fetchAlarmsData, setZoom }) => {
+const MapEvents = ({ changedMarker, setZoom }) => {
   const map = useMap();
 
   // Handle map movement and zoom events
@@ -21,15 +21,6 @@ const MapEvents = ({ changedMarker, fetchAlarmsData, setZoom }) => {
     },
   });
 
-  // Set up periodic alarm fetching
-  useEffect(() => {
-    const alarmInterval = setInterval(() => {
-      fetchAlarmsData();
-    }, 30000); // Fetch alarms every 30 seconds
-
-    return () => clearInterval(alarmInterval);
-  }, [fetchAlarmsData]);
-
   return null; // This component doesn't render anything
 };
 
@@ -37,10 +28,9 @@ MapEvents.propTypes = {
   changedMarker: PropTypes.shape({
     lat: PropTypes.number,
     lng: PropTypes.number,
-    cid: PropTypes.string,
-    type: PropTypes.string,
+    cid: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    type: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }),
-  fetchAlarmsData: PropTypes.func.isRequired,
   setZoom: PropTypes.func.isRequired,
 };
 

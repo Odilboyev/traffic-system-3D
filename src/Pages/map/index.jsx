@@ -1,50 +1,29 @@
-import {
-  ArrowsPointingInIcon,
-  ArrowsPointingOutIcon,
-} from "@heroicons/react/16/solid";
-import { IconButton, Radio, Typography } from "@material-tailwind/react";
-import PropTypes from "prop-types";
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { FaRegMap } from "react-icons/fa6";
-import { IoMdSunny } from "react-icons/io";
-import { MdBedtime } from "react-icons/md";
-import { TbBell, TbBellRinging } from "react-icons/tb";
 import { MapContainer, TileLayer } from "react-leaflet";
-import { ToastContainer } from "react-toastify";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
+import { useEffect, useRef, useState } from "react";
+
+import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import Control from "../../components/customControl/index.jsx";
-import SidePanel from "../../components/sidePanel/index.jsx";
-import baseLayers from "../../configurations/mapLayers.js";
-import { useTheme } from "../../customHooks/useTheme.jsx";
+import CrossroadWidget from "./widgets/crossroadData";
+import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
+import InfoWidget from "./widgets/infoWidget/index.jsx";
 import MapEvents from "./components/MapEvents/index.jsx";
 import MapModals from "./components/MapModals/index.jsx";
-import ZoomControl from "./components/controls/customZoomControl/index.jsx";
-import FilterControl from "./components/controls/filterControl/index.jsx";
-import RegionControl from "./components/controls/regionControl";
-import WidgetControl from "./components/controls/widgetControl";
-import CurrentAlarms from "./components/currentAlarms/index.jsx";
-import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
-import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
-import TileChanger from "./components/tileChanger/index.jsx";
+import PropTypes from "prop-types";
+import Sidebar from "./components/sidebar/index.jsx";
+import { ToastContainer } from "react-toastify";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
-import { useMapAlarms } from "./hooks/useMapAlarms.js";
-import { useMapControls } from "./hooks/useMapControls.js";
-import { useMapMarkers } from "./hooks/useMapMarkers.js";
-import DeviceErrorHistory from "./sections/deviceErrorHistory/index.jsx";
-import DeviceManagement from "./sections/deviceManagement/index.jsx";
-import LanguageSwitcher from "./sections/langSwitcher/index.jsx";
-import CrossroadWidget from "./widgets/crossroadData";
-import InfoWidget from "./widgets/infoWidget/index.jsx";
-import UserInfoWidget from "./widgets/userInfo/index.jsx";
 import WeatherWidget from "./widgets/weather/index.jsx";
-import DynamicWidgets from "./widgets/DynamicWidgets.jsx";
-import Sidebar from "../../components/sidebar/index.jsx";
+import ZoomControl from "./components/controls/customZoomControl/index.jsx";
+import baseLayers from "../../configurations/mapLayers.js";
 import toaster from "../../tools/toastconfig.jsx";
+import { useMapAlarms } from "./hooks/useMapAlarms.js";
+import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
+import { useTheme } from "../../customHooks/useTheme.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
 
-const MapComponent = ({ changedMarker }) => {
+const MapComponent = ({ changedMarker, t }) => {
   const {
     markers,
     setMarkers,
@@ -52,28 +31,19 @@ const MapComponent = ({ changedMarker }) => {
     getDataHandler,
     clearMarkers,
     updateMarkers,
+    useClusteredMarkers,
+    filter,
+    widgets,
+    isDraggable,
   } = useMapMarkers();
 
-  const { currentAlarms, fetchAlarmsData } = useMapAlarms();
+  const { fetchAlarmsData } = useMapAlarms();
 
-  const {
-    activeSidePanel,
-    setActiveSidePanel,
-    filter,
-    setFilter,
-    widgets,
-    setWidgets,
-    isDraggable,
-    setIsDraggable,
-  } = useMapControls();
+  // sidebar visibility
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
-  // user role
-  const role = atob(localStorage.getItem("its_user_role"));
-  const isPermitted = role === "admin" || role === "boss";
-  // language `-`
-  const { t } = useTranslation();
   //theme
-  const { theme, toggleTheme, currentLayer } = useTheme();
+  const { theme, currentLayer } = useTheme();
 
   const center = JSON.parse(localStorage.getItem("mapCenter"))
     ? JSON.parse(localStorage.getItem("mapCenter"))
@@ -82,19 +52,6 @@ const MapComponent = ({ changedMarker }) => {
     localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
   );
 
-  const [fulscreen, setFullscreen] = useState(false);
-
-  const toggleFullSceen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setFullscreen(true);
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-        setFullscreen(false);
-      }
-    }
-  };
   //variables
   /// ----------------------------------------------------------------
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
@@ -108,13 +65,9 @@ const MapComponent = ({ changedMarker }) => {
   const [isLightsLoading, setIsLightsLoading] = useState(false);
   const [activeLight, setActiveLight] = useState(null);
 
-  const [useClusteredMarkers, setUseClusteredMarkers] = useState(
-    role === "boss"
-      ? "clustered"
-      : role === "operator"
-      ? "dynamic"
-      : "clustered_dynamically"
-  );
+  const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
+
+  const map = useRef(null);
 
   useEffect(() => {
     getDataHandler();
@@ -132,11 +85,14 @@ const MapComponent = ({ changedMarker }) => {
     }
   };
 
-  const handleMonitorCrossroad = (marker) => {
+  // handle visibility of modals
+  const handleMonitorCrossroadOpen = (marker) => {
     setActiveMarker(marker);
     setIsbigMonitorOpen(true);
+    setIsSidebarVisible(false);
     console.log(marker);
   };
+
   const handleBoxModalOpen = async (box) => {
     if (box) {
       setIsBoxLoading(true);
@@ -144,7 +100,9 @@ const MapComponent = ({ changedMarker }) => {
         const res = await getBoxData(box.cid);
         setIsBoxLoading(false);
         setActiveBox(res);
-        setIsBoxModalOpen(!isBoxModalOpen);
+        setIsBoxModalOpen(true);
+        setIsSidebarVisible(false);
+        setIsSidebarVisible(false);
       } catch (error) {
         setIsBoxLoading(false);
         throw new Error(error);
@@ -155,27 +113,28 @@ const MapComponent = ({ changedMarker }) => {
   const handleLightsModalOpen = async (light) => {
     if (light) {
       setActiveLight(light);
+      setIsSidebarVisible(false);
+
       setIsLightsModalOpen(true);
     }
   };
   // ----------------------------------------------------------------
 
-  const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
-
-  const map = useRef(null);
-
   const handleCloseCrossroadModal = () => {
+    setIsSidebarVisible(true);
     setIsbigMonitorOpen(false);
     setActiveMarker(null);
   };
 
   const handleCloseDeviceModal = () => {
+    setIsSidebarVisible(true);
     setIsBoxModalOpen(false);
     setActiveBox(null);
     setIsBoxLoading(false);
   };
 
   const handleCloseTrafficLightsModal = () => {
+    setIsSidebarVisible(true);
     setIsLightsModalOpen(false);
     setActiveLight(null);
     setIsLightsLoading(false);
@@ -204,9 +163,16 @@ const MapComponent = ({ changedMarker }) => {
         center={center}
         zoom={zoom}
         zoomDelta={0.6}
+        doubleClickZoom={false}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
       >
+        <Sidebar
+          t={t}
+          mapRef={map}
+          isVisible={isSidebarVisible}
+          setIsVisible={setIsSidebarVisible}
+        />
         <ToastContainer containerId="alarms" className="z-[9998]" />
         <MapEvents
           changedMarker={changedMarker}
@@ -222,41 +188,39 @@ const MapComponent = ({ changedMarker }) => {
             maxZoom={20}
           />
         )}
-        {/* zoomcontrol */}
-        <ZoomControl theme={theme} />{" "}
+        {/* zoomcontrol */} <ZoomControl theme={theme} />{" "}
         <Control position="bottomright">
           <div className="bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded">
             Zoom: {zoom}
           </div>
         </Control>
-        <Control position="topleft">
+        {/* <Control position="topleft">
           <FilterControl
             activeSidePanel={activeSidePanel}
             setActiveSidePanel={setActiveSidePanel}
             filter={filter}
             changeFilter={setFilter}
           />
-        </Control>
-        <RegionControl
+        </Control> */}
+        {/* <RegionControl
           activeSidePanel={activeSidePanel}
           setActiveSidePanel={setActiveSidePanel}
           t={t}
-        />
+        /> */}
         {/* settings */}
-        <WidgetControl
-          activeSidePanel={activeSidePanel}
-          setActiveSidePanel={setActiveSidePanel}
+        {/* <WidgetControl
+
           isDraggable={isDraggable}
           setIsDraggable={setIsDraggable}
           widgets={widgets}
           setWidgets={setWidgets}
           t={t}
-        />
+        /> */}
         {/* layerchanger */}
-        <TileChanger
+        {/* <TileChanger
           activeSidePanel={activeSidePanel}
           setActiveSidePanel={setActiveSidePanel}
-        />
+        /> */}
         <Control position="topright">
           {widgets.weather ? (
             <WeatherWidget t={t} />
@@ -278,18 +242,17 @@ const MapComponent = ({ changedMarker }) => {
         </Control>
         {/* <DynamicWidgets widgets={widgets} t={t} /> */}
         {/* lights */}
-        {filter.trafficlights && <TrafficLightContainer />}
         {/* signs  */}
         {/* {<SignsContainer isVisible={filter.signs} />} */}
         {/* aalarm history */}
-        <Control position="topleft">
+        {/* <Control position="topleft">
           <DeviceErrorHistory
             activeSidePanel={activeSidePanel}
             setActiveSidePanel={setActiveSidePanel}
           />
-        </Control>
+        </Control> */}
         {/* Device Management */}
-        {isPermitted && (
+        {/* {isPermitted && (
           <Control position="topleft">
             <DeviceManagement
               refreshHandler={getDataHandler}
@@ -297,8 +260,8 @@ const MapComponent = ({ changedMarker }) => {
               setActiveSidePanel={setActiveSidePanel}
             />
           </Control>
-        )}
-        <Control position="topleft">
+        )} */}
+        {/* <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -310,12 +273,9 @@ const MapComponent = ({ changedMarker }) => {
               <ArrowsPointingOutIcon className="w-8 h-8 p-1" />
             )}
           </IconButton>
-        </Control>
-        <LanguageSwitcher
-          activeSidePanel={activeSidePanel}
-          setActiveSidePanel={setActiveSidePanel}
-        />
-        <Control position="topleft">
+        </Control> */}
+        {/* <LanguageSwitcher /> */}
+        {/* <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -336,8 +296,8 @@ const MapComponent = ({ changedMarker }) => {
             setIsOpen={() => setActiveSidePanel(null)}
             content={<CurrentAlarms data={currentAlarms} />}
           />
-        </Control>
-        <Control position="topleft">
+        </Control> */}
+        {/* <Control position="topleft">
           <IconButton
             size="lg"
             onClick={() => {
@@ -347,8 +307,8 @@ const MapComponent = ({ changedMarker }) => {
             }}
           >
             <FaRegMap className="w-5 h-5" />
-          </IconButton>
-          <SidePanel
+          </IconButton> */}
+        {/* <SidePanel
             title={t("markers")}
             wrapperClass="absolute -top-28  inline-block text-left"
             sndWrapperClass="absolute left-full ml-2 no-scrollbar overflow-y-scroll w-[15vw] "
@@ -369,7 +329,7 @@ const MapComponent = ({ changedMarker }) => {
                       }}
                       label={
                         <Typography className="mr-3 text-white">
-                          {t(type)}
+                          {t(type) || ""}
                         </Typography>
                       }
                     />
@@ -377,9 +337,9 @@ const MapComponent = ({ changedMarker }) => {
                 )}
               </div>
             }
-          />
-        </Control>
-        <Control position="topleft">
+          /> */}
+        {/* </Control> */}
+        {/* <Control position="topleft">
           <IconButton
             // color={theme === "light" ? "black" : "white"}
             size="lg"
@@ -391,7 +351,8 @@ const MapComponent = ({ changedMarker }) => {
               <IoMdSunny className="w-7 h-7 p-1" />
             )}
           </IconButton>
-        </Control>
+        </Control> */}
+        {filter.trafficlights && <TrafficLightContainer />}
         {useClusteredMarkers === "clustered" ||
         useClusteredMarkers === "clustered_dynamically" ? (
           <ClusteredMarkers
@@ -399,7 +360,7 @@ const MapComponent = ({ changedMarker }) => {
               useClusteredMarkers === "clustered_dynamically"
             }
             key={useClusteredMarkers}
-            handleMonitorCrossroad={handleMonitorCrossroad}
+            handleMonitorCrossroad={handleMonitorCrossroadOpen}
             handleBoxModalOpen={handleBoxModalOpen}
             handleLightsModalOpen={handleLightsModalOpen}
             handleMarkerDragEnd={handleMarkerDragEnd}
@@ -413,7 +374,7 @@ const MapComponent = ({ changedMarker }) => {
           />
         ) : (
           <DynamicMarkers
-            handleMonitorCrossroad={handleMonitorCrossroad}
+            handleMonitorCrossroad={handleMonitorCrossroadOpen}
             handleBoxModalOpen={handleBoxModalOpen}
             handleLightsModalOpen={handleLightsModalOpen}
             handleMarkerDragEnd={handleMarkerDragEnd}
@@ -445,6 +406,7 @@ const MapComponent = ({ changedMarker }) => {
 
 MapComponent.propTypes = {
   changedMarker: PropTypes.object,
+  t: PropTypes.func,
 };
 
 export default MapComponent;

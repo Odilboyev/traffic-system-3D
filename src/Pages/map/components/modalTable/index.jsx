@@ -3,10 +3,10 @@ import Pagination from "@/components/pagination";
 import { ChevronLeftIcon } from "@heroicons/react/16/solid";
 import { Button, Input, Typography } from "@material-tailwind/react";
 import { t } from "i18next";
+import L from "leaflet";
 import PropTypes from "prop-types";
 import { memo, useEffect, useState } from "react";
 import { MdSearch } from "react-icons/md";
-import { useMap } from "react-leaflet";
 import { ToastContainer } from "react-toastify";
 import Loader from "../../../../components/loader";
 import Modal from "../../../../components/modal";
@@ -44,9 +44,10 @@ const ModalTable = ({
   submitNewData,
 }) => {
   const { theme } = useTheme();
-  const map = useMap();
 
-  const [showTableActions, setShowTableActions] = useState(type !== "history");
+  const [showTableActions, setShowTableActions] = useState(
+    type !== "history" && type !== "currentAlarms"
+  );
   const [typeToShow, settypeToShow] = useState(t(type));
   const [subPageId, setSubPageId] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -98,13 +99,13 @@ const ModalTable = ({
     );
     setSortedColumn(keyName);
   };
-
   const locationHandler = (lat, lng) => {
+    const map = L.map("monitoring");
     if (lat && lng)
       map.flyTo([lat, lng], 20, {
-        animate: true,
         duration: 1,
       });
+
     handleOpen();
   };
 
@@ -171,7 +172,6 @@ const ModalTable = ({
           ? () => backButtonProps.onClick(false)
           : () => {
               handleOpen();
-
               editButtonCallback(false);
               setEditData(null);
               setIsSubPageOpen(false);
@@ -220,25 +220,28 @@ const ModalTable = ({
                   />
                 </div>
 
-                {!isSubPageOpen && filterOptions && (
-                  <FilterTypes
-                    filterOptions={filterOptions}
-                    active={selectedFilter}
-                    valueKey="type"
-                    nameKey="type_name"
-                    onFilterChange={(selectedType) => {
-                      filterHandler(selectedType);
-                      type === "history" && fetchHandler(1, selectedType); // using historyhandler when using history
-                      setCurrentPage(1);
-                      // type == "users"
-                      //   ? fetchHandler("user/" + selectedType, 1)
-                      //   : type == "crossroad"
-                      //   ? fetchHandler(type, 1, selectedType)
-                      //   : fetchHandler(1, selectedType);
-                    }}
-                  />
-                )}
-                {isSubPageOpen || type !== "history" ? (
+                {!isSubPageOpen &&
+                  filterOptions &&
+                  type !== "currentAlarms" && (
+                    <FilterTypes
+                      filterOptions={filterOptions}
+                      active={selectedFilter}
+                      valueKey="type"
+                      nameKey="type_name"
+                      onFilterChange={(selectedType) => {
+                        filterHandler(selectedType);
+                        type === "history" && fetchHandler(1, selectedType); // using historyhandler when using history
+                        setCurrentPage(1);
+                        // type == "users"
+                        //   ? fetchHandler("user/" + selectedType, 1)
+                        //   : type == "crossroad"
+                        //   ? fetchHandler(type, 1, selectedType)
+                        //   : fetchHandler(1, selectedType);
+                      }}
+                    />
+                  )}
+                {isSubPageOpen ||
+                (type !== "history" && type !== "currentAlarms") ? (
                   <Button
                     color="blue"
                     onClick={
@@ -336,20 +339,20 @@ const ModalTable = ({
 };
 
 ModalTable.propTypes = {
-  open: PropTypes.bool.isRequired,
+  open: PropTypes.bool,
   showActions: PropTypes.bool,
   type: PropTypes.string,
-  handleOpen: PropTypes.func.isRequired,
+  handleOpen: PropTypes.func,
   historyButtonCallback: PropTypes.func,
   data: PropTypes.arrayOf(PropTypes.object),
   isLoading: PropTypes.bool,
-  fetchHandler: PropTypes.func.isRequired,
+  fetchHandler: PropTypes.func,
   pickedFilter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   filterHandler: PropTypes.func,
   filterOptions: PropTypes.arrayOf(
     PropTypes.shape({
       type: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      type_name: PropTypes.string.isRequired,
+      type_name: PropTypes.string,
     })
   ),
 

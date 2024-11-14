@@ -233,7 +233,6 @@ const DeviceManagement = ({ refreshHandler }) => {
     "boxmonitor",
     "svetofor",
   ].includes(deviceType);
-
   return (
     <>
       <IconButton

@@ -1,5 +1,5 @@
-import { createContext, useState, useContext, useEffect } from "react";
-import baseLayers from "../configurations/mapLayers";
+import baseLayers, { layerSave } from "../configurations/mapLayers";
+import { createContext, useEffect, useState } from "react";
 
 export const ThemeContext = createContext();
 
@@ -18,6 +18,17 @@ export const MyThemeProvider = ({ children }) => {
       setTheme(savedTheme);
     }
   }, []);
+  const handleLayerChange = (layerName) => {
+    layerSave(layerName);
+    setCurrentLayer(layerName);
+  };
+  useEffect(() => {
+    if (theme === "dark") {
+      !currentLayer.includes("Dark") && handleLayerChange("Dark");
+    } else {
+      !currentLayer.includes("Transport") && handleLayerChange("Transport");
+    }
+  }, [theme]);
   useEffect(() => {
     const previousTheme = localStorage.getItem("trafficTheme");
     if (previousTheme && previousTheme !== theme) {

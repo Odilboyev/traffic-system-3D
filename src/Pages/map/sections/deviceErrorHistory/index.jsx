@@ -1,5 +1,5 @@
 import { IconButton } from "@material-tailwind/react";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { MdHistory } from "react-icons/md";
 import { getErrorHistory } from "../../../../api/api.handlers";
 import ModalTable from "../../components/modalTable";
@@ -24,32 +24,18 @@ const DeviceErrorHistory = ({ activeSidePanel, setActiveSidePanel }) => {
       setHistoryLoading(false);
     }
   }, []);
+  useEffect(() => {
+    if (activeSidePanel === "deviceErrorHistory") fetchErrorHistory(1);
+  }, [activeSidePanel]);
 
   return (
     <>
-      <IconButton
-        onClick={() => {
-          setActiveSidePanel(
-            activeSidePanel === "deviceErrorHistory"
-              ? null
-              : "deviceErrorHistory"
-          );
-          fetchErrorHistory(1);
-        }}
-        size="lg"
-      >
-        <MdHistory className="w-6 h-6 " />
-      </IconButton>
       <ModalTable
         open={activeSidePanel === "deviceErrorHistory"}
         handleOpen={() => {
           setHistoryData([]);
           setHistoryTotalPages(null);
-          setActiveSidePanel(
-            activeSidePanel === "deviceErrorHistory"
-              ? null
-              : "deviceErrorHistory"
-          );
+          setActiveSidePanel(null);
         }}
         selectedFilter={selectedFilter}
         filterOptions={[

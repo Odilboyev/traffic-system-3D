@@ -12,29 +12,34 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "./i18.js";
 import { PopupProvider } from "./context/popupContext.jsx";
 import SignIn from "./Pages/Login/index.jsx";
+import { MapMarkersProvider } from "./Pages/map/hooks/useMapMarkers.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <React.StrictMode>
   <I18nextProvider i18n={i18n}>
-    <ThemeProvider>
-      <PopupProvider>
-        <HashRouter>
-          <MyThemeProvider>
-            <Routes>
-              <Route element={<PrivateRoutes />}>
-                <Route path="/" element={<App />} />
-
+    <MapMarkersProvider>
+      <ThemeProvider>
+        <PopupProvider>
+          <HashRouter>
+            <MyThemeProvider>
+              <Routes>
+                <Route element={<PrivateRoutes />}>
+                  <Route path="/" element={<App />} />
+                  <Route
+                    path="*"
+                    element={<Navigate to={"/login"} replace />}
+                  />
+                </Route>{" "}
+                <Route path="/login" element={<SignIn />} />
                 <Route path="*" element={<Navigate to={"/login"} replace />} />
-              </Route>{" "}
-              <Route path="/login" element={<SignIn />} />
-              <Route path="*" element={<Navigate to={"/login"} replace />} />
-            </Routes>
-          </MyThemeProvider>
-        </HashRouter>
-      </PopupProvider>
+              </Routes>
+            </MyThemeProvider>
+          </HashRouter>
+        </PopupProvider>
 
-      {/* <App /> */}
-    </ThemeProvider>
+        {/* <App /> */}
+      </ThemeProvider>
+    </MapMarkersProvider>
   </I18nextProvider>
 
   // </React.StrictMode>

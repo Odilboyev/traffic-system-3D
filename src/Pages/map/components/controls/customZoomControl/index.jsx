@@ -15,26 +15,26 @@ const ZoomControl = ({ theme, position, size }) => {
   };
 
   return (
-    // <Control position={position || "topleft"}>
-    <div className="flex flex-col">
-      <IconButton
-        onClick={handleZoomIn}
-        size={size || "lg"}
-        className="rounded-b-none"
-        color={theme === "light" ? "black" : "white"}
-      >
-        <FaPlus />
-      </IconButton>
-      <IconButton
-        onClick={handleZoomOut}
-        size={size || "lg"}
-        className="rounded-t-none "
-        color={theme === "light" ? "black" : "white"}
-      >
-        <FaMinus />
-      </IconButton>
-    </div>
-    // </Control>
+    <Control position={"bottomright"}>
+      <div className="flex flex-col ">
+        <IconButton
+          onClick={handleZoomIn}
+          size={size || "lg"}
+          className="rounded-b-none"
+          color={theme === "light" ? "white" : "black"}
+        >
+          <FaPlus />
+        </IconButton>
+        <IconButton
+          onClick={handleZoomOut}
+          size={size || "lg"}
+          className="rounded-t-none "
+          color={theme === "light" ? "white" : "black"}
+        >
+          <FaMinus />
+        </IconButton>
+      </div>
+    </Control>
   );
 };
 

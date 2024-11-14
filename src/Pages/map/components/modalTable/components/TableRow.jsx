@@ -114,7 +114,7 @@ const TableRow = ({
         </td>
       ))}
 
-      {showActions && !isSubPageOpen && (
+      {showActions && !isSubPageOpen && type !== "currentAlarms" && (
         <td
           className={` !overflow-visible py-1 text-start overflow-x-scroll no-scrollbar border-separate border border-blue-gray-900 dark:border-white`}
           // style={{ width: "200px", minWidth: "200px" }}

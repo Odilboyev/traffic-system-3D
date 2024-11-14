@@ -1,10 +1,10 @@
 import { MapIcon } from "@heroicons/react/16/solid";
 import { IconButton, Radio, Typography } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
-import Control from "../../../../components/customControl";
-import SidePanel from "../../../../components/sidePanel";
-import baseLayers, { layerSave } from "../../../../configurations/mapLayers";
-import { useTheme } from "../../../../customHooks/useTheme";
+import Control from "../../../../../components/customControl";
+import SidePanel from "../../../../../components/sidePanel";
+import baseLayers, { layerSave } from "../../../../../configurations/mapLayers";
+import { useTheme } from "../../../../../customHooks/useTheme";
 
 const TileChanger = ({ activeSidePanel, setActiveSidePanel }) => {
   const { theme, setCurrentLayer } = useTheme();

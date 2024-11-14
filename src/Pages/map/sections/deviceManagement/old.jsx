@@ -1,6 +1,8 @@
-import { PlusIcon } from "@heroicons/react/16/solid";
+import { CogIcon, PlusIcon } from "@heroicons/react/16/solid";
+import { IconButton, List, ListItem } from "@material-tailwind/react";
 import { t } from "i18next";
-import { memo, useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { memo, useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import {
   addUser,
@@ -11,23 +13,19 @@ import {
   recoverUser,
   updateUser,
 } from "../../../../api/api.handlers";
+import SidePanel from "../../../../components/sidePanel";
 import { modalToastConfig } from "../../../../tools/toastconfig";
 import ModalTable from "../../components/modalTable";
+import { useMapMarkers } from "../../hooks/useMapMarkers";
 
-const DeviceManagement = ({
-  activeSidePanel,
-  setActiveSidePanel,
-  setIsSidebarVisible,
-}) => {
-  // const { getDataHandler: refreshHandler } = useMapMarkers();
+const DeviceManagement = ({ activeSidePanel, setActiveSidePanel }) => {
+  const { getDataHandler: refreshHandler } = useMapMarkers();
   const [deviceType, setDeviceType] = useState(""); // Default type
-  const [isDeviceOpen, setIsDeviceOpen] = useState(false);
+  const [isAlarmDeviceOpen, setIsAlarmDeviceOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(1);
   const [deviceData, setDeviceData] = useState([]);
   const [deviceLoading, setDeviceLoading] = useState(false);
   const [deviceTotalPages, setDeviceTotalPages] = useState(null);
-
-  // create a function to fetch the data from the devices endpoint
 
   // edit
   const [isEditing, setIsEditing] = useState(null);
@@ -59,7 +57,7 @@ const DeviceManagement = ({
 
   const fetchData = useCallback(
     async (type = deviceType, page = 1, isactive = filter) => {
-      // setDeviceLoading(true);
+      setDeviceLoading(true);
 
       try {
         const res = await fetchDataForManagement("GET", type, {
@@ -77,7 +75,7 @@ const DeviceManagement = ({
           modalToastConfig
         );
       } finally {
-        // setDeviceLoading(false);
+        setDeviceLoading(false);
       }
     },
     [deviceType]
@@ -121,7 +119,7 @@ const DeviceManagement = ({
         const newFilter =
           method === "delete" ? 1 : method === "patch" ? 0 : filter;
         fetchData(type, 1, newFilter);
-        // refreshHandler();
+        refreshHandler();
       }
     },
     [fetchData]
@@ -213,12 +211,10 @@ const DeviceManagement = ({
 
   // Handler for changing the device type
   const handleTypeChange = (type) => {
-    setIsDeviceOpen(true); // Open the device modal
-    setIsSidebarVisible(false);
     setDeviceType(type); // Update device type
     setActiveSidePanel(null); // Close the dropdown
+    setIsAlarmDeviceOpen(true); // Open the device modal
 
-    console.log("open device modal");
     if (type === "users") {
       fetchDeviceData("user/list_active"); // Fetch active users by default
     } else {
@@ -245,88 +241,106 @@ const DeviceManagement = ({
 
   return (
     <>
-      <div className="">
-        {[
-          "crossroad",
-          "cameratraffic",
-          "cameraview",
-          "camerapdd",
-          "boxmonitor",
-          "svetofor",
-          "users",
-        ].map((type) => (
-          <div key={type} className={`group border-l`}>
-            <button
-              className="text-left px-3 py-2 w-full hover:bg-gray-800/50 !rounded-none transition-colors font-medium"
-              onClick={() => {
-                handleTypeChange(type);
-              }}
-            >
-              {" "}
-              {t(type) || ""}
-            </button>
-          </div>
-        ))}
-      </div>
-      {isDeviceOpen && (
-        <ModalTable
-          open={isDeviceOpen}
-          handleOpen={() => {
-            setIsSidebarVisible(true);
-            setDeviceTotalPages(null);
-            setDeviceData([]);
-            setIsDeviceOpen(false);
-          }}
-          totalItems={totalItems}
-          historyButtonCallback={
-            deviceType !== "users" ? fetchErrorHistory : null
-          }
-          type={deviceType}
-          totalPages={deviceTotalPages}
-          data={deviceData}
-          filterHandler={handleFilterChange}
-          backButtonProps={{
-            label: `create_new_${deviceType}`,
-            onClick: (val) => createNewItem(val),
-            icon: <PlusIcon className="w-5 h-5 m-0" />,
-          }}
-          filterOptions={filterOptions}
-          showActions={true}
-          isLoading={deviceLoading}
-          selectedFilter={filter}
-          fetchHandler={(type, page) => {
-            deviceType === "users"
-              ? fetchDeviceData(
-                  type === 1 ? "user/list_active" : "user/list_deactive",
-                  page
-                )
-              : fetchData(type, page, filter);
-          }}
-          deleteButtonCallback={
-            isDeviceType
-              ? (data) => modifyData("delete", deviceType, data)
-              : (user) => handleUserStatus(user, "deactivate")
-          }
-          activateButtonCallback={
-            isDeviceType
-              ? (data) => modifyData("patch", deviceType, data)
-              : (user) => handleUserStatus(user, "activate")
-          }
-          editButtonCallback={setIsEditing}
-          isFormOpen={showFormModal}
-          submitNewData={(data) => {
-            deviceType === "users"
-              ? handleUserAction(data, isEditing)
-              : modifyData(isEditing ? "PUT" : "POST", deviceType, data);
-          }}
-        />
-      )}
+      <IconButton
+        onClick={() =>
+          setActiveSidePanel(
+            activeSidePanel === "deviceManagement" ? null : "deviceManagement"
+          )
+        }
+        size="lg"
+      >
+        <CogIcon className="w-6 h-6 " />
+      </IconButton>
+
+      <SidePanel
+        title={t("management_device")}
+        sndWrapperClass=" rounded-md !text-white backdrop-blur-md"
+        isOpen={activeSidePanel === "deviceManagement"}
+        setIsOpen={() =>
+          setActiveSidePanel(
+            activeSidePanel === "deviceManagement" ? null : "deviceManagement"
+          )
+        }
+        content={
+          <List>
+            {[
+              "crossroad",
+              "cameratraffic",
+              "cameraview",
+              "camerapdd",
+              "boxmonitor",
+              "svetofor",
+              "users",
+            ].map((type) => (
+              <ListItem
+                key={type}
+                className="shadow-sm text-sm text-white"
+                onClick={() => {
+                  handleTypeChange(type);
+                }}
+              >
+                {t(type) || ""}
+              </ListItem>
+            ))}
+          </List>
+        }
+      />
+      <ModalTable
+        open={isAlarmDeviceOpen}
+        handleOpen={() => {
+          setDeviceTotalPages(null);
+          setDeviceData([]);
+          setIsAlarmDeviceOpen(false);
+        }}
+        totalItems={totalItems}
+        historyButtonCallback={
+          deviceType !== "users" ? fetchErrorHistory : null
+        }
+        type={deviceType}
+        totalPages={deviceTotalPages}
+        data={deviceData}
+        filterHandler={handleFilterChange}
+        backButtonProps={{
+          label: `create_new_${deviceType}`,
+          onClick: (val) => createNewItem(val),
+          icon: <PlusIcon className="w-5 h-5 m-0" />,
+        }}
+        filterOptions={filterOptions}
+        showActions={true}
+        isLoading={deviceLoading}
+        selectedFilter={filter}
+        fetchHandler={(type, page) => {
+          deviceType === "users"
+            ? fetchDeviceData(
+                type === 1 ? "user/list_active" : "user/list_deactive",
+                page
+              )
+            : fetchData(type, page, filter);
+        }}
+        deleteButtonCallback={
+          isDeviceType
+            ? (data) => modifyData("delete", deviceType, data)
+            : (user) => handleUserStatus(user, "deactivate")
+        }
+        activateButtonCallback={
+          isDeviceType
+            ? (data) => modifyData("patch", deviceType, data)
+            : (user) => handleUserStatus(user, "activate")
+        }
+        editButtonCallback={setIsEditing}
+        isFormOpen={showFormModal}
+        submitNewData={(data) => {
+          deviceType === "users"
+            ? handleUserAction(data, isEditing)
+            : modifyData(isEditing ? "PUT" : "POST", deviceType, data);
+        }}
+      />
     </>
   );
 };
 
 DeviceManagement.propTypes = {
-  // refreshHandler: PropTypes.func,
+  refreshHandler: PropTypes.func.isRequired,
 };
 
 export default memo(DeviceManagement);
