@@ -10,7 +10,7 @@ const DateTime = ({ t, isSidebarOpen }) => {
   }, []);
 
   return (
-    <div className="w-full bg-blue-gray-900/10 py-2 backdrop-blur-xl text-center my-1 flex items-center justify-evenly">
+    <div className="w-full bg-blue-gray-900/10 py-2 backdrop-blur-xl text-center flex items-center justify-evenly">
       {isSidebarOpen ? (
         <>
           <div className="text-base font-bold text-gray-300">

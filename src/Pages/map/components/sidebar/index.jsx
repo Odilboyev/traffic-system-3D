@@ -22,6 +22,7 @@ import SidebarItem from "./components/sidebarItem";
 import SidebarSecondaryItem from "./components/sidebarSecondaryItem";
 import { TbBell } from "react-icons/tb";
 import TileLayerControl from "../controls/tileLayerControl";
+import WeatherCard from "../../widgets/weather/weatherCard";
 import WidgetControl from "../controls/widgetControl";
 import { isPermitted } from "../../constants/roles";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
@@ -68,7 +69,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       className={` ${
         isVisible ? "fixed" : "none"
       } z-[9999999999999999999] top-0 left-0 h-full max-h-full overflow-y-scroll no-scrollbar bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
-        isSidebarOpen ? "min-w-[16vw]" : "w-18"
+        isSidebarOpen ? "w-[16vw]" : "w-18"
       } transition-all duration-300 ease-in-out select-none`}
     >
       {" "}
@@ -87,8 +88,13 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
         )}
       </button>
       {/* Datetime Display */}
-      <div className="no-scrollbar pb-[40%] flex flex-col mt-4 items-center space-y-3 overflow-y-auto flex-grow">
-        {/* Sidebar items */} <DateTime t={t} isSidebarOpen={isSidebarOpen} />
+      <div className="no-scrollbar pb-[40%] flex flex-col items-center space-y-3 gap-1 overflow-y-auto flex-grow">
+        {/* Widgets */}
+
+        <DateTime t={t} isSidebarOpen={isSidebarOpen} />
+        <WeatherCard isSidebarOpen={isSidebarOpen} />
+
+        {/* Sidebar items */}
         <div className="flex flex-col items-center space-y-3 w-full">
           <SidebarItem
             icon={<FaFilter size={24} />}
@@ -117,6 +123,23 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
             setActiveSidePanel={setActiveSidePanel}
             extraContent={<WidgetControl t={t} />} // Another custom component
           />
+          {isPermitted && (
+            <SidebarItem
+              icon={<CogIcon className="w-6 h-6" />}
+              isSidebarOpen={isSidebarOpen}
+              label="deviceManagement"
+              activeSidePanel={activeSidePanel}
+              setActiveSidePanel={setActiveSidePanel}
+              extraContent={
+                <DeviceManagement
+                  setIsSidebarVisible={setIsVisible}
+                  activeSidePanel={activeSidePanel}
+                  setActiveSidePanel={setActiveSidePanel}
+                />
+              }
+              t={t}
+            />
+          )}
           <SidebarItem
             icon={<MdHistory size={24} />}
             isSidebarOpen={isSidebarOpen}
@@ -138,23 +161,6 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
             t={t}
           />
 
-          {isPermitted && (
-            <SidebarItem
-              icon={<CogIcon className="w-6 h-6" />}
-              isSidebarOpen={isSidebarOpen}
-              label="deviceManagement"
-              activeSidePanel={activeSidePanel}
-              setActiveSidePanel={setActiveSidePanel}
-              extraContent={
-                <DeviceManagement
-                  setIsSidebarVisible={setIsVisible}
-                  activeSidePanel={activeSidePanel}
-                  setActiveSidePanel={setActiveSidePanel}
-                />
-              }
-              t={t}
-            />
-          )}
           <SidebarItem
             icon={<TbBell size={24} />}
             isSidebarOpen={isSidebarOpen}

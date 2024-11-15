@@ -1,5 +1,4 @@
 import { t } from "i18next";
-import { useMap } from "react-leaflet";
 import { toast } from "react-toastify";
 
 const generateToastContent = (sensorData) => (
@@ -79,7 +78,7 @@ const toastConfig = {
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,
-  draggable: true,
+  draggable: false,
   progress: undefined,
   theme: "colored",
 };
