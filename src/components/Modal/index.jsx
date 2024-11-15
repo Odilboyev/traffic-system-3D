@@ -6,7 +6,8 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
-import React, { memo } from "react";
+
+import { memo } from "react";
 
 const Modal = ({
   title,
@@ -28,7 +29,7 @@ const Modal = ({
       <DialogHeader className="justify-between">
         <div>
           <Typography variant="h5" className="dark:text-white">
-            {title}
+            {title || ""}
           </Typography>
         </div>
         <IconButton

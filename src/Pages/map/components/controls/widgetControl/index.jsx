@@ -31,19 +31,25 @@ const WidgetControl = ({ t }) => {
       </Typography>
       <Checkbox
         label={
-          <Typography className="text-white ">{t("draggable")}</Typography>
+          <Typography className="text-white ">
+            {t("draggable") || ""}
+          </Typography>
         }
         ripple={false}
         checked={isDraggable}
         onChange={(e) => setIsDraggable(e.target.checked)}
       />
       <div className="text-sm mb-2"></div>
-      <Typography className=" text-sm text-white ">{t("widgets")}</Typography>
+      <Typography className=" text-sm text-white ">
+        {t("widgets") || ""}
+      </Typography>
       <div className="flex flex-col w-full">
         {filterOptions.map(({ type, label }) => (
           <Checkbox
             key={type}
-            label={<Typography className="text-white">{label}</Typography>}
+            label={
+              <Typography className="text-white">{t(label) || ""}</Typography>
+            }
             ripple={false}
             className="m-0 p-0"
             checked={

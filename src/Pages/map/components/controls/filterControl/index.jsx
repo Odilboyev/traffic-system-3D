@@ -1,4 +1,5 @@
 import { Checkbox, Typography } from "@material-tailwind/react";
+
 import { useMapMarkers } from "../../../hooks/useMapMarkers";
 
 const FilterControl = ({ t }) => {
@@ -39,7 +40,7 @@ const FilterControl = ({ t }) => {
               size={"sm"}
               label={
                 <Typography className="text-white text-sm">
-                  {t(label)}
+                  {t(label) || label || ""}
                 </Typography>
               }
               ripple={false}

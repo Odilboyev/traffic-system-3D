@@ -1,23 +1,24 @@
+import { Button, Input, Typography } from "@material-tailwind/react";
+import { getOrderedColumns, shouldHideColumn } from "./utils";
+import { memo, useEffect, useState } from "react";
+
+import { ChevronLeftIcon } from "@heroicons/react/16/solid";
+import FilterTypes from "./filterTypes";
+import FormComponent from "./components/FormComponent";
+import L from "leaflet";
+import Loader from "../../../../components/loader";
+import { MdSearch } from "react-icons/md";
+import Modal from "../../../../components/modal";
 // ModalTable.js
 import Pagination from "@/components/pagination";
-import { ChevronLeftIcon } from "@heroicons/react/16/solid";
-import { Button, Input, Typography } from "@material-tailwind/react";
-import { t } from "i18next";
-import L from "leaflet";
 import PropTypes from "prop-types";
-import { memo, useEffect, useState } from "react";
-import { MdSearch } from "react-icons/md";
-import { ToastContainer } from "react-toastify";
-import Loader from "../../../../components/loader";
-import Modal from "../../../../components/modal";
-import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
-import { useTheme } from "../../../../customHooks/useTheme";
-import FormComponent from "./components/FormComponent";
 import TableHeader from "./components/TableHeader";
 import TableRow from "./components/TableRow";
-import FilterTypes from "./filterTypes";
+import { ToastContainer } from "react-toastify";
+import { t } from "i18next";
+import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 import { useSortedData } from "./useSortedData";
-import { getOrderedColumns, shouldHideColumn } from "./utils";
+import { useTheme } from "../../../../customHooks/useTheme";
 
 const ModalTable = ({
   open,
@@ -189,6 +190,7 @@ const ModalTable = ({
               options={tableSelectOptions}
               onSubmit={handleFormSubmit}
               onCancel={() => backButtonProps.onClick(false)}
+              t={t}
             />
           ) : (
             <>
@@ -315,7 +317,7 @@ const ModalTable = ({
                 </div>
               ) : (
                 <div className="flex justify-center items-center h-[30vh]">
-                  <Typography>{t("No data available")}</Typography>
+                  <Typography>{t("no_data_found") || ""}</Typography>
                 </div>
               )}
             </>

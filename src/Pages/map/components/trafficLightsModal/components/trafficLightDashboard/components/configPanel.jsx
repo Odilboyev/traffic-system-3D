@@ -1,7 +1,8 @@
+import CustomSelect from "../../../../../../../components/customSelect";
 import PropTypes from "prop-types";
 import Slider from "react-smooth-range-input";
-import CustomSelect from "../../../../../../../components/customSelect";
 import { iconOptions } from "../utils";
+import { t } from "i18next";
 
 const ConfigPanel = ({ config, setConfig }) => {
   // Handles changes in road configuration for visibility or other fields
@@ -277,7 +278,7 @@ const ConfigPanel = ({ config, setConfig }) => {
         onClick={handleSubmit}
         className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition duration-200"
       >
-        Save Configuration
+        {t("save")}
       </button>
     </div>
   );

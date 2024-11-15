@@ -1,15 +1,16 @@
-import { Button } from "@material-tailwind/react";
-import { useState, useEffect } from "react";
-import UserFields from "./Fields/UserFields";
-import CameraTrafficFields from "./Fields/CameraTrafficFields";
-import CrossroadFields from "./Fields/CrossroadFields";
-import { getInitialData } from "./utils";
-import BoxMonitorFields from "./Fields/BoxControllerFields";
-import TrafficLightsFields from "./Fields/TrafficLightsFields";
-import CameraViewFields from "./Fields/CameraViewFields";
-import CameraPddFields from "./Fields/CameraPddFields";
+import { useEffect, useState } from "react";
 
-const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
+import BoxMonitorFields from "./Fields/BoxControllerFields";
+import { Button } from "@material-tailwind/react";
+import CameraPddFields from "./Fields/CameraPddFields";
+import CameraTrafficFields from "./Fields/CameraTrafficFields";
+import CameraViewFields from "./Fields/CameraViewFields";
+import CrossroadFields from "./Fields/CrossroadFields";
+import TrafficLightsFields from "./Fields/TrafficLightsFields";
+import UserFields from "./Fields/UserFields";
+import { getInitialData } from "./utils";
+
+const FormComponent = ({ data, options, onSubmit, onCancel, type, t }) => {
   const [formData, setFormData] = useState(null);
 
   // Initialize form data with defaults or from provided data
@@ -100,14 +101,14 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type }) => {
                 onClick={handleCancel}
                 className="font-semibold hover:bg-red-600 transition-all duration-300"
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button
                 type="submit"
                 color="green"
                 className="font-semibold hover:bg-green-600 transition-all duration-300"
               >
-                Save
+                {t("save")}
               </Button>
             </div>
           </div>
