@@ -3,7 +3,7 @@ import { IoIosArrowBack, IoIosArrowDown } from "react-icons/io";
 const SidebarItem = ({
   icon,
   label,
-  isOpen,
+  isSidebarOpen,
   activeSidePanel,
   setActiveSidePanel,
   subItems = [],
@@ -24,19 +24,19 @@ const SidebarItem = ({
       <div
         onClick={handleExpand}
         className={`flex items-center ${
-          isOpen ? "justify-start" : "justify-center"
+          isSidebarOpen ? "justify-start" : "justify-center"
         } w-full px-4 py-3 items-center flex-nowrap hover:bg-gray-700 cursor-pointer transition-all duration-300 `}
       >
         {icon}
         <span
           className={`ml-4 text-base font-medium transition-all duration-300 ${
-            isOpen ? "visible block" : "invisible hidden"
+            isSidebarOpen ? "visible block" : "invisible hidden"
           }`}
         >
           {t(label) || label}
         </span>
 
-        {(subItems.length > 0 || extraContent) && isOpen && (
+        {(subItems.length > 0 || extraContent) && isSidebarOpen && (
           <div className="ml-auto">
             {activeSidePanel === label ? (
               <IoIosArrowDown size={18} />
@@ -51,14 +51,16 @@ const SidebarItem = ({
 
       <div className="flex flex-col pl-8 space-y-2 ">
         <div
-          className={activeSidePanel === label && isOpen ? "visible" : "hidden"}
+          className={
+            activeSidePanel === label && isSidebarOpen ? "visible" : "hidden"
+          }
         >
           {extraContent}
         </div>
       </div>
 
       {/* Extra content inside collapsed item */}
-      {/* {isOpen && extraContent && <div className="mt-4">{extraContent}</div>} */}
+      {/* {isSidebarOpen && extraContent && <div className="mt-4">{extraContent}</div>} */}
     </div>
   );
 };

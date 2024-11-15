@@ -10,6 +10,7 @@ import { MdBedtime, MdHistory } from "react-icons/md";
 import { Suspense, useState } from "react";
 
 import CurrentAlarms from "../../sections/currentAlarms";
+import DateTime from "./components/time";
 import DeviceErrorHistory from "../../sections/deviceErrorHistory";
 import DeviceManagement from "../../sections/deviceManagement";
 import FilterControl from "../controls/filterControl";
@@ -22,27 +23,27 @@ import SidebarSecondaryItem from "./components/sidebarSecondaryItem";
 import { TbBell } from "react-icons/tb";
 import TileLayerControl from "../controls/tileLayerControl";
 import WidgetControl from "../controls/widgetControl";
+import { isPermitted } from "../../constants/roles";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 import { useMap } from "react-leaflet";
 import { useTheme } from "../../../../customHooks/useTheme";
 
 // Sidebar Component
 const Sidebar = ({ t, isVisible, setIsVisible }) => {
-  const { theme, toggleTheme } = useTheme();
   const map = useMap();
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-    setActiveSecondaryPanel(null);
-  };
-  const role = atob(localStorage.getItem("its_user_role"));
-  const isPermitted = role === "admin" || role === "boss";
-
-  const [isOpen, setIsOpen] = useLocalStorageState(
+  const { theme, toggleTheme } = useTheme();
+  const [isSidebarOpen, setIsSidebarOpen] = useLocalStorageState(
     "is_sidebar_open_its",
     false
   );
+
   const [activeSidePanel, setActiveSidePanel] = useState(null);
   const [activeSecondaryPanel, setActiveSecondaryPanel] = useState(null);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+    setActiveSecondaryPanel(null);
+  };
+
   const [fulscreen, setFullscreen] = useState(false);
 
   const toggleFullSceen = () => {
@@ -67,7 +68,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       className={` ${
         isVisible ? "fixed" : "none"
       } z-[9999999999999999999] top-0 left-0 h-full max-h-full overflow-y-scroll no-scrollbar bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
-        isOpen ? "min-w-[16vw]" : "w-18"
+        isSidebarOpen ? "min-w-[16vw]" : "w-18"
       } transition-all duration-300 ease-in-out select-none`}
     >
       {" "}
@@ -77,21 +78,22 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
           e.stopPropagation();
           toggleSidebar();
         }}
-        className="flex items-center justify-center h-12 border-b border-gray-700 text-gray-400 hover:text-white"
+        className="flex items-center rounded-none justify-center h-12 border-b border-gray-700 text-gray-400 hover:text-white"
       >
-        {isOpen ? (
+        {isSidebarOpen ? (
           <IoIosArrowBack size={24} />
         ) : (
           <IoIosArrowForward size={24} />
         )}
       </button>
-      <div className="no-scrollbar pb-[40%] flex flex-col items-center mt-4 space-y-3 overflow-y-auto flex-grow">
-        {/* Sidebar items */}
-        <div className="flex flex-col items-center mt-4 space-y-3 w-full">
+      {/* Datetime Display */}
+      <div className="no-scrollbar pb-[40%] flex flex-col mt-4 items-center space-y-3 overflow-y-auto flex-grow">
+        {/* Sidebar items */} <DateTime t={t} isSidebarOpen={isSidebarOpen} />
+        <div className="flex flex-col items-center space-y-3 w-full">
           <SidebarItem
             icon={<FaFilter size={24} />}
             label={"markerFilters"}
-            isOpen={isOpen}
+            isSidebarOpen={isSidebarOpen}
             activeSidePanel={activeSidePanel}
             setActiveSidePanel={setActiveSidePanel}
             t={t}
@@ -100,7 +102,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
           <SidebarItem
             icon={<FaLocationDot size={24} />}
             label="regionControl"
-            isOpen={isOpen}
+            isSidebarOpen={isSidebarOpen}
             t={t}
             activeSidePanel={activeSidePanel}
             setActiveSidePanel={setActiveSidePanel}
@@ -109,7 +111,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
           <SidebarItem
             icon={<HiCog8Tooth size={24} />}
             label="widgetControl"
-            isOpen={isOpen}
+            isSidebarOpen={isSidebarOpen}
             t={t}
             activeSidePanel={activeSidePanel}
             setActiveSidePanel={setActiveSidePanel}
@@ -117,7 +119,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
           />
           <SidebarItem
             icon={<MdHistory size={24} />}
-            isOpen={isOpen}
+            isSidebarOpen={isSidebarOpen}
             label="deviceErrorHistory"
             activeSidePanel={activeSidePanel}
             setActiveSidePanel={(e) => {
@@ -139,7 +141,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
           {isPermitted && (
             <SidebarItem
               icon={<CogIcon className="w-6 h-6" />}
-              isOpen={isOpen}
+              isSidebarOpen={isSidebarOpen}
               label="deviceManagement"
               activeSidePanel={activeSidePanel}
               setActiveSidePanel={setActiveSidePanel}
@@ -155,7 +157,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
           )}
           <SidebarItem
             icon={<TbBell size={24} />}
-            isOpen={isOpen}
+            isSidebarOpen={isSidebarOpen}
             label="currentAlarms"
             activeSidePanel={activeSidePanel}
             setActiveSidePanel={(e) => {
@@ -177,7 +179,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       </div>
       <div
         className={`flex items-center fixed bottom-0 left-0 ${
-          isOpen ? "justify-start" : "justify-center"
+          isSidebarOpen ? "justify-evenly" : "justify-center"
         } w-full px-4 py-3 gap-2 items-center bg-gray-900/70 backdrop-blur-md`}
       >
         <Suspense fallback={<div></div>}>
@@ -188,11 +190,11 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
             setActiveSecondaryPanel={setActiveSecondaryPanel}
             component={
               <LanguageSwitcher
-                setIsOpen={() => setActiveSecondaryPanel(null)}
+                setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
               />
             }
           />
-          {isOpen && (
+          {isSidebarOpen && (
             <>
               <SidebarSecondaryItem
                 icon={FaMap}
