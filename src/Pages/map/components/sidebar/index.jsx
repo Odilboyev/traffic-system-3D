@@ -68,7 +68,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       onMouseLeave={() => map.scrollWheelZoom?.enable()}
       className={` ${
         isVisible ? "fixed" : "none"
-      } z-[9999999999999999999] top-0 left-0 h-full max-h-full overflow-y-scroll no-scrollbar bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
+      } z-[9999999999999999999] top-0 left-0 h-full max-h-full overflow-y-scroll no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
         isSidebarOpen ? "w-[16vw]" : "w-18"
       } transition-all duration-300 ease-in-out select-none`}
     >
@@ -92,7 +92,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
         {/* Widgets */}
 
         <DateTime t={t} isSidebarOpen={isSidebarOpen} />
-        <WeatherCard isSidebarOpen={isSidebarOpen} />
+        <WeatherCard t={t} isSidebarOpen={isSidebarOpen} />
 
         {/* Sidebar items */}
         <div className="flex flex-col items-center space-y-3 w-full">
