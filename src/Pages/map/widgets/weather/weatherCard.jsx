@@ -35,12 +35,15 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
         <div className=" flex justify-evenly h-full">
           {/* Current Weather */}
           <div className="px-4 py-2 h-full flex flex-col justify-between  rounded">
-            <div className="flex items-center gap-3 mb-1">
-              <img
-                src={`${iconPath}/${today.weather_icon}`}
-                alt={today.weather_icon}
-                className="w-8 h-8"
-              />
+            <div className="flex items-center gap-3 mb-1 ">
+              <div className="p-2 rounded-full bg-white/30">
+                <img
+                  src={`${iconPath}/${today.weather_icon}`}
+                  alt={today.weather_icon}
+                  className="w-8 h-8"
+                />
+              </div>
+
               <Typography className="text-2xl font-medium">
                 {today.temp}°C
               </Typography>

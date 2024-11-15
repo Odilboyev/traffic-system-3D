@@ -1,4 +1,3 @@
-import { XMarkIcon } from "@heroicons/react/16/solid";
 import {
   Dialog,
   DialogBody,
@@ -6,24 +5,22 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
-import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
 import {
   getBoxData,
   getCrossRoadChart,
   getCrossRoadData,
   getTrafficLightsData,
 } from "../../../../api/api.handlers";
+import { useEffect, useState } from "react";
+
+import CrossroadDashboard from "./subPages/crossroadDash";
 import FullscreenBox from "./components/fullscreen";
-import Videos from "./subPages/videos";
-// import SensorSection from "./subPages/sensor";
-import { format } from "date-fns";
 import Loader from "../../../../components/loader";
-import baseLayers from "../../../../configurations/mapLayers";
-import { useTheme } from "../../../../customHooks/useTheme";
+import PropTypes from "prop-types";
 import SensorPartWrapper from "../deviceModal/components/sensorSection/wrapper";
 import TrafficLightDashboard from "../trafficLightsModal/components/trafficLightDashboard";
-import CrossroadDashboard from "./subPages/crossroadDash";
+import Videos from "./subPages/videos";
+import { XMarkIcon } from "@heroicons/react/16/solid";
 
 // Helper function to transform chart data
 function transformDataForCharts(data) {
@@ -46,11 +43,6 @@ function transformDataForCharts(data) {
 }
 
 const CrossroadModal = ({ isOpen, onClose, marker }) => {
-  const { theme } = useTheme();
-  const currentLayer = baseLayers.find(
-    (layer) => layer.name === localStorage.getItem("selectedLayer")
-  );
-
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [isDeviceLoading, setIsDeviceLoading] = useState(false);
   const [isChartLoading, setIsChartLoading] = useState(false);
@@ -62,10 +54,6 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
   );
   const [interval, setInterval] = useState(60);
   const [device, setDevice] = useState(null);
-
-  const handleDate = (date) => {
-    setChartDate(format(date, "yyyy-MM-dd"));
-  };
 
   const fetchData = async (id) => {
     setIsVideoLoading(true);
@@ -203,27 +191,6 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
             <div className="h-full w-full">
               <TrafficLightDashboard id={marker?.cid} isInModal={true} />
             </div>
-            {/* <MapContainer
-              id="monitoring"
-              attributionControl={false}
-              center={[Number(marker?.lat), Number(marker?.lng)]}
-              zoom={20}
-              zoomControl={false}
-              zoomDelta={0.6}
-              style={{ height: "100%", width: "100%" }}
-            >
-              <ZoomControl theme={theme} position={"bottomleft"} />{" "}
-              {currentLayer && (
-                <TileLayer
-                  maxNativeZoom={currentLayer.maxNativeZoom}
-                  url={currentLayer.url}
-                  attribution={currentLayer.attribution}
-                  key={currentLayer.name}
-                  maxZoom={22}
-                />
-              )}
-              <TrafficLightContainer isInModal={true} />
-            </MapContainer> */}
           </FullscreenBox>
           <FullscreenBox>
             {isChartLoading ? (

@@ -88,8 +88,6 @@ const MapComponent = ({ changedMarker, t }) => {
   const handleMonitorCrossroadOpen = (marker) => {
     setActiveMarker(marker);
     setIsbigMonitorOpen(true);
-    setIsSidebarVisible(false);
-    console.log(marker);
   };
 
   const handleBoxModalOpen = async (box) => {
@@ -120,7 +118,7 @@ const MapComponent = ({ changedMarker, t }) => {
   // ----------------------------------------------------------------
 
   const handleCloseCrossroadModal = () => {
-    setIsSidebarVisible(true);
+    // setIsSidebarVisible(true);
     setIsbigMonitorOpen(false);
     setActiveMarker(null);
   };
@@ -227,13 +225,6 @@ const MapComponent = ({ changedMarker, t }) => {
             <div style={{ display: "none" }}></div>
           )} */}
         </Control>{" "}
-        <Control position="topright">
-          {widgets.crossroad ? (
-            <CrossroadWidget />
-          ) : (
-            <div style={{ display: "none" }}></div>
-          )}
-        </Control>
         <Control position="bottomcenter">
           {widgets.bottomsection && (
             <InfoWidget cardsInfoData={bottomSectionData} />
@@ -351,6 +342,17 @@ const MapComponent = ({ changedMarker, t }) => {
             )}
           </IconButton>
         </Control> */}
+        {isbigMonitorOpen && activeMarker ? (
+          <CrossroadWidget
+            t={t}
+            isVisible={isSidebarVisible}
+            marker={activeMarker}
+            isOpen={isbigMonitorOpen}
+            onClose={handleCloseCrossroadModal}
+          />
+        ) : (
+          <div style={{ display: "none" }}></div>
+        )}
         {filter.trafficlights && <TrafficLightContainer />}
         {useClusteredMarkers === "clustered" ||
         useClusteredMarkers === "clustered_dynamically" ? (
@@ -388,7 +390,7 @@ const MapComponent = ({ changedMarker, t }) => {
       </MapContainer>
 
       <MapModals
-        crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}
+        // crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}
         isBoxLoading={isBoxLoading}
         deviceModal={{ isOpen: isBoxModalOpen, device: activeBox }}
         isLightsLoading={isLightsLoading}

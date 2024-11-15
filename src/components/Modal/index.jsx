@@ -11,16 +11,17 @@ import { memo } from "react";
 
 const Modal = ({
   title,
+  size,
+  height,
   handleOpen,
   open,
   body,
   footer,
-
   ...rest
 }) => {
   return (
     <Dialog
-      size="xxl"
+      size={size || "xxl"}
       open={open}
       handler={handleOpen}
       className="dark:bg-gray-900 dark:!text-white text-gray-900 overflow-hidden"
@@ -54,7 +55,11 @@ const Modal = ({
           </svg>
         </IconButton>
       </DialogHeader>
-      <DialogBody className="h-screen overflow-hidden py-0 ">{body}</DialogBody>
+      <DialogBody
+        className={`${height || "h-screen"} overflow-hidden py-0 pb-16`}
+      >
+        {body}
+      </DialogBody>
       <DialogFooter className="flex justify-center items-center mt-auto backdrop-blur-lg bg-white/20 dark:bg-gray-900/50 absolute bottom-0 w-full">
         {footer}
       </DialogFooter>

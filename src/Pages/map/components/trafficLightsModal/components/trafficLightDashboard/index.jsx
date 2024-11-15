@@ -1,11 +1,12 @@
-import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { TbPencil } from "react-icons/tb";
-import { getTrafficLightsConfig } from "../../../../../../api/api.handlers";
-import useLocalStorageState from "../../../../../../customHooks/uselocalStorageState";
-import { fixIncompleteJSON } from "../../../trafficLightMarkers/utils";
+
 import ConfigPanel from "./components/configPanel";
 import Intersection from "./components/intersection";
+import PropTypes from "prop-types";
+import { TbPencil } from "react-icons/tb";
+import { fixIncompleteJSON } from "../../../trafficLightMarkers/utils";
+import { getTrafficLightsConfig } from "../../../../../../api/api.handlers";
+import useLocalStorageState from "../../../../../../customHooks/uselocalStorageState";
 
 const TrafficLightDashboard = ({ id, isInModal }) => {
   const role = atob(localStorage.getItem("its_user_role"));
@@ -269,7 +270,7 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
   // Remove the interval-based useEffect
   return (
     <div
-      className={`relative h-[90vh] flex items-center justify-center overflow-hidden`}
+      className={`relative h-[80vh] flex items-center justify-center overflow-hidden`}
     >
       {wsConnectionStatus !== "connected" && incomingConfig && (
         <div className="absolute top-4 right-4 px-4 py-2 rounded-md text-white bg-red-500">
@@ -302,7 +303,7 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
       {(showConfig || incomingConfig) && (
         <Intersection
           id={id}
-          isInModal={isInModal}
+          isInModal={false}
           config={config}
           trafficLights={trafficLights}
           crosswalks={crosswalks}
@@ -311,7 +312,7 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
         />
       )}
 
-      {incomingConfig && !showConfig && (
+      {incomingConfig && !showConfig && !isInModal && (
         <button
           onClick={() => setShowConfig(true)}
           className="absolute bottom-4 left-4 p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg"

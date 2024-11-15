@@ -1,4 +1,3 @@
-import CrossroadModal from "../crossroad";
 import DeviceModal from "../deviceModal/deviceModal";
 import TrafficLightsModal from "../trafficLightsModal";
 
@@ -12,11 +11,11 @@ const MapModals = ({
 }) => {
   return (
     <>
-      <CrossroadModal
+      {/* <CrossroadModal
         isOpen={crossroadModal.isOpen}
         marker={crossroadModal.marker}
         onClose={onClose.crossroad}
-      />
+      /> */}
       <DeviceModal
         isOpen={deviceModal.isOpen}
         device={deviceModal.device}

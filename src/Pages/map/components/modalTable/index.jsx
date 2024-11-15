@@ -182,7 +182,7 @@ const ModalTable = ({
       }
       title={typeToShow}
       body={
-        <div className="h-full w-full no-scrollbar overflow-auto pb-20">
+        <div className="h-full w-full no-scrollbar overflow-auto ">
           {isFormOpen ? (
             <FormComponent
               type={type}

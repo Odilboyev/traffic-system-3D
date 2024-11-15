@@ -1,12 +1,13 @@
-import { t } from "i18next";
-import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { usePagination, useSortBy, useTable } from "react-table";
-import SensorSection from ".";
-import { getBoxSensorChart } from "../../../../../../api/api.handlers";
-import StatusBadge from "../../../../../../components/statusBadge";
-import useSensorErrorHistory from "../../../../../../customHooks/useSensorHistory";
+
 import DeviceDetails from "./deviceDetails";
+import SensorSection from ".";
+import StatusBadge from "../../../../../../components/statusBadge";
+import { getBoxSensorChart } from "../../../../../../api/api.handlers";
+import moment from "moment";
+import { t } from "i18next";
+import useSensorErrorHistory from "../../../../../../customHooks/useSensorHistory";
 
 const hiddenCols = ["type", "type_name", "device_id", "statuserror_name"];
 
@@ -93,25 +94,31 @@ const SensorPartWrapper = ({ device, isInCrossroad }) => {
     );
 
   return (
-    <div className="grid grid-cols-[20%_80%] gap-4 w-full">
-      <DeviceDetails
-        device_data={device_data}
-        isInCrossRoad={isInCrossroad}
-        // locationHandler={locationHandler}
-      />
-      <SensorSection
-        isLoading={isLoading || isErrorLoading}
-        sensor_data={sensor_data}
-        chartData={chartData}
-        selectedSensorId={selectedSensorId}
-        handleSensorSelection={handleSensorSelection}
-        getTableProps={getTableProps}
-        getTableBodyProps={getTableBodyProps}
-        headerGroups={headerGroups}
-        rows={rows}
-        prepareRow={prepareRow}
-      />
-    </div>
+    <>
+      {device ? (
+        <div className="grid grid-cols-[20%_80%] gap-4 w-full">
+          <DeviceDetails
+            device_data={device_data}
+            isInCrossRoad={isInCrossroad}
+            // locationHandler={locationHandler}
+          />
+          <SensorSection
+            isLoading={isLoading || isErrorLoading}
+            sensor_data={sensor_data}
+            chartData={chartData}
+            selectedSensorId={selectedSensorId}
+            handleSensorSelection={handleSensorSelection}
+            getTableProps={getTableProps}
+            getTableBodyProps={getTableBodyProps}
+            headerGroups={headerGroups}
+            rows={rows}
+            prepareRow={prepareRow}
+          />
+        </div>
+      ) : (
+        <div className="text-center text-gray-400">{t("no_data_found")}</div>
+      )}
+    </>
   );
 };
 
