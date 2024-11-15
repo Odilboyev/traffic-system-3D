@@ -87,7 +87,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       </button>
       <div className="no-scrollbar pb-[40%] flex flex-col items-center mt-4 space-y-3 overflow-y-auto flex-grow">
         {/* Sidebar items */}
-        <div className="flex flex-col items-center mt-4 space-y-3">
+        <div className="flex flex-col items-center mt-4 space-y-3 w-full">
           <SidebarItem
             icon={<FaFilter size={24} />}
             label={"markerFilters"}

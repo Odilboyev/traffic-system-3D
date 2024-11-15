@@ -1,11 +1,12 @@
-import { Typography } from "@material-tailwind/react";
+import { Marker, Tooltip } from "react-leaflet";
+
+import CustomPopup from "../customPopup";
+import { Fragment } from "react";
 import L from "leaflet";
 import PropTypes from "prop-types";
-import { Fragment } from "react";
-import { Marker, Tooltip } from "react-leaflet";
+import { Typography } from "@material-tailwind/react";
 import { getAllMarkers } from "../../../../api/api.handlers"; // You'll need to create this
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
-import CustomPopup from "../customPopup";
 
 // Rename from MarkerComponent to DynamicMarkerComponent
 const DynamicMarkers = ({
@@ -89,7 +90,7 @@ const DynamicMarkers = ({
               statuserror={marker.statuserror}
               icon={L.icon({
                 iconUrl: `icons/${marker.icon}`,
-                iconSize: [40, 40],
+                iconSize: marker.type === 2 ? [24, 24] : [40, 40],
               })}
               rotatedAngle={marker.type === 3 ? marker.rotated : 0}
             >

@@ -1,12 +1,13 @@
-import { Typography } from "@material-tailwind/react";
-import L from "leaflet";
-import PropTypes from "prop-types";
-import { useRef } from "react";
-import { renderToString } from "react-dom/server";
 import { Marker, Tooltip } from "react-leaflet";
+
+import CustomPopup from "../customPopup";
+import L from "leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { PieChart } from "react-minimal-pie-chart";
-import CustomPopup from "../customPopup";
+import PropTypes from "prop-types";
+import { Typography } from "@material-tailwind/react";
+import { renderToString } from "react-dom/server";
+import { useRef } from "react";
 
 const ClusteredMarkers = ({
   usePieChartForClusteredMarkers,
@@ -76,7 +77,7 @@ const ClusteredMarkers = ({
               statuserror={marker.statuserror}
               icon={L.icon({
                 iconUrl: `icons/${marker.icon}`,
-                iconSize: [40, 40],
+                iconSize: marker.type === 2 ? [24, 24] : [40, 40],
               })}
               rotatedAngle={marker.type === 3 ? marker.rotated : 0}
             >
