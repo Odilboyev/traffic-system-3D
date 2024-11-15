@@ -13,7 +13,6 @@ import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
-import WeatherWidget from "./widgets/weather/index.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import toaster from "../../tools/toastconfig.jsx";
@@ -222,11 +221,11 @@ const MapComponent = ({ changedMarker, t }) => {
           setActiveSidePanel={setActiveSidePanel}
         /> */}
         <Control position="topright">
-          {widgets.weather ? (
+          {/* {widgets.weather ? (
             <WeatherWidget t={t} />
           ) : (
             <div style={{ display: "none" }}></div>
-          )}
+          )} */}
         </Control>{" "}
         <Control position="topright">
           {widgets.crossroad ? (
