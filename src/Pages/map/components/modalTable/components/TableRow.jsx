@@ -1,6 +1,4 @@
 import { IconButton, Input, Typography } from "@material-tailwind/react";
-import moment from "moment/moment";
-import { useState } from "react";
 import {
   MdDelete,
   MdEdit,
@@ -8,8 +6,11 @@ import {
   MdPowerSettingsNew,
   MdSearch,
 } from "react-icons/md";
+
 import CustomSelect from "../../../../../components/customSelect";
 import StatusBadge from "../../../../../components/statusBadge";
+import moment from "moment/moment";
+import { useState } from "react";
 
 const TableRow = ({
   type,
@@ -38,15 +39,6 @@ const TableRow = ({
     }));
   };
 
-  // const handleSave = () => {
-  //   setIsEditing(false);
-  //   try {
-  //     editButtonCallback(editedData); // Callback with updated data when save is clicked
-  //   } catch (error) {
-  //     setEditedData({ ...item, password: "" });
-  //   }
-  // };
-
   return (
     <tr className="dark:text-white  !overflow-visible text-black hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
       {columns.map((key, index) => (
@@ -73,8 +65,6 @@ const TableRow = ({
                 } // Handle the change event, use name as the value
                 getOptionLabel={(option) => option.name} // Display the name as the label
                 getOptionValue={(option) => option.name} // Use name as the value
-                placeholder="Select Role" // Add placeholder text
-                styles={{}}
               />
             ) : (
               <Typography>{item[key]}</Typography>

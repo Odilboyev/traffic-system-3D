@@ -5,9 +5,10 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/solid";
 import { ButtonGroup, IconButton, Typography } from "@material-tailwind/react";
+
+import CustomSelect from "../customSelect";
 import { t } from "i18next";
 import { useTheme } from "../../customHooks/useTheme";
-import CustomSelect from "../customSelect";
 
 const Pagination = ({
   currentPage,
@@ -19,7 +20,7 @@ const Pagination = ({
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
-
+  console.log(itemsPerPage, "itemsPerPage");
   // Items per page options
   const itemsPerPageOptions = [
     { value: 10, label: "10" },
@@ -104,7 +105,7 @@ const Pagination = ({
         </Typography>
         <CustomSelect
           value={itemsPerPageOptions.find(
-            (option) => option.value === itemsPerPage
+            (option) => option.value === +itemsPerPage
           )}
           placeholder={t("select")}
           onChange={(value) => handleItemsPerPageChange(value.value)}

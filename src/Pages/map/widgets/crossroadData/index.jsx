@@ -1,14 +1,9 @@
-import { ArrowsPointingOutIcon, XMarkIcon } from "@heroicons/react/16/solid";
-import {
-  Card,
-  CardBody,
-  IconButton,
-  Typography,
-} from "@material-tailwind/react";
+import { Button, Card, Typography } from "@material-tailwind/react";
 import { getBoxData, getCrossRoadData } from "../../../../api/api.handlers";
 import { useEffect, useState } from "react";
 
 import CrossroadDataModal from "./components/modal";
+import { XMarkIcon } from "@heroicons/react/16/solid";
 
 const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -71,44 +66,45 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
   return (
     <>
       <Card
-        className={`w-[15vw] z-[9999]   ${
-          isVisible ? "fixed" : "none"
-        } top-0 right-0 h-full rounded-none overflow-y-scroll no-scrollbar duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col  transition-all  select-none`}
+        className={`w-full md:w-[15vw] z-[9999] ${
+          isVisible ? "fixed" : "hidden"
+        } top-0 right-0 h-full rounded-none bg-gray-900/80 dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col transition-all select-none`}
       >
-        <div className="relative w-full h-full">
-          <CardBody className="p-4">
-            <Typography className="my-2">{marker?.cname}</Typography>
+        <div className="relative w-full h-full flex flex-col p-4">
+          <div className="flex justify-between items-center">
+            <Typography className="text-xl font-semibold">
+              {marker?.cname}
+            </Typography>
             <button
               onClick={handleClose}
-              size="sm"
-              className="absolute top-1 right-1"
+              className="text-gray-400 hover:text-white"
             >
-              <XMarkIcon className="w-4 h-4" />
+              <XMarkIcon className="w-5 h-5" />
             </button>
-            <div className="flex flex-col gap-3">
-              {sections.map((section, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center bg-white/10 rounded-lg p-3"
-                >
-                  <div className="flex-1">
-                    <Typography variant="small" className="text-gray-300">
-                      {t(section.title)}
-                    </Typography>
-                  </div>
-                  <IconButton
-                    variant="text"
-                    className="text-white"
-                    onClick={() => handleOpenModal(section.title)}
-                  >
-                    <ArrowsPointingOutIcon className="h-4 w-4" />
-                  </IconButton>
+          </div>
+          <div className="flex flex-col mt-4 gap-3">
+            {sections.map((section, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  {/* Add icon for better section visualization */}
+                  <span className="text-gray-300 text-lg">{t(section)}</span>
                 </div>
-              ))}
-            </div>
-          </CardBody>
+                <Button
+                  variant="outlined"
+                  color="blue"
+                  onClick={() => handleOpenModal(section)}
+                >
+                  {t("show_all")}
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       </Card>
+
       {selectedSection && (
         <CrossroadDataModal
           t={t}
@@ -125,33 +121,4 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
 };
 
 export default CrossroadWidget;
-const sections = [
-  {
-    title: "camera",
-    value: "76",
-    status: "Online",
-    offline: "13",
-    onlinePercentage: "85.4%",
-  },
-  {
-    title: "sensor",
-    value: "30",
-    status: "Online",
-    offline: "0",
-    onlinePercentage: "100%",
-  },
-  {
-    title: "trafficlights",
-    value: "63",
-    status: "Online",
-    offline: "0",
-    onlinePercentage: "100%",
-  },
-  {
-    title: "statistics",
-    value: "49",
-    status: "Online",
-    offline: "10",
-    onlinePercentage: "83.1%",
-  },
-];
+const sections = ["camera", "sensors", "trafficlights", "statistics"];

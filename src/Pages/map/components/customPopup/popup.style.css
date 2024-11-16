@@ -2,14 +2,14 @@
   z-index: 50000000;
 } */
 
-.custom-popup > .leaflet-popup-content {
+.custom-popup .leaflet-popup-content {
   margin: 0 !important;
   padding: 0 !important;
 }
-/* 
 .custom-popup .leaflet-popup-content-wrapper {
   padding: 0;
   margin: 0;
+  background: transparent;
 }
 
 .leaflet-popup-content {
@@ -17,7 +17,7 @@
   min-width: 0 !important;
   max-width: none !important;
 }
-
+/* 
 .custom-popup .leaflet-popup-tip-container {
   left: 50%;
   transform: translateX(-50%);

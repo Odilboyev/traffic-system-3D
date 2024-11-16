@@ -8,8 +8,8 @@ import FormComponent from "./components/FormComponent";
 import Loader from "../../../../components/loader";
 import { MdSearch } from "react-icons/md";
 import Modal from "../../../../components/modal";
+import Pagination from "../../../../components/pagination";
 // ModalTable.js
-import Pagination from "@/components/pagination";
 import PropTypes from "prop-types";
 import TableHeader from "./components/TableHeader";
 import TableRow from "./components/TableRow";
@@ -184,7 +184,7 @@ const ModalTable = ({
       }
       title={typeToShow}
       body={
-        <div className="h-full w-full no-scrollbar overflow-auto ">
+        <div className="h-full w-full pb-20 no-scrollbar overflow-auto ">
           {isFormOpen ? (
             <FormComponent
               type={type}
@@ -284,7 +284,7 @@ const ModalTable = ({
                 <Loader />
               ) : sortedData.length > 0 ? (
                 <div className="w-full">
-                  <table className=" max-w-screen overflow-x-hidden border-collapse table-auto  border border-slate-400">
+                  <table className="w-full max-w-screen overflow-x-hidden border-collapse table-auto  border border-slate-400">
                     <TableHeader
                       columns={columns}
                       data={data}

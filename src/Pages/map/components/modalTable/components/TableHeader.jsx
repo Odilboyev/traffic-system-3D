@@ -1,8 +1,8 @@
+import { filterableColumns, getUniqueColumnValues } from "../utils";
+
 // TableHeader.js
 import CustomSelect from "@/components/customSelect";
-import { Typography } from "@material-tailwind/react";
 import { t } from "i18next";
-import { filterableColumns, getUniqueColumnValues } from "../utils";
 
 const TableHeader = ({
   columns,
@@ -26,9 +26,9 @@ const TableHeader = ({
           <CustomSelect
             options={options}
             onChange={(selected) => onFilterChange(key, selected?.value)}
-            placeholder={`${t(key.replace("_name", ""))} ${t("select")}`}
+            placeholder={`${t(key.replace("_name", ""))}`}
             className="min-w-[150px]"
-            onClick={(e) => e.stopPropagation()} // Prevent sorting when clicking select
+            // onClick={(e) => e.stopPropagation()} // Prevent sorting when clicking select
           />
         </div>
       );
@@ -36,7 +36,7 @@ const TableHeader = ({
 
     return (
       <div className="flex justify-between gap-4 items-center">
-        <Typography className="font-bold">{t(key)}</Typography>
+        <p className="font-bold">{t(key)}</p>
         {sortedColumn === key && <span>{sortOrder === "asc" ? "▲" : "▼"}</span>}
       </div>
     );
@@ -66,7 +66,7 @@ const TableHeader = ({
         ))}
         {showActions && (
           <th className="py-1 text-start border-separate border border-blue-gray-900 dark:border-white">
-            <Typography className="font-bold">{t("actions")}</Typography>
+            <p className="font-bold">{t("actions")}</p>
           </th>
         )}
       </tr>

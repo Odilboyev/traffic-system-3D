@@ -55,11 +55,7 @@ const Modal = ({
           </svg>
         </IconButton>
       </DialogHeader>
-      <DialogBody
-        className={`${
-          height || "h-screen"
-        } max-h-[90vh] overflow-y-scroll py-0 pb-16`}
-      >
+      <DialogBody className={`h-screen overflow-hidden py-0 `}>
         {body}
       </DialogBody>
       {footer && (

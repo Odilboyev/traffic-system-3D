@@ -19,6 +19,7 @@ const ClusteredMarkers = ({
   handleLightsModalOpen,
   handleMarkerDragEnd,
   changedMarker,
+  L,
 }) => {
   const clusterRef = useRef(null);
   const markerUpdate = markers?.length || 0;
@@ -83,7 +84,7 @@ const ClusteredMarkers = ({
             >
               {(marker.type === 1 ||
                 marker.type === 5 ||
-                marker.type === 6) && <CustomPopup marker={marker} />}
+                marker.type === 6) && <CustomPopup marker={marker} L={L} />}
               <Tooltip direction="top" className="rounded-md">
                 {marker.type === 1 || marker.type === 5 || marker.type === 6 ? (
                   <div

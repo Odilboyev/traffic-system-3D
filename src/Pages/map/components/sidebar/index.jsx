@@ -62,10 +62,8 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
   return (
     <div
       tabIndex={0}
-      onClick={(e) => e.stopPropagation()} // Prevents click events from reaching the map
-      // onWheel={(e) => mapRef.current?.leafletElement.scrollWheelZoom.disable()}
       onMouseEnter={() => map.scrollWheelZoom?.disable()}
-      onMouseLeave={() => map.scrollWheelZoom?.enable()}
+      onMouseLeave={() => map.scrollWheelZoom.enable()}
       className={` ${
         isVisible ? "fixed" : "none"
       } z-[9999] top-0 left-0 h-full max-h-full overflow-y-scroll no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${

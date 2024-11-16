@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import Control from "../../components/customControl/index.jsx";
@@ -357,6 +357,7 @@ const MapComponent = ({ changedMarker, t }) => {
             clearMarkers={clearMarkers}
             updateMarkers={updateMarkers}
             changedMarker={changedMarker}
+            L={L}
           />
         ) : (
           <DynamicMarkers
@@ -370,6 +371,7 @@ const MapComponent = ({ changedMarker, t }) => {
             setMarkers={setMarkers}
             clearMarkers={clearMarkers}
             updateMarkers={updateMarkers}
+            L={L}
           />
         )}
       </MapContainer>
@@ -395,4 +397,4 @@ MapComponent.propTypes = {
   t: PropTypes.func,
 };
 
-export default MapComponent;
+export default memo(MapComponent);

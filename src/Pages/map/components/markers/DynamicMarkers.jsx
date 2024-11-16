@@ -2,7 +2,6 @@ import { Marker, Tooltip } from "react-leaflet";
 
 import CustomPopup from "../customPopup";
 import { Fragment } from "react";
-import L from "leaflet";
 import PropTypes from "prop-types";
 import { Typography } from "@material-tailwind/react";
 import { getAllMarkers } from "../../../../api/api.handlers"; // You'll need to create this
@@ -20,6 +19,7 @@ const DynamicMarkers = ({
   handleBoxModalOpen,
   handleLightsModalOpen,
   handleMarkerDragEnd,
+  L,
 }) => {
   // Fetching function passed to custom hook
   const fetchMarkers = async (body) => {
@@ -95,7 +95,7 @@ const DynamicMarkers = ({
               rotatedAngle={marker.type === 3 ? marker.rotated : 0}
             >
               {marker.type === 1 || marker.type === 5 || marker.type === 6 ? (
-                <CustomPopup marker={marker} />
+                <CustomPopup marker={marker} L={L} />
               ) : null}
               <Tooltip direction="top" className="rounded-md">
                 {marker.type == 1 || marker.type == 5 || marker.type == 6 ? (

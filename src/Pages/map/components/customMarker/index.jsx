@@ -1,8 +1,9 @@
 // MarkerComponent.jsx
 import { Marker, Tooltip } from "react-leaflet";
+
+import CustomPopUp from "./customPopup";
 import L from "leaflet";
 import { Typography } from "@material-tailwind/react";
-import CustomPopUp from "./customPopup";
 import { memo } from "react";
 
 const MarkerComponent = ({
@@ -43,7 +44,7 @@ const MarkerComponent = ({
       icon={markerIcon}
       rotatedAngle={marker.type === 3 ? marker.rotated : 0}
     >
-      {marker.type === 1 && <CustomPopUp marker={marker} />}
+      {marker.type === 1 && <CustomPopUp marker={marker} L={L} />}
       <Tooltip direction="top">
         {marker.type == 1 && (
           <div className="w-[30vw]">
