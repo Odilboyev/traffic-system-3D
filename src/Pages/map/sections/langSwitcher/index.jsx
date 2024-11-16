@@ -1,10 +1,9 @@
-import { LanguageIcon } from "@heroicons/react/16/solid";
 import { Radio, Typography } from "@material-tailwind/react";
-import { memo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import DropPanel from "../../../../components/dropPanel";
 
-const LanguageSwitch = ({ setIsOpen }) => {
+import { memo } from "react";
+import { useTranslation } from "react-i18next";
+
+const LanguageSwitch = ({ setIsSidebarOpen }) => {
   const { i18n } = useTranslation();
   const languages = [
     { code: "en", name: "English" },
@@ -16,7 +15,7 @@ const LanguageSwitch = ({ setIsOpen }) => {
   const { language } = i18n;
   const selectedLanguage = language;
   const handleLanguageChange = (languageCode) => {
-    setIsOpen(false);
+    setIsSidebarOpen(false);
     i18n.changeLanguage(languageCode);
   };
 

@@ -1,7 +1,3 @@
-import { PlusIcon } from "@heroicons/react/16/solid";
-import { t } from "i18next";
-import { memo, useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import {
   addUser,
   deleteUser,
@@ -11,8 +7,13 @@ import {
   recoverUser,
   updateUser,
 } from "../../../../api/api.handlers";
-import { modalToastConfig } from "../../../../tools/toastconfig";
+import { memo, useCallback, useState } from "react";
+
 import ModalTable from "../../components/modalTable";
+import { PlusIcon } from "@heroicons/react/16/solid";
+import { modalToastConfig } from "../../../../tools/toastconfig";
+import { t } from "i18next";
+import { toast } from "react-toastify";
 
 const DeviceManagement = ({
   activeSidePanel,
@@ -33,10 +34,10 @@ const DeviceManagement = ({
   const [isEditing, setIsEditing] = useState(null);
 
   const [filterOptions] = useState([
-    { type: 1, type_name: t(`active`) },
+    { type: 1, type_name: `active` },
     {
       type: 0,
-      type_name: t(`inactive`),
+      type_name: `inactive`,
     },
   ]);
   const [filter, setFilter] = useState(filterOptions[0].type);
@@ -255,7 +256,7 @@ const DeviceManagement = ({
           "svetofor",
           "users",
         ].map((type) => (
-          <div key={type} className={`group border-l`}>
+          <div key={type} className={`group border-l my-2`}>
             <button
               className="text-left px-3 py-2 w-full hover:bg-gray-800/50 !rounded-none transition-colors font-medium"
               onClick={() => {

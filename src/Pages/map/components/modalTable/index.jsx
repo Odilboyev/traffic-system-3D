@@ -283,8 +283,8 @@ const ModalTable = ({
               {isLoading ? (
                 <Loader />
               ) : sortedData.length > 0 ? (
-                <div className="min-w-full">
-                  <table className="w-full border-collapse table-auto  border border-slate-400">
+                <div className="w-full">
+                  <table className=" max-w-screen overflow-x-hidden border-collapse table-auto  border border-slate-400">
                     <TableHeader
                       columns={columns}
                       data={data}
