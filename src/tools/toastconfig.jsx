@@ -40,11 +40,10 @@ const toaster = (sensorData, map) => {
   if (toast.isActive(toastId)) {
     return null;
   }
-
   const toastContent = generateToastContent(sensorData);
   const handleClick = () => {
     if (sensorData.lat && sensorData.lng) {
-      map.flyTo([sensorData.lat, sensorData.lng], 18);
+      map.flyTo([+sensorData.lat, +sensorData.lng], 18);
     }
   };
 

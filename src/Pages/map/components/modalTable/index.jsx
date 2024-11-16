@@ -5,7 +5,6 @@ import { memo, useEffect, useState } from "react";
 import { ChevronLeftIcon } from "@heroicons/react/16/solid";
 import FilterTypes from "./filterTypes";
 import FormComponent from "./components/FormComponent";
-import L from "leaflet";
 import Loader from "../../../../components/loader";
 import { MdSearch } from "react-icons/md";
 import Modal from "../../../../components/modal";
@@ -17,6 +16,7 @@ import TableRow from "./components/TableRow";
 import { ToastContainer } from "react-toastify";
 import { t } from "i18next";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
+import { useMap } from "react-leaflet";
 import { useSortedData } from "./useSortedData";
 import { useTheme } from "../../../../customHooks/useTheme";
 
@@ -100,10 +100,12 @@ const ModalTable = ({
     );
     setSortedColumn(keyName);
   };
+  const map = useMap();
+
   const locationHandler = (lat, lng) => {
-    const map = L.map("monitoring");
     if (lat && lng)
       map.flyTo([lat, lng], 20, {
+        animate: true,
         duration: 1,
       });
 

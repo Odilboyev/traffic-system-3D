@@ -78,14 +78,13 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
         <div className="relative w-full h-full">
           <CardBody className="p-4">
             <Typography className="my-2">{marker?.cname}</Typography>
-            <IconButton
+            <button
               onClick={handleClose}
               size="sm"
-              variant="text"
-              className="absolute top-2 right-2"
+              className="absolute top-1 right-1"
             >
               <XMarkIcon className="w-4 h-4" />
-            </IconButton>
+            </button>
             <div className="flex flex-col gap-3">
               {sections.map((section, index) => (
                 <div

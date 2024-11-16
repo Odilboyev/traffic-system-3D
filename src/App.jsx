@@ -1,13 +1,14 @@
-import { useContext, useEffect, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
+
+import { useContext, useEffect, useState } from "react";
+
+import MapComponent from "./Pages/map/index.jsx";
+import { ThemeContext } from "./context/themeContext.jsx";
+import WarningMessage from "./components/offlineWarning/index.jsx";
 import dangerSound from "../src/assets/audio/danger.mp3";
 import positiveSound from "../src/assets/audio/positive.mp3";
 import { subscribeToCurrentAlarms } from "./api/api.handlers.js";
-import WarningMessage from "./components/offlineWarning/index.jsx";
-import { ThemeContext } from "./context/themeContext.jsx";
-import MapComponent from "./Pages/map/index.jsx";
 import { t } from "i18next";
-import Sidebar from "./Pages/map/components/sidebar/index.jsx";
 
 const App = () => {
   const { theme } = useContext(ThemeContext);
@@ -30,6 +31,7 @@ const App = () => {
     setIsSubscribed(true);
     setChangedMarker(data.data);
     const sound = new Audio();
+    sound.volume = 0.3;
     if (data.data.statuserror === 1) {
       sound.src = dangerSound;
     } else if (data.data.statuserror === 0) {

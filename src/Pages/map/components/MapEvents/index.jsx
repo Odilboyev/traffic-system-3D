@@ -1,8 +1,10 @@
-import PropTypes from "prop-types";
-import { useEffect } from "react";
 import { useMap, useMapEvents } from "react-leaflet";
 
-const MapEvents = ({ changedMarker, setZoom }) => {
+import PropTypes from "prop-types";
+import toaster from "../../../../tools/toastconfig";
+import { useEffect } from "react";
+
+const MapEvents = ({ changedMarker, setMarkers, setZoom, setMap }) => {
   const map = useMap();
 
   // Handle map movement and zoom events
@@ -11,7 +13,7 @@ const MapEvents = ({ changedMarker, setZoom }) => {
       const center = map.getCenter();
       localStorage.setItem(
         "mapCenter",
-        JSON.stringify([center.lat, center.lng])
+        JSON.stringify([+center.lat, +center.lng])
       );
     },
     zoomend: () => {
@@ -20,6 +22,24 @@ const MapEvents = ({ changedMarker, setZoom }) => {
       setZoom(zoom);
     },
   });
+
+  // Add useEffect to handle changedMarker updates
+  useEffect(() => {
+    if (changedMarker) {
+      toaster(changedMarker, map);
+      setMarkers((prevMarkers) =>
+        prevMarkers.map((marker) =>
+          marker.cid === changedMarker.cid && marker.type === changedMarker.type
+            ? changedMarker
+            : marker
+        )
+      );
+    }
+  }, [changedMarker]);
+
+  useEffect(() => {
+    setMap(map);
+  }, []);
 
   return null; // This component doesn't render anything
 };

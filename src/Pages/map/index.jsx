@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import Control from "../../components/customControl/index.jsx";
@@ -15,7 +15,6 @@ import { ToastContainer } from "react-toastify";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
-import toaster from "../../tools/toastconfig.jsx";
 import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 import { useTheme } from "../../customHooks/useTheme.jsx";
@@ -35,7 +34,7 @@ const MapComponent = ({ changedMarker, t }) => {
     widgets,
     isDraggable,
   } = useMapMarkers();
-
+  const [map, setMap] = useState(null);
   const { fetchAlarmsData } = useMapAlarms();
 
   // sidebar visibility
@@ -65,8 +64,6 @@ const MapComponent = ({ changedMarker, t }) => {
   const [activeLight, setActiveLight] = useState(null);
 
   const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
-
-  const map = useRef(null);
 
   useEffect(() => {
     getDataHandler();
@@ -137,24 +134,10 @@ const MapComponent = ({ changedMarker, t }) => {
     setIsLightsLoading(false);
   };
 
-  // Add useEffect to handle changedMarker updates
-  useEffect(() => {
-    if (changedMarker) {
-      toaster(changedMarker, map);
-      setMarkers((prevMarkers) =>
-        prevMarkers.map((marker) =>
-          marker.cid === changedMarker.cid && marker.type === changedMarker.type
-            ? changedMarker
-            : marker
-        )
-      );
-    }
-  }, [changedMarker]);
-
   return (
     <>
       <MapContainer
-        ref={map}
+        // ref={map}
         id="monitoring"
         attributionControl={false}
         center={center}
@@ -172,6 +155,8 @@ const MapComponent = ({ changedMarker, t }) => {
         />
         <ToastContainer containerId="alarms" className="z-[9998]" />
         <MapEvents
+          setMap={setMap}
+          setMarkers={setMarkers}
           changedMarker={changedMarker}
           fetchAlarmsData={fetchAlarmsData}
           setZoom={setZoom}

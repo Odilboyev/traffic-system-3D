@@ -6,9 +6,9 @@ import Videos from "../../../components/crossroad/subPages/videos";
 const CrossroadDataModal = ({
   t,
   open,
-  data = {},
-  device = {},
-  marker = {},
+  data,
+  device,
+  marker,
   handler,
   section,
 }) => {
@@ -28,8 +28,8 @@ const CrossroadDataModal = ({
               <TrafficLightDashboard t={t} id={marker?.cid} isInModal />{" "}
             </div>
           )}
-          {section === "crossroad" && (
-            <CrossroadDashboard t={t} marker={marker || {}} />
+          {section === "statistics" && (
+            <CrossroadDashboard t={t} marker={marker} />
           )}
         </>
       }
