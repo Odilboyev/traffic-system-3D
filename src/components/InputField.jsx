@@ -1,6 +1,6 @@
-import { t } from "i18next";
-import PropTypes from "prop-types";
 import PasswordInput from "./PasswordInput";
+import PropTypes from "prop-types";
+import { t } from "i18next";
 
 // Reusable input field component
 const InputField = ({
@@ -15,7 +15,7 @@ const InputField = ({
   <div className="flex flex-col">
     <div className="flex items-center gap-2 mb-2">
       {Icon && <Icon className="text-gray-600 dark:text-gray-300" size={24} />}
-      <label>{t(label)}</label>
+      <label>{t(label) || label}</label>
     </div>
     {inputType && inputType == "password" ? (
       <PasswordInput label={t(label)} value={value} onChange={onChange} />

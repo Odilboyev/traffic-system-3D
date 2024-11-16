@@ -13,15 +13,18 @@ import CurrentAlarms from "../../sections/currentAlarms";
 import DateTime from "./components/time";
 import DeviceErrorHistory from "../../sections/deviceErrorHistory";
 import DeviceManagement from "../../sections/deviceManagement";
+import { FiLogOut } from "react-icons/fi";
 import FilterControl from "../controls/filterControl";
 import { HiCog8Tooth } from "react-icons/hi2";
 import LanguageSwitcher from "../../sections/langSwitcher";
+import LogoutControl from "../controls/logoutControl";
 import MarkerClusterType from "../../sections/markerClusterType";
 import RegionControl from "../controls/regionControl";
 import SidebarItem from "./components/sidebarItem";
 import SidebarSecondaryItem from "./components/sidebarSecondaryItem";
 import { TbBell } from "react-icons/tb";
 import TileLayerControl from "../controls/tileLayerControl";
+import UserName from "./components/userName";
 import WeatherCard from "../../widgets/weather/weatherCard";
 import WidgetControl from "../controls/widgetControl";
 import { isPermitted } from "../../constants/roles";
@@ -88,7 +91,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       {/* Datetime Display */}
       <div className="no-scrollbar pb-[40%] flex flex-col items-center space-y-3 gap-1 overflow-y-auto flex-grow">
         {/* Widgets */}
-
+        <UserName t={t} isSidebarOpen={isSidebarOpen} />
         <DateTime t={t} isSidebarOpen={isSidebarOpen} />
         <WeatherCard t={t} isSidebarOpen={isSidebarOpen} />
 
@@ -188,18 +191,25 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       >
         <Suspense fallback={<div></div>}>
           <SidebarSecondaryItem
-            icon={LanguageIcon}
-            label="language"
+            icon={FiLogOut}
             activeSecondaryPanel={activeSecondaryPanel}
             setActiveSecondaryPanel={setActiveSecondaryPanel}
-            component={
-              <LanguageSwitcher
-                setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
-              />
-            }
+            component={<LogoutControl t={t} />}
           />
+
           {isSidebarOpen && (
             <>
+              <SidebarSecondaryItem
+                icon={LanguageIcon}
+                label="language"
+                activeSecondaryPanel={activeSecondaryPanel}
+                setActiveSecondaryPanel={setActiveSecondaryPanel}
+                component={
+                  <LanguageSwitcher
+                    setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
+                  />
+                }
+              />
               <SidebarSecondaryItem
                 icon={FaMap}
                 label={"tile_layer_control"}

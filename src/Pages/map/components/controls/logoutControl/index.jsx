@@ -1,19 +1,6 @@
-import {
-  Button,
-  Card,
-  CardBody,
-  Dialog,
-  DialogBody,
-  DialogFooter,
-  DialogHeader,
-  IconButton,
-  Typography,
-} from "@material-tailwind/react";
-import { useEffect, useState } from "react";
-
 import { MdLogout } from "react-icons/md";
-import { getInfoAboutCurrentUser } from "../../../../api/api.handlers";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
 /**
  * UserInfoWidget is a React component that displays the current user's information
@@ -25,25 +12,12 @@ import { toast } from "react-toastify";
  *
  * @returns {JSX.Element} A component rendering user info card with logout and password change options.
  */
-const UserInfoWidget = () => {
+const LogoutControl = ({ t }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPasswordChangeOpen, setIsPasswordChangeOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-
-  // Fetch user info on component mount
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await getInfoAboutCurrentUser();
-        setUserInfo(response.user_info);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-    fetchUserInfo();
-  }, []);
 
   const handleLogoutClick = () => {
     setIsLogoutModalOpen(true);
@@ -72,28 +46,20 @@ const UserInfoWidget = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  if (!userInfo) {
-    return <div></div>;
-  }
-
   return (
     <>
-      <Card className="w-[15vw]  bg-transparent text-white shadow-xl rounded-md bg-gradient-to-br from-blue-gray-900/60 to-black/80 backdrop-blur-md">
-        <CardBody className="py-5 relative flex justify-between items-center overflow-visible">
-          <div className="pl-5 mb-3 w-2/3">
-            <Typography variant="h5" className="text-white font-bold">
-              {userInfo.name}
-            </Typography>
-            <Typography variant="h6" className="text-gray-400">
-              {userInfo.role}
-            </Typography>
-          </div>
+      {" "}
+      <div
+        className="flex justify-between items-center px-3 py-2 hover:bg-gray-700 cursor-pointer rounded-md w-[6vw]"
+        onClick={confirmLogout}
+      >
+        <div className="text-base font-bold">{t("logout")}</div>{" "}
+        <MdLogout className="w-5 h-5" />
+      </div>
+      <div className="">
+        {/* Dropdown Toggle */}
 
-          {/* Dropdown Toggle */}
-          <IconButton color="black" className="" onClick={handleLogoutClick}>
-            <MdLogout className="w-5 h-5" />
-          </IconButton>
-          {/* <div className="relative">
+        {/* <div className="relative">
             {isDropdownOpen && (
               <div className="absolute top-full z-[99998] right-0 mt-2 w-48 bg-gray-900/80 backdrop-blur-md text-white shadow-md rounded-lg p-2">
                 <div
@@ -115,8 +81,8 @@ const UserInfoWidget = () => {
             )}
           </div> */}
 
-          {/* Password Change Form */}
-          {/* {isPasswordChangeOpen && (
+        {/* Password Change Form */}
+        {/* {isPasswordChangeOpen && (
             <div className="mt-3 w-full">
               <Input
                 type="password"
@@ -134,11 +100,9 @@ const UserInfoWidget = () => {
               </IconButton>
             </div>
           )} */}
-        </CardBody>
-      </Card>
-
+      </div>
       {/* Logout Confirmation Modal */}
-      <Dialog
+      {/* <Dialog
         open={isLogoutModalOpen}
         handler={() => setIsLogoutModalOpen(false)}
         className="dark:bg-gray-800"
@@ -165,9 +129,9 @@ const UserInfoWidget = () => {
             Logout
           </Button>
         </DialogFooter>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 };
 
-export default UserInfoWidget;
+export default LogoutControl;
