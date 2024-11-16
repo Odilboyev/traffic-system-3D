@@ -3,6 +3,7 @@ import { filterableColumns, getUniqueColumnValues } from "../utils";
 // TableHeader.js
 import CustomSelect from "@/components/customSelect";
 import { t } from "i18next";
+import { useState } from "react";
 
 const TableHeader = ({
   columns,
@@ -15,6 +16,7 @@ const TableHeader = ({
   onFilterChange,
 }) => {
   // Columns that should have filter dropdowns
+  const [selectedOption, setSelectedOption] = useState();
 
   const renderHeaderContent = (key) => {
     const isFilterable = filterableColumns.includes(key);
@@ -24,10 +26,15 @@ const TableHeader = ({
         <div className="flex flex-col gap-2">
           {/* <Typography className="font-bold">{t(key)}</Typography> */}
           <CustomSelect
+            value={selectedOption}
             options={options}
-            onChange={(selected) => onFilterChange(key, selected?.value)}
+            onChange={(selected) => {
+              setSelectedOption(selected);
+              onFilterChange(key, selected?.value);
+            }}
             placeholder={`${t(key.replace("_name", ""))}`}
             className="min-w-[150px]"
+            onMouseDown={(e) => e.stopPropagation()}
             // onClick={(e) => e.stopPropagation()} // Prevent sorting when clicking select
           />
         </div>
@@ -59,7 +66,13 @@ const TableHeader = ({
                   ? "15vw"
                   : "auto",
             }}
-            onClick={() => onHeaderClick(key)}
+            onClick={
+              key !== "actions" &&
+              key !== "crossroad_name" &&
+              key !== "crossroad_id"
+                ? () => onHeaderClick(key)
+                : null
+            }
           >
             {renderHeaderContent(key)}
           </th>

@@ -20,7 +20,7 @@ const Pagination = ({
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
-  console.log(itemsPerPage, "itemsPerPage");
+
   // Items per page options
   const itemsPerPageOptions = [
     { value: 10, label: "10" },
