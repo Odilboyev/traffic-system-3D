@@ -1,9 +1,10 @@
-import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
-import { useMap } from "react-leaflet";
 import { getDistricts, getRegions } from "../../../../../api/api.handlers";
+import { useEffect, useState } from "react";
 
-const RegionControl = ({ t }) => {
+import PropTypes from "prop-types";
+import { useMap } from "react-leaflet";
+
+const RegionControl = ({ t, activeSidePanel }) => {
   const [regions, setRegions] = useState([]);
   const [districts, setDistricts] = useState({});
   const [hoveredRegion, setHoveredRegion] = useState(null);
@@ -23,6 +24,10 @@ const RegionControl = ({ t }) => {
     };
     fetchRegions();
   }, []);
+  useEffect(() => {
+    setActiveDistrict(null);
+    setHoveredRegion(null);
+  }, [activeSidePanel]);
 
   useEffect(() => {
     const fetchDistricts = async () => {
@@ -68,7 +73,7 @@ const RegionControl = ({ t }) => {
                 hoveredRegion === region.id ? "bg-gray-800 text-blue-500" : ""
               }`}
             >
-              {region.name}
+              {t(region.name)}
             </button>
             {hoveredRegion === region.id && districts[region.id] && (
               <div className="ml-2 max-w-[200px] z-50">
@@ -83,7 +88,7 @@ const RegionControl = ({ t }) => {
                           : ""
                       }`}
                     >
-                      {district.name}
+                      {t(district.name)}
                     </button>
                   ))}
                 </div>

@@ -2,10 +2,14 @@ import { useMap, useMapEvents } from "react-leaflet";
 
 import PropTypes from "prop-types";
 import toaster from "../../../../tools/toastconfig";
+import { useDispatch } from "react-redux";
 import { useEffect } from "react";
+import { useMapMarkers } from "../../hooks/useMapMarkers";
 
-const MapEvents = ({ changedMarker, setMarkers, setZoom, setMap }) => {
+const MapEvents = ({ setZoom }) => {
   const map = useMap();
+  const dispatch = useDispatch();
+  const { markers, setMarkers } = useMapMarkers();
 
   // Handle map movement and zoom events
   useMapEvents({
@@ -25,32 +29,35 @@ const MapEvents = ({ changedMarker, setMarkers, setZoom, setMap }) => {
 
   // Add useEffect to handle changedMarker updates
   useEffect(() => {
-    if (changedMarker) {
-      toaster(changedMarker, map);
-      setMarkers((prevMarkers) =>
-        prevMarkers.map((marker) =>
-          marker.cid === changedMarker.cid && marker.type === changedMarker.type
-            ? changedMarker
-            : marker
-        )
-      );
-    }
-  }, [changedMarker]);
+    if (markers.length > 0) {
+      // Logic for handling updates (for example, after marker has changed)
+      // Assuming 'changedMarker' is available in the state or props
+      const changedMarker = markers.find((marker) => marker.cid === "someId"); // You can adjust this logic based on your requirements
+      if (changedMarker) {
+        toaster(changedMarker, map);
 
+        setMarkers(
+          markers.map((marker) =>
+            marker.cid === changedMarker.cid &&
+            marker.type === changedMarker.type
+              ? changedMarker
+              : marker
+          )
+        );
+      }
+    }
+  }, [markers, dispatch, map, setZoom]);
+
+  // Update map reference
   useEffect(() => {
-    setMap(map);
-  }, []);
+    // You can manage this map state globally in Redux if necessary
+    // setMap(map);
+  }, [map]);
 
   return null; // This component doesn't render anything
 };
 
 MapEvents.propTypes = {
-  changedMarker: PropTypes.shape({
-    lat: PropTypes.number,
-    lng: PropTypes.number,
-    cid: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    type: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  }),
   setZoom: PropTypes.func.isRequired,
 };
 

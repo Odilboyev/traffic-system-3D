@@ -1,23 +1,28 @@
-import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
 import "./index.css";
 import "../tailwind.css";
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
-import PrivateRoutes from "./private.router.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import "leaflet/dist/leaflet.css";
-import { ThemeProvider } from "@material-tailwind/react";
-import { MyThemeProvider } from "./context/themeContext.jsx";
+
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+
+import App from "./App.jsx";
 import { I18nextProvider } from "react-i18next";
-import i18n from "./i18.js";
+// import { MapMarkersProvider } from "./Pages/map/hooks/useMapMarkers.jsx";
+import { MyThemeProvider } from "./context/themeContext.jsx";
 import { PopupProvider } from "./context/popupContext.jsx";
+import PrivateRoutes from "./private.router.jsx";
+import { Provider } from "react-redux";
+import ReactDOM from "react-dom/client";
 import SignIn from "./Pages/Login/index.jsx";
-import { MapMarkersProvider } from "./Pages/map/hooks/useMapMarkers.jsx";
+import { ThemeProvider } from "@material-tailwind/react";
+import i18n from "./i18.js";
+import { store } from "./redux/store.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <React.StrictMode>
   <I18nextProvider i18n={i18n}>
-    <MapMarkersProvider>
+    <Provider store={store}>
+      {/* <MapMarkersProvider> */}
       <ThemeProvider>
         <PopupProvider>
           <HashRouter>
@@ -39,7 +44,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
         {/* <App /> */}
       </ThemeProvider>
-    </MapMarkersProvider>
+      {/* </MapMarkersProvider> */}
+    </Provider>
   </I18nextProvider>
 
   // </React.StrictMode>

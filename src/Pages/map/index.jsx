@@ -133,7 +133,6 @@ const MapComponent = ({ changedMarker, t }) => {
     setActiveLight(null);
     setIsLightsLoading(false);
   };
-
   return (
     <>
       <MapContainer
@@ -170,163 +169,18 @@ const MapComponent = ({ changedMarker, t }) => {
             maxZoom={20}
           />
         )}
-        {/* zoomcontrol */} <ZoomControl theme={theme} />{" "}
+        {/* zoomcontrol */}{" "}
+        <ZoomControl theme={theme} position={"bottomright"} />{" "}
         <Control position="bottomright">
           <div className="bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded">
             Zoom: {zoom}
           </div>
         </Control>
-        {/* <Control position="topleft">
-          <FilterControl
-            activeSidePanel={activeSidePanel}
-            setActiveSidePanel={setActiveSidePanel}
-            filter={filter}
-            changeFilter={setFilter}
-          />
-        </Control> */}
-        {/* <RegionControl
-          activeSidePanel={activeSidePanel}
-          setActiveSidePanel={setActiveSidePanel}
-          t={t}
-        /> */}
-        {/* settings */}
-        {/* <WidgetControl
-
-          isDraggable={isDraggable}
-          setIsDraggable={setIsDraggable}
-          widgets={widgets}
-          setWidgets={setWidgets}
-          t={t}
-        /> */}
-        {/* layerchanger */}
-        {/* <TileChanger
-          activeSidePanel={activeSidePanel}
-          setActiveSidePanel={setActiveSidePanel}
-        /> */}
-        <Control position="topright">
-          {/* {widgets.weather ? (
-            <WeatherWidget t={t} />
-          ) : (
-            <div style={{ display: "none" }}></div>
-          )} */}
-        </Control>{" "}
         <Control position="bottomcenter">
           {widgets.bottomsection && (
             <InfoWidget cardsInfoData={bottomSectionData} />
           )}
         </Control>
-        {/* <DynamicWidgets widgets={widgets} t={t} /> */}
-        {/* lights */}
-        {/* signs  */}
-        {/* {<SignsContainer isVisible={filter.signs} />} */}
-        {/* aalarm history */}
-        {/* <Control position="topleft">
-          <DeviceErrorHistory
-            activeSidePanel={activeSidePanel}
-            setActiveSidePanel={setActiveSidePanel}
-          />
-        </Control> */}
-        {/* Device Management */}
-        {/* {isPermitted && (
-          <Control position="topleft">
-            <DeviceManagement
-              refreshHandler={getDataHandler}
-              activeSidePanel={activeSidePanel}
-              setActiveSidePanel={setActiveSidePanel}
-            />
-          </Control>
-        )} */}
-        {/* <Control position="topleft">
-          <IconButton
-            // color={theme === "light" ? "black" : "white"}
-            size="lg"
-            onClick={toggleFullSceen}
-          >
-            {fulscreen ? (
-              <ArrowsPointingInIcon className="w-8 h-8 p-1" />
-            ) : (
-              <ArrowsPointingOutIcon className="w-8 h-8 p-1" />
-            )}
-          </IconButton>
-        </Control> */}
-        {/* <LanguageSwitcher /> */}
-        {/* <Control position="topleft">
-          <IconButton
-            // color={theme === "light" ? "black" : "white"}
-            size="lg"
-            onClick={() =>
-              setActiveSidePanel(activeSidePanel === "alarms" ? null : "alarms")
-            }
-          >
-            {activeSidePanel === "alarms" ? (
-              <TbBell className="w-6 h-6" />
-            ) : (
-              <TbBellRinging className="w-6 h-6" />
-            )}
-          </IconButton>
-          <SidePanel
-            title={t("alarms")}
-            wrapperClass="fixed top-5  inline-block text-left"
-            isOpen={activeSidePanel === "alarms"}
-            setIsOpen={() => setActiveSidePanel(null)}
-            content={<CurrentAlarms data={currentAlarms} />}
-          />
-        </Control> */}
-        {/* <Control position="topleft">
-          <IconButton
-            size="lg"
-            onClick={() => {
-              setActiveSidePanel(
-                activeSidePanel === "markers" ? null : "markers"
-              );
-            }}
-          >
-            <FaRegMap className="w-5 h-5" />
-          </IconButton> */}
-        {/* <SidePanel
-            title={t("markers")}
-            wrapperClass="absolute -top-28  inline-block text-left"
-            sndWrapperClass="absolute left-full ml-2 no-scrollbar overflow-y-scroll w-[15vw] "
-            isOpen={activeSidePanel === "markers"}
-            setIsOpen={() => setActiveSidePanel(null)}
-            content={
-              <div className="flex rounded-b-lg flex-col p-3 bg-gray-900/80 text-blue-gray-900">
-                {["clustered", "clustered_dynamically", "dynamic"].map(
-                  (type) => (
-                    <Radio
-                      key={type}
-                      checked={useClusteredMarkers === type}
-                      className="checked:bg-white"
-                      value={type === useClusteredMarkers}
-                      onChange={() => {
-                        setUseClusteredMarkers(type);
-                        type !== "dynamic" ? getDataHandler() : setMarkers([]);
-                      }}
-                      label={
-                        <Typography className="mr-3 text-white">
-                          {t(type) || ""}
-                        </Typography>
-                      }
-                    />
-                  )
-                )}
-              </div>
-            }
-          /> */}
-        {/* </Control> */}
-        {/* <Control position="topleft">
-          <IconButton
-            // color={theme === "light" ? "black" : "white"}
-            size="lg"
-            onClick={() => toggleTheme()}
-          >
-            {theme === "light" ? (
-              <MdBedtime className="w-7 h-7 p-1" />
-            ) : (
-              <IoMdSunny className="w-7 h-7 p-1" />
-            )}
-          </IconButton>
-        </Control> */}
         {isbigMonitorOpen && activeMarker ? (
           <CrossroadWidget
             t={t}

@@ -1,97 +1,122 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import {
+  updateActiveSidePanel,
+  updateErrorMessage,
+  updateFilter,
+  updateIsDraggable,
+  updateLoadingState,
+  updateMarkers,
+  updateUseClusteredMarkers,
+  updateWidgets,
+} from "../../../redux/mapSlice";
+import { useCallback, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import { getMarkerData } from "../../../api/api.handlers";
-import { role } from "../constants/roles";
-import useLocalStorageState from "../../../customHooks/uselocalStorageState";
 
-// Create the context
-const MapMarkersContext = createContext();
+// Adjust the import path
 
-// Create the provider component
-export const MapMarkersProvider = ({ children }) => {
-  const [markers, setMarkers] = useState([]);
-  const [areMarkersLoading, setAreMarkersLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [useClusteredMarkers, setUseClusteredMarkers] = useLocalStorageState(
-    "its_cluster_type",
-    role === "boss"
-      ? "clustered"
-      : role === "operator"
-      ? "dynamic"
-      : "clustered_dynamically"
+const useMapMarkers = () => {
+  const dispatch = useDispatch();
+
+  // Access state from Redux
+  const markers = useSelector((state) => state.map.markers);
+  const areMarkersLoading = useSelector((state) => state.map.areMarkersLoading);
+  const errorMessage = useSelector((state) => state.map.errorMessage);
+  const useClusteredMarkers = useSelector(
+    (state) => state.map.useClusteredMarkers
   );
-  const [activeSidePanel, setActiveSidePanel] = useState(null);
+  const activeSidePanel = useSelector((state) => state.map.activeSidePanel);
+  const filter = useSelector((state) => state.map.filter);
+  const widgets = useSelector((state) => state.map.widgets);
+  const isDraggable = useSelector((state) => state.map.isDraggable);
 
-  const [filter, setFilter] = useLocalStorageState("traffic_filter", {
-    box: true,
-    crossroad: true,
-    trafficlights: true,
-    // signs: true,
-    camera: true,
-    cameraview: true,
-    camerapdd: true,
-  });
-
-  const [widgets, setWidgets] = useLocalStorageState("traffic_widgets", {
-    bottomsection: true,
-    weather: true,
-    crossroad: false,
-  });
-
-  const [isDraggable, setIsDraggable] = useLocalStorageState(
-    "traffic_isDraggable",
-    false
-  );
+  // Action to fetch data
   const getDataHandler = useCallback(async () => {
-    setAreMarkersLoading(true);
+    dispatch(updateLoadingState(true));
     try {
       const myData = await getMarkerData();
-      setMarkers(
-        myData.data.map((marker) => ({
-          ...marker,
-          isPopupOpen: false,
-        }))
+      dispatch(
+        updateMarkers(
+          myData.data.map((marker) => ({ ...marker, isPopupOpen: false }))
+        )
       );
     } catch (error) {
       if (error.code === "ERR_NETWORK") {
-        setErrorMessage("You are offline. Please try again");
+        dispatch(updateErrorMessage("You are offline. Please try again"));
       }
       console.error(error);
     } finally {
-      setAreMarkersLoading(false);
+      dispatch(updateLoadingState(false));
     }
+  }, [dispatch]);
+  useEffect(() => {
+    getDataHandler();
   }, []);
 
-  const clearMarkers = useCallback(() => setMarkers([]), []);
-  const updateMarkers = useCallback((data) => {
-    if (data) setMarkers(data);
-  }, []);
+  const clearMarkers = useCallback(() => {
+    dispatch(updateMarkers([]));
+  }, [dispatch]);
 
-  return (
-    <MapMarkersContext.Provider
-      value={{
-        markers,
-        setMarkers,
-        areMarkersLoading,
-        errorMessage,
-        getDataHandler,
-        clearMarkers,
-        updateMarkers,
-        useClusteredMarkers,
-        setUseClusteredMarkers,
-        activeSidePanel,
-        setActiveSidePanel,
-        filter,
-        setFilter,
-        widgets,
-        setWidgets,
-        isDraggable,
-        setIsDraggable,
-      }}
-    >
-      {children}
-    </MapMarkersContext.Provider>
+  const setMarkers = useCallback(
+    (data) => {
+      if (data) dispatch(updateMarkers(data));
+    },
+    [dispatch]
   );
+
+  const setFilter = useCallback(
+    (newFilter) => {
+      dispatch(updateFilter(newFilter));
+    },
+    [dispatch]
+  );
+
+  const setUseClusteredMarkers = useCallback(
+    (newClusteredType) => {
+      dispatch(updateUseClusteredMarkers(newClusteredType));
+    },
+    [dispatch]
+  );
+
+  const setActiveSidePanel = useCallback(
+    (panel) => {
+      dispatch(updateActiveSidePanel(panel));
+    },
+    [dispatch]
+  );
+
+  const setWidgets = useCallback(
+    (newWidgets) => {
+      dispatch(updateWidgets(newWidgets));
+    },
+    [dispatch]
+  );
+
+  const setIsDraggable = useCallback(
+    (isDraggableState) => {
+      dispatch(updateIsDraggable(isDraggableState));
+    },
+    [dispatch]
+  );
+
+  return {
+    markers,
+    areMarkersLoading,
+    errorMessage,
+    getDataHandler,
+    clearMarkers,
+    setMarkers,
+    useClusteredMarkers,
+    setUseClusteredMarkers,
+    activeSidePanel,
+    setActiveSidePanel,
+    filter,
+    setFilter,
+    widgets,
+    setWidgets,
+    isDraggable,
+    setIsDraggable,
+  };
 };
 
-// Custom hook for consuming the context
-export const useMapMarkers = () => useContext(MapMarkersContext);
+export { useMapMarkers };

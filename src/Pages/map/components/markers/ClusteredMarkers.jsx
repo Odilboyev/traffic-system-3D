@@ -1,28 +1,31 @@
-import { Marker, Tooltip } from "react-leaflet";
-
-import CustomPopup from "../customPopup";
+import CustomMarker from "../customMarker";
 import L from "leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { PieChart } from "react-minimal-pie-chart";
 import PropTypes from "prop-types";
-import { Typography } from "@material-tailwind/react";
 import { renderToString } from "react-dom/server";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
 
 const ClusteredMarkers = ({
   usePieChartForClusteredMarkers,
-  markers,
+  // markers,
   filter,
   isDraggable,
   handleMonitorCrossroad,
   handleBoxModalOpen,
   handleLightsModalOpen,
   handleMarkerDragEnd,
-  changedMarker,
+  // changedMarker,
   L,
 }) => {
   const clusterRef = useRef(null);
+  // Access markers and changedMarker from Redux store
+  const markers = useSelector((state) => state.map.markers); // Assuming markers are stored in state.map.markers
+  const changedMarker = useSelector((state) => state.map.changedMarker); // Assuming changedMarker is stored in state.map.changedMarker
+
   const markerUpdate = markers?.length || 0;
+
   return (
     <div>
       <MarkerClusterGroup
@@ -59,50 +62,17 @@ const ClusteredMarkers = ({
           }
 
           return (
-            <Marker
+            <CustomMarker
               key={i}
-              markerId={marker.cid}
-              markerType={marker.type}
-              position={[marker.lat, marker.lng]}
-              draggable={isDraggable}
-              rotationAngle={marker.rotated}
-              eventHandlers={{
-                click: () => {
-                  if (marker.type === 2) handleMonitorCrossroad(marker);
-                  else if (marker.type === 3) handleBoxModalOpen(marker);
-                  else if (marker.type === 4) handleLightsModalOpen(marker);
-                },
-                dragend: (event) =>
-                  handleMarkerDragEnd(marker.cid, marker.type, event),
-              }}
-              statuserror={marker.statuserror}
-              icon={L.icon({
-                iconUrl: `icons/${marker.icon}`,
-                iconSize: marker.type === 2 ? [24, 24] : [40, 40],
-              })}
-              rotatedAngle={marker.type === 3 ? marker.rotated : 0}
-            >
-              {(marker.type === 1 ||
-                marker.type === 5 ||
-                marker.type === 6) && <CustomPopup marker={marker} L={L} />}
-              <Tooltip direction="top" className="rounded-md">
-                {marker.type === 1 || marker.type === 5 || marker.type === 6 ? (
-                  <div
-                    style={{ width: "8vw", height: "6vw", overflow: "hidden" }}
-                  >
-                    <img
-                      src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
-                      className="w-full"
-                      alt=""
-                    />
-                    <Typography className="my-0">{marker?.cname}</Typography>
-                  </div>
-                ) : (
-                  <Typography className="my-0">{marker?.cname}</Typography>
-                )}
-              </Tooltip>
-            </Marker>
-          );
+              marker={marker}
+              L={L}
+              isDraggable={isDraggable}
+              handleMonitorCrossroad={handleMonitorCrossroad}
+              handleBoxModalOpen={handleBoxModalOpen}
+              handleLightsModalOpen={handleLightsModalOpen}
+              handleMarkerDragEnd={handleMarkerDragEnd}
+            />
+          ); // CustomMarker;
         })}
       </MarkerClusterGroup>
     </div>

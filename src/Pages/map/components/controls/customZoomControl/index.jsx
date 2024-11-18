@@ -1,7 +1,8 @@
-import { IconButton } from "@material-tailwind/react";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-import { useMap } from "react-leaflet";
+
 import Control from "../../../../../components/customControl";
+import { IconButton } from "@material-tailwind/react";
+import { useMap } from "react-leaflet";
 
 const ZoomControl = ({ theme, position, size }) => {
   const map = useMap();
@@ -15,7 +16,7 @@ const ZoomControl = ({ theme, position, size }) => {
   };
 
   return (
-    <Control position={"bottomright"}>
+    <Control position={position || "bottomright"}>
       <div className="flex flex-col ">
         <IconButton
           onClick={handleZoomIn}

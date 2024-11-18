@@ -7,7 +7,6 @@ import { CogIcon, LanguageIcon } from "@heroicons/react/24/solid";
 import { FaFilter, FaLocationDot, FaMap } from "react-icons/fa6";
 import { IoIosArrowBack, IoIosArrowForward, IoMdSunny } from "react-icons/io";
 import { MdBedtime, MdHistory } from "react-icons/md";
-import { Suspense, useState } from "react";
 
 import CurrentAlarms from "../../sections/currentAlarms";
 import DateTime from "./components/time";
@@ -30,6 +29,7 @@ import WidgetControl from "../controls/widgetControl";
 import { isPermitted } from "../../constants/roles";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 import { useMap } from "react-leaflet";
+import { useState } from "react";
 import { useTheme } from "../../../../customHooks/useTheme";
 
 // Sidebar Component
@@ -69,7 +69,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       onMouseLeave={() => map.scrollWheelZoom.enable()}
       className={` ${
         isVisible ? "fixed" : "none"
-      } z-[9999] top-0 left-0 h-full max-h-full overflow-y-scroll no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
+      } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
         isSidebarOpen ? "w-[16vw]" : "w-18"
       } transition-all duration-300 ease-in-out select-none`}
     >
@@ -113,7 +113,9 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
             t={t}
             activeSidePanel={activeSidePanel}
             setActiveSidePanel={setActiveSidePanel}
-            extraContent={<RegionControl t={t} />} // Another custom component
+            extraContent={
+              <RegionControl t={t} activeSidePanel={activeSidePanel} />
+            } // Another custom component
           />
           <SidebarItem
             icon={<HiCog8Tooth size={24} />}
@@ -187,54 +189,54 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       <div
         className={`flex items-center fixed bottom-0 left-0 ${
           isSidebarOpen ? "justify-evenly" : "justify-center"
-        } w-full px-4 py-3 gap-2 items-center bg-gray-900/70 backdrop-blur-md`}
+        } w-full px-4 py-3 gap-2 items-center bg-gray-900/70 !backdrop-blur-md border-t border-gray-500/20`}
       >
-        <Suspense fallback={<div></div>}>
-          <SidebarSecondaryItem
-            icon={FiLogOut}
-            activeSecondaryPanel={activeSecondaryPanel}
-            setActiveSecondaryPanel={setActiveSecondaryPanel}
-            component={<LogoutControl t={t} />}
-          />
+        {/* <Suspense fallback={<div></div>}> */}
+        <SidebarSecondaryItem
+          icon={FiLogOut}
+          activeSecondaryPanel={activeSecondaryPanel}
+          setActiveSecondaryPanel={setActiveSecondaryPanel}
+          component={<LogoutControl t={t} />}
+        />
 
-          {isSidebarOpen && (
-            <>
-              <SidebarSecondaryItem
-                icon={LanguageIcon}
-                label="language"
-                activeSecondaryPanel={activeSecondaryPanel}
-                setActiveSecondaryPanel={setActiveSecondaryPanel}
-                component={
-                  <LanguageSwitcher
-                    setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
-                  />
-                }
-              />
-              <SidebarSecondaryItem
-                icon={FaMap}
-                label={"tile_layer_control"}
-                activeSecondaryPanel={activeSecondaryPanel}
-                setActiveSecondaryPanel={setActiveSecondaryPanel}
-                component={<TileLayerControl t={t} />}
-              />
-              <SidebarSecondaryItem
-                icon={MapIcon}
-                label={"markers"}
-                activeSecondaryPanel={activeSecondaryPanel}
-                setActiveSecondaryPanel={setActiveSecondaryPanel}
-                component={<MarkerClusterType t={t} />}
-              />
-              <SidebarSecondaryItem
-                onClick={toggleFullSceen}
-                icon={fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
-              />
-              <SidebarSecondaryItem
-                onClick={toggleTheme}
-                icon={theme === "light" ? MdBedtime : IoMdSunny}
-              />
-            </>
-          )}
-        </Suspense>
+        {isSidebarOpen && (
+          <>
+            <SidebarSecondaryItem
+              icon={LanguageIcon}
+              label="language"
+              activeSecondaryPanel={activeSecondaryPanel}
+              setActiveSecondaryPanel={setActiveSecondaryPanel}
+              component={
+                <LanguageSwitcher
+                  setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
+                />
+              }
+            />
+            <SidebarSecondaryItem
+              icon={FaMap}
+              label={"tile_layer_control"}
+              activeSecondaryPanel={activeSecondaryPanel}
+              setActiveSecondaryPanel={setActiveSecondaryPanel}
+              component={<TileLayerControl t={t} />}
+            />
+            <SidebarSecondaryItem
+              icon={MapIcon}
+              label={"markers"}
+              activeSecondaryPanel={activeSecondaryPanel}
+              setActiveSecondaryPanel={setActiveSecondaryPanel}
+              component={<MarkerClusterType t={t} />}
+            />
+            <SidebarSecondaryItem
+              onClick={toggleFullSceen}
+              icon={fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
+            />
+            <SidebarSecondaryItem
+              onClick={toggleTheme}
+              icon={theme === "light" ? MdBedtime : IoMdSunny}
+            />
+          </>
+        )}
+        {/* </Suspense> */}
       </div>
     </div>
   );
