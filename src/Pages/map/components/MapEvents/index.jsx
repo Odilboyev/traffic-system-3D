@@ -16,7 +16,19 @@ import { useMapMarkers } from "../../hooks/useMapMarkers";
 const MapEvents = ({ changedMarker, setZoom }) => {
   const map = useMap();
   const { markers, setMarkers } = useMapMarkers();
-
+  const center = map.getCenter();
+  useEffect(() => {
+    if (center)
+      localStorage.setItem(
+        "its_currentLocation",
+        JSON.stringify([+center.lat, +center.lng])
+      );
+    else
+      localStorage.setItem(
+        "its_currentLocation",
+        JSON.stringify([[41.2995, 69.2401]])
+      );
+  });
   // Handle map movement and zoom events
   useMapEvents({
     moveend: () => {

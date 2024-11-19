@@ -57,7 +57,7 @@ const InfoWidgetCard = ({ data = [], length = 0 }) => {
               className="rounded-full h-full text-center bg-green-600 transition-all duration-300"
               style={{ width: `${onlinePercentage}%` }}
             >
-              <p className="text-white text-xs font-bold">
+              <p className="text-white text-xs font-semibold">
                 {onlinePercentage}%
               </p>
             </div>

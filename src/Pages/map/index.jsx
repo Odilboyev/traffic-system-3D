@@ -14,6 +14,7 @@ import { ToastContainer } from "react-toastify";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
+import { safeParseJSON } from "../../redux/utils.js";
 import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 import { useTheme } from "../../customHooks/useTheme.jsx";
@@ -30,9 +31,7 @@ const MapComponent = ({ changedMarker, t }) => {
     updateMarkers,
     useClusteredMarkers,
     filter,
-    widgets,
     isDraggable,
-    currentLocation,
   } = useMapMarkers();
   const [map, setMap] = useState(null);
   const { fetchAlarmsData } = useMapAlarms();
@@ -43,7 +42,9 @@ const MapComponent = ({ changedMarker, t }) => {
   //theme
   const { theme, currentLayer } = useTheme();
 
-  // const center = currentLocation ?? home;
+  // const
+  const center = safeParseJSON("its_currentLocation", home);
+
   const [zoom, setZoom] = useState(
     localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
   );
@@ -137,7 +138,7 @@ const MapComponent = ({ changedMarker, t }) => {
         // ref={map}
         id="monitoring"
         attributionControl={false}
-        center={JSON.parse(localStorage.getItem("its_currentLocation")) ?? home}
+        center={center}
         zoom={JSON.parse(localStorage.getItem("its_currentZoom")) ?? 13}
         zoomDelta={0.6}
         doubleClickZoom={false}
