@@ -1,5 +1,5 @@
-import { Typography } from "@material-tailwind/react";
 import PropTypes from "prop-types";
+import { Typography } from "@material-tailwind/react";
 
 const statusStyles = {
   0: "dark:bg-green-500/20 bg-green-600/20 dark:text-green-300 text-green-400 ring-green-300",
@@ -16,13 +16,20 @@ const neonTextShadowStyles = {
   3: "text-gray-400 dark:text-gray-300",
 };
 
-const NeonIcon = ({ icon: Icon, iconStyle, isRounded, text, status }) => {
+const NeonIcon = ({
+  icon: Icon,
+  iconStyle,
+  isRounded,
+  text,
+  status,
+  className,
+}) => {
   const statusClass = statusStyles[status] || statusStyles[0];
   const textShadowClass =
     neonTextShadowStyles[status] || neonTextShadowStyles[0];
 
   // Determine the classes for the container
-  let containerClasses = `flex items-center justify-center p-2 shadow-sm  text-green-300 rounded-full dark:drop-shadow-neon`;
+  let containerClasses = `flex items-center justify-center p-2 shadow-sm  text-green-300 rounded-full drop-shadow-neon`;
   if (isRounded && Icon) {
     // If `isRounded` is true and `Icon` exists, add ring and background color
     containerClasses += ` rounded-full ring-1 ${statusClass}`;
@@ -37,7 +44,7 @@ const NeonIcon = ({ icon: Icon, iconStyle, isRounded, text, status }) => {
   return (
     <div className={containerClasses}>
       {Icon ? (
-        <div className={textShadowClass} style={iconStyle}>
+        <div className={textShadowClass + " " + className} style={iconStyle}>
           {Icon}
         </div>
       ) : (

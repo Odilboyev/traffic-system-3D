@@ -14,6 +14,7 @@ import DeviceErrorHistory from "../../sections/deviceErrorHistory";
 import DeviceManagement from "../../sections/deviceManagement";
 import FilterControl from "../controls/filterControl";
 import { HiCog8Tooth } from "react-icons/hi2";
+import InfoWidget from "../../widgets/infoWidget";
 import LanguageSwitcher from "../../sections/langSwitcher";
 import MarkerClusterType from "../../sections/markerClusterType";
 import MarkerControl from "../controls/markerControl";
@@ -72,188 +73,196 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
     }
   };
   return (
-    <div
-      tabIndex={0}
-      onMouseEnter={() => map.scrollWheelZoom?.disable()}
-      onMouseLeave={() => map.scrollWheelZoom.enable()}
-      className={` ${
-        isVisible ? "fixed" : "none"
-      } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
-        isSidebarOpen ? "w-[16vw]" : "w-18"
-      } transition-all duration-300 ease-in-out select-none`}
-    >
+    <>
       {" "}
-      {/* Toggle button */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          toggleSidebar();
-        }}
-        className="flex items-center rounded-none justify-center h-12 border-b border-gray-700 text-gray-400 hover:text-white"
+      <div
+        tabIndex={0}
+        onMouseEnter={() => map.scrollWheelZoom?.disable()}
+        onMouseLeave={() => map.scrollWheelZoom.enable()}
+        className={` ${
+          isVisible ? "fixed" : "none"
+        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
+          isSidebarOpen ? "w-[16vw]" : "w-18"
+        } transition-all duration-300 ease-in-out select-none`}
       >
-        {isSidebarOpen ? (
-          <IoIosArrowBack size={24} />
-        ) : (
-          <IoIosArrowForward size={24} />
-        )}
-      </button>
-      {/* Datetime Display */}
-      <div className="no-scrollbar pb-[40%] flex flex-col items-center space-y-3 gap-1 overflow-y-auto flex-grow">
-        {/* Widgets */}
-        <UserName t={t} isSidebarOpen={isSidebarOpen} />
-        {widgets.time && (
-          <DateTime
-            t={t}
-            isSidebarOpen={isSidebarOpen}
-            currentLocation={currentLocation}
-          />
-        )}{" "}
-        {widgets.weather && <WeatherCard t={t} isSidebarOpen={isSidebarOpen} />}
-        {/* Sidebar items */}
-        <div className="flex flex-col items-center space-y-3 w-full">
-          <SidebarItem
-            icon={<FaFilter size={24} />}
-            label={"markerFilters"}
-            isSidebarOpen={isSidebarOpen}
-            activeSidePanel={activeSidePanel}
-            setActiveSidePanel={setActiveSidePanel}
-            t={t}
-            extraContent={<FilterControl t={t} />} // Include your custom component here
-          />
-          <SidebarItem
-            icon={<FaLocationDot size={24} />}
-            label="regionControl"
-            isSidebarOpen={isSidebarOpen}
-            t={t}
-            activeSidePanel={activeSidePanel}
-            setActiveSidePanel={setActiveSidePanel}
-            extraContent={
-              <RegionControl t={t} activeSidePanel={activeSidePanel} />
-            } // Another custom component
-          />
-          <SidebarItem
-            icon={<HiCog8Tooth size={24} />}
-            label="widgetControl"
-            isSidebarOpen={isSidebarOpen}
-            t={t}
-            activeSidePanel={activeSidePanel}
-            setActiveSidePanel={setActiveSidePanel}
-            extraContent={<WidgetControl t={t} />} // Another custom component
-          />
-          {isPermitted && (
-            <SidebarItem
-              icon={<CogIcon className="w-6 h-6" />}
+        {" "}
+        {/* Toggle button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleSidebar();
+          }}
+          className="flex items-center rounded-none justify-center h-12 border-b border-gray-700 text-gray-400 hover:text-white"
+        >
+          {isSidebarOpen ? (
+            <IoIosArrowBack size={24} />
+          ) : (
+            <IoIosArrowForward size={24} />
+          )}
+        </button>
+        {/* Datetime Display */}
+        <div className="no-scrollbar pb-[40%] flex flex-col items-center space-y-3 gap-1 overflow-y-auto flex-grow">
+          {/* Widgets */}
+          <UserName t={t} isSidebarOpen={isSidebarOpen} />
+          {widgets.time && (
+            <DateTime
+              t={t}
               isSidebarOpen={isSidebarOpen}
-              label="deviceManagement"
+              currentLocation={currentLocation}
+            />
+          )}{" "}
+          {widgets.weather && (
+            <WeatherCard t={t} isSidebarOpen={isSidebarOpen} />
+          )}
+          {/* Sidebar items */}
+          <div className="flex flex-col items-center space-y-3 w-full">
+            <SidebarItem
+              icon={<FaFilter size={24} />}
+              label={"markerFilters"}
+              isSidebarOpen={isSidebarOpen}
+              activeSidePanel={activeSidePanel}
+              setActiveSidePanel={setActiveSidePanel}
+              t={t}
+              extraContent={<FilterControl t={t} />} // Include your custom component here
+            />
+            <SidebarItem
+              icon={<FaLocationDot size={24} />}
+              label="regionControl"
+              isSidebarOpen={isSidebarOpen}
+              t={t}
               activeSidePanel={activeSidePanel}
               setActiveSidePanel={setActiveSidePanel}
               extraContent={
-                <DeviceManagement
-                  setIsSidebarVisible={setIsVisible}
+                <RegionControl t={t} activeSidePanel={activeSidePanel} />
+              } // Another custom component
+            />
+            <SidebarItem
+              icon={<HiCog8Tooth size={24} />}
+              label="widgetControl"
+              isSidebarOpen={isSidebarOpen}
+              t={t}
+              activeSidePanel={activeSidePanel}
+              setActiveSidePanel={setActiveSidePanel}
+              extraContent={<WidgetControl t={t} />} // Another custom component
+            />
+            {isPermitted && (
+              <SidebarItem
+                icon={<CogIcon className="w-6 h-6" />}
+                isSidebarOpen={isSidebarOpen}
+                label="deviceManagement"
+                activeSidePanel={activeSidePanel}
+                setActiveSidePanel={setActiveSidePanel}
+                extraContent={
+                  <DeviceManagement
+                    setIsSidebarVisible={setIsVisible}
+                    activeSidePanel={activeSidePanel}
+                    setActiveSidePanel={setActiveSidePanel}
+                  />
+                }
+                t={t}
+              />
+            )}
+            <SidebarItem
+              icon={<MdHistory size={24} />}
+              isSidebarOpen={isSidebarOpen}
+              label="deviceErrorHistory"
+              activeSidePanel={activeSidePanel}
+              setActiveSidePanel={(e) => {
+                setActiveSidePanel(e);
+                setIsVisible(false);
+              }}
+              content={
+                <DeviceErrorHistory
                   activeSidePanel={activeSidePanel}
-                  setActiveSidePanel={setActiveSidePanel}
+                  setActiveSidePanel={(e) => {
+                    setActiveSidePanel(e);
+                    setIsVisible(true);
+                  }}
                 />
               }
               t={t}
             />
-          )}
-          <SidebarItem
-            icon={<MdHistory size={24} />}
-            isSidebarOpen={isSidebarOpen}
-            label="deviceErrorHistory"
-            activeSidePanel={activeSidePanel}
-            setActiveSidePanel={(e) => {
-              setActiveSidePanel(e);
-              setIsVisible(false);
-            }}
-            content={
-              <DeviceErrorHistory
-                activeSidePanel={activeSidePanel}
-                setActiveSidePanel={(e) => {
-                  setActiveSidePanel(e);
-                  setIsVisible(true);
-                }}
-              />
-            }
-            t={t}
-          />
 
-          <SidebarItem
-            icon={<TbBell size={24} />}
-            isSidebarOpen={isSidebarOpen}
-            label="currentAlarms"
-            activeSidePanel={activeSidePanel}
-            setActiveSidePanel={(e) => {
-              setActiveSidePanel(e);
-              setIsVisible(false);
-            }}
-            content={
-              <CurrentAlarms
-                activeSidePanel={activeSidePanel}
-                setActiveSidePanel={(e) => {
-                  setActiveSidePanel(e);
-                  setIsVisible(true);
-                }}
-              />
-            }
-            t={t}
-          />
-        </div>
-      </div>
-      <div
-        className={`flex items-center fixed bottom-0 left-0 ${
-          isSidebarOpen
-            ? "justify-evenly px-4 py-3"
-            : "justify-center px-2 py-3"
-        } w-full  gap-2 items-center bg-gray-900/70 !backdrop-blur-md border-t border-gray-500/20`}
-      >
-        <SidebarSecondaryItem
-          onClick={toggleTheme}
-          icon={theme === "light" ? MdBedtime : IoMdSunny}
-        />
-
-        {isSidebarOpen && (
-          <>
-            <SidebarSecondaryItem
-              icon={LanguageIcon}
-              label="language"
-              activeSecondaryPanel={activeSecondaryPanel}
-              setActiveSecondaryPanel={setActiveSecondaryPanel}
-              component={
-                <LanguageSwitcher
-                  setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
+            <SidebarItem
+              icon={<TbBell size={24} />}
+              isSidebarOpen={isSidebarOpen}
+              label="currentAlarms"
+              activeSidePanel={activeSidePanel}
+              setActiveSidePanel={(e) => {
+                setActiveSidePanel(e);
+                setIsVisible(false);
+              }}
+              content={
+                <CurrentAlarms
+                  activeSidePanel={activeSidePanel}
+                  setActiveSidePanel={(e) => {
+                    setActiveSidePanel(e);
+                    setIsVisible(true);
+                  }}
                 />
               }
+              t={t}
             />
-            <SidebarSecondaryItem
-              icon={CogIcon}
-              label={"settings"}
-              activeSecondaryPanel={activeSecondaryPanel}
-              setActiveSecondaryPanel={setActiveSecondaryPanel}
-              component={<MarkerControl t={t} />}
-            />
-            <SidebarSecondaryItem
-              icon={FaMap}
-              label={"tile_layer_control"}
-              activeSecondaryPanel={activeSecondaryPanel}
-              setActiveSecondaryPanel={setActiveSecondaryPanel}
-              component={<TileLayerControl t={t} />}
-            />
-            <SidebarSecondaryItem
-              icon={MdBubbleChart}
-              label={"clusterization"}
-              activeSecondaryPanel={activeSecondaryPanel}
-              setActiveSecondaryPanel={setActiveSecondaryPanel}
-              component={<MarkerClusterType t={t} />}
-            />
-            <SidebarSecondaryItem
-              onClick={toggleFullSceen}
-              icon={fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
-            />
-          </>
-        )}
+          </div>
+        </div>
+        <div
+          className={`flex items-center fixed bottom-0 left-0 ${
+            isSidebarOpen
+              ? "justify-evenly px-4 py-3"
+              : "justify-center px-2 py-3"
+          } w-full  gap-2 items-center bg-gray-900/70 !backdrop-blur-md border-t border-gray-500/20`}
+        >
+          <SidebarSecondaryItem
+            onClick={toggleTheme}
+            icon={theme === "light" ? MdBedtime : IoMdSunny}
+          />
+
+          {isSidebarOpen && (
+            <>
+              <SidebarSecondaryItem
+                icon={LanguageIcon}
+                label="language"
+                activeSecondaryPanel={activeSecondaryPanel}
+                setActiveSecondaryPanel={setActiveSecondaryPanel}
+                component={
+                  <LanguageSwitcher
+                    setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
+                  />
+                }
+              />
+              <SidebarSecondaryItem
+                icon={CogIcon}
+                label={"settings"}
+                activeSecondaryPanel={activeSecondaryPanel}
+                setActiveSecondaryPanel={setActiveSecondaryPanel}
+                component={<MarkerControl t={t} />}
+              />
+              <SidebarSecondaryItem
+                icon={FaMap}
+                label={"tile_layer_control"}
+                activeSecondaryPanel={activeSecondaryPanel}
+                setActiveSecondaryPanel={setActiveSecondaryPanel}
+                component={<TileLayerControl t={t} />}
+              />
+              <SidebarSecondaryItem
+                icon={MdBubbleChart}
+                label={"clusterization"}
+                activeSecondaryPanel={activeSecondaryPanel}
+                setActiveSecondaryPanel={setActiveSecondaryPanel}
+                component={<MarkerClusterType t={t} />}
+              />
+              <SidebarSecondaryItem
+                onClick={toggleFullSceen}
+                icon={fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
+              />
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      {widgets.bottomsection && (
+        <InfoWidget t={t} isSideBarOpen={isSidebarOpen} />
+      )}
+    </>
   );
 };
 

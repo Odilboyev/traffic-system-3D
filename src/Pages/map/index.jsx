@@ -6,7 +6,6 @@ import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import Control from "../../components/customControl/index.jsx";
 import CrossroadWidget from "./widgets/crossroadData";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
-import InfoWidget from "./widgets/infoWidget/index.jsx";
 import MapEvents from "./components/MapEvents/index.jsx";
 import MapModals from "./components/MapModals/index.jsx";
 import PropTypes from "prop-types";
@@ -177,9 +176,6 @@ const MapComponent = ({ changedMarker, t }) => {
           </div>
         </Control>
         {/* <Control position="bottomcenter"> */}
-        {widgets.bottomsection && (
-          <InfoWidget cardsInfoData={bottomSectionData} />
-        )}
         {/* </Control> */}
         {isbigMonitorOpen && activeMarker ? (
           <CrossroadWidget
