@@ -1,30 +1,42 @@
+import { migrateLocalStorage, safeParseJSON } from "./utils";
+
 import { createSlice } from "@reduxjs/toolkit";
 
 // mapSlice.js
-const getInitialState = () => ({
-  markers: JSON.parse(localStorage.getItem("its_markers")) || [],
-  areMarkersLoading:
-    JSON.parse(localStorage.getItem("its_areMarkersLoading")) || false,
-  errorMessage: JSON.parse(localStorage.getItem("its_errorMessage")) || null,
-  filter: JSON.parse(localStorage.getItem("its_filter")) || {
-    boxcontroller: true,
-    crossroad: true,
-    trafficlights: true,
-    camera: true,
-    cameraview: true,
-    camerapdd: true,
-  },
-  isDraggable: JSON.parse(localStorage.getItem("its_isDraggable")) || false,
-  useClusteredMarkers:
-    JSON.parse(localStorage.getItem("its_useClusteredMarkers")) || "clustered",
-  activeSidePanel:
-    JSON.parse(localStorage.getItem("its_activeSidePanel")) || null,
-  widgets: JSON.parse(localStorage.getItem("its_widgets")) || {
-    bottomsection: true,
-    weather: true,
-    crossroad: false,
-  },
-});
+const getInitialState = () => {
+  const defaultState = {
+    markers: [],
+    areMarkersLoading: false,
+    errorMessage: null,
+    filter: {
+      boxcontroller: true,
+      crossroad: true,
+      trafficlights: true,
+      camera: true,
+      cameraview: true,
+      camerapdd: true,
+    },
+    isDraggable: false,
+    useClusteredMarkers: "clustered",
+    activeSidePanel: null,
+    widgets: {
+      bottomsection: true,
+      weather: true,
+      time: true,
+    },
+  };
+
+  migrateLocalStorage(defaultState);
+
+  return Object.fromEntries(
+    Object.entries(defaultState).map(([key, defaultValue]) => [
+      key,
+      safeParseJSON(`its_${key}`, defaultValue),
+    ])
+  );
+};
+
+export { getInitialState };
 
 export const mapSlice = createSlice({
   name: "map",

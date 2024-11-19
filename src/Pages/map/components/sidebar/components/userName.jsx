@@ -1,5 +1,14 @@
+import {
+  Button,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+  IconButton,
+} from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 
+import { FiLogOut } from "react-icons/fi";
 import { getInfoAboutCurrentUser } from "../../../../../api/api.handlers";
 
 /**
@@ -9,6 +18,7 @@ import { getInfoAboutCurrentUser } from "../../../../../api/api.handlers";
  */
 const UserName = ({ t, isSidebarOpen }) => {
   const [userInfo, setUserInfo] = useState(null);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -21,18 +31,74 @@ const UserName = ({ t, isSidebarOpen }) => {
     };
     fetchUserInfo();
   }, []);
+  const confirmLogout = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
+
   return (
-    <div className=" bg-blue-gray-900/10 py-2 backdrop-blur-xl text-center flex flex-col w-full">
+    <div
+      className={`${
+        isSidebarOpen
+          ? "justify-between "
+          : "justify-center hover:bg-gray-700 cursor-pointer "
+      } bg-blue-gray-900/10 px-4 py-3 backdrop-blur-xl flex  w-full`}
+    >
       {isSidebarOpen ? (
         <>
-          <div className="text-lg font-bold text-gray-300">
-            {userInfo?.name}
+          <div>
+            <div className="text-lg font-bold text-gray-300">
+              {userInfo?.name}
+            </div>
+            <div className="text-sm font-bold text-gray-300">
+              {t(userInfo?.role)}
+            </div>
           </div>
-          <div className="text-sm  text-gray-300">{t(userInfo?.role)}</div>
+          <IconButton onClick={() => setIsLogoutModalOpen(!isLogoutModalOpen)}>
+            <FiLogOut className="w-6 h-6" />
+          </IconButton>
         </>
       ) : (
-        <div className="text-sm font-bold">{t(userInfo?.role)}</div>
+        <div
+          className=""
+          onClick={() => setIsLogoutModalOpen(!isLogoutModalOpen)}
+        >
+          <FiLogOut className="w-6 h-6" />
+        </div>
       )}
+
+      <Dialog
+        open={isLogoutModalOpen}
+        handler={() => setIsLogoutModalOpen(false)}
+        className="dark:bg-gray-800"
+      >
+        <DialogHeader className="dark:text-white">
+          <div className="">{t("confirm_logout")}</div>{" "}
+        </DialogHeader>
+        <DialogBody className=" dark:text-gray-300">
+          {/* Are you sure you want to logout? */}
+          <div className="text-lg font-bold">{userInfo?.name}</div>
+          {t("confirm_logout_message")}
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            variant="text"
+            color="gray"
+            onClick={() => setIsLogoutModalOpen(false)}
+            className="mr-1 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="gradient"
+            color="red"
+            onClick={confirmLogout}
+            className="dark:bg-red-600 dark:hover:bg-red-700"
+          >
+            Logout
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };

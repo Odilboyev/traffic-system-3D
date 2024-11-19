@@ -30,11 +30,11 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
   const iconPath = "icons/wheather_icons";
 
   return (
-    <div className="w-full text-white bg-blue-gray-900/10 backdrop-blur-xl py-2">
+    <div className="w-full px-4 py-3 text-white bg-blue-gray-900/10 backdrop-blur-xl ">
       {isSidebarOpen ? (
-        <div className=" flex justify-evenly h-full">
+        <div className="flex justify-between h-full">
           {/* Current Weather */}
-          <div className="px-4 py-2 h-full flex flex-col justify-between  rounded">
+          <div className=" h-full flex flex-col justify-between  rounded">
             <div className="flex items-center gap-3 mb-1 ">
               <div className="p-2 rounded-full bg-white/30">
                 <img
@@ -62,7 +62,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
           </div>
 
           {/* Forecast */}
-          <div className="flex flex-col gap-2 ">
+          <div className="flex flex-col gap-1">
             {/* Day Forecast */}
             <div className=" border border-blue-gray-200/20 rounded py-2 px-3">
               <div className="flex items-center gap-2">

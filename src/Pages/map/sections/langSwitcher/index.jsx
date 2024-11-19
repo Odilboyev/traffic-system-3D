@@ -20,12 +20,14 @@ const LanguageSwitch = ({ setIsSidebarOpen }) => {
   };
 
   return (
-    <div className="flex flex-col p-3 rounded-md bg-gray-900/80  backdrop-blur-md">
+    <div className="flex flex-col rounded-md bg-gray-900/80  backdrop-blur-md">
       {languages.map((language, i) => (
         <Radio
           key={i}
           checked={selectedLanguage === language.code}
+          value={selectedLanguage === language.code}
           className="checked:bg-white"
+          color="blue-gray"
           variant={selectedLanguage === language.code ? "filled" : "outlined"}
           onChange={() => handleLanguageChange(language.code)}
           label={

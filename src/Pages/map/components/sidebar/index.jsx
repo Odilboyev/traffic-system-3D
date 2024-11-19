@@ -1,23 +1,22 @@
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
-  MapIcon,
 } from "@heroicons/react/16/solid";
 import { CogIcon, LanguageIcon } from "@heroicons/react/24/solid";
 import { FaFilter, FaLocationDot, FaMap } from "react-icons/fa6";
 import { IoIosArrowBack, IoIosArrowForward, IoMdSunny } from "react-icons/io";
-import { MdBedtime, MdHistory } from "react-icons/md";
+import { MdBedtime, MdBubbleChart, MdHistory } from "react-icons/md";
+import { useMap, useMapEvents } from "react-leaflet";
 
 import CurrentAlarms from "../../sections/currentAlarms";
 import DateTime from "./components/time";
 import DeviceErrorHistory from "../../sections/deviceErrorHistory";
 import DeviceManagement from "../../sections/deviceManagement";
-import { FiLogOut } from "react-icons/fi";
 import FilterControl from "../controls/filterControl";
 import { HiCog8Tooth } from "react-icons/hi2";
 import LanguageSwitcher from "../../sections/langSwitcher";
-import LogoutControl from "../controls/logoutControl";
 import MarkerClusterType from "../../sections/markerClusterType";
+import MarkerControl from "../controls/markerControl";
 import RegionControl from "../controls/regionControl";
 import SidebarItem from "./components/sidebarItem";
 import SidebarSecondaryItem from "./components/sidebarSecondaryItem";
@@ -28,7 +27,7 @@ import WeatherCard from "../../widgets/weather/weatherCard";
 import WidgetControl from "../controls/widgetControl";
 import { isPermitted } from "../../constants/roles";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
-import { useMap } from "react-leaflet";
+import { useMapMarkers } from "../../hooks/useMapMarkers";
 import { useState } from "react";
 import { useTheme } from "../../../../customHooks/useTheme";
 
@@ -40,12 +39,23 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
     "is_sidebar_open_its",
     false
   );
+  const [currentLocation, setCurrentLocation] = useLocalStorageState(
+    "its_currentLocation"
+  );
+  const { widgets } = useMapMarkers();
+  useMapEvents({
+    moveend: () => {
+      const center = map.getCenter();
+      setCurrentLocation([+center.lat, +center.lng]);
+    },
+  });
 
   const [activeSidePanel, setActiveSidePanel] = useState(null);
   const [activeSecondaryPanel, setActiveSecondaryPanel] = useState(null);
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
     setActiveSecondaryPanel(null);
+    setActiveSidePanel(null);
   };
 
   const [fulscreen, setFullscreen] = useState(false);
@@ -61,7 +71,6 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       }
     }
   };
-
   return (
     <div
       tabIndex={0}
@@ -92,9 +101,14 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       <div className="no-scrollbar pb-[40%] flex flex-col items-center space-y-3 gap-1 overflow-y-auto flex-grow">
         {/* Widgets */}
         <UserName t={t} isSidebarOpen={isSidebarOpen} />
-        <DateTime t={t} isSidebarOpen={isSidebarOpen} />
-        <WeatherCard t={t} isSidebarOpen={isSidebarOpen} />
-
+        {widgets.time && (
+          <DateTime
+            t={t}
+            isSidebarOpen={isSidebarOpen}
+            currentLocation={currentLocation}
+          />
+        )}{" "}
+        {widgets.weather && <WeatherCard t={t} isSidebarOpen={isSidebarOpen} />}
         {/* Sidebar items */}
         <div className="flex flex-col items-center space-y-3 w-full">
           <SidebarItem
@@ -188,15 +202,14 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       </div>
       <div
         className={`flex items-center fixed bottom-0 left-0 ${
-          isSidebarOpen ? "justify-evenly" : "justify-center"
-        } w-full px-4 py-3 gap-2 items-center bg-gray-900/70 !backdrop-blur-md border-t border-gray-500/20`}
+          isSidebarOpen
+            ? "justify-evenly px-4 py-3"
+            : "justify-center px-2 py-3"
+        } w-full  gap-2 items-center bg-gray-900/70 !backdrop-blur-md border-t border-gray-500/20`}
       >
-        {/* <Suspense fallback={<div></div>}> */}
         <SidebarSecondaryItem
-          icon={FiLogOut}
-          activeSecondaryPanel={activeSecondaryPanel}
-          setActiveSecondaryPanel={setActiveSecondaryPanel}
-          component={<LogoutControl t={t} />}
+          onClick={toggleTheme}
+          icon={theme === "light" ? MdBedtime : IoMdSunny}
         />
 
         {isSidebarOpen && (
@@ -213,6 +226,13 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
               }
             />
             <SidebarSecondaryItem
+              icon={CogIcon}
+              label={"settings"}
+              activeSecondaryPanel={activeSecondaryPanel}
+              setActiveSecondaryPanel={setActiveSecondaryPanel}
+              component={<MarkerControl t={t} />}
+            />
+            <SidebarSecondaryItem
               icon={FaMap}
               label={"tile_layer_control"}
               activeSecondaryPanel={activeSecondaryPanel}
@@ -220,8 +240,8 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
               component={<TileLayerControl t={t} />}
             />
             <SidebarSecondaryItem
-              icon={MapIcon}
-              label={"markers"}
+              icon={MdBubbleChart}
+              label={"clusterization"}
               activeSecondaryPanel={activeSecondaryPanel}
               setActiveSecondaryPanel={setActiveSecondaryPanel}
               component={<MarkerClusterType t={t} />}
@@ -230,18 +250,11 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
               onClick={toggleFullSceen}
               icon={fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
             />
-            <SidebarSecondaryItem
-              onClick={toggleTheme}
-              icon={theme === "light" ? MdBedtime : IoMdSunny}
-            />
           </>
         )}
-        {/* </Suspense> */}
       </div>
     </div>
   );
 };
-
-// SidebarItem Component with extra content
 
 export default Sidebar;

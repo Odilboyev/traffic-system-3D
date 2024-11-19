@@ -29,7 +29,6 @@ const useMapMarkers = () => {
   const filter = useSelector((state) => state.map.filter);
   const widgets = useSelector((state) => state.map.widgets);
   const isDraggable = useSelector((state) => state.map.isDraggable);
-
   // Action to fetch data
   const getDataHandler = useCallback(async () => {
     dispatch(updateLoadingState(true));

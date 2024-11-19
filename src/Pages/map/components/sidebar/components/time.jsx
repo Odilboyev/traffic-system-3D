@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 
-const DateTime = ({ t, isSidebarOpen }) => {
+const DateTime = ({ t, isSidebarOpen, currentLocation }) => {
   const [time, setTime] = useState(new Date());
-  const [location, setLocation] = useState("Tashkent");
-
   useEffect(() => {
     const timerId = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timerId);
   }, []);
-
+  const location = "Tashkent";
   return (
-    <div className="w-full bg-blue-gray-900/10 py-2 backdrop-blur-xl text-center flex items-center justify-evenly">
+    <div className="w-full bg-blue-gray-900/10  px-4 py-3 backdrop-blur-xl flex items-center justify-between">
       {isSidebarOpen ? (
         <>
-          <div className="text-base font-bold text-gray-300">
+          <div className="text-base  font-bold text-gray-300">
             <div className="text-xs text-gray-400">{t("region")}</div>
             <div className="text-lg font-bold">{location}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-right text-gray-400">
               {time.toLocaleDateString(undefined, options)}
             </div>
-            <div className="text-lg font-bold">{timeToString(time)}</div>
+            <div className="text-lg text-right font-bold">
+              {timeToString(time)}
+            </div>
           </div>
         </>
       ) : (

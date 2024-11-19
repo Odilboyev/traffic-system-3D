@@ -4,16 +4,7 @@ import { useMapMarkers } from "../../../hooks/useMapMarkers";
 
 const FilterControl = ({ t }) => {
   const { filter, setFilter } = useMapMarkers();
-  const filterOptios = [
-    { type: "all", label: t("all") },
-    { type: "box", label: t("boxcontroller") },
-    { type: "camera", label: t("camera") },
-    { type: "cameraview", label: t("cameraview") },
-    { type: "camerapdd", label: t("camerapdd") },
-    { type: "crossroad", label: t("crossroad") },
-    { type: "trafficlights", label: t("svetofor") },
-    { type: "signs", label: t("signs") },
-  ];
+
   const filterOptions = Object.keys(filter).map((v, i) => ({
     type: v,
     label: t(v),

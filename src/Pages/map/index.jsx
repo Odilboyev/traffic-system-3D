@@ -33,6 +33,7 @@ const MapComponent = ({ changedMarker, t }) => {
     filter,
     widgets,
     isDraggable,
+    currentLocation,
   } = useMapMarkers();
   const [map, setMap] = useState(null);
   const { fetchAlarmsData } = useMapAlarms();
@@ -43,9 +44,7 @@ const MapComponent = ({ changedMarker, t }) => {
   //theme
   const { theme, currentLayer } = useTheme();
 
-  const center = JSON.parse(localStorage.getItem("mapCenter"))
-    ? JSON.parse(localStorage.getItem("mapCenter"))
-    : home;
+  // const center = currentLocation ?? home;
   const [zoom, setZoom] = useState(
     localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
   );
@@ -139,8 +138,8 @@ const MapComponent = ({ changedMarker, t }) => {
         // ref={map}
         id="monitoring"
         attributionControl={false}
-        center={center}
-        zoom={zoom}
+        center={JSON.parse(localStorage.getItem("its_currentLocation")) ?? home}
+        zoom={JSON.parse(localStorage.getItem("its_currentZoom")) ?? 13}
         zoomDelta={0.6}
         doubleClickZoom={false}
         style={{ height: "100vh", width: "100%" }}
@@ -155,10 +154,11 @@ const MapComponent = ({ changedMarker, t }) => {
         <ToastContainer containerId="alarms" className="z-[9998]" />
         <MapEvents
           setMap={setMap}
+          setZoom={setZoom}
           setMarkers={setMarkers}
           changedMarker={changedMarker}
           fetchAlarmsData={fetchAlarmsData}
-          setZoom={setZoom}
+          // setZoom={setZoom}
         />
         {currentLayerDetails && (
           <TileLayer
@@ -176,11 +176,11 @@ const MapComponent = ({ changedMarker, t }) => {
             Zoom: {zoom}
           </div>
         </Control>
-        <Control position="bottomcenter">
-          {widgets.bottomsection && (
-            <InfoWidget cardsInfoData={bottomSectionData} />
-          )}
-        </Control>
+        {/* <Control position="bottomcenter"> */}
+        {widgets.bottomsection && (
+          <InfoWidget cardsInfoData={bottomSectionData} />
+        )}
+        {/* </Control> */}
         {isbigMonitorOpen && activeMarker ? (
           <CrossroadWidget
             t={t}

@@ -1,7 +1,7 @@
-import { MapIcon } from "@heroicons/react/16/solid";
 import { Radio, Typography } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
 import baseLayers, { layerSave } from "../../../../../configurations/mapLayers";
+import { useEffect, useState } from "react";
+
 import { useTheme } from "../../../../../customHooks/useTheme";
 
 const TileLayerControl = ({ t }) => {
@@ -31,12 +31,13 @@ const TileLayerControl = ({ t }) => {
     }
   }, [theme]);
   return (
-    <div className="flex flex-col p-3 min-w-[10vw]">
+    <div className="flex flex-col min-w-[10vw]">
       {filteredLayers.map((layer) => (
         <Radio
           key={layer.name}
           checked={selectedLayer === layer.name}
           className="checked:bg-white"
+          color="blue-gray"
           variant={selectedLayer === layer.name ? "filled" : "outlined"}
           onChange={() => handleLayerChange(layer.name)}
           label={
