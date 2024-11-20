@@ -1,6 +1,7 @@
-import L from "leaflet";
 import { useEffect, useState } from "react";
 import { useMap, useMapEvents } from "react-leaflet";
+
+import L from "leaflet";
 
 const useMapDataFetcher = ({
   fetchData, // function to fetch data
@@ -24,11 +25,6 @@ const useMapDataFetcher = ({
       const distance = lastSuccessfulLocation
         ? currentLocation.distanceTo(lastSuccessfulLocation)
         : Infinity;
-
-      // Debug logging
-      console.log("Distance moved:", distance);
-      console.log("Threshold:", fetchDistanceThreshold);
-      console.log("Last location:", lastSuccessfulLocation);
 
       if (
         !lastSuccessfulLocation ||

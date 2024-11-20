@@ -43,6 +43,8 @@ const getMarkerData = async () => getData(import.meta.env.VITE_MARKER_DATA);
 const getBoxData = async (id) => getData(import.meta.env.VITE_DEVICE_DATA, id);
 const getCrossRoadData = async (id) =>
   getData(import.meta.env.VITE_CROSSROAD_DATA, id);
+const getCrossRoadInfo = async (id) =>
+  getData(import.meta.env.VITE_CROSSROAD_INFO, "/" + id);
 const getTrafficLightsData = async (id) =>
   getData(import.meta.env.VITE_TRAFFICLIGHTS_DATA, id);
 const getCrossRoadChart = async (body) =>
@@ -188,6 +190,7 @@ export {
   getBoxSensorChart,
   getCrossRoadChart,
   getCrossRoadData,
+  getCrossRoadInfo,
   getCrossRoadStats,
   getCurrentAlarms,
   getDevices,

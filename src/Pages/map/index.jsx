@@ -4,7 +4,6 @@ import { memo, useEffect, useState } from "react";
 
 import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import Control from "../../components/customControl/index.jsx";
-import CrossroadWidget from "./widgets/crossroadData";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import MapEvents from "./components/MapEvents/index.jsx";
 import MapModals from "./components/MapModals/index.jsx";
@@ -150,6 +149,9 @@ const MapComponent = ({ changedMarker, t }) => {
           // mapRef={map}
           isVisible={isSidebarVisible}
           setIsVisible={setIsSidebarVisible}
+          isbigMonitorOpen={isbigMonitorOpen}
+          activeMarker={activeMarker}
+          handleCloseCrossroadModal={handleCloseCrossroadModal}
         />
         <ToastContainer containerId="alarms" className="z-[9998]" />
         <MapEvents
@@ -178,17 +180,6 @@ const MapComponent = ({ changedMarker, t }) => {
         </Control>
         {/* <Control position="bottomcenter"> */}
         {/* </Control> */}
-        {isbigMonitorOpen && activeMarker ? (
-          <CrossroadWidget
-            t={t}
-            isVisible={isSidebarVisible}
-            marker={activeMarker}
-            isOpen={isbigMonitorOpen}
-            onClose={handleCloseCrossroadModal}
-          />
-        ) : (
-          <div style={{ display: "none" }}></div>
-        )}
         {filter.trafficlights && <TrafficLightContainer />}
         {useClusteredMarkers === "clustered" ||
         useClusteredMarkers === "clustered_dynamically" ? (

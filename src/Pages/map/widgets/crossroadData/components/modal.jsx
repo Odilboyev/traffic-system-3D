@@ -14,13 +14,17 @@ import { XMarkIcon } from "@heroicons/react/16/solid";
 
 const CrossroadDataModal = ({
   t,
+  section,
   open,
   data,
   device,
   marker,
   handler,
-  section,
 }) => {
+  const isCamera =
+    section === "camera_pdd" ||
+    section === "camera_view" ||
+    section === "camera_traffic";
   return (
     <Dialog
       size={"lg"}
@@ -37,9 +41,11 @@ const CrossroadDataModal = ({
         </IconButton>
       </DialogHeader>
       <DialogBody className={`max-h-[90vh] overflow-y-scroll  no-scrollbar`}>
-        {section === "camera" && <Videos t={t} videos={data} />}
-        {section === "sensors" && <SensorPartWrapper t={t} device={device} />}
-        {section === "trafficlights" && (
+        {isCamera && <Videos t={t} videos={data[section].data} />}
+        {section === "box_device" && (
+          <SensorPartWrapper t={t} device={device} />
+        )}
+        {section === "svetofor" && (
           <div className="h-[80vh] relative">
             <TrafficLightDashboard t={t} id={marker?.cid} isInModal />{" "}
           </div>
@@ -48,7 +54,7 @@ const CrossroadDataModal = ({
           <CrossroadDashboard t={t} marker={marker} />
         )}
       </DialogBody>
-      <DialogFooter />
+      <DialogFooter>{""}</DialogFooter>
     </Dialog>
   );
 };

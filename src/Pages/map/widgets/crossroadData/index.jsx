@@ -1,8 +1,9 @@
 import { Button, Card, Typography } from "@material-tailwind/react";
-import { getBoxData, getCrossRoadData } from "../../../../api/api.handlers";
+import { getBoxData, getCrossRoadInfo } from "../../../../api/api.handlers";
 import { useEffect, useState } from "react";
 
 import CrossroadDataModal from "./components/modal";
+import Loader from "../../../../components/loader";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 
 const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
@@ -15,8 +16,9 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
   const fetchData = async (id) => {
     setIsLoading(true);
     try {
-      const crossroadData = await getCrossRoadData(id);
-      setData(crossroadData?.data.camera);
+      const crossroadData = await getCrossRoadInfo(id);
+      console.log(crossroadData?.data);
+      setData(crossroadData?.data);
     } catch (error) {
       console.error("Failed to fetch crossroad data:", error);
     } finally {
@@ -62,7 +64,6 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
     setSelectedSection(section);
     setOpenModal(true);
   };
-  console.log(marker, "handleOpenModal");
   return (
     <>
       <Card
@@ -83,24 +84,49 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
             </button>
           </div>
           <div className="flex flex-col mt-4 gap-3">
-            {sections.map((section, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-all"
-              >
-                <div className="flex items-center gap-2">
-                  {/* Add icon for better section visualization */}
-                  <span className="text-gray-300 text-lg">{t(section)}</span>
-                </div>
-                <Button
-                  variant="outlined"
-                  color="blue"
-                  onClick={() => handleOpenModal(section)}
-                >
-                  {t("show_all")}
-                </Button>
+            {!isLoading && data ? (
+              [
+                "camera_traffic",
+                "camera_pdd",
+                "camera_view",
+                "svetofor",
+                "box_device",
+                "statistics",
+              ].map((section, index) =>
+                data[section]?.data?.length > 0 ||
+                !section.toLowerCase().includes("camera") ? (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-all"
+                  >
+                    <div className="flex flex-col justify-center text-left gap-2">
+                      {/* Add icon for better section visualization */}
+                      <span className="text-gray-300 text-lg">
+                        {t(section)}
+                      </span>
+                      {data[section]?.data?.length && (
+                        <span className="text-sm text-gray-400">
+                          {t("amount")}: {data[section]?.data?.length}
+                        </span>
+                      )}
+                    </div>
+                    <Button
+                      variant="outlined"
+                      color="blue"
+                      onClick={() => handleOpenModal(section)}
+                    >
+                      {t("show_all")}
+                    </Button>
+                  </div>
+                ) : (
+                  ""
+                )
+              )
+            ) : (
+              <div>
+                <Loader />
               </div>
-            ))}
+            )}
           </div>
         </div>
       </Card>
@@ -121,4 +147,3 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
 };
 
 export default CrossroadWidget;
-const sections = ["camera", "sensors", "trafficlights", "statistics"];

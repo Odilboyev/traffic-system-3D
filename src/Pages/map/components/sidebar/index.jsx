@@ -8,6 +8,7 @@ import { IoIosArrowBack, IoIosArrowForward, IoMdSunny } from "react-icons/io";
 import { MdBedtime, MdBubbleChart, MdHistory } from "react-icons/md";
 import { useMap, useMapEvents } from "react-leaflet";
 
+import CrossroadWidget from "../../widgets/crossroadData";
 import CurrentAlarms from "../../sections/currentAlarms";
 import DateTime from "./components/time";
 import DeviceErrorHistory from "../../sections/deviceErrorHistory";
@@ -33,7 +34,14 @@ import { useState } from "react";
 import { useTheme } from "../../../../customHooks/useTheme";
 
 // Sidebar Component
-const Sidebar = ({ t, isVisible, setIsVisible }) => {
+const Sidebar = ({
+  t,
+  isVisible,
+  setIsVisible,
+  isbigMonitorOpen,
+  activeMarker,
+  handleCloseCrossroadModal,
+}) => {
   const map = useMap();
   const { theme, toggleTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useLocalStorageState(
@@ -82,7 +90,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
         className={` ${
           isVisible ? "fixed" : "none"
         } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
-          isSidebarOpen ? "w-[16vw]" : "w-18"
+          isSidebarOpen ? "w-[15vw]" : "w-18"
         } transition-all duration-300 ease-in-out select-none`}
       >
         {" "}
@@ -210,7 +218,7 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
             isSidebarOpen
               ? "justify-evenly px-4 py-3"
               : "justify-center px-2 py-3"
-          } w-full  gap-2 items-center bg-gray-900/70 !backdrop-blur-md border-t border-gray-500/20`}
+          } w-full max-w-full overflow-x-scroll no-scrollbar gap-2 items-center bg-gray-900/70 !backdrop-blur-md border-t border-gray-500/20`}
         >
           <SidebarSecondaryItem
             onClick={toggleTheme}
@@ -261,6 +269,17 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       </div>
       {widgets.bottomsection && (
         <InfoWidget t={t} isSideBarOpen={isSidebarOpen} />
+      )}
+      {isbigMonitorOpen && activeMarker ? (
+        <CrossroadWidget
+          t={t}
+          isVisible={isVisible}
+          marker={activeMarker}
+          isOpen={isbigMonitorOpen}
+          onClose={handleCloseCrossroadModal}
+        />
+      ) : (
+        <div style={{ display: "none" }}></div>
       )}
     </>
   );
