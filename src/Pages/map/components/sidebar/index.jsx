@@ -77,8 +77,8 @@ const Sidebar = ({ t, isVisible, setIsVisible }) => {
       {" "}
       <div
         tabIndex={0}
-        onMouseEnter={() => map.scrollWheelZoom?.disable()}
-        onMouseLeave={() => map.scrollWheelZoom.enable()}
+        onPointerEnter={() => map.scrollWheelZoom?.disable()}
+        onPointerLeave={() => map.scrollWheelZoom.enable()}
         className={` ${
           isVisible ? "fixed" : "none"
         } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${

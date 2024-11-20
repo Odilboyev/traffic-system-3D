@@ -43,7 +43,7 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type, t }) => {
           onSubmit(formData); // Submit form data
           setFormData(null);
         }}
-        className="p-8 w-full max-w-[80vw] mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
+        className="p-8 w-full max-w-[80vw] mt-[3%] mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
       >
         {formData && (
           <div className="flex flex-col gap-6 static">

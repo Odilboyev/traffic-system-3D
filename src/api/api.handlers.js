@@ -1,6 +1,6 @@
 import axios from "axios";
-import login from "../Auth";
 import config from "./api.config";
+import login from "../Auth";
 
 // Helper function to handle responses
 const handleResponse = (res) => {
@@ -73,6 +73,8 @@ const getAllMarkers = async (body) =>
 const getDistricts = async (region_id) =>
   getDataWithParams(import.meta.env.VITE_DISTRICTS, { region_id });
 const getRegions = async () => getData(import.meta.env.VITE_REGIONS);
+const getOverviewCameraModels = async () =>
+  getData(import.meta.env.VITE_OVERVIEW_CAMERA + "/camera_view_model");
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -197,6 +199,7 @@ export {
   getNearbySigns,
   getNearbyTrafficLights,
   getRegions,
+  getOverviewCameraModels,
   getTexts,
   getTrafficLightsConfig,
   getTrafficLightsData,

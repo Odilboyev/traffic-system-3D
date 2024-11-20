@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import InputField from "../../../../../../../components/InputField";
 import LocationPicker from "../../../../../../../components/LocationPicker";
 import SelectField from "../../../../../../../components/SelectField";
-import { fetchDataForManagement } from "../../../../../../../api/api.handlers";
-import { toast } from "react-toastify";
-import { MdCameraAlt, MdFlag } from "react-icons/md";
+import { MdFlag } from "react-icons/md";
 import { t } from "i18next";
 import { crossroadHandler } from "../utils";
+import { PiSecurityCameraDuotone } from "react-icons/pi";
 
 // CameraPdd-specific fields
 const CameraPddFields = ({ formData, handleInputChange }) => {
@@ -45,7 +44,7 @@ const CameraPddFields = ({ formData, handleInputChange }) => {
           <InputField
             key={field}
             required
-            icon={MdCameraAlt}
+            icon={PiSecurityCameraDuotone}
             label={t(field)}
             value={formData[field] || ""}
             onChange={(e) => handleInputChange(field, e.target.value)}

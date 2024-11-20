@@ -78,7 +78,7 @@ const DeviceManagement = ({
           modalToastConfig
         );
       } finally {
-        // setDeviceLoading(false);
+        setDeviceLoading(false);
       }
     },
     [deviceType]

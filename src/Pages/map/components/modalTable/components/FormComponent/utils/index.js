@@ -1,5 +1,5 @@
-import { toast } from "react-toastify";
 import { fetchDataForManagement } from "../../../../../../../api/api.handlers";
+import { toast } from "react-toastify";
 
 // Get initial data based on type
 export const getInitialData = (type) => {
@@ -35,6 +35,7 @@ export const getInitialData = (type) => {
         sdk_port: 8000,
         lat: "",
         lng: "",
+        camera_view_model_id: "",
       };
     case "camerapdd":
       return {
@@ -105,6 +106,29 @@ export const crossroadHandler = async (
   } catch (error) {
     console.error("Error fetching crossroads:", error);
     toast.error("Failed to fetch crossroads.");
+    throw new Error(error);
+  }
+};
+export const modelHandler = async (
+  formData,
+  models,
+  setSelectedModel,
+  handleInputChange
+) => {
+  try {
+    if (formData.camera_view_model_id) {
+      setSelectedModel(
+        formData.camera_view_model_id
+          ? models.find((item) => item.id == formData.camera_view_model_id)
+          : models[0]
+      );
+    } else {
+      setSelectedModel(models[0]);
+      handleInputChange("camera_view_model_id", models[0].id);
+    }
+  } catch (error) {
+    console.error("Error fetching models:", error);
+    toast.error("Failed to fetch models.");
     throw new Error(error);
   }
 };
