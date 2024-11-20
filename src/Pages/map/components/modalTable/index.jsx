@@ -42,6 +42,7 @@ const ModalTable = ({
   tableDataCallback = () => {},
   tableSelectOptions,
   isFormOpen,
+  setIsEditing,
   submitNewData,
 }) => {
   const { theme } = useTheme();
@@ -180,6 +181,8 @@ const ModalTable = ({
               setIsSubPageOpen(false);
               settypeToShow("");
               setCurrentPage(1);
+              setEditData(null);
+              setIsEditing(false);
             }
       }
       title={typeToShow}
@@ -191,7 +194,11 @@ const ModalTable = ({
               data={editData}
               options={tableSelectOptions}
               onSubmit={handleFormSubmit}
-              onCancel={() => backButtonProps.onClick(false)}
+              onCancel={() => {
+                backButtonProps.onClick(false);
+                setEditData(null);
+                setIsEditing(false);
+              }}
               t={t}
             />
           ) : (

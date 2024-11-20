@@ -313,6 +313,7 @@ const DeviceManagement = ({
               ? (data) => modifyData("patch", deviceType, data)
               : (user) => handleUserStatus(user, "activate")
           }
+          setIsEditing={setIsEditing}
           editButtonCallback={setIsEditing}
           isFormOpen={showFormModal}
           submitNewData={(data) => {

@@ -36,8 +36,14 @@ export const shouldHideColumn = (
     "region_id",
     "district_id",
     "device_id",
+    "camera_view_model_id",
   ];
-  const hiddenOnSubPageKeys = ["type", "type_name", "device_id"];
+  const hiddenOnSubPageKeys = [
+    "type",
+    "type_name",
+    "device_id",
+    "camera_view_model_id",
+  ];
   const hiddenOnAllHistory = [
     "type",
     selectedFilter != null && "type_name",
@@ -58,6 +64,7 @@ export const getOrderedColumns = (columns) => {
     "crossroad_name",
     "region_name",
     "district_name",
+    "camera_view_model_name",
   ];
 
   return columns.sort((a, b) => {

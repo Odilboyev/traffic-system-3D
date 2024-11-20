@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
+
 import InputField from "../../../../../../../components/InputField";
-import LocationPicker from "../../../../../../../components/LocationPicker";
-import SelectField from "../../../../../../../components/SelectField";
-import { fetchDataForManagement } from "../../../../../../../api/api.handlers";
-import { toast } from "react-toastify";
-import { MdCameraAlt, MdFlag } from "react-icons/md";
-import { t } from "i18next";
-import { crossroadHandler } from "../utils";
 import { LiaTrafficLightSolid } from "react-icons/lia";
+import LocationPicker from "../../../../../../../components/LocationPicker";
+import { MdFlag } from "react-icons/md";
+import SelectField from "../../../../../../../components/SelectField";
+import { crossroadHandler } from "../utils";
+import { t } from "i18next";
 
 // TrafficLightsFields-specific fields
 const TrafficLightsFields = ({ formData, handleInputChange }) => {
@@ -21,7 +20,9 @@ const TrafficLightsFields = ({ formData, handleInputChange }) => {
       name: "FAMA",
     },
   ]);
-  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [selectedVendor, setSelectedVendor] = useState(
+    formData.vendor_id || null
+  );
   const [crossroads, setCrossroads] = useState(null);
   const [selectedCrossroad, setSelectedCrossroad] = useState(null);
 
@@ -74,7 +75,7 @@ const TrafficLightsFields = ({ formData, handleInputChange }) => {
             icon={MdFlag}
             label={t("vendor")}
             options={vendors}
-            value={vendors.find((item) => item.id == selectedVendor?.id)}
+            value={vendors.find((item) => item.id == selectedVendor)}
             getOptionLabel={(option) => option.name || ""}
             getOptionValue={(option) => option.id}
             onChange={handleVendorChange}

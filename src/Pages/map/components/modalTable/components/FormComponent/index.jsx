@@ -31,6 +31,9 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type, t }) => {
       [key]: value,
     }));
   };
+  /**
+   * Handles cancel button click by resetting form data and calling onCancel callback.
+   */
   const handleCancel = () => {
     setFormData(null);
     onCancel();
