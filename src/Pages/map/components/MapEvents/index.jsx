@@ -59,7 +59,7 @@ const MapEvents = ({ changedMarker, setZoom }) => {
         )
       );
     }
-  }, [changedMarker, map]);
+  }, [changedMarker]);
 
   return null;
 };

@@ -8,12 +8,14 @@ import { IoIosArrowBack, IoIosArrowForward, IoMdSunny } from "react-icons/io";
 import { MdBedtime, MdBubbleChart, MdHistory } from "react-icons/md";
 import { useMap, useMapEvents } from "react-leaflet";
 
+import CrossroadWidget from "../../widgets/crossroadData";
 import CurrentAlarms from "../../sections/currentAlarms";
 import DateTime from "./components/time";
 import DeviceErrorHistory from "../../sections/deviceErrorHistory";
 import DeviceManagement from "../../sections/deviceManagement";
 import FilterControl from "../controls/filterControl";
 import { HiCog8Tooth } from "react-icons/hi2";
+import InfoWidget from "../../widgets/infoWidget";
 import LanguageSwitcher from "../../sections/langSwitcher";
 import MarkerClusterType from "../../sections/markerClusterType";
 import MarkerControl from "../controls/markerControl";
@@ -267,7 +269,7 @@ const Sidebar = ({
           )}
         </div>
       </div>
-      {/* {widgets.bottomsection && (
+      {widgets.bottomsection && (
         <InfoWidget t={t} isSideBarOpen={isSidebarOpen} />
       )}
       {isbigMonitorOpen && activeMarker ? (
@@ -280,7 +282,7 @@ const Sidebar = ({
         />
       ) : (
         <div style={{ display: "none" }}></div>
-      )} */}
+      )}
     </>
   );
 };
