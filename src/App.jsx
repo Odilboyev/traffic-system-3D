@@ -31,7 +31,7 @@ const App = () => {
     setIsSubscribed(true);
     setChangedMarker(data.data);
     const sound = new Audio();
-    sound.volume = 0.3;
+    sound.volume = 0.2;
     if (data.data.statuserror === 1) {
       sound.src = dangerSound;
     } else if (data.data.statuserror === 0) {

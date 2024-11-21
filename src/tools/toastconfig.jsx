@@ -35,8 +35,8 @@ const generateToastContent = (sensorData) => (
 );
 
 const toaster = (sensorData, map) => {
-  const toastId = `${sensorData.sensor_name}-${sensorData.eventdate}`;
-
+  const toastId = `${sensorData?.sensor_name}-${sensorData?.eventdate}`;
+  console.log(toastId, "toaster working");
   if (toast.isActive(toastId)) {
     return null;
   }

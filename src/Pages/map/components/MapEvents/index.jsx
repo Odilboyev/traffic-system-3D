@@ -48,7 +48,7 @@ const MapEvents = ({ changedMarker, setZoom }) => {
 
   // Add useEffect to handle changedMarker updates
   useEffect(() => {
-    if (markers.length > 0 && changedMarker) {
+    if (changedMarker) {
       toaster(changedMarker, map);
 
       setMarkers(
@@ -59,7 +59,7 @@ const MapEvents = ({ changedMarker, setZoom }) => {
         )
       );
     }
-  }, [markers, map, setZoom]);
+  }, [changedMarker, map]);
 
   return null;
 };
