@@ -12,11 +12,12 @@ const getInitialState = () => {
       boxcontroller: true,
       crossroad: true,
       trafficlights: true,
-      camera: true,
+      cameratrafic: true,
       cameraview: true,
       camerapdd: true,
     },
     isDraggable: false,
+    isHighQuality: false,
     useClusteredMarkers: "clustered",
 
     widgets: {
@@ -64,6 +65,9 @@ export const mapSlice = createSlice({
     updateIsDraggable: (state, action) => {
       state.isDraggable = action.payload;
     },
+    updateIsHighQuality: (state, action) => {
+      state.isHighQuality = action.payload;
+    },
   },
 });
 
@@ -76,6 +80,7 @@ export const {
   updateActiveSidePanel,
   updateWidgets,
   updateIsDraggable,
+  updateIsHighQuality,
 } = mapSlice.actions;
 
 export default mapSlice.reducer;

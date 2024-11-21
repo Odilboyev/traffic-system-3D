@@ -17,6 +17,10 @@
   min-width: 0 !important;
   max-width: none !important;
 }
+
+.leaflet-tooltip-pane {
+  background: transparent !important;
+}
 /* 
 .custom-popup .leaflet-popup-tip-container {
   left: 50%;

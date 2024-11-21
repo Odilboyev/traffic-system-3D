@@ -2,6 +2,7 @@ import {
   updateErrorMessage,
   updateFilter,
   updateIsDraggable,
+  updateIsHighQuality,
   updateLoadingState,
   updateMarkers,
   updateUseClusteredMarkers,
@@ -27,6 +28,7 @@ const useMapMarkers = () => {
   const filter = useSelector((state) => state.map.filter);
   const widgets = useSelector((state) => state.map.widgets);
   const isDraggable = useSelector((state) => state.map.isDraggable);
+  const isHighQuality = useSelector((state) => state.map.isHighQuality);
   // Action to fetch data
   const getDataHandler = useCallback(async () => {
     dispatch(updateLoadingState(true));
@@ -88,6 +90,12 @@ const useMapMarkers = () => {
     },
     [dispatch]
   );
+  const setIsHighQuality = useCallback(
+    (isHighQualityState) => {
+      dispatch(updateIsHighQuality(isHighQualityState));
+    },
+    [dispatch]
+  );
 
   return {
     markers,
@@ -104,6 +112,8 @@ const useMapMarkers = () => {
     setWidgets,
     isDraggable,
     setIsDraggable,
+    isHighQuality,
+    setIsHighQuality,
   };
 };
 

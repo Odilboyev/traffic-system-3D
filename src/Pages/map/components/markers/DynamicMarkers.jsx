@@ -1,9 +1,6 @@
-import { Marker, Tooltip } from "react-leaflet";
-
-import CustomPopup from "../customPopup";
 import { Fragment } from "react";
+import { Marker } from "react-leaflet";
 import PropTypes from "prop-types";
-import { Typography } from "@material-tailwind/react";
 import { getAllMarkers } from "../../../../api/api.handlers"; // You'll need to create this
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
 
@@ -49,11 +46,13 @@ const DynamicMarkers = ({
     useDistanceThreshold: true,
   });
 
+  // const isCamera = marker.type == 1 || marker.type == 5 || marker.type == 6;
+
   return (
     <>
       {markers.map((marker) => {
         if (
-          (marker.type === 1 && !filter.camera) ||
+          (marker.type === 1 && !filter.cameratrafic) ||
           (marker.type === 2 && !filter.crossroad) ||
           (marker.type === 3 && !filter.box) ||
           (marker.type === 4 && !filter.trafficlights) ||
@@ -84,8 +83,10 @@ const DynamicMarkers = ({
                     : marker.type == 4
                     ? () => handleLightsModalOpen(marker)
                     : null,
+
                 dragend: (event) =>
                   handleMarkerDragEnd(marker.cid, marker.type, event),
+                // mouseover: fetchCameraDetails(marker.type, marker.cid),
               }}
               statuserror={marker.statuserror}
               icon={L.icon({
@@ -94,11 +95,10 @@ const DynamicMarkers = ({
               })}
               rotatedAngle={marker.type === 3 ? marker.rotated : 0}
             >
-              {marker.type === 1 || marker.type === 5 || marker.type === 6 ? (
-                <CustomPopup marker={marker} L={L} />
-              ) : null}
-              <Tooltip direction="top" className="rounded-md">
-                {marker.type == 1 || marker.type == 5 || marker.type == 6 ? (
+              {/* {isCamera ? (
+                <CameraDetails marker={marker} cameraData={cameraData} L={L} />
+              ) : (
+                <Tooltip direction="top" className="rounded-md">
                   <div
                     style={{
                       width: "8vw",
@@ -106,17 +106,10 @@ const DynamicMarkers = ({
                       overflow: "hidden",
                     }}
                   >
-                    <img
-                      src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
-                      className="w-full"
-                      alt=""
-                    />
                     <Typography className="my-0">{marker?.cname}</Typography>
                   </div>
-                ) : (
-                  <Typography className="my-0">{marker?.cname}</Typography>
-                )}
-              </Tooltip>
+                </Tooltip>
+              )} */}
             </Marker>
           </Fragment>
         );

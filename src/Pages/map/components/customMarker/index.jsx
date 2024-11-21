@@ -1,10 +1,12 @@
 // MarkerComponent.jsx
 import { Marker, Tooltip } from "react-leaflet";
+import { memo, useRef, useState } from "react";
 
-import CustomPopup from "../customPopup";
+import CameraDetails from "../customPopup";
 import PropTypes from "prop-types";
 import { Typography } from "@material-tailwind/react";
-import { memo } from "react";
+import { debounce } from "lodash";
+import { getCameraDetails } from "../../../../api/api.handlers";
 
 const CustomMarker = memo(function CustomMarker({
   marker,
@@ -15,6 +17,48 @@ const CustomMarker = memo(function CustomMarker({
   handleLightsModalOpen,
   handleMarkerDragEnd,
 }) {
+  const isCamera = (type) => type == 1 || type == 5 || type == 6;
+
+  const cameraType = (type) => {
+    switch (type) {
+      case 1:
+        return "cameratraffic";
+      case 5:
+        return "cameraview";
+      case 6:
+        return "camerapdd";
+      default:
+        return "";
+    }
+  };
+  const [cameraData, setCameraData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+
+  const fetchedDataMap = useRef(new Map()); // Store fetched data
+
+  const fetchCameraDetails = async (type, id) => {
+    const markerKey = `${type}-${id}`;
+    if (fetchedDataMap.current.has(markerKey)) {
+      setCameraData(fetchedDataMap.current.get(markerKey));
+      return;
+    }
+    if (isCamera(type)) {
+      setIsLoading(true);
+      try {
+        const res = await getCameraDetails(cameraType(type), id + "");
+        fetchedDataMap.current.set(markerKey, res.data); // Cache data
+        setCameraData(res.data);
+      } catch (error) {
+        console.error("Error fetching markers:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const debouncedFetchCameraDetails = debounce(fetchCameraDetails, 300);
+
   return (
     <Marker
       key={`${marker.lat}-${marker.lng}-${marker.cid}`}
@@ -30,6 +74,11 @@ const CustomMarker = memo(function CustomMarker({
           else if (marker.type === 4) handleLightsModalOpen(marker);
         },
         dragend: (event) => handleMarkerDragEnd(marker.cid, marker.type, event),
+        mouseout: () => setShowPopup(false),
+        mouseover: () => {
+          fetchCameraDetails(marker.type, marker.cid);
+          setShowPopup(true); // Show popup
+        },
       }}
       statuserror={marker.statuserror}
       icon={L.icon({
@@ -38,23 +87,17 @@ const CustomMarker = memo(function CustomMarker({
       })}
       rotatedAngle={marker.type === 3 ? marker.rotated : 0}
     >
-      {(marker.type === 1 || marker.type === 5 || marker.type === 6) && (
-        <CustomPopup marker={marker} L={L} />
-      )}
-      <Tooltip direction="top" className="rounded-md">
-        {marker.type === 1 || marker.type === 5 || marker.type === 6 ? (
-          <div style={{ width: "8vw", height: "6vw", overflow: "hidden" }}>
-            <img
-              src={`https://trafficapi.bgsoft.uz/upload/camerascreenshots/${marker.cid}.jpg`}
-              className="w-full"
-              alt=""
-            />
-            <Typography className="my-0">{marker?.cname}</Typography>
-          </div>
-        ) : (
+      {isCamera(marker.type) ? (
+        !isLoading &&
+        // showPopup &&
+        cameraData && (
+          <CameraDetails marker={marker} cameraData={cameraData} L={L} />
+        )
+      ) : (
+        <Tooltip direction="top" className="rounded-md">
           <Typography className="my-0">{marker?.cname}</Typography>
-        )}
-      </Tooltip>
+        </Tooltip>
+      )}
     </Marker>
   );
 });
@@ -68,4 +111,4 @@ CustomMarker.propTypes = {
   handleLightsModalOpen: PropTypes.func,
   handleMarkerDragEnd: PropTypes.func,
 };
-export default CustomMarker;
+export default memo(CustomMarker); // CustomMarker;

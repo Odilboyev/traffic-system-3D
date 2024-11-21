@@ -77,6 +77,7 @@ const getDistricts = async (region_id) =>
 const getRegions = async () => getData(import.meta.env.VITE_REGIONS);
 const getOverviewCameraModels = async () =>
   getData(import.meta.env.VITE_OVERVIEW_CAMERA + "/camera_view_model");
+const getCameraDetails = async (type, id) => await getData(type, "/" + id);
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -214,4 +215,5 @@ export {
   signIn,
   subscribeToCurrentAlarms,
   updateUser,
+  getCameraDetails,
 };
