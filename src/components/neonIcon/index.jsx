@@ -44,8 +44,16 @@ const NeonIcon = ({
   return (
     <div className={containerClasses}>
       {Icon ? (
-        <div className={textShadowClass + " " + className} style={iconStyle}>
-          {Icon}
+        <div
+          className={textShadowClass + " flex items-center" + className}
+          style={iconStyle}
+        >
+          {Icon}{" "}
+          {text && (
+            <Typography className={`ml-2 font-bold text-xs ${textShadowClass}`}>
+              {text}
+            </Typography>
+          )}
         </div>
       ) : (
         <Typography
