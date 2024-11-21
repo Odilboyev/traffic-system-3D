@@ -1,8 +1,8 @@
 import { IconButton, Typography } from "@material-tailwind/react";
-import { t } from "i18next";
-import PropTypes from "prop-types";
-import { useState } from "react";
+
 import { IoMdClose } from "react-icons/io";
+import PropTypes from "prop-types";
+import { t } from "i18next";
 
 const DropPanel = ({
   icon: Icon,

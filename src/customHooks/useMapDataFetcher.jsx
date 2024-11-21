@@ -31,7 +31,6 @@ const useMapDataFetcher = ({
         !useDistanceThreshold ||
         distance > fetchDistanceThreshold
       ) {
-        console.log("Fetching new data...");
         fetchData({
           lat: center.lat,
           lng: center.lng,

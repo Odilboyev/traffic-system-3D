@@ -18,7 +18,7 @@ const getInitialState = () => {
     },
     isDraggable: false,
     useClusteredMarkers: "clustered",
-    activeSidePanel: null,
+
     widgets: {
       bottomsection: true,
       weather: true,
@@ -57,9 +57,7 @@ export const mapSlice = createSlice({
     updateUseClusteredMarkers: (state, action) => {
       state.useClusteredMarkers = action.payload;
     },
-    updateActiveSidePanel: (state, action) => {
-      state.activeSidePanel = action.payload;
-    },
+
     updateWidgets: (state, action) => {
       state.widgets = action.payload;
     },

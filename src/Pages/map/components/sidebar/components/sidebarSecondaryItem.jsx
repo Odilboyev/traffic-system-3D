@@ -1,4 +1,3 @@
-import React from "react";
 import DropPanel from "../../../../../components/dropPanel";
 import { IconButton } from "@material-tailwind/react";
 

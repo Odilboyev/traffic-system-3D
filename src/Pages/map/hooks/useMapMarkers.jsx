@@ -1,5 +1,4 @@
 import {
-  updateActiveSidePanel,
   updateErrorMessage,
   updateFilter,
   updateIsDraggable,
@@ -25,7 +24,6 @@ const useMapMarkers = () => {
   const useClusteredMarkers = useSelector(
     (state) => state.map.useClusteredMarkers
   );
-  const activeSidePanel = useSelector((state) => state.map.activeSidePanel);
   const filter = useSelector((state) => state.map.filter);
   const widgets = useSelector((state) => state.map.widgets);
   const isDraggable = useSelector((state) => state.map.isDraggable);
@@ -77,13 +75,6 @@ const useMapMarkers = () => {
     [dispatch]
   );
 
-  const setActiveSidePanel = useCallback(
-    (panel) => {
-      dispatch(updateActiveSidePanel(panel));
-    },
-    [dispatch]
-  );
-
   const setWidgets = useCallback(
     (newWidgets) => {
       dispatch(updateWidgets(newWidgets));
@@ -107,8 +98,6 @@ const useMapMarkers = () => {
     setMarkers,
     useClusteredMarkers,
     setUseClusteredMarkers,
-    activeSidePanel,
-    setActiveSidePanel,
     filter,
     setFilter,
     widgets,
