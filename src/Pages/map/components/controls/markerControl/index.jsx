@@ -1,12 +1,31 @@
 import { Checkbox, Typography } from "@material-tailwind/react";
+import { memo, useCallback } from "react";
+import {
+  updateIsDraggable,
+  updateIsHighQuality,
+} from "../../../../../redux/mapSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 import PropTypes from "prop-types";
-import { memo } from "react";
-import { useMapMarkers } from "../../../hooks/useMapMarkers";
 
 const MarkerControl = memo(({ t }) => {
-  const { isDraggable, setIsDraggable, isHighQuality, setIsHighQuality } =
-    useMapMarkers();
+  // const { isDraggable, setIsDraggable, isHighQuality, setIsHighQuality } =
+  //   useMapMarkers();
+  const dispatch = useDispatch();
+  const isDraggable = useSelector((state) => state.map.isDraggable);
+  const isHighQuality = useSelector((state) => state.map.isHighQuality);
+  const setIsDraggable = useCallback(
+    (isDraggableState) => {
+      dispatch(updateIsDraggable(isDraggableState));
+    },
+    [dispatch]
+  );
+  const setIsHighQuality = useCallback(
+    (isHighQualityState) => {
+      dispatch(updateIsHighQuality(isHighQualityState));
+    },
+    [dispatch]
+  );
 
   return (
     <div className="min-w-[10vw] flex flex-col">
