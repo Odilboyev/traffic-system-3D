@@ -1,10 +1,18 @@
 import { Checkbox, Typography } from "@material-tailwind/react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { useMapMarkers } from "../../../hooks/useMapMarkers";
+import { updateFilter } from "../../../../../redux/mapSlice";
+import { useCallback } from "react";
 
 const FilterControl = ({ t }) => {
-  const { filter, setFilter } = useMapMarkers();
-
+  const dispatch = useDispatch();
+  const setFilter = useCallback(
+    (isDraggableState) => {
+      dispatch(updateFilter(isDraggableState));
+    },
+    [dispatch]
+  );
+  const filter = useSelector((state) => state.map.filter);
   const filterOptions = Object.keys(filter).map((v, i) => ({
     type: v,
     label: t(v),

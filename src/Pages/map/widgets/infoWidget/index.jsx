@@ -4,7 +4,7 @@ import InfoWidgetCard from "./singleCard";
 import PropTypes from "prop-types";
 import { getInfoForCards } from "../../../../api/api.handlers";
 
-const InfoWidget = ({ t, isSideBarOpen }) => {
+const InfoWidget = ({ t, changedMarker, isSideBarOpen }) => {
   const [cardsInfoData, setCardsInfoData] = useState([]);
   useEffect(() => {
     const fetchCardsInfoData = async () => {
@@ -16,7 +16,7 @@ const InfoWidget = ({ t, isSideBarOpen }) => {
       }
     };
     fetchCardsInfoData();
-  }, []);
+  }, [changedMarker]);
   return (
     <div className={`fixed bottom-1 left-0 right-0 z-[999] px-5 mx-auto `}>
       <div

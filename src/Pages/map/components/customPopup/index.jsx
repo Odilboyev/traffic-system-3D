@@ -1,16 +1,33 @@
 import "./popup.style.css";
 
+import { FaMinus, FaPlus, FaVideo } from "react-icons/fa6";
 import { Popup, Tooltip } from "react-leaflet";
-import { memo, useRef } from "react";
+import { memo, useRef, useState } from "react";
 
-import Records from "./records";
-import { Typography } from "@material-tailwind/react";
+import { FiExternalLink } from "react-icons/fi";
+import { IconButton } from "@material-tailwind/react";
+import PTZCameraModal from "./components/ptzModal";
+import Records from "./components/records";
 import { t } from "i18next";
 
 const CameraDetails = memo(
   function CameraDetails({ marker = {}, isLoading, cameraData, L }) {
     const popupRef = useRef(null);
+    const [isCollapsed, setIsCollapsed] = useState(true);
+    const handleCollapseToggle = () => {
+      setIsCollapsed((prev) => !prev);
+    };
 
+    const handleOpenLink = () => {
+      const { ip, http_port } = cameraData;
+      const url = `http://${ip}:${http_port}`;
+      window.open(url, "_blank");
+    };
+
+    const [isModalOpen, setModalOpen] = useState(false);
+
+    const openModal = () => setModalOpen(true);
+    const closeModal = () => setModalOpen(false);
     return (
       <>
         {" "}
@@ -32,14 +49,76 @@ const CameraDetails = memo(
           autoPan={false}
           className="!p-0 !m-0 z-[50000000] select-none custom-popup text-white"
         >
-          {!isLoading && cameraData && cameraData?.streams?.length > 0 ? (
-            <>
-              <Records
-                videos={cameraData?.streams}
-                isLoading={isLoading}
-                name={cameraData?.name}
-              />
-            </>
+          {!isLoading && cameraData ? (
+            <div className="rounded-xl bg-gray-900/60 backdrop-blur-md text-white ">
+              {/* Header Section */}
+              <div className="flex w-full gap-2">
+                {" "}
+                <IconButton
+                  size="sm"
+                  variant={"outlined"}
+                  className="text-white"
+                  onClick={handleOpenLink}
+                >
+                  <FiExternalLink className="w-4 h-4" />
+                </IconButton>
+                <IconButton
+                  size="sm"
+                  variant={"outlined"}
+                  className="text-white"
+                  onClick={handleCollapseToggle}
+                >
+                  {isCollapsed ? <FaPlus /> : <FaMinus />}
+                </IconButton>
+                <IconButton
+                  size="sm"
+                  variant={"outlined"}
+                  onClick={openModal}
+                  className="text-white"
+                >
+                  <FaVideo />
+                </IconButton>
+              </div>
+
+              {/* Streams Section */}
+              {cameraData?.streams?.length > 0 && (
+                <Records videos={cameraData.streams} name={cameraData.name} />
+              )}
+
+              {/* Collapsible Description */}
+
+              {/* <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md mb-2 hover:bg-blue-700"
+                  onClick={handleCollapseToggle}
+                >
+                  {isCollapsed ? t("Show Details") : t("Hide Details")}
+                </button> */}
+
+              {!isCollapsed && (
+                <div className="text-sm bg-transparent backdrop-blur-md  rounded-b-xl p-2">
+                  <p>
+                    <strong>{t("Crossroad_Name")}: </strong>
+                    {cameraData.crossroad_name}
+                  </p>
+                  <p>
+                    <strong>{t("ip")}: </strong>
+                    {cameraData.ip}
+                  </p>
+                  {/* <p>
+                    <strong>{t("Updated_On")}: </strong>
+                    {cameraData.dateupdate}
+                  </p> */}
+                </div>
+              )}
+
+              {/* Open Link Button */}
+              {/* <button
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                onClick={handleOpenLink}
+              >
+                {t("Open Camera in New Tab")}
+              </button> */}
+            </div>
           ) : (
             t("loading")
           )}
@@ -63,15 +142,20 @@ const CameraDetails = memo(
                   />
                 ))}
 
-                <Typography className="my-0">{marker?.cname}</Typography>
+                <p className="my-0">{marker?.cname}</p>
               </>
             ) : (
               <>
-                <Typography className="my-0">{t("loading")}</Typography>
+                <p className="my-0">{t("loading")}</p>
               </>
             )}
           </div>
         </Tooltip>
+        <PTZCameraModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          cameraData={cameraData}
+        />
       </>
     );
   },

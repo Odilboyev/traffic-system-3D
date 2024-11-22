@@ -37,7 +37,10 @@ const postData = async (endpoint, body) => {
   const res = await config.post(endpoint, body);
   return handleResponse(res);
 };
-
+const putData = async (endpoint, data) => {
+  const res = await config.put(endpoint, data);
+  return handleResponse(res);
+};
 // Specific API functions using helper functions
 const getMarkerData = async () => getData(import.meta.env.VITE_MARKER_DATA);
 const getBoxData = async (id) => getData(import.meta.env.VITE_DEVICE_DATA, id);
@@ -78,6 +81,8 @@ const getRegions = async () => getData(import.meta.env.VITE_REGIONS);
 const getOverviewCameraModels = async () =>
   getData(import.meta.env.VITE_OVERVIEW_CAMERA + "/camera_view_model");
 const getCameraDetails = async (type, id) => await getData(type, "/" + id);
+const modifyPTZCamera = async (data) =>
+  putData(import.meta.env.VITE_OVERVIEW_CAMERA + "/ptz_control", data);
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -216,4 +221,5 @@ export {
   subscribeToCurrentAlarms,
   updateUser,
   getCameraDetails,
+  modifyPTZCamera,
 };

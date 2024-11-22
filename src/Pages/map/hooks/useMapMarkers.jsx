@@ -1,12 +1,8 @@
 import {
   updateErrorMessage,
-  updateFilter,
-  updateIsDraggable,
-  updateIsHighQuality,
   updateLoadingState,
   updateMarkers,
   updateUseClusteredMarkers,
-  updateWidgets,
 } from "../../../redux/mapSlice";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,10 +21,7 @@ const useMapMarkers = () => {
   const useClusteredMarkers = useSelector(
     (state) => state.map.useClusteredMarkers
   );
-  const filter = useSelector((state) => state.map.filter);
-  const widgets = useSelector((state) => state.map.widgets);
-  const isDraggable = useSelector((state) => state.map.isDraggable);
-  const isHighQuality = useSelector((state) => state.map.isHighQuality);
+
   // Action to fetch data
   const getDataHandler = useCallback(async () => {
     dispatch(updateLoadingState(true));
@@ -63,36 +56,9 @@ const useMapMarkers = () => {
     [dispatch]
   );
 
-  const setFilter = useCallback(
-    (newFilter) => {
-      dispatch(updateFilter(newFilter));
-    },
-    [dispatch]
-  );
-
   const setUseClusteredMarkers = useCallback(
     (newClusteredType) => {
       dispatch(updateUseClusteredMarkers(newClusteredType));
-    },
-    [dispatch]
-  );
-
-  const setWidgets = useCallback(
-    (newWidgets) => {
-      dispatch(updateWidgets(newWidgets));
-    },
-    [dispatch]
-  );
-
-  const setIsDraggable = useCallback(
-    (isDraggableState) => {
-      dispatch(updateIsDraggable(isDraggableState));
-    },
-    [dispatch]
-  );
-  const setIsHighQuality = useCallback(
-    (isHighQualityState) => {
-      dispatch(updateIsHighQuality(isHighQualityState));
     },
     [dispatch]
   );
@@ -106,14 +72,6 @@ const useMapMarkers = () => {
     setMarkers,
     useClusteredMarkers,
     setUseClusteredMarkers,
-    filter,
-    setFilter,
-    widgets,
-    setWidgets,
-    isDraggable,
-    setIsDraggable,
-    isHighQuality,
-    setIsHighQuality,
   };
 };
 

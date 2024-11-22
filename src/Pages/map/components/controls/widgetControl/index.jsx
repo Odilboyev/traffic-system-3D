@@ -1,11 +1,19 @@
 import { Checkbox, Typography } from "@material-tailwind/react";
+import { useDispatch, useSelector } from "react-redux";
 
 import PropTypes from "prop-types";
-import { useMapMarkers } from "../../../hooks/useMapMarkers";
+import { updateWidgets } from "../../../../../redux/mapSlice";
+import { useCallback } from "react";
 
 const WidgetControl = ({ t }) => {
-  const { widgets, setWidgets } = useMapMarkers();
-
+  const widgets = useSelector((state) => state.map.widgets);
+  const dispatch = useDispatch();
+  const setWidgets = useCallback(
+    (newWidgets) => {
+      dispatch(updateWidgets(newWidgets));
+    },
+    [dispatch]
+  );
   const filterOptions = Object.keys(widgets).map((v) => ({
     type: v,
     label: t(v),

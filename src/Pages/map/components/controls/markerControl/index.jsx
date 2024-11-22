@@ -9,8 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
 const MarkerControl = memo(({ t }) => {
-  // const { isDraggable, setIsDraggable, isHighQuality, setIsHighQuality } =
-  //   useMapMarkers();
   const dispatch = useDispatch();
   const isDraggable = useSelector((state) => state.map.isDraggable);
   const isHighQuality = useSelector((state) => state.map.isHighQuality);

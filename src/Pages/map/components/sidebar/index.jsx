@@ -29,7 +29,7 @@ import WeatherCard from "../../widgets/weather/weatherCard";
 import WidgetControl from "../controls/widgetControl";
 import { isPermitted } from "../../constants/roles";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
-import { useMapMarkers } from "../../hooks/useMapMarkers";
+import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useTheme } from "../../../../customHooks/useTheme";
 
@@ -37,6 +37,7 @@ import { useTheme } from "../../../../customHooks/useTheme";
 const Sidebar = ({
   t,
   isVisible,
+  changedMarker,
   setIsVisible,
   isbigMonitorOpen,
   activeMarker,
@@ -51,7 +52,7 @@ const Sidebar = ({
   const [currentLocation, setCurrentLocation] = useLocalStorageState(
     "its_currentLocation"
   );
-  const { widgets } = useMapMarkers();
+  const widgets = useSelector((state) => state.map.widgets);
   useMapEvents({
     moveend: () => {
       const center = map.getCenter();
@@ -88,7 +89,7 @@ const Sidebar = ({
         onPointerLeave={() => map.scrollWheelZoom.enable()}
         className={` ${
           isVisible ? "fixed" : "none"
-        } z-[9999] top-0 left-0 h-full max-h-full relative no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
+        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
           isSidebarOpen ? "w-[15vw]" : "w-18"
         } ${theme === "light" ? "bg-gray-100" : "bg-gray-900"} 
         transition-all duration-300 ease-in-out select-none`}
@@ -270,7 +271,11 @@ const Sidebar = ({
         </div>
       </div>
       {widgets.bottomsection && (
-        <InfoWidget t={t} isSideBarOpen={isSidebarOpen} />
+        <InfoWidget
+          t={t}
+          changedMarker={changedMarker}
+          isSideBarOpen={isSidebarOpen}
+        />
       )}
       {isbigMonitorOpen && activeMarker ? (
         <CrossroadWidget

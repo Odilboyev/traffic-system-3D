@@ -16,6 +16,7 @@ import baseLayers from "../../configurations/mapLayers.js";
 import { safeParseJSON } from "../../redux/utils.js";
 import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
+import { useSelector } from "react-redux";
 import { useTheme } from "../../customHooks/useTheme.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
@@ -24,14 +25,13 @@ const MapComponent = ({ changedMarker, t }) => {
   const {
     markers,
     setMarkers,
-    bottomSectionData,
     getDataHandler,
     clearMarkers,
     updateMarkers,
     useClusteredMarkers,
-    filter,
-    isDraggable,
   } = useMapMarkers();
+  const isDraggable = useSelector((state) => state.map.isDraggable);
+  const filter = useSelector((state) => state.map.filter);
   const [map, setMap] = useState(null);
   const { fetchAlarmsData } = useMapAlarms();
 
@@ -147,6 +147,7 @@ const MapComponent = ({ changedMarker, t }) => {
         <Sidebar
           t={t}
           // mapRef={map}
+          changedMarker={changedMarker}
           isVisible={isSidebarVisible}
           setIsVisible={setIsSidebarVisible}
           isbigMonitorOpen={isbigMonitorOpen}

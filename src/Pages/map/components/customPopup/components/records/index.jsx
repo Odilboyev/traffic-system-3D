@@ -1,11 +1,11 @@
 import { memo } from "react";
-import { useMapMarkers } from "../../../hooks/useMapMarkers";
+import { useSelector } from "react-redux";
 
 const Records = ({ videos, name }) => {
-  const { isHighQuality } = useMapMarkers();
+  const isHighQuality = useSelector((state) => state.map.isHighQuality);
   return (
     <div
-      className="rounded-xl bg-gray-900/60 backdrop-blur-md text-white"
+      className=" bg-gray-900/60 backdrop-blur-md text-white"
       style={{
         minWidth: "14vw",
         minHeight: "8vw",
