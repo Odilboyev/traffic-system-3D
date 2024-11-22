@@ -14,50 +14,50 @@ const Joystick = ({ onDirectionControl, onZoomControl }) => {
     const handleKeyDown = (event) => {
       // Handle directional keys (arrow keys)
 
-      if (event.shiftKey) {
-        if (event.key === "ArrowUp") {
-          onZoomControl("zoom-in", true); // Zoom in
-        } else if (event.key === "ArrowDown") {
-          onZoomControl("zoom-out", true); // Zoom out
-        }
-      } else {
-        if (event.key === "ArrowUp") {
-          onDirectionControl("up", true);
-        }
-        if (event.key === "ArrowDown") {
-          onDirectionControl("down", true);
-        }
-        if (event.key === "ArrowLeft") {
-          onDirectionControl("left", true);
-        }
-        if (event.key === "ArrowRight") {
-          onDirectionControl("right", true);
-        }
+      // zoom
+      if (event.key === "+") {
+        onZoomControl("zoom-in", false);
+      }
+      if (event.key === "-") {
+        onZoomControl("zoom-out", false);
+      }
+      // drag
+      if (event.key === "ArrowUp") {
+        onDirectionControl("up", true);
+      }
+      if (event.key === "ArrowDown") {
+        onDirectionControl("down", true);
+      }
+      if (event.key === "ArrowLeft") {
+        onDirectionControl("left", true);
+      }
+      if (event.key === "ArrowRight") {
+        onDirectionControl("right", true);
       }
     };
 
     const handleKeyUp = (event) => {
       // Stop direction control when key is released
 
-      if (event.shiftKey) {
-        if (event.key === "ArrowUp") {
-          onZoomControl("zoom-in", false); // Zoom in
-        } else if (event.key === "ArrowDown") {
-          onZoomControl("zoom-out", false); // Zoom out
-        }
-      } else {
-        if (event.key === "ArrowUp") {
-          onDirectionControl("up", false);
-        }
-        if (event.key === "ArrowDown") {
-          onDirectionControl("down", false);
-        }
-        if (event.key === "ArrowLeft") {
-          onDirectionControl("left", false);
-        }
-        if (event.key === "ArrowRight") {
-          onDirectionControl("right", false);
-        }
+      // zoom
+      if (event.key === "+") {
+        onZoomControl("zoom-in", false);
+      }
+      if (event.key === "-") {
+        onZoomControl("zoom-out", false);
+      }
+      // drag
+      if (event.key === "ArrowUp") {
+        onDirectionControl("up", false);
+      }
+      if (event.key === "ArrowDown") {
+        onDirectionControl("down", false);
+      }
+      if (event.key === "ArrowLeft") {
+        onDirectionControl("left", false);
+      }
+      if (event.key === "ArrowRight") {
+        onDirectionControl("right", false);
       }
     };
 
