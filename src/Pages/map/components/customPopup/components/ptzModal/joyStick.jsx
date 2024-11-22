@@ -75,7 +75,7 @@ const Joystick = ({ onDirectionControl, onZoomControl }) => {
   return (
     <div className="flex flex-col items-center gap-4">
       {/* Joystick Controls */}
-      <div className="relative w-[8vw] h-[8vw] bg-gray-200 rounded-full flex items-center justify-center shadow-lg">
+      <div className="relative w-[8vw] h-[8vw] bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center shadow-lg">
         {/* Main Direction Buttons */}
         <button
           className="absolute top-2 text-lg left-1/2 transform -translate-x-1/2 bg-gray-300 rounded-full p-2 hover:bg-gray-400"

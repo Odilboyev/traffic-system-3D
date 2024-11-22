@@ -75,10 +75,10 @@ const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
       open={isOpen}
       handler={onClose}
       size="lg"
-      className="dark:bg-gray-900  text-white"
+      className="dark:bg-gray-900 "
     >
       {/* Header */}
-      <DialogHeader className="flex items-center justify-between text-white rounded-t-lg">
+      <DialogHeader className="flex items-center justify-between dark:text-white rounded-t-lg">
         <h2 className="text-lg font-semibold">
           {cameraData?.name || "Camera Details"}
         </h2>
