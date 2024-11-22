@@ -1,10 +1,11 @@
 import CustomSelect from "../../../../../../../components/customSelect";
 import PropTypes from "prop-types";
 import Slider from "react-smooth-range-input";
+import { XMarkIcon } from "@heroicons/react/16/solid";
 import { iconOptions } from "../utils";
 import { t } from "i18next";
 
-const ConfigPanel = ({ config, setConfig }) => {
+const ConfigPanel = ({ config, setConfig, handleCLose }) => {
   // Handles changes in road configuration for visibility or other fields
   const handleRoadChange = (direction, field, value) => {
     setConfig((prevConfig) => ({
@@ -83,7 +84,7 @@ const ConfigPanel = ({ config, setConfig }) => {
       const updatedLanes = [...prevConfig[direction][side]];
       updatedLanes[laneIndex] = {
         ...updatedLanes[laneIndex],
-        chanel_id: parseInt(value),
+        channel_id: parseInt(value),
       };
       return {
         ...prevConfig,
@@ -101,13 +102,20 @@ const ConfigPanel = ({ config, setConfig }) => {
       ...prevConfig,
       [direction]: {
         ...prevConfig[direction],
-        cross_walk: { chanel_id: parseInt(value) },
+        cross_walk: { channel_id: parseInt(value) },
       },
     }));
   };
 
   return (
-    <div className=" no-scrollbar max-h-screen overflow-y-scroll p-6 border shadow-lg z-50 h-full rounded-lg space-y-6">
+    <div className=" no-scrollbar relative max-h-[90vh] overflow-y-scroll p-6 border border-gray-100/20 shadow-lg z-50 h-full rounded-lg space-y-6">
+      <button
+        size="sm"
+        onClick={handleCLose}
+        className="absolute top-1 right-1 dark:text-white"
+      >
+        <XMarkIcon className="h-6 w-6" />
+      </button>
       {/* Angle Control */}
       <div className="flex items-center mb-6">
         <span className="text-sm font-medium mr-4">Rotation Angle:</span>
@@ -128,10 +136,10 @@ const ConfigPanel = ({ config, setConfig }) => {
       {["north", "south", "east", "west"].map((direction) => (
         <div
           key={direction}
-          className="p-4  rounded-lg border border-gray-200 mb-4 w-full max-w-full"
+          className="p-4  rounded-lg border border-gray-100/20 border border-gray-100/20-gray-200 mb-4 w-full max-w-full"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="capitalize font-medium text-gray-700">
+            <span className="capitalize font-medium ">
               {direction} Direction
             </span>
             <div className="flex items-center gap-2">
@@ -154,7 +162,7 @@ const ConfigPanel = ({ config, setConfig }) => {
           <div className="flex flex-col mb-3 gap-2 max-w-full">
             <label
               htmlFor={`lanesLeft-${direction}`}
-              className="text-sm font-bold text-gray-800 uppercase tracking-wide"
+              className="text-sm font-bold  uppercase tracking-wide"
             >
               Lanes Left:{" "}
               <span className="font-semibold text-blue-600">
@@ -181,7 +189,7 @@ const ConfigPanel = ({ config, setConfig }) => {
           <div className="flex flex-col mb-3 gap-2 ">
             <label
               htmlFor={`lanesRight-${direction}`}
-              className="text-sm font-bold text-gray-800 uppercase tracking-wide"
+              className="text-sm font-bold  uppercase tracking-wide"
             >
               Lanes Right:{" "}
               <span className="font-semibold text-blue-600">
@@ -205,7 +213,7 @@ const ConfigPanel = ({ config, setConfig }) => {
 
           {/* Lane Icon Controls with Channel ID */}
           <div className="flex flex-col gap-3 mt-2">
-            <label className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+            <label className="text-sm font-bold uppercase tracking-wide">
               Lane Icons (Right):
             </label>
             <div className="flex flex-wrap gap-1">
@@ -235,7 +243,7 @@ const ConfigPanel = ({ config, setConfig }) => {
                     <div className="w-1/2">
                       <input
                         type="number"
-                        value={lane.chanel_id || ""}
+                        value={lane.channel_id || ""}
                         onChange={(e) =>
                           handleChannelIdChange(
                             direction,
@@ -246,7 +254,7 @@ const ConfigPanel = ({ config, setConfig }) => {
                         }
                         onWheel={(e) => e.target.blur()}
                         placeholder="Channel ID"
-                        className="w-full px-2 py-1 border rounded"
+                        className="w-full px-2 py-1 border border-gray-100/20 rounded dark:bg-gray-800"
                       />
                     </div>
                   </div>
@@ -257,18 +265,18 @@ const ConfigPanel = ({ config, setConfig }) => {
 
           {/* Crosswalk Channel ID */}
           <div className="mt-4">
-            <label className="text-sm font-bold text-gray-800 uppercase tracking-wide block mb-2">
+            <label className="text-sm font-bold uppercase tracking-wide block mb-2">
               Crosswalk Channel ID:
             </label>
             <input
               type="number"
               onWheel={(e) => e.target.blur()}
-              value={config[direction].cross_walk?.chanel_id || ""}
+              value={config[direction].cross_walk?.channel_id || ""}
               onChange={(e) =>
                 handleCrosswalkChannelChange(direction, e.target.value)
               }
               placeholder="Crosswalk Channel ID"
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-2 py-1 border border-gray-100/20 rounded dark:bg-gray-800"
             />
           </div>
         </div>
@@ -293,11 +301,11 @@ ConfigPanel.propTypes = {
       lanesRight: PropTypes.arrayOf(
         PropTypes.shape({
           icon: PropTypes.string,
-          chanel_id: PropTypes.number,
+          channel_id: PropTypes.number,
         })
       ),
       cross_walk: PropTypes.shape({
-        chanel_id: PropTypes.number,
+        channel_id: PropTypes.number,
       }),
     }),
     south: PropTypes.shape({
@@ -306,11 +314,11 @@ ConfigPanel.propTypes = {
       lanesRight: PropTypes.arrayOf(
         PropTypes.shape({
           icon: PropTypes.string,
-          chanel_id: PropTypes.number,
+          channel_id: PropTypes.number,
         })
       ),
       cross_walk: PropTypes.shape({
-        chanel_id: PropTypes.number,
+        channel_id: PropTypes.number,
       }),
     }),
     east: PropTypes.shape({
@@ -319,11 +327,11 @@ ConfigPanel.propTypes = {
       lanesRight: PropTypes.arrayOf(
         PropTypes.shape({
           icon: PropTypes.string,
-          chanel_id: PropTypes.number,
+          channel_id: PropTypes.number,
         })
       ),
       cross_walk: PropTypes.shape({
-        chanel_id: PropTypes.number,
+        channel_id: PropTypes.number,
       }),
     }),
     west: PropTypes.shape({
@@ -332,11 +340,11 @@ ConfigPanel.propTypes = {
       lanesRight: PropTypes.arrayOf(
         PropTypes.shape({
           icon: PropTypes.string,
-          chanel_id: PropTypes.number,
+          channel_id: PropTypes.number,
         })
       ),
       cross_walk: PropTypes.shape({
-        chanel_id: PropTypes.number,
+        channel_id: PropTypes.number,
       }),
     }),
   }).isRequired,

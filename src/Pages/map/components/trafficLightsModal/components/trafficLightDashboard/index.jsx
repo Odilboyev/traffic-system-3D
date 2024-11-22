@@ -270,7 +270,7 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
   // Remove the interval-based useEffect
   return (
     <div
-      className={`relative h-[80vh] flex items-center justify-center overflow-hidden`}
+      className={` no-scrollbar relative h-full flex items-center justify-center`}
     >
       {wsConnectionStatus !== "connected" && incomingConfig && (
         <div className="absolute top-4 right-4 px-4 py-2 rounded-md text-white bg-red-500">
@@ -296,7 +296,13 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
               )}
             </div>
           )}
-          {showConfig && <ConfigPanel config={config} setConfig={setConfig} />}
+          {showConfig && (
+            <ConfigPanel
+              config={config}
+              setConfig={setConfig}
+              handleCLose={() => setShowConfig(false)}
+            />
+          )}
         </div>
       )}
 

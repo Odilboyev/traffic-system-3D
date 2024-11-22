@@ -91,7 +91,12 @@ const CustomMarker = memo(function CustomMarker({
         !isLoading &&
         // showPopup &&
         cameraData && (
-          <CameraDetails marker={marker} cameraData={cameraData} L={L} />
+          <CameraDetails
+            marker={marker}
+            cameraData={cameraData}
+            isPTZ={marker.type === 5}
+            L={L}
+          />
         )
       ) : (
         <Tooltip direction="top" className="rounded-md">

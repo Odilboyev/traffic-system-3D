@@ -5,16 +5,23 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
+
 import PropTypes from "prop-types";
 import TrafficLightDashboard from "./components/trafficLightDashboard";
+
 const TrafficLightsModal = ({ light, isOpen, onClose }) => {
   const handleClose = () => {
     onClose();
   };
   return (
     <>
-      <Dialog size="xxl" open={isOpen} onClose={handleClose}>
-        <DialogHeader className="justify-between dark:bg-blue-gray-900 dark:text-white">
+      <Dialog
+        size="xxl"
+        className="no-scrollbar"
+        open={isOpen}
+        onClose={handleClose}
+      >
+        <DialogHeader className="justify-between  dark:bg-blue-gray-900 dark:text-white">
           <div>
             <Typography variant="h5">{light?.cname || ""}</Typography>
           </div>
@@ -36,7 +43,7 @@ const TrafficLightsModal = ({ light, isOpen, onClose }) => {
           </IconButton>
         </DialogHeader>
 
-        <DialogBody className="min-h-[90vh] max-h-[94vh] overflow-y-scroll dark:bg-blue-gray-900 dark:text-white">
+        <DialogBody className="max-h-[94vh] h-full no-scrollbar overflow-y-scroll dark:bg-blue-gray-900 dark:text-white">
           <TrafficLightDashboard id={light?.cid} />
         </DialogBody>
       </Dialog>

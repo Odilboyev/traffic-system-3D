@@ -1,12 +1,8 @@
-import PropTypes from "prop-types";
-import {
-  getCrosswalkWidth,
-  getIntersectionSize,
-  getRoadWidth,
-  getLaneWidth,
-} from "../utils";
+import { getIntersectionSize, getLaneWidth, getRoadWidth } from "../utils";
+
 import IntersectionArrows from "./intersectionArrows";
 import Lane from "./lane";
+import PropTypes from "prop-types";
 import renderCrosswalks from "./crosswalk";
 
 const Intersection = ({
@@ -148,7 +144,7 @@ const Intersection = ({
 
   return (
     <div
-      className={`relative ${
+      className={`relative no-scrollbar ${
         id ? "w-full" : "w-2/3"
       } h-full flex items-center justify-center overflow-hidden`}
       style={{

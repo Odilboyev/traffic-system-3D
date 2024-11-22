@@ -11,7 +11,7 @@ import Records from "./components/records";
 import { t } from "i18next";
 
 const CameraDetails = memo(
-  function CameraDetails({ marker = {}, isLoading, cameraData, L }) {
+  function CameraDetails({ marker = {}, isLoading, cameraData, isPTZ, L }) {
     const popupRef = useRef(null);
     const [isCollapsed, setIsCollapsed] = useState(true);
     const handleCollapseToggle = () => {
@@ -57,10 +57,10 @@ const CameraDetails = memo(
                 <IconButton
                   size="sm"
                   variant={"outlined"}
+                  onClick={openModal}
                   className="text-white"
-                  onClick={handleOpenLink}
                 >
-                  <FiExternalLink className="w-4 h-4" />
+                  <FaVideo />
                 </IconButton>
                 <IconButton
                   size="sm"
@@ -73,10 +73,10 @@ const CameraDetails = memo(
                 <IconButton
                   size="sm"
                   variant={"outlined"}
-                  onClick={openModal}
                   className="text-white"
+                  onClick={handleOpenLink}
                 >
-                  <FaVideo />
+                  <FiExternalLink className="w-4 h-4" />
                 </IconButton>
               </div>
 
@@ -152,6 +152,7 @@ const CameraDetails = memo(
           </div>
         </Tooltip>
         <PTZCameraModal
+          showController={isPTZ}
           isOpen={isModalOpen}
           onClose={closeModal}
           cameraData={cameraData}

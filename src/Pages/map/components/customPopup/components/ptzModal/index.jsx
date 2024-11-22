@@ -12,7 +12,7 @@ import { modifyPTZCamera } from "../../../../../../api/api.handlers";
 import { t } from "i18next";
 import { useSelector } from "react-redux";
 
-const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
+const PTZCameraModal = ({ isOpen, onClose, showController, cameraData }) => {
   const isHighQuality = useSelector((state) => state.map.isHighQuality);
 
   const sendCommand = async (command, pan, tilt) => {
@@ -89,26 +89,29 @@ const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
 
       {/* Body */}
       <DialogBody className="flex p-4 gap-4 max-h-[70vh] h-[70vh] overfolow-y-scroll">
-        {/* Sidebar */}
-        <div className="w-1/5 p-4 border border-gray-600 rounded-lg">
-          <h3 className="text-sm font-bold mb-4">{t("camera_controls")}</h3>
-          {/* Joystick Placeholder */}
-          <Joystick
-            onDirectionControl={handleDirectionControl}
-            onZoomControl={handleZoomControl}
-          />
+        {showController && (
+          <div className="w-1/5 p-4 border border-gray-600 rounded-lg">
+            <h3 className="text-sm font-bold mb-4">{t("camera_controls")}</h3>
+            {/* Joystick Placeholder */}
+            <Joystick
+              onDirectionControl={handleDirectionControl}
+              onZoomControl={handleZoomControl}
+            />
 
-          {/* Additional Details */}
-          <div className="mt-6">
-            <p>
-              <strong>IP:</strong> {cameraData?.ip || "N/A"}
-            </p>
-            <p>
-              <strong>Port:</strong> {cameraData?.http_port || "N/A"}
-            </p>
+            {/* Additional Details */}
+            <div className="mt-6">
+              <p>
+                <strong>IP:</strong> {cameraData?.ip || "N/A"}
+              </p>
+              <p>
+                <strong>Port:</strong> {cameraData?.http_port || "N/A"}
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="flex-flex-wrap ">
+        )}
+        {/* Sidebar */}
+
+        <div className="flex flex-wrap w-full">
           {/* Main Content */}
           {cameraData?.streams.map((video, index) => {
             // Modify the mselink based on isHighQuality
@@ -117,20 +120,21 @@ const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
               isHighQuality ? "1" : "0"
             );
             return (
-              <iframe
-                key={index}
-                className="space-x-0 space-y-0"
-                width="100%"
-                style={{
-                  margin: "0 auto",
-                  border: "none",
-                  padding: 0,
-                  minWidth: "400px",
-                  minHeight: "300px",
-                }}
-                src={updatedLink}
-                allowFullScreen
-              ></iframe>
+              <div key={index} className="w-full h-auto">
+                {" "}
+                <iframe
+                  className="space-x-0 space-y-0"
+                  width="100%"
+                  height={"100%"}
+                  style={{
+                    margin: "0 auto",
+                    border: "none",
+                    padding: 0,
+                  }}
+                  src={updatedLink}
+                  allowFullScreen
+                ></iframe>
+              </div>
             );
           })}
         </div>
