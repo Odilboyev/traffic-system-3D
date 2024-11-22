@@ -9,6 +9,7 @@ import {
 import { FaTimes } from "react-icons/fa";
 import Joystick from "./joyStick";
 import { modifyPTZCamera } from "../../../../../../api/api.handlers";
+import { t } from "i18next";
 import { useSelector } from "react-redux";
 
 const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
@@ -74,10 +75,10 @@ const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
       open={isOpen}
       handler={onClose}
       size="lg"
-      className="bg-gray-800 text-white"
+      className="dark:bg-gray-900  text-white"
     >
       {/* Header */}
-      <DialogHeader className="flex items-center justify-between bg-gray-900 text-white rounded-t-lg">
+      <DialogHeader className="flex items-center justify-between text-white rounded-t-lg">
         <h2 className="text-lg font-semibold">
           {cameraData?.name || "Camera Details"}
         </h2>
@@ -89,8 +90,8 @@ const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
       {/* Body */}
       <DialogBody className="flex p-4 gap-4 max-h-[70vh] h-[70vh] overfolow-y-scroll">
         {/* Sidebar */}
-        <div className="w-1/5 bg-gray-700 p-4 border-r border-gray-600 rounded-lg">
-          <h3 className="text-sm font-bold mb-4">Camera Controls</h3>
+        <div className="w-1/5 p-4 border border-gray-600 rounded-lg">
+          <h3 className="text-sm font-bold mb-4">{t("camera_controls")}</h3>
           {/* Joystick Placeholder */}
           <Joystick
             onDirectionControl={handleDirectionControl}
@@ -98,7 +99,7 @@ const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
           />
 
           {/* Additional Details */}
-          <div className="mt-4">
+          <div className="mt-6">
             <p>
               <strong>IP:</strong> {cameraData?.ip || "N/A"}
             </p>
@@ -107,7 +108,7 @@ const PTZCameraModal = ({ isOpen, onClose, cameraData }) => {
             </p>
           </div>
         </div>
-        <div className="flex-flex-wrap">
+        <div className="flex-flex-wrap ">
           {/* Main Content */}
           {cameraData?.streams.map((video, index) => {
             // Modify the mselink based on isHighQuality
