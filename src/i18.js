@@ -1,14 +1,13 @@
+import { getTexts } from "./api/api.handlers";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { getTexts } from "./api/api.handlers";
-
 const loadTranslations = async () => {
   try {
     const response = await getTexts();
     i18n.use(initReactI18next).init({
       debug: false,
       resources: response,
-      lng: "ru", // default language
+      lng: JSON.parse(localStorage.getItem("its_language")), // default language
       fallbackLng: "en",
       interpolation: {
         escapeValue: false,

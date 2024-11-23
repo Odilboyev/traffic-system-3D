@@ -19,7 +19,7 @@ const getInitialState = () => {
     isDraggable: false,
     isHighQuality: false,
     useClusteredMarkers: "clustered",
-
+    // language: "ru",
     widgets: {
       bottomsection: true,
       weather: true,
@@ -68,6 +68,9 @@ export const mapSlice = createSlice({
     updateIsHighQuality: (state, action) => {
       state.isHighQuality = action.payload;
     },
+    // updateLanguage: (state, action) => {
+    //   state.language = action.payload;
+    // },
   },
 });
 
@@ -81,6 +84,7 @@ export const {
   updateWidgets,
   updateIsDraggable,
   updateIsHighQuality,
+  // updateLanguage,
 } = mapSlice.actions;
 
 export default mapSlice.reducer;

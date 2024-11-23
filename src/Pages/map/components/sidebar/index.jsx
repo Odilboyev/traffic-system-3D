@@ -17,6 +17,7 @@ import FilterControl from "../controls/filterControl";
 import { HiCog8Tooth } from "react-icons/hi2";
 import InfoWidget from "../../widgets/infoWidget";
 import LanguageSwitcher from "../../sections/langSwitcher";
+import Logo from "./components/logo";
 import MarkerClusterType from "../../sections/markerClusterType";
 import MarkerControl from "../controls/markerControl";
 import RegionControl from "../controls/regionControl";
@@ -111,6 +112,7 @@ const Sidebar = ({
         {/* main content of sidebar */}
         <div className="no-scrollbar pb-[40%] flex flex-col items-center space-y-3 gap-1 overflow-y-auto ">
           {/* Widgets */}
+          <Logo t={t} isSidebarOpen={isSidebarOpen} />
           <UserName t={t} isSidebarOpen={isSidebarOpen} />
           {widgets.time && (
             <DateTime

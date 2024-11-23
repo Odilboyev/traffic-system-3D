@@ -1,10 +1,12 @@
 import { Radio, Typography } from "@material-tailwind/react";
 
 import { memo } from "react";
+import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 import { useTranslation } from "react-i18next";
 
 const LanguageSwitch = ({ setIsSidebarOpen }) => {
   const { i18n } = useTranslation();
+  const [language, setLanguage] = useLocalStorageState("its_language", "ru");
   const languages = [
     { code: "en", name: "English" },
     { code: "ru", name: "Русский" },
@@ -12,11 +14,12 @@ const LanguageSwitch = ({ setIsSidebarOpen }) => {
     { code: "uz", name: "Ўзбекча" },
     { code: "tr", name: "Türkçe" },
   ];
-  const { language } = i18n;
   const selectedLanguage = language;
   const handleLanguageChange = (languageCode) => {
     setIsSidebarOpen(false);
     i18n.changeLanguage(languageCode);
+    setLanguage(languageCode);
+    localStorage.setItem("its_language", JSON.stringify(languageCode)); // Ensure localStorage is updated
   };
 
   return (
