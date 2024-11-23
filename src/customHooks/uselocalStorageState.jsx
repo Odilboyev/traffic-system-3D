@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
 
 const useLocalStorageState = (key, defaultValue) => {
+  // Initialize state with value from localStorage or defaultValue
   const [state, setState] = useState(() => {
     try {
       const saved = localStorage.getItem(key);
-      // Return parsed value if it's valid JSON, otherwise fallback to defaultValue
-      return saved && saved !== "undefined" ? JSON.parse(saved) : defaultValue;
+      return saved ? JSON.parse(saved) : defaultValue;
     } catch (error) {
-      console.warn(`Error parsing localStorage key "${key}":`, error);
-      return defaultValue; // Fallback if parsing fails
+      console.warn(`Failed to read localStorage key "${key}":`, error);
+      return defaultValue;
     }
   });
 
   useEffect(() => {
     try {
-      localStorage.setItem(key, JSON.stringify(state)); // Safely update localStorage
+      // Update localStorage whenever state changes
+      localStorage.setItem(key, JSON.stringify(state));
     } catch (error) {
-      console.error(`Error saving to localStorage key "${key}":`, error);
+      console.error(`Failed to save to localStorage key "${key}":`, error);
     }
   }, [key, state]);
 

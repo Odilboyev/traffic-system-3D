@@ -1,13 +1,15 @@
-import { Button } from "@material-tailwind/react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { signIn } from "../../api/api.handlers";
-import login from "../../Auth";
-import bg from "../../assets/images/back.jpg";
-import { FaSpinner } from "react-icons/fa6";
 import { MdPassword, MdPerson } from "react-icons/md";
-import { t } from "i18next";
+
+import { Button } from "@material-tailwind/react";
+import { FaSpinner } from "react-icons/fa6";
 import InputField from "../../components/InputField";
+import bg from "../../assets/images/back.jpg";
+import login from "../../Auth";
+import { signIn } from "../../api/api.handlers";
+import { t } from "i18next";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 export function SignIn() {
   const navigate = useNavigate();
   console.log("page login");
@@ -58,7 +60,7 @@ export function SignIn() {
       }}
     >
       <div
-        className={`w-full md:w-2/5 mx-auto p-[3%] shadow-lg bg-white dark:bg-blue-gray-900 dark:!text-white rounded`}
+        className={`w-full md:w-2/5 mx-auto p-[3%] shadow-lg backdrop-blur-md bg-blue-gray-900/85 border-blue-gray-200/20 border dark:!text-white rounded`}
       >
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">

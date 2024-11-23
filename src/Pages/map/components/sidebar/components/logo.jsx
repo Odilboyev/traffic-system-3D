@@ -1,10 +1,9 @@
-import { LiaTrafficLightSolid } from "react-icons/lia";
-
 /**
  * Displays the name of the user who is currently logged in.
  *
  * @returns {React.ReactElement} A React component displaying the user's name.
  */
+import logo from "../../../../../assets/icons/logo.png";
 const Logo = ({ t, isSidebarOpen }) => {
   return (
     <div
@@ -16,17 +15,17 @@ const Logo = ({ t, isSidebarOpen }) => {
     >
       {isSidebarOpen ? (
         <>
-          <>
-            <LiaTrafficLightSolid className="w-6 h-6 text-red-500" />
-          </>
+          <div className="w-1/4">
+            <img src={logo} alt="logo" className="w-full" />
+          </div>
           <div className="text-lg font-bold text-gray-300">
             {t("logo_name")}
           </div>
         </>
       ) : (
-        <>
-          <LiaTrafficLightSolid className="w-6 h-6 text-red-500" />
-        </>
+        <div className="w-1/4">
+          <img src={logo} alt="logo" className="w-full" />
+        </div>
       )}
     </div>
   );
