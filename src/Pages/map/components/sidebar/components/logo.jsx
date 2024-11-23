@@ -11,7 +11,7 @@ const Logo = ({ t, isSidebarOpen }) => {
         isSidebarOpen
           ? "justify-start gap-4 "
           : "justify-center hover:bg-gray-700 cursor-pointer "
-      } bg-blue-gray-900/10 items-center px-4 py-3 backdrop-blur-xl flex  w-full`}
+      } bg-blue-gray-900/10 items-center px-4 py-3 backdrop-blur-xl flex w-full`}
     >
       {isSidebarOpen ? (
         <>
@@ -23,7 +23,7 @@ const Logo = ({ t, isSidebarOpen }) => {
           </div>
         </>
       ) : (
-        <div className="w-1/4">
+        <div className="w-[2vw]">
           <img src={logo} alt="logo" className="w-full" />
         </div>
       )}

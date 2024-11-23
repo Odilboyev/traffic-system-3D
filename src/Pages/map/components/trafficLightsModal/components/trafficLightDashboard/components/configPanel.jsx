@@ -1,11 +1,17 @@
+import { ToastContainer, toast } from "react-toastify";
+
 import CustomSelect from "../../../../../../../components/customSelect";
+import { FaSpinner } from "react-icons/fa6";
 import PropTypes from "prop-types";
 import Slider from "react-smooth-range-input";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import { iconOptions } from "../utils";
+import { modifySvetofor } from "../../../../../../../api/api.handlers";
 import { t } from "i18next";
+import { useState } from "react";
 
-const ConfigPanel = ({ config, setConfig, handleCLose }) => {
+const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
+  const [isLoading, setIsLoading] = useState(false);
   // Handles changes in road configuration for visibility or other fields
   const handleRoadChange = (direction, field, value) => {
     setConfig((prevConfig) => ({
@@ -74,8 +80,31 @@ const ConfigPanel = ({ config, setConfig, handleCLose }) => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const jsonOutput = JSON.stringify(config, null, 2);
+    try {
+      setIsLoading(true);
+      const res = await modifySvetofor(jsonOutput, id);
+
+      // Assuming the response indicates success
+
+      toast.success(t("saved_successfully!"), {
+        position: "bottom-right",
+        autoClose: 3000,
+        containerId: "trafficlights",
+      }); // Success notification
+
+      console.log(res);
+    } catch (error) {
+      toast.error(t("error_occured"), {
+        position: "bottom-right",
+        autoClose: 3000,
+        containerId: "trafficlights",
+      }); // Error notification
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Add handler for channel ID updates
@@ -109,6 +138,11 @@ const ConfigPanel = ({ config, setConfig, handleCLose }) => {
 
   return (
     <div className=" no-scrollbar relative max-h-[90vh] overflow-y-scroll p-6 border border-gray-100/20 shadow-lg z-50 h-full rounded-lg space-y-6">
+      <ToastContainer
+        position="bottom-right"
+        containerId={"trafficlights"}
+        autoClose={3000}
+      />
       <button
         size="sm"
         onClick={handleCLose}
@@ -284,9 +318,10 @@ const ConfigPanel = ({ config, setConfig, handleCLose }) => {
 
       <button
         onClick={handleSubmit}
+        disabled={isLoading}
         className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition duration-200"
       >
-        {t("save")}
+        {isLoading ? <FaSpinner className="animate-spin mx-auto" /> : t("save")}
       </button>
     </div>
   );

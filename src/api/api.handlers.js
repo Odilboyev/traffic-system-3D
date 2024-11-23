@@ -83,6 +83,8 @@ const getOverviewCameraModels = async () =>
 const getCameraDetails = async (type, id) => await getData(type, "/" + id);
 const modifyPTZCamera = async (data) =>
   putData(import.meta.env.VITE_OVERVIEW_CAMERA + "/ptz_control", data);
+const modifySvetofor = async (data, id) =>
+  postData(import.meta.env.VITE_TRAFFIC_LIGHTS_UPDATE + "/" + id, data);
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -222,4 +224,5 @@ export {
   updateUser,
   getCameraDetails,
   modifyPTZCamera,
+  modifySvetofor,
 };

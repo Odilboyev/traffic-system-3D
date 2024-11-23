@@ -300,6 +300,7 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
             <ConfigPanel
               config={config}
               setConfig={setConfig}
+              id={id}
               handleCLose={() => setShowConfig(false)}
             />
           )}
