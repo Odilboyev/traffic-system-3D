@@ -47,12 +47,8 @@ const UserName = ({ t, isSidebarOpen }) => {
       {isSidebarOpen ? (
         <>
           <div>
-            <div className="text-lg font-bold text-gray-300">
-              {userInfo?.name}
-            </div>
-            <div className="text-sm font-bold text-gray-300">
-              {t(userInfo?.role)}
-            </div>
+            <div className="text-lg font-bold">{userInfo?.name}</div>
+            <div className="text-sm font-bold">{t(userInfo?.role)}</div>
           </div>
           <IconButton onClick={() => setIsLogoutModalOpen(!isLogoutModalOpen)}>
             <FiLogOut className="w-6 h-6" />

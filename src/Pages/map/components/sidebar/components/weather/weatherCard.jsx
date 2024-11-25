@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Typography } from "@material-tailwind/react";
-import { getWeatherData } from "../../../../api/api.handlers";
+import { getWeatherData } from "../../../../../../api/api.handlers";
 
 const WeatherCard = ({ t, isSidebarOpen }) => {
   const [weatherData, setWeatherData] = useState(null);
@@ -30,7 +30,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
   const iconPath = "icons/wheather_icons";
 
   return (
-    <div className="w-full px-4 py-3 text-white bg-blue-gray-900/10 backdrop-blur-xl ">
+    <div className="w-full px-4 py-3  bg-blue-gray-900/10 backdrop-blur-xl ">
       {isSidebarOpen ? (
         <div className="flex justify-between h-full">
           {/* Current Weather */}
@@ -48,7 +48,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                 {today.temp}°C
               </Typography>
             </div>
-            <div className="space-y-0.5 text-sm  text-gray-300">
+            <div className="space-y-0.5 text-sm  ">
               <div>
                 {t("humidity")}: <b>{today.humidity}%</b>
               </div>
@@ -75,9 +75,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                   <div className="text-sm font-medium">
                     {nextDays[0].temp_max}°C
                   </div>
-                  <div className="text-xs text-gray-400">
-                    {nextDays[0].humidity_max}
-                  </div>
+                  <div className="text-xs ">{nextDays[0].humidity_max}</div>
                 </div>
               </div>
             </div>
@@ -94,9 +92,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                   <div className="text-sm font-medium">
                     {nextDays[0].temp_min}°C
                   </div>
-                  <div className="text-xs text-gray-400">
-                    {nextDays[0].humidity_min}
-                  </div>
+                  <div className="text-xs ">{nextDays[0].humidity_min}</div>
                 </div>
               </div>
             </div>

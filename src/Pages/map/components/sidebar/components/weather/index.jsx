@@ -2,7 +2,7 @@ import WeatherCard from "./weatherCard";
 
 const WeatherWidget = ({ t }) => {
   return (
-    <div className="weather w-[280px] bg-gray-900/80 backdrop-blur-md text-white rounded-lg shadow-lg p-3">
+    <div className="weather w-[280px] bg-gray-900/80 backdrop-blur-md  rounded-lg shadow-lg p-3">
       <WeatherCard />
     </div>
   );

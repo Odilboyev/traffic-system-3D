@@ -25,11 +25,11 @@ const SidebarItem = ({
         onClick={handleExpand}
         className={`flex items-center ${
           isSidebarOpen ? "justify-start" : "justify-center"
-        } w-full px-4 py-3 items-center flex-nowrap hover:bg-gray-700 cursor-pointer transition-all duration-300 `}
+        } w-full px-4 py-3 items-center flex-nowrap dark:hover:bg-gray-700 hover:bg-gray-300 cursor-pointer transition-all duration-300 `}
       >
         {icon}
         <span
-          className={`ml-4 text-base font-medium transition-all duration-300 ${
+          className={`ml-4 text-sm transition-all duration-300 ${
             isSidebarOpen ? "visible block" : "invisible hidden"
           }`}
         >

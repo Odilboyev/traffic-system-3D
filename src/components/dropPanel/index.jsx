@@ -3,6 +3,8 @@ import { IconButton, Typography } from "@material-tailwind/react";
 import { IoMdClose } from "react-icons/io";
 import PropTypes from "prop-types";
 import { t } from "i18next";
+import { useMap } from "react-leaflet";
+import { useTheme } from "../../customHooks/useTheme";
 
 const DropPanel = ({
   icon: Icon,
@@ -14,13 +16,21 @@ const DropPanel = ({
   wrapperClass = "relative inline-block text-left",
   sndWrapperClass = "no-scrollbar max-h-[80vh] overflow-y-scroll w-[50vw]",
 }) => {
+  const { theme } = useTheme();
   // Determine position classes based on menuPlacement
   const positionClass =
     menuPlacement === "top" ? "bottom-full mb-2" : "top-full mt-2";
-
+  const map = useMap();
   return (
-    <div className={wrapperClass}>
-      <IconButton onClick={() => hanleDropDownOpen(!isDropOpen)}>
+    <div
+      className={wrapperClass}
+      onPointerLeave={() => map.scrollWheelZoom.enable()}
+    >
+      <IconButton
+        size="sm"
+        onClick={() => hanleDropDownOpen(!isDropOpen)}
+        color={theme === "dark" ? "black" : "white"}
+      >
         <Icon className="w-6 h-6" />
       </IconButton>
 

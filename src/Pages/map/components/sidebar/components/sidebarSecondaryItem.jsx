@@ -2,6 +2,7 @@
 import DropPanel from "../../../../../components/dropPanel";
 import { IconButton } from "@material-tailwind/react";
 import { memo } from "react";
+import { useTheme } from "../../../../../customHooks/useTheme";
 
 const SidebarSecondaryItem = memo(
   ({
@@ -12,6 +13,7 @@ const SidebarSecondaryItem = memo(
     component,
     ...rest
   }) => {
+    const { theme } = useTheme();
     const dropDownHandler = () => {
       if (setActiveSecondaryPanel) {
         if (activeSecondaryPanel === label) {
@@ -34,7 +36,11 @@ const SidebarSecondaryItem = memo(
         {component}
       </DropPanel>
     ) : (
-      <IconButton onClick={rest.onClick}>
+      <IconButton
+        onClick={rest.onClick}
+        color={theme === "dark" ? "black" : "white"}
+        size="sm"
+      >
         <Icon className="w-6 h-6" />
       </IconButton>
     );

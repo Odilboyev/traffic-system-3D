@@ -2,10 +2,16 @@ import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
 } from "@heroicons/react/16/solid";
-import { CogIcon, LanguageIcon } from "@heroicons/react/24/solid";
 import { FaFilter, FaLocationDot, FaMap } from "react-icons/fa6";
 import { IoIosArrowBack, IoIosArrowForward, IoMdSunny } from "react-icons/io";
-import { MdBedtime, MdBubbleChart, MdHistory } from "react-icons/md";
+import {
+  MdBedtime,
+  MdBubbleChart,
+  MdHistory,
+  MdOutlineLanguage,
+  MdOutlineWidgets,
+} from "react-icons/md";
+import { TbBell, TbServerCog } from "react-icons/tb";
 import { useMap, useMapEvents } from "react-leaflet";
 
 import CrossroadWidget from "../../widgets/crossroadData";
@@ -14,7 +20,7 @@ import DateTime from "./components/time";
 import DeviceErrorHistory from "../../sections/deviceErrorHistory";
 import DeviceManagement from "../../sections/deviceManagement";
 import FilterControl from "../controls/filterControl";
-import { HiCog8Tooth } from "react-icons/hi2";
+import { HiCog6Tooth } from "react-icons/hi2";
 import InfoWidget from "../../widgets/infoWidget";
 import LanguageSwitcher from "../../sections/langSwitcher";
 import Logo from "./components/logo";
@@ -23,10 +29,9 @@ import MarkerControl from "../controls/markerControl";
 import RegionControl from "../controls/regionControl";
 import SidebarItem from "./components/sidebarItem";
 import SidebarSecondaryItem from "./components/sidebarSecondaryItem";
-import { TbBell } from "react-icons/tb";
 import TileLayerControl from "../controls/tileLayerControl";
 import UserName from "./components/userName";
-import WeatherCard from "../../widgets/weather/weatherCard";
+import WeatherCard from "./components/weather/weatherCard";
 import WidgetControl from "../controls/widgetControl";
 import { isPermitted } from "../../constants/roles";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
@@ -90,7 +95,7 @@ const Sidebar = ({
         onPointerLeave={() => map.scrollWheelZoom.enable()}
         className={` ${
           isVisible ? "fixed" : "none"
-        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-900/80  dark:bg-gray-900/50 backdrop-blur-md text-white shadow-lg flex flex-col ${
+        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-lg  shadow-lg flex flex-col ${
           isSidebarOpen ? "w-[15vw]" : "w-18"
         } ${theme === "light" ? "bg-gray-100" : "bg-gray-900"} 
         transition-all duration-300 ease-in-out select-none`}
@@ -101,12 +106,12 @@ const Sidebar = ({
             e.stopPropagation();
             toggleSidebar();
           }}
-          className="flex items-center rounded-none justify-center h-12 border-b border-gray-700 text-gray-400 hover:text-white"
+          className="flex items-center rounded-none justify-center h-12 border-b border-gray-700 hover:text-white"
         >
           {isSidebarOpen ? (
-            <IoIosArrowBack size={24} />
+            <IoIosArrowBack className="w-4 h-4" />
           ) : (
-            <IoIosArrowForward size={24} />
+            <IoIosArrowForward className="w-4 h-4" />
           )}
         </button>
         {/* main content of sidebar */}
@@ -125,9 +130,9 @@ const Sidebar = ({
             <WeatherCard t={t} isSidebarOpen={isSidebarOpen} />
           )}
           {/* Sidebar items */}
-          <div className="flex flex-col items-center space-y-3 w-full">
+          <div className="flex flex-col items-center space-y-1 w-full">
             <SidebarItem
-              icon={<FaFilter size={24} />}
+              icon={<FaFilter className="w-4 h-4" />}
               label={"markerFilters"}
               isSidebarOpen={isSidebarOpen}
               activeSidePanel={activeSidePanel}
@@ -136,7 +141,7 @@ const Sidebar = ({
               extraContent={<FilterControl t={t} />} // Include your custom component here
             />
             <SidebarItem
-              icon={<FaLocationDot size={24} />}
+              icon={<FaLocationDot className="w-4 h-4" />}
               label="regionControl"
               isSidebarOpen={isSidebarOpen}
               t={t}
@@ -147,7 +152,7 @@ const Sidebar = ({
               } // Another custom component
             />
             <SidebarItem
-              icon={<HiCog8Tooth size={24} />}
+              icon={<MdOutlineWidgets className="w-4 h-4" />}
               label="widgetControl"
               isSidebarOpen={isSidebarOpen}
               t={t}
@@ -157,7 +162,7 @@ const Sidebar = ({
             />
             {isPermitted && (
               <SidebarItem
-                icon={<CogIcon className="w-6 h-6" />}
+                icon={<TbServerCog className="w-4 h-4" />}
                 isSidebarOpen={isSidebarOpen}
                 label="deviceManagement"
                 activeSidePanel={activeSidePanel}
@@ -174,7 +179,7 @@ const Sidebar = ({
             )}
             {/* <ErrorBoundary> */}
             <SidebarItem
-              icon={<MdHistory size={24} />}
+              icon={<MdHistory className="w-4 h-4" />}
               isSidebarOpen={isSidebarOpen}
               label="deviceErrorHistory"
               activeSidePanel={activeSidePanel}
@@ -196,7 +201,7 @@ const Sidebar = ({
             {/* </ErrorBoundary> */}
 
             <SidebarItem
-              icon={<TbBell size={24} />}
+              icon={<TbBell className="w-4 h-4" />}
               isSidebarOpen={isSidebarOpen}
               label="currentAlarms"
               activeSidePanel={activeSidePanel}
@@ -217,13 +222,13 @@ const Sidebar = ({
             />
           </div>
         </div>
-        <div className="overflow-y-visible"></div>
         <div
-          className={`flex items-center absolute bottom-0 left-0 ${
-            isSidebarOpen
-              ? "justify-evenly px-4 py-3"
-              : "justify-center px-2 py-3"
-          } w-full max-w-full no-scrollbar gap-2 items-center bg-gray-900/70  border-t border-gray-500/20`}
+          className={`w-full max-w-full no-scrollbar gap-2 items-center bg-blue-gray-100 backdrop-blur dark:bg-gray-900  border-t border-gray-500/20
+            flex items-center absolute bottom-0 left-0 ${
+              isSidebarOpen
+                ? "justify-evenly px-4 py-3"
+                : "justify-center px-2 py-3"
+            } `}
         >
           <SidebarSecondaryItem
             onClick={toggleTheme}
@@ -233,7 +238,7 @@ const Sidebar = ({
           {isSidebarOpen && (
             <>
               <SidebarSecondaryItem
-                icon={LanguageIcon}
+                icon={MdOutlineLanguage}
                 label="language"
                 activeSecondaryPanel={activeSecondaryPanel}
                 setActiveSecondaryPanel={setActiveSecondaryPanel}
@@ -244,7 +249,7 @@ const Sidebar = ({
                 }
               />
               <SidebarSecondaryItem
-                icon={CogIcon}
+                icon={HiCog6Tooth}
                 label={"settings"}
                 activeSecondaryPanel={activeSecondaryPanel}
                 setActiveSecondaryPanel={setActiveSecondaryPanel}

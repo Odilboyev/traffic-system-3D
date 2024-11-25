@@ -18,9 +18,7 @@ const Logo = ({ t, isSidebarOpen }) => {
           <div className="w-1/4">
             <img src={logo} alt="logo" className="w-full" />
           </div>
-          <div className="text-lg font-bold text-gray-300">
-            {t("logo_name")}
-          </div>
+          <div className="text-lg font-bold">{t("logo_name")}</div>
         </>
       ) : (
         <div className="w-[2vw]">

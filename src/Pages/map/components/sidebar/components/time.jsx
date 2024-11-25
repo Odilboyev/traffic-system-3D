@@ -11,12 +11,12 @@ const DateTime = ({ t, isSidebarOpen, currentLocation }) => {
     <div className="w-full bg-blue-gray-900/10  px-4 py-3 backdrop-blur-xl flex items-center justify-between">
       {isSidebarOpen ? (
         <>
-          <div className="text-base  font-bold text-gray-300">
-            <div className="text-xs text-gray-400">{t("region")}</div>
+          <div className="text-base  font-bold">
+            <div className="text-xs ">{t("region")}</div>
             <div className="text-lg font-bold">{location}</div>
           </div>
           <div>
-            <div className="text-xs text-right text-gray-400">
+            <div className="text-xs text-right">
               {time.toLocaleDateString(undefined, options)}
             </div>
             <div className="text-lg text-right font-bold">
