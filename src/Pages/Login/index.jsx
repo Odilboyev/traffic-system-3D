@@ -5,6 +5,7 @@ import { FaSpinner } from "react-icons/fa6";
 import InputField from "../../components/InputField";
 import bg from "../../assets/images/back.jpg";
 import login from "../../Auth";
+import logo from "../../assets/icons/logo.png";
 import { signIn } from "../../api/api.handlers";
 import { t } from "i18next";
 import { useNavigate } from "react-router-dom";
@@ -60,8 +61,16 @@ export function SignIn() {
       }}
     >
       <div
-        className={`w-full md:w-2/5 mx-auto p-[3%] shadow-lg backdrop-blur-md bg-blue-gray-900/85 border-blue-gray-200/20 border dark:!text-white rounded`}
+        className={
+          "w-full md:w-2/5 mx-auto p-[5%] shadow-lg backdrop-blur-md dark:bg-blue-gray-900/85 bg-white/85 border-blue-gray-200/20 border dark:!text-white rounded-xl"
+        }
       >
+        <div className="w-full flex items-center gap-5  mb-[12%]">
+          <div className="w-1/4">
+            <img src={logo} alt="logo" className="w-full" />
+          </div>
+          <div className="w-2/4 text-2xl font-bold">{t("logo_name")}</div>
+        </div>
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">
             {error && (
@@ -96,7 +105,7 @@ export function SignIn() {
             disabled={loading || !loginName} // Keep the disable logic
           >
             {loading && <FaSpinner className="animate-spin mx-auto" />}{" "}
-            {t("enter")}
+            {t("enter") || "enter"}
           </Button>
 
           {/* ---------Forgot Password --------- */}

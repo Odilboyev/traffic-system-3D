@@ -108,7 +108,7 @@ const renderCrosswalks = (
         }}
       >
         <div
-          className={`absolute border border-white/10 rounded-full p-2 ${colorMapping.text[crosswalkSignal]} ${colorMapping.glow[crosswalkSignal]} font-digital text-xl`}
+          className={`absolute border border-white/10 rounded-full px-2 py-1 ${colorMapping.text[crosswalkSignal]} ${colorMapping.glow[crosswalkSignal]} font-digital text-xl`}
           style={counterStyle}
         >
           {crosswalkTimer}
