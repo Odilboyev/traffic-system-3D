@@ -1,5 +1,3 @@
-import React from "react";
-
 import { iconOptions } from "../utils";
 
 const ArrowDisplay = ({
@@ -13,7 +11,6 @@ const ArrowDisplay = ({
   trafficLights,
   seconds,
   channelId,
-  isInModal,
 }) => {
   // Rotation logic based on direction and roadName
   const getRotationAngle = () => {
@@ -44,11 +41,11 @@ const ArrowDisplay = ({
   };
 
   // Add size classes based on isInModal
-  const iconSizeClass = isInModal ? "text-lg" : "text-2xl";
-  const numberSizeClass = isInModal ? "text-base" : "text-xl";
+  const iconSizeClass = "text-2xl";
+  const numberSizeClass = "text-xl";
 
   // Adjust margins for modal
-  const marginSize = isInModal ? "24px" : "40px";
+  const marginSize = "40px";
 
   return (
     <div

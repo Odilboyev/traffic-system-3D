@@ -4,64 +4,16 @@ import ConfigPanel from "./components/configPanel";
 import Intersection from "./components/intersection";
 import PropTypes from "prop-types";
 import { TbPencil } from "react-icons/tb";
+import { defaultConfig } from "./utils";
 import { fixIncompleteJSON } from "../../../trafficLightMarkers/utils";
 import { getTrafficLightsConfig } from "../../../../../../api/api.handlers";
 import useLocalStorageState from "../../../../../../customHooks/uselocalStorageState";
 
-const TrafficLightDashboard = ({ id, isInModal }) => {
+const TrafficLightDashboard = ({ id, isInModal = false }) => {
   const role = atob(localStorage.getItem("its_user_role"));
   const [showConfig, setShowConfig] = useState(false);
   const [incomingConfig, setIncomingConfig] = useState(null);
   const [trafficSocket, setTrafficSocket] = useState(null);
-  const defaultConfig = {
-    angle: 45,
-    north: {
-      lanesLeft: [[], []],
-      lanesRight: [
-        { icon: "TbArrowBackUp", channel_id: 3 },
-        { icon: "TbArrowUp", channel_id: 3 },
-        { icon: "TbArrowUp", channel_id: 3 },
-        { icon: "TbArrowRampRight", channel_id: 3 },
-      ],
-      visible: true,
-      direction: "vertical",
-      cross_walk: { channel_id: 15 },
-    },
-    south: {
-      lanesLeft: [[], []],
-      lanesRight: [
-        { icon: "TbArrowBackUp", channel_id: 4 },
-        { icon: "TbArrowUp", channel_id: 4 },
-        { icon: "TbArrowRight", channel_id: 6 },
-      ],
-      visible: true,
-      direction: "vertical",
-      cross_walk: { channel_id: 16 },
-    },
-    east: {
-      lanesLeft: [[], []],
-      lanesRight: [
-        { icon: "TbArrowBackUp", channel_id: 7 },
-        { icon: "TbArrowUp", channel_id: 7 },
-        { icon: "TbArrowRampRight", channel_id: 8 },
-      ],
-      visible: true,
-      direction: "horizontal",
-      cross_walk: { channel_id: 17 },
-    },
-    west: {
-      lanesLeft: [[], []],
-      lanesRight: [
-        { icon: "TbArrowBackUp", channel_id: 9 },
-        { icon: "TbArrowUp", channel_id: 9 },
-        { icon: "TbArrowUp", channel_id: 9 },
-        { icon: "TbArrowRampRight", channel_id: 10 },
-      ],
-      visible: true,
-      direction: "horizontal",
-      cross_walk: { channel_id: 18 },
-    },
-  };
 
   const [config, setConfig] = useLocalStorageState(
     "its_roadDrawingConfig",
@@ -76,19 +28,19 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
   });
 
   const [crosswalks, setCrosswalks] = useState({
-    north: "green",
-    south: "green",
-    east: "red",
-    west: "red",
+    north: { left: "green", right: "green" },
+    south: { left: "green", right: "green" },
+    east: { left: "red", right: "red" },
+    west: { left: "red", right: "red" },
   });
 
   const [seconds, setSeconds] = useState({});
 
   const [crosswalkSeconds, setCrosswalkSeconds] = useState({
-    north: 30,
-    south: 30,
-    east: 30,
-    west: 30,
+    north: { left: 30, right: 30 },
+    south: { left: 30, right: 30 },
+    east: { left: 30, right: 30 },
+    west: { left: 30, right: 30 },
   });
 
   const [wsConnectionStatus, setWsConnectionStatus] = useState("disconnected");
@@ -211,10 +163,25 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
                 const newState = { ...prevState };
                 Object.entries(config).forEach(([direction, dirConfig]) => {
                   if (direction !== "angle") {
-                    const channelId = dirConfig.cross_walk?.channel_id;
-                    if (channelId && channelStatuses[channelId]) {
-                      const status = channelStatuses[channelId].status;
-                      newState[direction] = status === 1 ? "green" : "red";
+                    const leftChannelId = dirConfig.cross_walkLeft?.channel_id;
+                    const rightChannelId =
+                      dirConfig.cross_walkRight?.channel_id;
+
+                    // Check and update the left crosswalk status
+                    if (leftChannelId && channelStatuses[leftChannelId]) {
+                      const leftStatus = channelStatuses[leftChannelId].status;
+                      newState[direction] = newState[direction] || {};
+                      newState[direction].left =
+                        leftStatus === 1 ? "green" : "red";
+                    }
+
+                    // Check and update the right crosswalk status
+                    if (rightChannelId && channelStatuses[rightChannelId]) {
+                      const rightStatus =
+                        channelStatuses[rightChannelId].status;
+                      newState[direction] = newState[direction] || {};
+                      newState[direction].right =
+                        rightStatus === 1 ? "green" : "red";
                     }
                   }
                 });
@@ -226,10 +193,22 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
                 const newSeconds = { ...prevSeconds };
                 Object.entries(config).forEach(([direction, dirConfig]) => {
                   if (direction !== "angle") {
-                    const channelId = dirConfig.cross_walk?.channel_id;
-                    if (channelId && channelStatuses[channelId]) {
-                      newSeconds[direction] =
-                        channelStatuses[channelId].countdown;
+                    const leftChannelId = dirConfig.cross_walkLeft?.channel_id;
+                    const rightChannelId =
+                      dirConfig.cross_walkRight?.channel_id;
+
+                    // Check and update the left crosswalk countdown
+                    if (leftChannelId && channelStatuses[leftChannelId]) {
+                      newSeconds[direction] = newSeconds[direction] || {};
+                      newSeconds[direction].left =
+                        channelStatuses[leftChannelId].countdown;
+                    }
+
+                    // Check and update the right crosswalk countdown
+                    if (rightChannelId && channelStatuses[rightChannelId]) {
+                      newSeconds[direction] = newSeconds[direction] || {};
+                      newSeconds[direction].right =
+                        channelStatuses[rightChannelId].countdown;
                     }
                   }
                 });
@@ -310,7 +289,7 @@ const TrafficLightDashboard = ({ id, isInModal }) => {
       {(showConfig || incomingConfig) && (
         <Intersection
           id={id}
-          isInModal={false}
+          // isInModal={false}
           config={config}
           trafficLights={trafficLights}
           crosswalks={crosswalks}

@@ -126,12 +126,12 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
   };
 
   // Add handler for crosswalk channel ID updates
-  const handleCrosswalkChannelChange = (direction, value) => {
+  const handleCrosswalkChannelChange = (direction, side, value) => {
     setConfig((prevConfig) => ({
       ...prevConfig,
       [direction]: {
         ...prevConfig[direction],
-        cross_walk: { channel_id: parseInt(value) },
+        [side]: { channel_id: parseInt(value) },
       },
     }));
   };
@@ -300,14 +300,38 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
           {/* Crosswalk Channel ID */}
           <div className="mt-4">
             <label className="text-sm font-bold uppercase tracking-wide block mb-2">
-              Crosswalk Channel ID:
+              {t("crosswalkLeftChannelId")}:
             </label>
             <input
               type="number"
               onWheel={(e) => e.target.blur()}
-              value={config[direction].cross_walk?.channel_id || ""}
+              value={config[direction].cross_walkLeft?.channel_id || ""}
               onChange={(e) =>
-                handleCrosswalkChannelChange(direction, e.target.value)
+                handleCrosswalkChannelChange(
+                  direction,
+                  "cross_walkLeft",
+                  e.target.value
+                )
+              }
+              placeholder="Crosswalk Channel ID"
+              className="w-full px-2 py-1 border border-gray-100/20 rounded dark:bg-gray-800"
+            />
+          </div>
+          {/* Crosswalk Channel ID */}
+          <div className="mt-4">
+            <label className="text-sm font-bold uppercase tracking-wide block mb-2">
+              {t("crosswalkRightChannelId")}:
+            </label>
+            <input
+              type="number"
+              onWheel={(e) => e.target.blur()}
+              value={config[direction].cross_walkRight?.channel_id || ""}
+              onChange={(e) =>
+                handleCrosswalkChannelChange(
+                  direction,
+                  "cross_walkRight",
+                  e.target.value
+                )
               }
               placeholder="Crosswalk Channel ID"
               className="w-full px-2 py-1 border border-gray-100/20 rounded dark:bg-gray-800"

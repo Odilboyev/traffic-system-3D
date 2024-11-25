@@ -1,93 +1,140 @@
-import { getLaneWidth, getRoadWidth } from "../utils";
+import { getLaneWidth } from "../utils";
 
+// Color and style mappings
+const colorMapping = {
+  bg: {
+    green: "#4ade80",
+    yellow: "#fde047",
+    red: "#ef4444",
+  },
+  text: {
+    green: "text-green-400",
+    yellow: "text-yellow-400",
+    red: "text-red-500",
+  },
+  glow: {
+    green: "drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]",
+    yellow: "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
+    red: "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]",
+  },
+};
+
+// Function to calculate crosswalk dimensions based on direction and lane count
+const calculateDimensions = (direction, laneWidth, laneCount) => {
+  if (direction === "vertical") {
+    return {
+      width: laneWidth * laneCount,
+      height: laneWidth / 2,
+    };
+  } else {
+    return {
+      width: laneWidth / 2,
+      height: laneWidth * laneCount,
+    };
+  }
+};
+
+const calculateCounterStyle = (direction, crosswalkPosition) => {
+  // If the direction is vertical
+  if (direction === "vertical") {
+    return {
+      left:
+        crosswalkPosition === "left" ? `calc(100% + 10px)` : `calc(0% - 50px)`, // Position on left or right side
+      top: "50%",
+      transform: "translateY(-50%)",
+    };
+  } else {
+    // If the direction is horizontal
+    return {
+      top:
+        crosswalkPosition === "right" ? `calc(100% + 10px)` : `calc(0% - 50px)`, // Position on top or bottom side
+      left: "50%",
+      transform: "translateX(-50%)",
+    };
+  }
+};
+
+// Function to generate the crosswalk component
 const renderCrosswalks = (
   roadConfig,
   direction,
   roadName,
   crosswalks,
-  crosswalkSeconds,
-  isInModal
+  crosswalkSeconds
 ) => {
-  const crosswalkWidth = getRoadWidth(roadConfig, isInModal);
-  const crosswalkHeight = getLaneWidth(isInModal) / 2;
-
   if (!roadConfig.visible) return null;
 
-  let top, left;
-  if (direction === "vertical") {
-    top = roadName === "north" ? `calc(100% - ${crosswalkHeight}px)` : `0`;
-    left = `calc(50% - ${crosswalkWidth / 2}px)`;
-  } else {
-    top = `calc(50% - ${crosswalkWidth / 2}px)`;
-    left = roadName === "east" ? `0` : `calc(100% - ${crosswalkHeight}px)`;
-  }
+  const sides = ["Left", "Right"];
 
-  const colorMappingBG = {
-    green: "#4ade80",
-    yellow: "#fde047",
-    red: "#ef4444",
-  };
+  return sides.map((side) => {
+    const isLeft = side === "Left";
+    const laneKey = `lanes${side}`;
+    const crosswalkKey = `cross_walk${side}`;
+    const laneCount = roadConfig[laneKey].length;
+    const laneWidth = getLaneWidth(); // Get lane width dynamically
 
-  const colorMappingText = {
-    green: "text-green-400",
-    yellow: "text-yellow-400",
-    red: "text-red-500",
-  };
+    // Calculate crosswalk dimensions
+    const { width: crosswalkWidth, height: crosswalkHeight } =
+      calculateDimensions(direction, laneWidth, laneCount);
 
-  const colorMappingGlow = {
-    green: "drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]",
-    yellow: "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
-    red: "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]",
-  };
+    // Determine the crosswalk signal and timer for the specific side
+    const crosswalkSignal = crosswalks[side.toLowerCase()];
+    const crosswalkTimer = crosswalkSeconds[side.toLowerCase()] || 0;
 
-  // Calculate counter position based on direction and road name
-  let counterStyle = {};
-  if (direction === "vertical") {
-    counterStyle = {
-      left: `calc(100% + 10px)`,
-      top: "50%",
-      transform: "translateY(-50%)",
-    };
-  } else {
-    counterStyle = {
-      top: `calc(100% + 10px)`,
-      left: "50%",
-      transform: "translateX(-50%)",
-    };
-  }
+    // Positioning logic
+    const { top, left } = calculatePosition(
+      direction,
+      isLeft,
+      crosswalkWidth,
+      crosswalkHeight,
+      roadName
+    );
 
-  return (
-    <div
-      className={`absolute`}
-      style={{
-        width:
-          direction === "vertical"
-            ? `${crosswalkWidth}px`
-            : `${crosswalkHeight}px`,
-        height:
-          direction === "vertical"
-            ? `${crosswalkHeight}px`
-            : `${crosswalkWidth}px`,
-        top,
-        left,
-        backgroundImage: `repeating-linear-gradient(${
-          direction === "vertical" ? "90deg" : "0"
-        }, ${colorMappingBG[crosswalks[roadName]]}, ${
-          colorMappingBG[crosswalks[roadName]]
-        } 5px, transparent 5px, transparent 10px)`,
-        zIndex: 50,
-      }}
-    >
+    const counterStyle = calculateCounterStyle(direction, side.toLowerCase());
+    return (
       <div
-        className={`absolute ${colorMappingText[crosswalks[roadName]]} ${
-          colorMappingGlow[crosswalks[roadName]]
-        } font-digital ${isInModal ? "text-base" : "text-xl"}`}
-        style={counterStyle}
+        key={side}
+        className="absolute z-[999]"
+        style={{
+          width: `${crosswalkWidth}px`,
+          height: `${crosswalkHeight}px`,
+          top,
+          left,
+          backgroundImage: `repeating-linear-gradient(${
+            direction === "vertical" ? "90deg" : "0"
+          }, ${colorMapping.bg[crosswalkSignal]}, ${
+            colorMapping.bg[crosswalkSignal]
+          } 5px, transparent 5px, transparent 10px)`,
+        }}
       >
-        {crosswalkSeconds[roadName]}
+        <div
+          className={`absolute border border-white/10 rounded-full p-2 ${colorMapping.text[crosswalkSignal]} ${colorMapping.glow[crosswalkSignal]} font-digital text-xl`}
+          style={counterStyle}
+        >
+          {crosswalkTimer}
+        </div>
       </div>
-    </div>
-  );
+    );
+  });
 };
-
 export default renderCrosswalks;
+
+const calculatePosition = (
+  direction,
+  isLeft,
+  crosswalkWidth,
+  crosswalkHeight,
+  roadName
+) => {
+  if (direction === "vertical") {
+    return {
+      top: roadName === "north" ? `calc(100% - ${crosswalkHeight}px)` : `0`, // Far end of the road
+      left: isLeft ? `calc(100% - ${crosswalkWidth}px)` : `0`, // Far end of the road
+    };
+  } else if (direction === "horizontal") {
+    return {
+      top: isLeft ? `0` : `calc(100% - ${crosswalkHeight}px)`, // Top or bottom of the road
+      left: roadName === "west" ? `calc(100% - ${crosswalkWidth}px)` : `0`, // Left or right side of the road
+    };
+  }
+};

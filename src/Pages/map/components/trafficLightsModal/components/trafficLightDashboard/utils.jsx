@@ -23,11 +23,15 @@ export const iconOptions = [
   },
 ];
 
-export const getLaneWidth = (isInModal = false) =>
-  isInModal ? Math.floor(40 * MODAL_SIZE_MULTIPLIER) : 40;
+// export const getLaneWidth = (isInModal = false) =>
+//   isInModal ? Math.floor(40 * MODAL_SIZE_MULTIPLIER) : 40;
 
-export const getCrosswalkWidth = (isInModal = false) =>
-  isInModal ? Math.floor(20 * MODAL_SIZE_MULTIPLIER) : 20;
+// export const getCrosswalkWidth = (isInModal = false) =>
+//   isInModal ? Math.floor(20 * MODAL_SIZE_MULTIPLIER) : 20;
+
+export const getLaneWidth = () => 40;
+
+export const getCrosswalkWidth = () => 20;
 
 export const getRoadWidth = (roadConfig, isInModal = false) => {
   return (
@@ -103,4 +107,136 @@ export const getIntersectionSize = (config, isInModal = false) => {
   paddingFactor = Math.min(Math.max(paddingFactor, 1.25), 1.4);
 
   return Math.ceil(baseSize * paddingFactor);
+};
+
+export const defaultConfig = {
+  east: {
+    visible: true,
+    direction: "horizontal",
+    lanesLeft: [[], [], [], []],
+    cross_walkLeft: {
+      channel_id: 12,
+    },
+    cross_walkRight: {
+      channel_id: 12,
+    },
+    lanesRight: [
+      {
+        icon: "TbArrowLeft",
+        channel_id: 2,
+      },
+      {
+        icon: "TbArrowLeft",
+        channel_id: 2,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 5,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 5,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 5,
+      },
+      {
+        icon: "TbArrowRight",
+        channel_id: 5,
+      },
+    ],
+  },
+  west: {
+    visible: true,
+    direction: "horizontal",
+    lanesLeft: [{}, {}, {}, {}],
+    cross_walkLeft: {
+      channel_id: 3,
+    },
+    cross_walkRight: {
+      channel_id: 3,
+    },
+    lanesRight: [
+      {
+        icon: "TbArrowLeft",
+        channel_id: 3,
+      },
+      {
+        icon: "TbArrowLeft",
+        channel_id: 3,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 1,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 1,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 1,
+      },
+      {
+        icon: "TbArrowRampRight",
+        channel_id: 1,
+      },
+    ],
+  },
+  angle: 0,
+  north: {
+    visible: true,
+    direction: "vertical",
+    lanesLeft: [{}, {}, {}, {}],
+    cross_walkLeft: {
+      channel_id: 8,
+    },
+    cross_walkRight: {
+      channel_id: 8,
+    },
+    lanesRight: [
+      {
+        icon: "TbArrowRampLeft",
+        channel_id: 6,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 6,
+      },
+      {
+        icon: "TbArrowRight",
+        channel_id: 6,
+      },
+    ],
+  },
+  south: {
+    visible: true,
+    direction: "vertical",
+    lanesLeft: [[], [], [], []],
+    cross_walkLeft: {
+      channel_id: 4,
+    },
+    cross_walkRight: {
+      channel_id: 4,
+    },
+    lanesRight: [
+      {
+        icon: "TbArrowRampLeft",
+        channel_id: 14,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 14,
+      },
+      {
+        icon: "TbArrowUp",
+        channel_id: 14,
+      },
+      {
+        icon: "TbArrowRight",
+        channel_id: 9,
+      },
+    ],
+  },
 };
