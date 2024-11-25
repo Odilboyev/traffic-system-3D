@@ -25,7 +25,6 @@ const ClusteredMarkers = ({
   const changedMarker = useSelector((state) => state.map.changedMarker); // Assuming changedMarker is stored in state.map.changedMarker
 
   const markerUpdate = markers?.length || 0;
-  console.log(filter, "Marker update");
   return (
     <div>
       <MarkerClusterGroup
@@ -38,9 +37,7 @@ const ClusteredMarkers = ({
         animate={true}
         animateAddingMarkers={false}
         iconCreateFunction={
-          usePieChartForClusteredMarkers
-            ? (e) => ClusterIcon(e, changedMarker)
-            : null
+          usePieChartForClusteredMarkers ? (e) => ClusterIcon(e) : null
         }
       >
         {markers?.map((marker, i) => {

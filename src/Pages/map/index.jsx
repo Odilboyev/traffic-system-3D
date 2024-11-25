@@ -2,7 +2,6 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
 import { memo, useEffect, useState } from "react";
 
-import ClusteredMarkers from "./components/markers/ClusteredMarkers.jsx";
 import Control from "../../components/customControl/index.jsx";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import MapEvents from "./components/MapEvents/index.jsx";
@@ -10,7 +9,6 @@ import MapModals from "./components/MapModals/index.jsx";
 import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
-import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import { safeParseJSON } from "../../redux/utils.js";
@@ -181,7 +179,7 @@ const MapComponent = ({ changedMarker, t }) => {
         </Control>
         {/* <Control position="bottomcenter"> */}
         {/* </Control> */}
-        {filter.trafficlights && <TrafficLightContainer />}
+        {/* {filter.trafficlights && <TrafficLightContainer />}
         {useClusteredMarkers === "clustered" ||
         useClusteredMarkers === "clustered_dynamically" ? (
           <ClusteredMarkers
@@ -202,21 +200,27 @@ const MapComponent = ({ changedMarker, t }) => {
             changedMarker={changedMarker}
             L={L}
           />
-        ) : (
-          <DynamicMarkers
-            handleMonitorCrossroad={handleMonitorCrossroadOpen}
-            handleBoxModalOpen={handleBoxModalOpen}
-            handleLightsModalOpen={handleLightsModalOpen}
-            handleMarkerDragEnd={handleMarkerDragEnd}
-            markers={markers}
-            filter={filter}
-            isDraggable={isDraggable}
-            setMarkers={setMarkers}
-            clearMarkers={clearMarkers}
-            updateMarkers={updateMarkers}
-            L={L}
-          />
-        )}
+        ) : ( */}
+        <DynamicMarkers
+          usePieChartForClusteredMarkers={
+            useClusteredMarkers === "clustered_dynamically"
+          }
+          key={useClusteredMarkers}
+          handleMonitorCrossroad={handleMonitorCrossroadOpen}
+          handleBoxModalOpen={handleBoxModalOpen}
+          handleLightsModalOpen={handleLightsModalOpen}
+          handleMarkerDragEnd={handleMarkerDragEnd}
+          markers={markers}
+          filter={filter}
+          isDraggable={isDraggable}
+          setMarkers={setMarkers}
+          clearMarkers={clearMarkers}
+          updateMarkers={updateMarkers}
+          changedMarker={changedMarker}
+          L={L}
+          useDynamicFetching={useClusteredMarkers === "dynamic"}
+        />
+        {/* )} */}
       </MapContainer>
 
       <MapModals

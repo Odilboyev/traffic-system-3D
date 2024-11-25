@@ -21,6 +21,9 @@
 .leaflet-tooltip-pane {
   background: transparent !important;
 }
+.leaflet-popup-close-button {
+  color: white !important;
+}
 /* 
 .custom-popup .leaflet-popup-tip-container {
   left: 50%;

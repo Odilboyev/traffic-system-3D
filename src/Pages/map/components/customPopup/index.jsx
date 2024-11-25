@@ -47,7 +47,7 @@ const CameraDetails = memo(
           autoClose={false}
           keepInView={false}
           autoPan={false}
-          className="!p-0 !m-0 z-[50000000] select-none custom-popup text-white"
+          className="!p-0 !m-0 z-[50000000] custom-popup text-white"
         >
           {!isLoading && cameraData ? (
             <div className="rounded-xl bg-gray-900/60 backdrop-blur-md text-white ">

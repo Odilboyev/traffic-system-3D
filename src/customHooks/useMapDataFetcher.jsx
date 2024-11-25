@@ -13,7 +13,7 @@ const useMapDataFetcher = ({
 }) => {
   const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
   const map = useMap();
-
+  if (!fetchData) return;
   // Function to check distance and trigger fetch if conditions are met
   const handleMapEvents = () => {
     const center = map.getCenter();

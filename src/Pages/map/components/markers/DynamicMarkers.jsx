@@ -1,14 +1,19 @@
-import { Fragment } from "react";
-import { Marker } from "react-leaflet";
+import CustomMarker from "../customMarker";
+import L from "leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
+import { PieChart } from "react-minimal-pie-chart";
 import PropTypes from "prop-types";
-import { getAllMarkers } from "../../../../api/api.handlers"; // You'll need to create this
+import { getAllMarkers } from "../../../../api/api.handlers";
+import { renderToString } from "react-dom/server";
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
+import { useRef } from "react";
+import { useSelector } from "react-redux";
 
-// Rename from MarkerComponent to DynamicMarkerComponent
 const DynamicMarkers = ({
-  markers,
-  filter,
+  useDynamicFetching,
+  usePieChartForClusteredMarkers,
   isDraggable,
+  filter,
   setMarkers,
   clearMarkers,
   updateMarkers,
@@ -16,112 +21,93 @@ const DynamicMarkers = ({
   handleBoxModalOpen,
   handleLightsModalOpen,
   handleMarkerDragEnd,
-  L,
 }) => {
-  // Fetching function passed to custom hook
+  const clusterRef = useRef(null);
+  const markers = useSelector((state) => state.map.markers); // Assuming markers are stored in state.map.markers
   const fetchMarkers = async (body) => {
     try {
       const response = await getAllMarkers(body);
-      console.log(response, "response");
       if (response.status === "error") {
-        console.error(response.message);
         clearMarkers();
         return;
       }
-
       setMarkers(response.data);
     } catch (error) {
       console.error("Error fetching markers:", error);
       clearMarkers();
     }
   };
-
-  // Use the custom hook
   useMapDataFetcher({
-    fetchData: fetchMarkers,
-    onClearData: clearMarkers,
-    onNewData: updateMarkers,
-    minZoom: 5, // Adjust this value based on your needs
-    fetchDistanceThreshold: 500, // Adjust this value based on your needs
+    fetchData: useDynamicFetching ? fetchMarkers : null, // Pass null if not using dynamic fetching
+    onClearData: useDynamicFetching ? clearMarkers : null,
+    onNewData: useDynamicFetching ? updateMarkers : null,
+    minZoom: 5,
+    fetchDistanceThreshold: 500,
     useDistanceThreshold: true,
   });
 
-  // const isCamera = marker.type == 1 || marker.type == 5 || marker.type == 6;
+  // Render function for markers
+  const renderMarkers = () =>
+    markers.map((marker, i) => {
+      if (
+        (marker.type === 1 && !filter.cameratraffic) ||
+        (marker.type === 2 && !filter.crossroad) ||
+        (marker.type === 3 && !filter.boxcontroller) ||
+        (marker.type === 4 && !filter.trafficlights) ||
+        (marker.type === 6 && !filter.camerapdd) ||
+        (marker.type === 5 && !filter.cameraview)
+      ) {
+        return null;
+      }
 
+      if (isNaN(Number(marker.lat)) || isNaN(Number(marker.lng))) {
+        return null;
+      }
+
+      return (
+        <CustomMarker
+          key={i}
+          marker={marker}
+          L={L}
+          isDraggable={isDraggable}
+          handleMonitorCrossroad={handleMonitorCrossroad}
+          handleBoxModalOpen={handleBoxModalOpen}
+          handleLightsModalOpen={handleLightsModalOpen}
+          handleMarkerDragEnd={handleMarkerDragEnd}
+        />
+      );
+    });
+
+  // Render component
   return (
-    <>
-      {markers.map((marker) => {
-        if (
-          (marker.type === 1 && !filter.cameratrafic) ||
-          (marker.type === 2 && !filter.crossroad) ||
-          (marker.type === 3 && !filter.box) ||
-          (marker.type === 4 && !filter.trafficlights) ||
-          (marker.type === 6 && !filter.camerapdd) ||
-          (marker.type === 5 && !filter.cameraview)
-        ) {
-          return null;
-        }
-
-        // Skip mapping the marker if lat or lng is undefined
-        if (isNaN(Number(marker.lat)) || isNaN(Number(marker.lng))) {
-          return null;
-        }
-        return (
-          <Fragment key={`${marker.cid}-${marker.type}`}>
-            <Marker
-              markerId={marker.cid}
-              markerType={marker.type}
-              position={[marker.lat, marker.lng]}
-              draggable={isDraggable}
-              rotationAngle={marker.rotated}
-              eventHandlers={{
-                click:
-                  marker.type == 2
-                    ? () => handleMonitorCrossroad(marker)
-                    : marker.type == 3
-                    ? () => handleBoxModalOpen(marker)
-                    : marker.type == 4
-                    ? () => handleLightsModalOpen(marker)
-                    : null,
-
-                dragend: (event) =>
-                  handleMarkerDragEnd(marker.cid, marker.type, event),
-                // mouseover: fetchCameraDetails(marker.type, marker.cid),
-              }}
-              statuserror={marker.statuserror}
-              icon={L.icon({
-                iconUrl: `icons/${marker.icon}`,
-                iconSize: marker.type === 2 ? [24, 24] : [40, 40],
-              })}
-              rotatedAngle={marker.type === 3 ? marker.rotated : 0}
-            >
-              {/* {isCamera ? (
-                <CameraDetails marker={marker} cameraData={cameraData} L={L} />
-              ) : (
-                <Tooltip direction="top" className="rounded-md">
-                  <div
-                    style={{
-                      width: "8vw",
-                      height: "6vw",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Typography className="my-0">{marker?.cname}</Typography>
-                  </div>
-                </Tooltip>
-              )} */}
-            </Marker>
-          </Fragment>
-        );
-      })}
-    </>
+    <div>
+      {useDynamicFetching ? (
+        <>{renderMarkers()}</>
+      ) : (
+        <MarkerClusterGroup
+          ref={clusterRef}
+          spiderfyOnMaxZoom={false}
+          showCoverageOnHover={false}
+          disableClusteringAtZoom={15}
+          zoomToBoundsOnClick={true}
+          animate={true}
+          animateAddingMarkers={false}
+          iconCreateFunction={
+            usePieChartForClusteredMarkers ? (e) => ClusterIcon(e) : null
+          }
+        >
+          {renderMarkers()}
+        </MarkerClusterGroup>
+      )}
+    </div>
   );
 };
 
 DynamicMarkers.propTypes = {
-  markers: PropTypes.array.isRequired,
-  filter: PropTypes.object.isRequired,
+  useDynamicFetching: PropTypes.bool.isRequired,
+  usePieChartForClusteredMarkers: PropTypes.bool,
   isDraggable: PropTypes.bool.isRequired,
+  filter: PropTypes.object.isRequired,
   setMarkers: PropTypes.func.isRequired,
   clearMarkers: PropTypes.func.isRequired,
   updateMarkers: PropTypes.func.isRequired,
@@ -132,3 +118,66 @@ DynamicMarkers.propTypes = {
 };
 
 export default DynamicMarkers;
+// Cluster icon logic
+const ClusterIcon = (cluster) => {
+  const childMarkers = cluster.getAllChildMarkers();
+  const statusCounts = {};
+  let isHighlighted = false;
+
+  childMarkers.forEach((marker) => {
+    const status = marker.options.statuserror;
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
+  });
+
+  const pieChartData = Object.entries(statusCounts).map(([status, count]) => ({
+    status: parseInt(status),
+    count,
+  }));
+
+  const pieChartIcon = L.divIcon({
+    className: `cluster !bg-transparent`,
+    iconSize: L.point(50, 50),
+    html: renderToString(
+      <div
+        className={`w-20 h-20 !bg-transparent ${
+          isHighlighted ? "animate-pulse" : ""
+        }`}
+      >
+        <PieChart
+          data={pieChartData.map((datam, key) => ({
+            value: datam.count,
+            title: datam.status,
+            color: getStatusColor(datam.status),
+            key,
+          }))}
+          style={{ filter: `drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))` }}
+          segmentsStyle={{ transition: "stroke .3s", cursor: "pointer" }}
+          segmentsShift={1}
+          radius={42}
+          labelStyle={{
+            fill: "#fff",
+            fontSize: "0.9rem",
+            fontWeight: "bold",
+          }}
+          label={(props) => props.dataEntry.value}
+        />
+      </div>
+    ),
+  });
+
+  return pieChartIcon;
+};
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case 1:
+      return "#FFD54F";
+    case 2:
+      return "#FF5252";
+    case 3:
+      return "#FF4081";
+    case 0:
+    default:
+      return "#66BB6A";
+  }
+};
