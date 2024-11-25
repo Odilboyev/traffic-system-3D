@@ -69,7 +69,7 @@ export function SignIn() {
           <div className="w-1/4">
             <img src={logo} alt="logo" className="w-full" />
           </div>
-          <div className="w-2/4 text-2xl font-bold">{t("logo_name")}</div>
+          <div className="w-2/4 text-2xl font-semibold">{t("logo_name")}</div>
         </div>
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">

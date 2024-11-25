@@ -27,11 +27,7 @@ const useMapMarkers = () => {
     dispatch(updateLoadingState(true));
     try {
       const myData = await getMarkerData();
-      dispatch(
-        updateMarkers(
-          myData.data.map((marker) => ({ ...marker, isPopupOpen: false }))
-        )
-      );
+      dispatch(updateMarkers(myData.data));
     } catch (error) {
       if (error.code === "ERR_NETWORK") {
         dispatch(updateErrorMessage("You are offline. Please try again"));

@@ -12,7 +12,7 @@ const getInitialState = () => {
       boxcontroller: true,
       crossroad: true,
       trafficlights: true,
-      cameratrafic: true,
+      cameratraffic: true,
       cameraview: true,
       camerapdd: true,
     },

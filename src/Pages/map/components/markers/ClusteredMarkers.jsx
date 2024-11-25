@@ -25,7 +25,7 @@ const ClusteredMarkers = ({
   const changedMarker = useSelector((state) => state.map.changedMarker); // Assuming changedMarker is stored in state.map.changedMarker
 
   const markerUpdate = markers?.length || 0;
-
+  console.log(filter, "Marker update");
   return (
     <div>
       <MarkerClusterGroup
@@ -46,9 +46,9 @@ const ClusteredMarkers = ({
         {markers?.map((marker, i) => {
           // Skip markers based on filter
           if (
-            (marker.type === 1 && !filter.camera) ||
+            (marker.type === 1 && !filter.cameratraffic) ||
             (marker.type === 2 && !filter.crossroad) ||
-            (marker.type === 3 && !filter.box) ||
+            (marker.type === 3 && !filter.boxcontroller) ||
             (marker.type === 4 && !filter.trafficlights) ||
             (marker.type === 6 && !filter.camerapdd) ||
             (marker.type === 5 && !filter.cameraview)
