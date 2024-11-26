@@ -2,11 +2,11 @@
 import { Marker, Tooltip } from "react-leaflet";
 import { memo, useRef, useState } from "react";
 
-import CameraDetails from "../customPopup";
+import CameraDetails from "../../customPopup";
 import PropTypes from "prop-types";
 import { Typography } from "@material-tailwind/react";
 import { debounce } from "lodash";
-import { getCameraDetails } from "../../../../api/api.handlers";
+import { getCameraDetails } from "../../../../../api/api.handlers";
 
 const CustomMarker = memo(function CustomMarker({
   marker,
@@ -80,6 +80,7 @@ const CustomMarker = memo(function CustomMarker({
           setShowPopup(true); // Show popup
         },
       }}
+      type={marker.type}
       statuserror={marker.statuserror}
       icon={L.icon({
         iconUrl: `icons/${marker.icon}`,

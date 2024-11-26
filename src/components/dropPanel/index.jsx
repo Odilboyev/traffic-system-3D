@@ -52,7 +52,10 @@ const DropPanel = ({
               <IconButton
                 size="sm"
                 variant="text"
-                onClick={() => hanleDropDownOpen(false)}
+                onClick={() => {
+                  map.scrollWheelZoom.enable();
+                  hanleDropDownOpen(false);
+                }}
               >
                 <IoMdClose className="w-5 h-5 p-1" />
               </IconButton>

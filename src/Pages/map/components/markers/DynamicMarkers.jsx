@@ -1,4 +1,4 @@
-import CustomMarker from "../customMarker";
+import CustomMarker from "./customMarker";
 import L from "leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { PieChart } from "react-minimal-pie-chart";
@@ -82,20 +82,7 @@ const DynamicMarkers = ({
   return (
     <div>
       {useDynamicFetching ? (
-        <MarkerClusterGroup
-          ref={clusterRef}
-          spiderfyOnMaxZoom={false}
-          showCoverageOnHover={false}
-          disableClusteringAtZoom={17}
-          zoomToBoundsOnClick={true}
-          animate={true}
-          animateAddingMarkers={false}
-          iconCreateFunction={
-            usePieChartForClusteredMarkers ? (e) => ClusterIcon(e) : null
-          }
-        >
-          <>{renderMarkers()}</>
-        </MarkerClusterGroup>
+        <>{renderMarkers()}</>
       ) : (
         <MarkerClusterGroup
           ref={clusterRef}
@@ -106,7 +93,9 @@ const DynamicMarkers = ({
           animate={true}
           animateAddingMarkers={false}
           iconCreateFunction={
-            usePieChartForClusteredMarkers ? (e) => ClusterIcon(e) : null
+            usePieChartForClusteredMarkers
+              ? (e) => ClusterIcon(e)
+              : (e) => ClusterIcon(e, true)
           }
         >
           {renderMarkers()}
@@ -132,13 +121,21 @@ DynamicMarkers.propTypes = {
 
 export default DynamicMarkers;
 // Cluster icon logic
-const ClusterIcon = (cluster) => {
+const ClusterIcon = (cluster, useCrossRoadCount) => {
   const childMarkers = cluster.getAllChildMarkers();
   const statusCounts = {};
+  const crossroadStatusCounts = {};
   let isHighlighted = false;
+
+  let crossRoadCount = 0;
 
   childMarkers.forEach((marker) => {
     const status = marker.options.statuserror;
+    if (marker.options.type === 2) {
+      crossRoadCount++;
+      crossroadStatusCounts[status] = (crossroadStatusCounts[status] || 0) + 1;
+    }
+
     statusCounts[status] = (statusCounts[status] || 0) + 1;
   });
 
@@ -146,37 +143,69 @@ const ClusterIcon = (cluster) => {
     status: parseInt(status),
     count,
   }));
+  const crossroadPieChartData = Object.entries(crossroadStatusCounts).map(
+    ([status, count]) => ({
+      status: parseInt(status),
+      count,
+    })
+  );
 
   const pieChartIcon = L.divIcon({
     className: `cluster !bg-transparent`,
-    iconSize: L.point(50, 50),
     html: renderToString(
+      // useCrossRoadCount ? (
+      //   <div
+      //     className=" rounded-full w-full cursor-pointer bg-green-600 min-w-12 min-h-12 max-h-12 flex items-center justify-center text-white font-bold text-lg"
+      //     style={{ pointerEvents: "none" }}
+      //   >
+      //     {crossRoadCount}
+      //   </div>
+      // ) : (
       <div
-        className={`w-20 h-20 !bg-transparent ${
+        className={`relative w-16 h-16 !bg-transparent ${
           isHighlighted ? "animate-pulse" : ""
         }`}
+        // style={{ background: getStatusColor(datam.status) }}
       >
+        {/* Render the pie chart */}
+        {/* Add crossRoadCount in the middle if useCrossRoadCount is true */}
         <PieChart
-          data={pieChartData.map((datam, key) => ({
-            value: datam.count,
-            title: datam.status,
-            color: getStatusColor(datam.status),
-            key,
-          }))}
+          data={(useCrossRoadCount ? crossroadPieChartData : pieChartData).map(
+            (datam, key) => ({
+              value: datam.count,
+              title: datam.status,
+              color: getStatusColor(datam.status),
+              key,
+            })
+          )}
           style={{ filter: `drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))` }}
           segmentsStyle={{ transition: "stroke .3s", cursor: "pointer" }}
           segmentsShift={1}
           radius={42}
           labelStyle={{
             fill: "#fff",
-            fontSize: "0.9rem",
-            fontWeight: "bold",
+            fontSize: "1.1rem",
+            fontWeight: "bolder",
           }}
-          label={(props) => props.dataEntry.value}
+          label={
+            !useCrossRoadCount ? (props) => props.dataEntry.value : undefined
+          }
         />
+        {useCrossRoadCount && crossroadPieChartData.length > 0 && (
+          <div
+            className="absolute top-1/2 left-1/2 transform bg-white w-10 h-10 text-blue-gray-900 rounded-full flex items-center justify-center -translate-x-1/2 -translate-y-1/2  font-bold text-lg"
+            style={{
+              pointerEvents: "none",
+            }}
+          >
+            {crossRoadCount}
+          </div>
+        )}
       </div>
+      // )
     ),
   });
+  //94/6
 
   return pieChartIcon;
 };
