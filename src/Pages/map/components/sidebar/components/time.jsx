@@ -8,7 +8,11 @@ const DateTime = ({ t, isSidebarOpen, currentLocation }) => {
   }, []);
   const location = "Tashkent";
   return (
-    <div className="w-full bg-blue-gray-900/10  px-4 py-3 backdrop-blur-xl flex items-center justify-between">
+    <div
+      className={`w-full bg-blue-gray-900/10  px-4 py-3 backdrop-blur-xl flex items-center ${
+        isSidebarOpen ? "justify-between" : "justify-center"
+      }`}
+    >
       {isSidebarOpen ? (
         <>
           <div className="text-base  font-bold">
@@ -25,7 +29,9 @@ const DateTime = ({ t, isSidebarOpen, currentLocation }) => {
           </div>
         </>
       ) : (
-        <div className="text-sm font-bold">{timeToStringShort(time)}</div>
+        <div className="text-sm text-center font-bold">
+          {timeToStringShort(time)}
+        </div>
       )}
     </div>
   );

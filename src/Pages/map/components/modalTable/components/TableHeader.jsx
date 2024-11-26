@@ -48,7 +48,6 @@ const TableHeader = ({
       </div>
     );
   };
-
   return (
     <thead className="text-left">
       <tr className="font-bold">
@@ -67,11 +66,7 @@ const TableHeader = ({
                   : "auto",
             }}
             onClick={
-              key !== "actions" &&
-              key !== "crossroad_name" &&
-              key !== "crossroad_id"
-                ? () => onHeaderClick(key)
-                : null
+              !filterableColumns.includes(key) ? () => onHeaderClick(key) : null
             }
           >
             {renderHeaderContent(key)}

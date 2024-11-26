@@ -30,7 +30,13 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
   const iconPath = "icons/wheather_icons";
 
   return (
-    <div className="w-full px-4 py-3  bg-blue-gray-900/10 backdrop-blur-xl ">
+    <div
+      className={`w-full px-4 py-3 ${
+        isSidebarOpen
+          ? " bg-gradient-to-r from-gray-200 to-gray-700/30 dark:from-blue-gray-800/80 dark:to-black/50 bg-blue-gray-900/10"
+          : "bg-blue-gray-900/10"
+      } backdrop-blur-xl`}
+    >
       {isSidebarOpen ? (
         <div className="flex justify-between h-full">
           {/* Current Weather */}
@@ -64,8 +70,8 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
           {/* Forecast */}
           <div className="flex flex-col gap-1">
             {/* Day Forecast */}
-            <div className=" border border-blue-gray-200/20 rounded py-2 px-3">
-              <div className="flex items-center gap-2">
+            <div className=" border dark:bg-blue-gray-800 bg-gray-100 border-blue-gray-200/20  rounded py-2 px-3">
+              <div className="flex items-center gap-2 ">
                 <img
                   src={`${iconPath}/${nextDays[0].wheather_icon_day}`}
                   alt="day"
@@ -81,8 +87,8 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
             </div>
 
             {/* Night Forecast */}
-            <div className=" border border-blue-gray-200/20 rounded py-2 px-3">
-              <div className="flex items-center gap-2">
+            <div className=" border dark:bg-blue-gray-800 bg-gray-100 border-blue-gray-200/20 rounded py-2 px-3">
+              <div className="flex items-center gap-2 ">
                 <img
                   src={`${iconPath}/${nextDays[0].wheather_icon_night}`}
                   alt="night"

@@ -47,7 +47,12 @@ const CrossroadDataModal = ({
         )}
         {section === "svetofor" && (
           <div className="h-[80vh] relative">
-            <TrafficLightDashboard t={t} id={marker?.cid} isInModal />{" "}
+            <TrafficLightDashboard
+              t={t}
+              id={marker?.cid}
+              vendor={marker?.vendor_id}
+              isInModal
+            />{" "}
           </div>
         )}
         {section === "statistics" && (

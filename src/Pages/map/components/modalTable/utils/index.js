@@ -82,6 +82,7 @@ export const filterableColumns = [
   "crossroad_name",
   "region_name",
   "district_name",
+  "camera_view_model_name",
 ];
 // Add this new function to get unique values for select options
 export const getUniqueColumnValues = (data, column) => {

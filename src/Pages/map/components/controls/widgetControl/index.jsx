@@ -39,7 +39,9 @@ const WidgetControl = ({ t }) => {
             <Checkbox
               key={type}
               label={
-                <Typography className="text-white">{t(label) || ""}</Typography>
+                <Typography className="text-sm font-medium dark:text-white">
+                  {t(label) || ""}
+                </Typography>
               }
               ripple={false}
               className="m-0 p-0"

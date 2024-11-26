@@ -189,7 +189,11 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
           </FullscreenBox>
           <FullscreenBox>
             <div className="h-full w-full">
-              <TrafficLightDashboard id={marker?.cid} isInModal={true} />
+              <TrafficLightDashboard
+                id={marker?.cid}
+                vendor={marker?.vendor_id}
+                isInModal={true}
+              />
             </div>
           </FullscreenBox>
           <FullscreenBox>

@@ -49,7 +49,7 @@ const SidebarItem = ({
       {content}
       {/* Collapsible sub-items */}
 
-      <div className="flex flex-col pl-8 space-y-2 ">
+      <div className="flex flex-col space-y-2 dark:bg-gray-900/50 bg-gray-300/50">
         <div
           className={
             activeSidePanel === label && isSidebarOpen ? "visible" : "hidden"

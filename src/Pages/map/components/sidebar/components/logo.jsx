@@ -15,10 +15,10 @@ const Logo = ({ t, isSidebarOpen }) => {
     >
       {isSidebarOpen ? (
         <>
-          <div className="w-1/4">
+          <div className="w-1/4 ">
             <img src={logo} alt="logo" className="w-full" />
           </div>
-          <div className="text-lg font-bold">{t("logo_name")}</div>
+          <div className="text-base font-bold">{t("logo_name")}</div>
         </>
       ) : (
         <div className="w-[2vw]">

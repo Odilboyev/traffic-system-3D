@@ -95,7 +95,7 @@ const Sidebar = ({
         onPointerLeave={() => map.scrollWheelZoom.enable()}
         className={` ${
           isVisible ? "fixed" : "none"
-        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-lg  shadow-lg flex flex-col ${
+        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-xl  shadow-lg flex flex-col ${
           isSidebarOpen ? "w-[15vw]" : "w-18"
         } ${theme === "light" ? "bg-gray-100" : "bg-gray-900"} 
         transition-all duration-300 ease-in-out select-none`}
@@ -130,7 +130,7 @@ const Sidebar = ({
             <WeatherCard t={t} isSidebarOpen={isSidebarOpen} />
           )}
           {/* Sidebar items */}
-          <div className="flex flex-col items-center space-y-1 w-full">
+          <div className="flex flex-col items-center space-y-2 w-full">
             <SidebarItem
               icon={<FaFilter className="w-4 h-4" />}
               label={"markerFilters"}

@@ -32,4 +32,5 @@ const config = axios.create({
 
 config.defaults.headers.common["Authorization"] = `Bearer ${token_monitoring}`;
 
+export { token_monitoring as authToken };
 export default config;

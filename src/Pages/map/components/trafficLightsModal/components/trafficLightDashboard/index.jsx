@@ -4,12 +4,13 @@ import ConfigPanel from "./components/configPanel";
 import Intersection from "./components/intersection";
 import PropTypes from "prop-types";
 import { TbPencil } from "react-icons/tb";
+import { authToken } from "../../../../../../api/api.config";
 import { defaultConfig } from "./utils";
 import { fixIncompleteJSON } from "../../../trafficLightMarkers/utils";
 import { getTrafficLightsConfig } from "../../../../../../api/api.handlers";
 import useLocalStorageState from "../../../../../../customHooks/uselocalStorageState";
 
-const TrafficLightDashboard = ({ id, isInModal = false }) => {
+const TrafficLightDashboard = ({ id, vendor, isInModal = false }) => {
   const role = atob(localStorage.getItem("its_user_role"));
   const [showConfig, setShowConfig] = useState(false);
   const [incomingConfig, setIncomingConfig] = useState(null);
@@ -19,7 +20,6 @@ const TrafficLightDashboard = ({ id, isInModal = false }) => {
     "its_roadDrawingConfig",
     incomingConfig || defaultConfig
   );
-
   const [trafficLights, setTrafficLights] = useState({
     north: "red",
     south: "red",
@@ -62,10 +62,12 @@ const TrafficLightDashboard = ({ id, isInModal = false }) => {
   }, []);
 
   useEffect(() => {
-    if (id && incomingConfig) {
+    if (id && incomingConfig && vendor == 1) {
       const connectWebSocket = () => {
         const socket = new WebSocket(
-          `${import.meta.env.VITE_TRAFFIC_SOCKET}/${id}`
+          `${
+            import.meta.env.VITE_TRAFFICLIGHT_SOCKET
+          }?svetofor_id=${id}&token=${authToken}`
         );
 
         socket.onopen = () => {

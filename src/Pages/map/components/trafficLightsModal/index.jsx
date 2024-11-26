@@ -44,7 +44,7 @@ const TrafficLightsModal = ({ light, isOpen, onClose }) => {
         </DialogHeader>
 
         <DialogBody className="max-h-[94vh] h-full no-scrollbar overflow-y-scroll dark:bg-blue-gray-900 dark:text-white">
-          <TrafficLightDashboard id={light?.cid} />
+          <TrafficLightDashboard id={light?.cid} vendor={light?.vendor_id} />
         </DialogBody>
       </Dialog>
     </>

@@ -47,7 +47,11 @@ const RegionControl = ({ t, activeSidePanel }) => {
   }, [hoveredRegion]);
 
   const handleRegionClick = (regionId) => {
-    if (hoveredRegion !== regionId) {
+    if (hoveredRegion === regionId) {
+      // If the same region is clicked again, close it
+      setHoveredRegion(null);
+    } else {
+      // Otherwise, set the clicked region as active
       setHoveredRegion(regionId);
     }
   };
@@ -63,7 +67,7 @@ const RegionControl = ({ t, activeSidePanel }) => {
   };
 
   return (
-    <div className="flex flex-col p-3 ">
+    <div className="flex flex-col ">
       <div className="rounded-lg flex flex-col gap-2 relative">
         {regions?.map((region) => (
           <div key={region.id} className="relative group border-l">
@@ -76,7 +80,7 @@ const RegionControl = ({ t, activeSidePanel }) => {
               {t(region.name)}
             </button>
             {hoveredRegion === region.id && districts[region.id] && (
-              <div className="ml-2 max-w-[200px] z-50">
+              <div className="ml-2 my-1 z-50">
                 <div className="my-2 group border-l">
                   {districts[region.id].map((district, i) => (
                     <button

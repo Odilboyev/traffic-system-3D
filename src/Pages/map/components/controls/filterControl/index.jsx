@@ -36,11 +36,11 @@ const FilterControl = ({ t }) => {
       <div className="flex flex-col gap-2">
         {[{ type: "all", label: t("all") }, ...filterOptions].map(
           ({ type, label }) => (
-            <div key={type} className="hover:bg-blue-gray-700/20 rounded-md">
+            <div key={type} className="hover:bg-blue-gray-700/20 ">
               <Checkbox
                 size={"sm"}
                 label={
-                  <Typography className="text-white text-sm">
+                  <Typography className="text-sm font-medium">
                     {t(label) || label || ""}
                   </Typography>
                 }
