@@ -216,8 +216,6 @@ const getStatusColor = (status) => {
       return "#FFD54F";
     case 2:
       return "#FF5252";
-    case 3:
-      return "#FF4081";
     case 0:
     default:
       return "#66BB6A";
