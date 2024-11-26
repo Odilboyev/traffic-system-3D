@@ -24,7 +24,7 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
   };
 
   // Generates lane icons based on lane count for the right side
-  const getLaneIcons = (count) => {
+  const getLaneIcons = (count, currentIcons) => {
     const baseIcons = ["TbArrowBackUp"]; // Base icon(s) for lanes
     const rightIcon = "TbArrowRampRight"; // Right-most lane icon
     const icons = [...baseIcons];
@@ -34,7 +34,28 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
       icons.push("TbArrowUp");
     }
     icons.push(rightIcon);
-    return icons;
+
+    // Update current icons based on the new count
+    const updatedIcons = currentIcons.slice(0, count).map((icon, index) => {
+      // For existing icons, retain the channel_id
+      if (icon.channel_id) {
+        return icon;
+      } else {
+        // For new lanes, assign empty channel_id
+        return {
+          icon: icons[index] || icons[icons.length - 1], // default to the last icon if no new one is available
+          channel_id: 100, // New lanes get an empty channel_id
+        };
+      }
+    });
+
+    // Add new lanes with empty channel_id if the count is greater than existing ones
+    const newIcons = icons.slice(currentIcons.length, count).map((icon) => ({
+      icon,
+      channel_id: 100, // Empty channel_id for new lanes
+    }));
+
+    return [...updatedIcons, ...newIcons];
   };
 
   // Updates the lane count for the specified direction and side
@@ -43,10 +64,14 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
     const newCount = Math.max(1, Math.min(count, 5));
 
     setConfig((prev) => {
+      // Get the existing lanes for the given side (either lanesLeft or lanesRight)
+      const existingLanes = prev[direction]?.[side] || [];
+
+      // Generate the new lanes based on the count
       const newLanes =
         side === "lanesLeft"
-          ? Array(newCount).fill({}) // Create lanes for "lanesLeft"
-          : getLaneIcons(newCount).map((icon) => ({ icon })); // Create lanes for "lanesRight"
+          ? Array(newCount).fill({}) // Create empty lanes for "lanesLeft"
+          : getLaneIcons(newCount, existingLanes);
 
       return {
         ...prev,

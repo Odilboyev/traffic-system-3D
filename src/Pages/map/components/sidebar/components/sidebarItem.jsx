@@ -4,6 +4,8 @@ const SidebarItem = ({
   icon,
   label,
   isSidebarOpen,
+  setIsSidebarOpen,
+
   activeSidePanel,
   setActiveSidePanel,
   subItems = [],
@@ -12,6 +14,7 @@ const SidebarItem = ({
   t,
 }) => {
   const handleExpand = () => {
+    setIsSidebarOpen(true);
     activeSidePanel === label
       ? setActiveSidePanel(null)
       : setActiveSidePanel(label);
@@ -25,7 +28,7 @@ const SidebarItem = ({
         onClick={handleExpand}
         className={`flex items-center ${
           isSidebarOpen ? "justify-start" : "justify-center"
-        } w-full px-4 py-3 items-center flex-nowrap dark:hover:bg-gray-700 hover:bg-gray-300 cursor-pointer transition-all duration-300 `}
+        } w-full px-4 py-3 items-center flex-nowrap dark:hover:bg-gray-700 hover:bg-gray-300 cursor-pointer transition-all duration-300`}
       >
         {icon}
         <span

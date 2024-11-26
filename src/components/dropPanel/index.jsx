@@ -38,6 +38,7 @@ const DropPanel = ({
         <div
           className={`${sndWrapperClass} ${positionClass} absolute left-0 rounded-md  bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5`}
           role="menu"
+          onPointerLeave={() => map.scrollWheelZoom.enable()}
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
@@ -59,7 +60,10 @@ const DropPanel = ({
           )}
 
           {/* Content */}
-          <div className="bg-gray-900/30 backdrop-blur-md rounded-b-lg p-2">
+          <div
+            className="bg-gray-900/30 backdrop-blur-md rounded-b-lg p-2"
+            onPointerLeave={() => map.scrollWheelZoom.enable()}
+          >
             {children}
           </div>
         </div>

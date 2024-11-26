@@ -135,6 +135,7 @@ const Sidebar = ({
               icon={<FaFilter className="w-4 h-4" />}
               label={"markerFilters"}
               isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
               activeSidePanel={activeSidePanel}
               setActiveSidePanel={setActiveSidePanel}
               t={t}
@@ -144,6 +145,7 @@ const Sidebar = ({
               icon={<FaLocationDot className="w-4 h-4" />}
               label="regionControl"
               isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
               t={t}
               activeSidePanel={activeSidePanel}
               setActiveSidePanel={setActiveSidePanel}
@@ -155,6 +157,7 @@ const Sidebar = ({
               icon={<MdOutlineWidgets className="w-4 h-4" />}
               label="widgetControl"
               isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
               t={t}
               activeSidePanel={activeSidePanel}
               setActiveSidePanel={setActiveSidePanel}
@@ -164,6 +167,7 @@ const Sidebar = ({
               <SidebarItem
                 icon={<TbServerCog className="w-4 h-4" />}
                 isSidebarOpen={isSidebarOpen}
+                setIsSidebarOpen={setIsSidebarOpen}
                 label="deviceManagement"
                 activeSidePanel={activeSidePanel}
                 setActiveSidePanel={setActiveSidePanel}
@@ -181,6 +185,7 @@ const Sidebar = ({
             <SidebarItem
               icon={<MdHistory className="w-4 h-4" />}
               isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
               label="deviceErrorHistory"
               activeSidePanel={activeSidePanel}
               setActiveSidePanel={(e) => {
@@ -203,6 +208,7 @@ const Sidebar = ({
             <SidebarItem
               icon={<TbBell className="w-4 h-4" />}
               isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
               label="currentAlarms"
               activeSidePanel={activeSidePanel}
               setActiveSidePanel={(e) => {

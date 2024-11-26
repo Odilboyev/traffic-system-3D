@@ -82,13 +82,26 @@ const DynamicMarkers = ({
   return (
     <div>
       {useDynamicFetching ? (
-        <>{renderMarkers()}</>
+        <MarkerClusterGroup
+          ref={clusterRef}
+          spiderfyOnMaxZoom={false}
+          showCoverageOnHover={false}
+          disableClusteringAtZoom={17}
+          zoomToBoundsOnClick={true}
+          animate={true}
+          animateAddingMarkers={false}
+          iconCreateFunction={
+            usePieChartForClusteredMarkers ? (e) => ClusterIcon(e) : null
+          }
+        >
+          <>{renderMarkers()}</>
+        </MarkerClusterGroup>
       ) : (
         <MarkerClusterGroup
           ref={clusterRef}
           spiderfyOnMaxZoom={false}
           showCoverageOnHover={false}
-          disableClusteringAtZoom={15}
+          disableClusteringAtZoom={17}
           zoomToBoundsOnClick={true}
           animate={true}
           animateAddingMarkers={false}
