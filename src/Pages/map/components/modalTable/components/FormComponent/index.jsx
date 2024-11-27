@@ -9,8 +9,17 @@ import CrossroadFields from "./Fields/CrossroadFields";
 import TrafficLightsFields from "./Fields/TrafficLightsFields";
 import UserFields from "./Fields/UserFields";
 import { getInitialData } from "./utils";
+import { toast } from "react-toastify";
 
-const FormComponent = ({ data, options, onSubmit, onCancel, type, t }) => {
+const FormComponent = ({
+  data,
+  options,
+  onSubmit,
+  onCancel,
+  type,
+  t,
+  currentState,
+}) => {
   const [formData, setFormData] = useState(null);
 
   // Initialize form data with defaults or from provided data
@@ -38,13 +47,37 @@ const FormComponent = ({ data, options, onSubmit, onCancel, type, t }) => {
     setFormData(null);
     onCancel();
   };
+  // Validate form data
+  const validateFormData = () => {
+    for (const [key, value] of Object.entries(formData)) {
+      console.log(value, "valid");
+      if (!value || (value + "").trim() === "") {
+        toast.error(`${key.replace(/_/g, " ")} is required`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          containerId: "modal",
+        });
+        return false;
+      }
+    }
+    return true;
+  };
+
   return (
     <div className="flex justify-center items-center h-full w-full">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          onSubmit(formData); // Submit form data
-          setFormData(null);
+
+          if (validateFormData()) {
+            onSubmit(formData); // Submit form data
+            setFormData(null);
+          }
         }}
         className="p-8 w-full max-w-[80vw] mt-[3%] mx-auto bg-white rounded-xl shadow-2xl dark:text-white dark:bg-gray-800"
       >

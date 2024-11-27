@@ -49,8 +49,8 @@ const ModalTable = ({
   tableDataCallback = () => {},
   tableSelectOptions,
   isFormOpen,
-  setIsEditing,
   submitNewData,
+  isEditing,
 }) => {
   const { theme } = useTheme();
 
@@ -191,15 +191,25 @@ const ModalTable = ({
               setIsSubPageOpen(false);
               settypeToShow("");
               setCurrentPage(1);
-              setEditData(null);
-              setIsEditing(false);
             }
       }
       title={typeToShow}
       body={
         <div className="h-full w-full pb-20 no-scrollbar overflow-auto ">
+          <ToastContainer
+            containerId="modal"
+            style={{ zIndex: 99999 }}
+            position="bottom-right" // Set the position to bottom-right
+            autoClose={3000} // Auto close after 3 seconds
+            hideProgressBar={false}
+            closeOnClick
+            draggable
+            theme="colored"
+            pauseOnHover
+          />
           {isFormOpen ? (
             <FormComponent
+              currentState={isEditing}
               type={type}
               data={editData}
               options={tableSelectOptions}
@@ -207,23 +217,11 @@ const ModalTable = ({
               onCancel={() => {
                 backButtonProps.onClick(false);
                 setEditData(null);
-                setIsEditing(false);
               }}
               t={t}
             />
           ) : (
             <>
-              <ToastContainer
-                containerId="modal"
-                style={{ zIndex: 99999 }}
-                position="bottom-right" // Set the position to bottom-right
-                autoClose={3000} // Auto close after 3 seconds
-                hideProgressBar={false}
-                closeOnClick
-                draggable
-                theme="colored"
-                pauseOnHover
-              />
               <div className="flex justify-between w-full py-3 mb-2">
                 <div className={`flex w-2/6 gap-5`}>
                   <Input
@@ -266,6 +264,7 @@ const ModalTable = ({
                         ? () => {
                             backButtonProps.onClick(true);
                             setEditData(null);
+                            editButtonCallback(false);
                             fetchHandler(type, 1);
                           }
                         : () => {

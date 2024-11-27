@@ -31,7 +31,7 @@ const DeviceManagement = ({
   // create a function to fetch the data from the devices endpoint
 
   // edit
-  const [isEditing, setIsEditing] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [filterOptions] = useState([
     { type: 1, type_name: `active` },
@@ -313,7 +313,7 @@ const DeviceManagement = ({
               ? (data) => modifyData("patch", deviceType, data)
               : (user) => handleUserStatus(user, "activate")
           }
-          setIsEditing={setIsEditing}
+          isEditing={isEditing}
           editButtonCallback={setIsEditing}
           isFormOpen={showFormModal}
           submitNewData={(data) => {
