@@ -28,45 +28,49 @@ const InfoWidgetCard = ({ data = [], length = 0 }) => {
          
         </div> */}
         <div className="w-full  px-2 relative">
-          <div className="flex justify-center items-center px-2 absolute -top-1/3 left-1/2 transform -translate-x-1/2 w-16 h-11  backdrop-blur-md bg-blue-gray-900 rounded-t-full font-bold">
+          <div className="flex justify-center items-start pt-1 px-2 absolute -top-1/4 left-1/2 transform -translate-x-1/2 w-16 h-11  backdrop-blur-md bg-blue-gray-900 font-bold bg-green-600 drop-shadow-neon  rounded-full">
             {total}
           </div>
-          <div className="flex items-center w-full gap-3 bg-blue-gray-900 backdrop-blur-md p-3 rounded-lg">
-            {data.data?.length > 0 &&
-              data.data.map(
-                (value, i) =>
-                  value.status !== 1 && (
-                    <div
-                      className="flex flex-col items-center gap-3 w-full justify-between"
-                      key={i}
-                    >
-                      <div>
-                        <NeonIcon
-                          text={
-                            value.status_name == "online"
-                              ? onlinePercentage + "%"
-                              : offlinePercentage + "%"
-                          }
-                          isRounded
-                          icon={iconSwitcher(data.type)}
-                          status={value.status}
-                          className=" !shadow-none !drop-shadow-none"
-                        />
-                      </div>
+          <div className="bg-gray-900/60 backdrop-blur-2xl  shadow-lg rounded-lg">
+            {" "}
+            <div className="flex items-center w-full backdrop-blur-2xl gap-3 p-3 rounded-lg">
+              {data.data?.length > 0 &&
+                data.data.map(
+                  (value, i) =>
+                    value.status !== 1 && (
+                      <div
+                        className="flex flex-col items-center gap-3 w-full justify-between"
+                        key={i}
+                      >
+                        <div>
+                          <NeonIcon
+                            text={
+                              value.status_name == "online"
+                                ? onlinePercentage + "%"
+                                : offlinePercentage + "%"
+                            }
+                            isRounded
+                            icon={iconSwitcher(data.type)}
+                            status={value.status}
+                            className=" !shadow-none !drop-shadow-none"
+                          />
+                        </div>
 
-                      <div className="gap-2 items-center mb-1 flex">
-                        <Typography className="text-base font-bold">
-                          {value.count}
-                        </Typography>
+                        <div className="gap-2 items-center mb-1 flex">
+                          <Typography className="text-base font-bold">
+                            {value.count}
+                          </Typography>
 
-                        <Typography className="text-gray-400 text-xs font-medium">
-                          {t(value.status_name)}
-                        </Typography>
+                          <Typography className="text-gray-400 text-xs font-medium">
+                            {t(value.status_name)}
+                          </Typography>
+                        </div>
                       </div>
-                    </div>
-                  )
-              )}{" "}
+                    )
+                )}{" "}
+            </div>
           </div>
+
           <div className="w-full px-2 absolute bottom-0 left-0">
             <div className="text-sm text-gray-400 mb-2 flex justify-between"></div>
             <div className="w-full h-2 rounded-b-full bg-red-800/70">

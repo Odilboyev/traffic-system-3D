@@ -54,8 +54,8 @@ const DynamicMarkers = ({
         (marker.type === 2 && !filter.crossroad) ||
         (marker.type === 3 && !filter.boxcontroller) ||
         (marker.type === 4 && !filter.trafficlights) ||
-        (marker.type === 6 && !filter.camerapdd) ||
-        (marker.type === 5 && !filter.cameraview)
+        (marker.type === 5 && !filter.cameraview) ||
+        (marker.type === 6 && !filter.camerapdd)
       ) {
         return null;
       }

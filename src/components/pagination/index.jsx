@@ -13,11 +13,13 @@ import { useTheme } from "../../customHooks/useTheme";
 const Pagination = ({
   currentPage,
   totalItems,
+  showItemsPerPage = true,
+  totalPageProp,
   onPageChange,
   itemsPerPage = 10,
   handleItemsPerPageChange,
 }) => {
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = totalPageProp ?? Math.ceil(totalItems / itemsPerPage);
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === totalPages;
 
@@ -96,30 +98,33 @@ const Pagination = ({
 
   return (
     <div className="flex gap-2 items-center justify-between w-full">
-      <div className="flex items-center gap-2">
-        <Typography
-          variant="small"
-          className="text-blue-gray-900 dark:text-white"
-        >
-          {t("items_per_page")}:
-        </Typography>
-        <CustomSelect
-          value={itemsPerPageOptions.find(
-            (option) => option.value === +itemsPerPage
-          )}
-          placeholder={t("select")}
-          onChange={(value) => handleItemsPerPageChange(value.value)}
-          className="text-blue-gray-900 dark:text-white"
-          options={itemsPerPageOptions.map((value) => ({
-            value: value.value.toString(),
-            label: value.label,
-          }))}
-          menuPlacement="top"
-          getOptionLabel={(option) => option.label}
-          getOptionValue={(option) => option.value}
-        />
-      </div>
-      <div className="flex justify-center">
+      {showItemsPerPage && (
+        <div className="flex items-center gap-2">
+          <Typography
+            variant="small"
+            className="text-blue-gray-900 dark:text-white"
+          >
+            {t("items_per_page")}:
+          </Typography>
+          <CustomSelect
+            value={itemsPerPageOptions.find(
+              (option) => option.value === +itemsPerPage
+            )}
+            placeholder={t("select")}
+            onChange={(value) => handleItemsPerPageChange(value.value)}
+            className="text-blue-gray-900 dark:text-white"
+            options={itemsPerPageOptions.map((value) => ({
+              value: value.value.toString(),
+              label: value.label,
+            }))}
+            menuPlacement="top"
+            getOptionLabel={(option) => option.label}
+            getOptionValue={(option) => option.value}
+          />
+        </div>
+      )}
+
+      <div className="flex justify-center mx-auto">
         <ButtonGroup
           variant="outlined"
           color={theme === "light" ? "black" : "white"}
@@ -140,20 +145,22 @@ const Pagination = ({
           </IconButton>
         </ButtonGroup>
       </div>
-      <div className="flex justify-between items-center">
-        <Typography
-          variant="small"
-          className="text-blue-gray-900 dark:text-white"
-        >
-          {t("showing")}{" "}
-          <span className="font-medium">
-            {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} -{" "}
-            {Math.min(currentPage * itemsPerPage, totalItems)}
-          </span>{" "}
-          {t("of")} <span className="font-medium">{totalItems}</span>{" "}
-          {t("items")}
-        </Typography>
-      </div>
+      {showItemsPerPage && (
+        <div className="flex justify-between items-center">
+          <Typography
+            variant="small"
+            className="text-blue-gray-900 dark:text-white"
+          >
+            {t("showing")}{" "}
+            <span className="font-medium">
+              {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} -{" "}
+              {Math.min(currentPage * itemsPerPage, totalItems)}
+            </span>{" "}
+            {t("of")} <span className="font-medium">{totalItems}</span>{" "}
+            {t("items")}
+          </Typography>
+        </div>
+      )}
     </div>
   );
 };

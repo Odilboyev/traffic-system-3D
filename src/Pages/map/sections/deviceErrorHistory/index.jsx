@@ -1,14 +1,15 @@
-import { IconButton } from "@material-tailwind/react";
 import { memo, useCallback, useEffect, useState } from "react";
-import { MdHistory } from "react-icons/md";
-import { getErrorHistory } from "../../../../api/api.handlers";
+
 import ModalTable from "../../components/modalTable";
+import { getErrorHistory } from "../../../../api/api.handlers";
+import { useSelector } from "react-redux";
 
 const DeviceErrorHistory = ({ activeSidePanel, setActiveSidePanel }) => {
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyTotalPages, setHistoryTotalPages] = useState(null);
   const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState(null);
   // fetchErrorHistory
   const fetchErrorHistory = useCallback(async (current, type) => {
@@ -18,6 +19,7 @@ const DeviceErrorHistory = ({ activeSidePanel, setActiveSidePanel }) => {
       setHistoryData(all.data);
       setHistoryTotalPages(all.total_pages ? all.total_pages : 1);
       setTotalItems(all.total_items);
+      setItemsPerPage(all.per_page_items);
     } catch (err) {
       throw new Error(err);
     } finally {
@@ -28,6 +30,9 @@ const DeviceErrorHistory = ({ activeSidePanel, setActiveSidePanel }) => {
     if (activeSidePanel === "deviceErrorHistory") fetchErrorHistory(1);
   }, [activeSidePanel]);
 
+  const filterOptions = useSelector(
+    (state) => state.map.filterOptionsWithTypes
+  );
   return (
     <>
       <ModalTable
@@ -38,16 +43,17 @@ const DeviceErrorHistory = ({ activeSidePanel, setActiveSidePanel }) => {
           setActiveSidePanel(null);
         }}
         selectedFilter={selectedFilter}
-        filterOptions={[
-          { type: null, type_name: "all" },
-          { type: 1, type_name: "camera" },
-          { type: 3, type_name: "boxcontroller" },
-          { type: 4, type_name: "svetofor" },
-        ]}
+        filterOptions={[{ name: "all", type: null }, ...filterOptions].filter(
+          (item) => item.type !== 2
+        )}
+        totalPageProp={historyTotalPages}
+        nameKeyOfFilter="name"
+        valueKeyOfFilter="type"
         filterHandler={setSelectedFilter}
         data={historyData}
+        itemsPerPageProp={itemsPerPage}
         type={"history"}
-        totalItems={totalItems}
+        totalItemsProp={totalItems}
         isLoading={historyLoading}
         itemsPerPage={20}
         totalPages={historyTotalPages}

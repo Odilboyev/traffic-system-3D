@@ -1,9 +1,9 @@
 import { Card, CardBody, Typography } from "@material-tailwind/react";
+
 import Chart from "react-apexcharts";
 import { FiAlertCircle } from "react-icons/fi";
-
+import FilterTypes from "../../../modalTable/components/filterTypes";
 import Loader from "../../../../../../components/loader";
-import FilterTypes from "../../../modalTable/filterTypes";
 import SensorCard from "../sensorCard";
 
 const SensorSection = ({

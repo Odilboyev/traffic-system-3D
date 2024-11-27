@@ -3,17 +3,17 @@ import { getOrderedColumns, shouldHideColumn } from "./utils";
 import { memo, useEffect, useState } from "react";
 
 import { ChevronLeftIcon } from "@heroicons/react/16/solid";
-import FilterTypes from "./filterTypes";
+import FilterTypes from "./components/filterTypes";
 import FormComponent from "./components/FormComponent";
 import Loader from "../../../../components/loader";
 import { MdSearch } from "react-icons/md";
 import Modal from "../../../../components/modal";
 import Pagination from "../../../../components/pagination";
-// ModalTable.js
 import PropTypes from "prop-types";
 import TableHeader from "./components/TableHeader";
 import TableRow from "./components/TableRow";
 import { ToastContainer } from "react-toastify";
+// ModalTable.js
 import { t } from "i18next";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 import { useMap } from "react-leaflet";
@@ -31,6 +31,11 @@ const ModalTable = ({
   isLoading,
   fetchHandler,
   filterOptions,
+  nameKeyOfFilter,
+  valueKeyOfFilter,
+  itemsPerPageProp,
+  totalPageProp,
+  totalItemsProp,
   backButtonProps = {
     label: "back",
     onClick: null,
@@ -55,8 +60,8 @@ const ModalTable = ({
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [itemsPerPage, setItemsPerPage] = useLocalStorageState(
-    "itemsPerPage",
-    50
+    "its_itemsPerPage_" + type,
+    itemsPerPageProp ?? 50
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -91,7 +96,7 @@ const ModalTable = ({
     if (isSubPageOpen) {
       historyButtonCallback(1, type, subPageId);
     } else {
-      type === "history" && fetchHandler(selectedFilter);
+      type === "history" && fetchHandler(page, selectedFilter);
     }
   };
 
@@ -148,6 +153,7 @@ const ModalTable = ({
 
   // Calculate paginated data
   const getPaginatedData = () => {
+    if (type === "history") return sortedData;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return sortedData.slice(startIndex, endIndex);
@@ -215,11 +221,7 @@ const ModalTable = ({
                 pauseOnHover
               />
               <div className="flex justify-between w-full py-3 mb-2">
-                <div
-                  className={`flex ${
-                    type !== "history" ? "w-2/6" : "w-3/6"
-                  } gap-5`}
-                >
+                <div className={`flex w-2/6 gap-5`}>
                   <Input
                     aria-label={t("search_input")}
                     color={theme === "dark" ? "white" : "black"}
@@ -237,8 +239,8 @@ const ModalTable = ({
                     <FilterTypes
                       filterOptions={filterOptions}
                       active={selectedFilter}
-                      valueKey="type"
-                      nameKey="type_name"
+                      valueKey={valueKeyOfFilter}
+                      nameKey={nameKeyOfFilter}
                       onFilterChange={(selectedType) => {
                         filterHandler(selectedType);
                         type === "history" && fetchHandler(1, selectedType); // using historyhandler when using history
@@ -263,6 +265,7 @@ const ModalTable = ({
                             fetchHandler(type, 1);
                           }
                         : () => {
+                            // history second page
                             settypeToShow(t(type));
                             fetchHandler(type, currentPage, 1);
                             setShowTableActions(true);
@@ -336,7 +339,9 @@ const ModalTable = ({
       footer={
         !isFormOpen && (
           <Pagination
-            totalItems={sortedData.length}
+            showItemsPerPage={type !== "history"}
+            totalPageProp={totalPageProp}
+            totalItems={totalItemsProp ?? sortedData.length}
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
             handleItemsPerPageChange={handleItemsPerPageChange}

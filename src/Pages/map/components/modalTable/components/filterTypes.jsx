@@ -1,7 +1,6 @@
 import { Button } from "@material-tailwind/react";
 import { t } from "i18next";
-import { useTheme } from "../../../../customHooks/useTheme";
-
+import { useTheme } from "../../../../../customHooks/useTheme";
 const FilterTypes = ({
   active,
   filterOptions,

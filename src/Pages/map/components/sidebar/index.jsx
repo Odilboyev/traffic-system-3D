@@ -97,8 +97,7 @@ const Sidebar = ({
           isVisible ? "fixed" : "none"
         } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-xl  shadow-lg flex flex-col ${
           isSidebarOpen ? "w-[15vw]" : "w-18"
-        } ${theme === "light" ? "bg-gray-100" : "bg-gray-900"} 
-        transition-all duration-300 ease-in-out select-none`}
+        } transition-all duration-300 ease-in-out select-none`}
       >
         {/* Toggle button */}
         <button
