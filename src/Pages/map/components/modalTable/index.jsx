@@ -22,6 +22,8 @@ import { useTheme } from "../../../../customHooks/useTheme";
 
 const ModalTable = ({
   open,
+  modalSize,
+  modalHeight,
   type,
   handleOpen,
   historyButtonCallback,
@@ -176,6 +178,8 @@ const ModalTable = ({
 
   return (
     <Modal
+      height={modalHeight}
+      size={modalSize}
       open={open}
       handleOpen={
         isFormOpen

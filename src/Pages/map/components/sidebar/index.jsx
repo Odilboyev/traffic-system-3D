@@ -9,7 +9,7 @@ import {
   MdBubbleChart,
   MdHistory,
   MdOutlineLanguage,
-  MdOutlineWidgets,
+  MdWidgets,
 } from "react-icons/md";
 import { TbBell, TbServerCog } from "react-icons/tb";
 import { useMap, useMapEvents } from "react-leaflet";
@@ -153,7 +153,7 @@ const Sidebar = ({
               } // Another custom component
             />
             <SidebarItem
-              icon={<MdOutlineWidgets className="w-4 h-4" />}
+              icon={<MdWidgets className="w-4 h-4" />}
               label="widgetControl"
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
@@ -180,6 +180,27 @@ const Sidebar = ({
                 t={t}
               />
             )}
+            <SidebarItem
+              icon={<TbBell className="w-4 h-4" />}
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+              label="currentAlarms"
+              activeSidePanel={activeSidePanel}
+              setActiveSidePanel={(e) => {
+                setActiveSidePanel(e);
+                setIsVisible(false);
+              }}
+              content={
+                <CurrentAlarms
+                  activeSidePanel={activeSidePanel}
+                  setActiveSidePanel={(e) => {
+                    setActiveSidePanel(e);
+                    setIsVisible(true);
+                  }}
+                />
+              }
+              t={t}
+            />
             {/* <ErrorBoundary> */}
             <SidebarItem
               icon={<MdHistory className="w-4 h-4" />}
@@ -203,28 +224,6 @@ const Sidebar = ({
               t={t}
             />
             {/* </ErrorBoundary> */}
-
-            <SidebarItem
-              icon={<TbBell className="w-4 h-4" />}
-              isSidebarOpen={isSidebarOpen}
-              setIsSidebarOpen={setIsSidebarOpen}
-              label="currentAlarms"
-              activeSidePanel={activeSidePanel}
-              setActiveSidePanel={(e) => {
-                setActiveSidePanel(e);
-                setIsVisible(false);
-              }}
-              content={
-                <CurrentAlarms
-                  activeSidePanel={activeSidePanel}
-                  setActiveSidePanel={(e) => {
-                    setActiveSidePanel(e);
-                    setIsVisible(true);
-                  }}
-                />
-              }
-              t={t}
-            />
           </div>
         </div>
         <div

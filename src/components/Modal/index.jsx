@@ -55,11 +55,13 @@ const Modal = ({
           </svg>
         </IconButton>
       </DialogHeader>
-      <DialogBody className={`h-screen overflow-hidden py-0 `}>
+      <DialogBody
+        className={` ${height ? height : "h-screen"}  overflow-hidden py-0 `}
+      >
         {body}
       </DialogBody>
       {footer && (
-        <DialogFooter className="flex justify-center items-center mt-auto backdrop-blur-lg bg-white/20 dark:bg-gray-900/50 absolute bottom-0 w-full">
+        <DialogFooter className="flex justify-center items-center mt-auto backdrop-blur-lg bg-white/20 dark:bg-gray-900/50 absolute -bottom-1 w-full">
           {footer}
         </DialogFooter>
       )}

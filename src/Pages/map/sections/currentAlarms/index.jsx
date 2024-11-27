@@ -1,6 +1,5 @@
-import { Typography } from "@material-tailwind/react";
-import { useEffect, useState, useCallback, memo } from "react";
-import moment from "moment";
+import { memo, useCallback, useEffect, useState } from "react";
+
 import ModalTable from "../../components/modalTable"; // Reusing the same ModalTable component
 import { getCurrentAlarms } from "../../../../api/api.handlers"; // Assuming you have an API handler
 
@@ -33,6 +32,8 @@ const CurrentAlarms = ({ activeSidePanel, setActiveSidePanel }) => {
 
   return (
     <ModalTable
+      modalSize={"lg"}
+      modalHeight={"h-[90vh]"}
       open={activeSidePanel === "currentAlarms"}
       handleOpen={() => {
         setAlarmData([]);
