@@ -219,7 +219,6 @@ const DeviceManagement = ({
     setDeviceType(type); // Update device type
     setActiveSidePanel(null); // Close the dropdown
 
-    console.log("open device modal");
     if (type === "users") {
       fetchDeviceData("user/list_active"); // Fetch active users by default
     } else {

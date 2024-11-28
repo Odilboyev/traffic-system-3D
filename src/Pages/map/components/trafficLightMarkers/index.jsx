@@ -1,26 +1,24 @@
 import L from "leaflet";
-import { renderToString } from "react-dom/server";
 import { Marker } from "react-leaflet";
-import { getNearbyTrafficLights } from "../../../../api/api.handlers";
 import NeonIcon from "../../../../components/neonIcon";
+import { getNearbyTrafficLights } from "../../../../api/api.handlers";
+import iconSelector from "./icons/iconSelector";
+import { renderToString } from "react-dom/server";
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
-import iconSelector from "./iconSelector";
 
 const TrafficlightMarkers = ({
   trafficLights,
   setTrafficLights,
-  setWssLink,
+  setSvetofor_id,
   setCurrentSvetoforId,
   setTrafficSocket,
   currentSvetoforId,
-  wssLink,
-  setLastSuccessfulLocation,
-  trafficSocket,
   clearTrafficLights,
   updateTrafficLights,
 }) => {
   // Fetching function passed to custom hook
   const fetchTrafficLights = async (body) => {
+    console.log(body, "traffic markers");
     try {
       const response = await getNearbyTrafficLights(body);
 
@@ -35,7 +33,7 @@ const TrafficlightMarkers = ({
       // Only open a new WebSocket if the svetofor_id has changed
       if (currentSvetoforId !== response.svetofor_id) {
         setCurrentSvetoforId(response.svetofor_id);
-        setWssLink(response.wss_link);
+        setSvetofor_id(response.svetofor_id);
       }
     } catch (error) {
       console.error("Error fetching traffic lights:", error);

@@ -4,12 +4,11 @@ import {
   TbCornerUpLeft,
   TbCornerUpRight,
 } from "react-icons/tb";
-import { PiArrowULeftDownBold } from "react-icons/pi";
 
-import ThreeArrowsIcon from "./threeArrowIcon";
-import PhasesDisplay from "../crossroad/components/phases";
-import PedestrianIcon from "./pedestrian";
 import { MdStraight } from "react-icons/md";
+import PedestrianIcon from "./pedestrian";
+import { PiArrowULeftDownBold } from "react-icons/pi";
+import ThreeArrowsIcon from "./threeArrowIcon";
 
 const iconSelector = ({ type = 1, status = 0, style }) => {
   const IconComponent = (() => {

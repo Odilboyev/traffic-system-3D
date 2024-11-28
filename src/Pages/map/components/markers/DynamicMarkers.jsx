@@ -38,7 +38,7 @@ const DynamicMarkers = ({
     }
   };
   useMapDataFetcher({
-    fetchData: useDynamicFetching ? fetchMarkers : null, // Pass null if not using dynamic fetching
+    fetchData: useDynamicFetching ? fetchMarkers : () => {}, // Pass null if not using dynamic fetching
     onClearData: useDynamicFetching ? clearMarkers : null,
     onNewData: useDynamicFetching ? updateMarkers : null,
     minZoom: 5,
@@ -112,7 +112,7 @@ DynamicMarkers.propTypes = {
   filter: PropTypes.object.isRequired,
   setMarkers: PropTypes.func.isRequired,
   clearMarkers: PropTypes.func.isRequired,
-  updateMarkers: PropTypes.func.isRequired,
+  updateMarkers: PropTypes.func,
   handleMonitorCrossroad: PropTypes.func.isRequired,
   handleBoxModalOpen: PropTypes.func.isRequired,
   handleLightsModalOpen: PropTypes.func.isRequired,

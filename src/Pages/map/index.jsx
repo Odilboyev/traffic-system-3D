@@ -9,6 +9,7 @@ import MapModals from "./components/MapModals/index.jsx";
 import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
+import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import { safeParseJSON } from "../../redux/utils.js";
@@ -177,9 +178,10 @@ const MapComponent = ({ changedMarker, t }) => {
             Zoom: {zoom}
           </div>
         </Control>
+        {filter.trafficlights && <TrafficLightContainer />}
         {/* <Control position="bottomcenter"> */}
         {/* </Control> */}
-        {/* {filter.trafficlights && <TrafficLightContainer />}
+        {/* 
         {useClusteredMarkers === "clustered" ||
         useClusteredMarkers === "clustered_dynamically" ? (
           <ClusteredMarkers

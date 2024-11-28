@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import ConfigPanel from "./components/configPanel";
+import InfoBarTrafficDash from "./components/infoBar";
 import Intersection from "./components/intersection";
 import PropTypes from "prop-types";
 import { TbPencil } from "react-icons/tb";
@@ -10,12 +11,18 @@ import { fixIncompleteJSON } from "../../../trafficLightMarkers/utils";
 import { getTrafficLightsConfig } from "../../../../../../api/api.handlers";
 import useLocalStorageState from "../../../../../../customHooks/uselocalStorageState";
 
-const TrafficLightDashboard = ({ id, vendor, isInModal = false }) => {
+const TrafficLightDashboard = ({
+  id,
+  vendor,
+  markerData,
+  isInModal = false,
+  onClose,
+}) => {
   const role = atob(localStorage.getItem("its_user_role"));
   const [showConfig, setShowConfig] = useState(false);
   const [incomingConfig, setIncomingConfig] = useState(null);
   const [trafficSocket, setTrafficSocket] = useState(null);
-
+  const [phases, setPhases] = useState([]);
   const [config, setConfig] = useLocalStorageState(
     "its_roadDrawingConfig",
     incomingConfig || defaultConfig
@@ -92,6 +99,7 @@ const TrafficLightDashboard = ({ id, vendor, isInModal = false }) => {
 
           try {
             const data = JSON.parse(message);
+            setPhases(data.phase);
             if (data?.channel) {
               // Create a map of channel statuses
               const channelStatuses = data.channel.reduce((acc, channel) => {
@@ -247,12 +255,17 @@ const TrafficLightDashboard = ({ id, vendor, isInModal = false }) => {
       };
     }
   }, [id, incomingConfig]);
+  const info = {
+    name: markerData?.cname,
+    crossroad_id: "12345",
+    IP: "192.168.1.1",
+    status: "Active",
+    traffic_volume: "High",
+  };
 
   // Remove the interval-based useEffect
   return (
-    <div
-      className={` no-scrollbar relative h-full flex items-center justify-center`}
-    >
+    <div className={` no-scrollbar relative h-full flex items-center justify-`}>
       {wsConnectionStatus !== "connected" && incomingConfig && (
         <div className="absolute top-4 right-4 px-4 py-2 rounded-md text-white bg-red-500">
           {wsConnectionStatus === "disconnected"
@@ -299,6 +312,12 @@ const TrafficLightDashboard = ({ id, vendor, isInModal = false }) => {
           crosswalkSeconds={crosswalkSeconds}
         />
       )}
+      <InfoBarTrafficDash
+        info={info}
+        phase={phases}
+        config={config}
+        onClose={onClose}
+      />
 
       {incomingConfig && !showConfig && !isInModal && (
         <button

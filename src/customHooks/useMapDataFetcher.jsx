@@ -10,16 +10,16 @@ const useMapDataFetcher = ({
   minZoom = 19, // optional minimum zoom level to trigger fetch
   fetchDistanceThreshold = 100, // optional distance threshold (in meters) for fetching data
   useDistanceThreshold = true, // New prop with default value true
+  updateTrafficLights, // function to update traffic lights
 }) => {
   const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
   const map = useMap();
-  if (!fetchData) return;
-  // Function to check distance and trigger fetch if conditions are met
   const handleMapEvents = () => {
     const center = map.getCenter();
     const zoom = map.getZoom();
     const currentLocation = L.latLng(center.lat, center.lng);
-
+    // console.log(center, "center");
+    // if (!fetchData) return;
     if (zoom >= minZoom) {
       // Calculate distance only if we have a last location
       const distance = lastSuccessfulLocation
@@ -45,10 +45,11 @@ const useMapDataFetcher = ({
     }
   };
 
-  // Effect to trigger the map event handler when component is mounted and on zoom or drag end
   useEffect(() => {
     handleMapEvents(); // Initial trigger on mount
   }, []);
+  // Function to check distance and trigger fetch if conditions are met
+  // Effect to trigger the map event handler when component is mounted and on zoom or drag end
 
   // Set up event listeners for map dragging and zooming
   useMapEvents({
