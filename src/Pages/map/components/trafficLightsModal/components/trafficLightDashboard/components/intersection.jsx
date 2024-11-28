@@ -138,7 +138,7 @@ const Intersection = ({
       }}
     >
       <div
-        className="absolute overflow-hidden"
+        className="absolute overflow-hidden flex justify-center items-center"
         style={{
           width: `${intersectionSize}px`,
           height: `${intersectionSize}px`,
@@ -146,12 +146,7 @@ const Intersection = ({
           left: `calc(50% - ${intersectionSize / 2}px)`,
         }}
       >
-        <IntersectionArrows
-          trafficLights={trafficLights}
-          currentDirection={
-            trafficLights.east === "green" ? "east-west" : "north-south"
-          }
-        />
+        <IntersectionArrows trafficState={trafficLights} />
         {renderIntersectionBoundary()}
       </div>
 

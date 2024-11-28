@@ -10,26 +10,23 @@ const useMapDataFetcher = ({
   minZoom = 19, // optional minimum zoom level to trigger fetch
   fetchDistanceThreshold = 100, // optional distance threshold (in meters) for fetching data
   useDistanceThreshold = true, // New prop with default value true
-  updateTrafficLights, // function to update traffic lights
 }) => {
   const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
   const map = useMap();
+
+  // Function to check distance and trigger fetch if conditions are met
   const handleMapEvents = () => {
     const center = map.getCenter();
     const zoom = map.getZoom();
     const currentLocation = L.latLng(center.lat, center.lng);
-    // console.log(center, "center");
-    // if (!fetchData) return;
-    if (zoom >= minZoom) {
-      // Calculate distance only if we have a last location
-      const distance = lastSuccessfulLocation
-        ? currentLocation.distanceTo(lastSuccessfulLocation)
-        : Infinity;
 
+    if (zoom >= minZoom) {
+      // Modified condition to check useDistanceThreshold prop
       if (
         !lastSuccessfulLocation ||
         !useDistanceThreshold ||
-        distance > fetchDistanceThreshold
+        currentLocation.distanceTo(lastSuccessfulLocation) >
+          fetchDistanceThreshold
       ) {
         fetchData({
           lat: center.lat,
@@ -41,15 +38,16 @@ const useMapDataFetcher = ({
     } else {
       // If zoom is lower than minZoom, clear the data and reset last location
       onClearData();
-      setLastSuccessfulLocation(null);
+      if (lastSuccessfulLocation !== null) {
+        setLastSuccessfulLocation(null); // Only clear if it's not already null
+      }
     }
   };
 
+  // Effect to trigger the map event handler when component is mounted and on zoom or drag end
   useEffect(() => {
     handleMapEvents(); // Initial trigger on mount
   }, []);
-  // Function to check distance and trigger fetch if conditions are met
-  // Effect to trigger the map event handler when component is mounted and on zoom or drag end
 
   // Set up event listeners for map dragging and zooming
   useMapEvents({

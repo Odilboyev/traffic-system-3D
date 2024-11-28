@@ -9,7 +9,6 @@ import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
 const TrafficlightMarkers = ({
   trafficLights,
   setTrafficLights,
-  setSvetofor_id,
   setCurrentSvetoforId,
   setTrafficSocket,
   currentSvetoforId,
@@ -18,7 +17,6 @@ const TrafficlightMarkers = ({
 }) => {
   // Fetching function passed to custom hook
   const fetchTrafficLights = async (body) => {
-    console.log(body, "traffic markers");
     try {
       const response = await getNearbyTrafficLights(body);
 
@@ -33,7 +31,6 @@ const TrafficlightMarkers = ({
       // Only open a new WebSocket if the svetofor_id has changed
       if (currentSvetoforId !== response.svetofor_id) {
         setCurrentSvetoforId(response.svetofor_id);
-        setSvetofor_id(response.svetofor_id);
       }
     } catch (error) {
       console.error("Error fetching traffic lights:", error);
@@ -43,6 +40,7 @@ const TrafficlightMarkers = ({
 
   // Use the custom hook
   useMapDataFetcher({
+    use: true,
     fetchData: fetchTrafficLights,
     onClearData: clearTrafficLights,
     onNewData: updateTrafficLights,

@@ -1,3 +1,4 @@
+import { defaultConfig, updateTrafficStates } from "./utils";
 import { useEffect, useState } from "react";
 
 import ConfigPanel from "./components/configPanel";
@@ -6,7 +7,6 @@ import Intersection from "./components/intersection";
 import PropTypes from "prop-types";
 import { TbPencil } from "react-icons/tb";
 import { authToken } from "../../../../../../api/api.config";
-import { defaultConfig } from "./utils";
 import { fixIncompleteJSON } from "../../../trafficLightMarkers/utils";
 import { getTrafficLightsConfig } from "../../../../../../api/api.handlers";
 import useLocalStorageState from "../../../../../../customHooks/uselocalStorageState";
@@ -101,7 +101,6 @@ const TrafficLightDashboard = ({
             const data = JSON.parse(message);
             setPhases(data.phase);
             if (data?.channel) {
-              // Create a map of channel statuses
               const channelStatuses = data.channel.reduce((acc, channel) => {
                 acc[channel.id] = {
                   status: channel.status,
@@ -110,120 +109,17 @@ const TrafficLightDashboard = ({
                 return acc;
               }, {});
 
-              // Update traffic lights and seconds for each direction
-              setTrafficLights((prevState) => {
-                const newState = { ...prevState };
-                const newSeconds = {}; // Create an object to store seconds for each direction
+              const {
+                newTrafficLights,
+                newSeconds,
+                newCrosswalks,
+                newCrosswalkSeconds,
+              } = updateTrafficStates(incomingConfig, channelStatuses);
 
-                Object.entries(incomingConfig).forEach(
-                  ([direction, dirConfig]) => {
-                    if (direction !== "angle") {
-                      // Handle right lanes
-                      if (dirConfig.lanesRight.length > 0) {
-                        // Get status from first lane for traffic light
-                        const firstChannelId =
-                          dirConfig.lanesRight[0].channel_id;
-                        if (firstChannelId && channelStatuses[firstChannelId]) {
-                          const status = channelStatuses[firstChannelId].status;
-                          newState[direction] =
-                            status === 1
-                              ? "green"
-                              : status === 9 || status === 3
-                              ? "yellow"
-                              : "red";
-                        }
-
-                        // Store countdown for each channel in the direction
-                        newSeconds[direction] = {};
-                        dirConfig.lanesRight.forEach((lane) => {
-                          if (
-                            lane.channel_id &&
-                            channelStatuses[lane.channel_id]
-                          ) {
-                            newSeconds[direction][lane.channel_id] =
-                              channelStatuses[lane.channel_id].countdown;
-                          }
-                        });
-                      }
-
-                      // Handle left lanes
-                      if (dirConfig.lanesLeft.length > 0) {
-                        dirConfig.lanesLeft.forEach((lane) => {
-                          if (
-                            lane.channel_id &&
-                            channelStatuses[lane.channel_id]
-                          ) {
-                            if (!newSeconds[direction])
-                              newSeconds[direction] = {};
-                            newSeconds[direction][lane.channel_id] =
-                              channelStatuses[lane.channel_id].countdown;
-                          }
-                        });
-                      }
-                    }
-                  }
-                );
-
-                setSeconds(newSeconds); // Update seconds state
-                return newState;
-              });
-
-              // Update crosswalks and their countdowns
-              setCrosswalks((prevState) => {
-                const newState = { ...prevState };
-                Object.entries(config).forEach(([direction, dirConfig]) => {
-                  if (direction !== "angle") {
-                    const leftChannelId = dirConfig.cross_walkLeft?.channel_id;
-                    const rightChannelId =
-                      dirConfig.cross_walkRight?.channel_id;
-
-                    // Check and update the left crosswalk status
-                    if (leftChannelId && channelStatuses[leftChannelId]) {
-                      const leftStatus = channelStatuses[leftChannelId].status;
-                      newState[direction] = newState[direction] || {};
-                      newState[direction].left =
-                        leftStatus === 1 ? "green" : "red";
-                    }
-
-                    // Check and update the right crosswalk status
-                    if (rightChannelId && channelStatuses[rightChannelId]) {
-                      const rightStatus =
-                        channelStatuses[rightChannelId].status;
-                      newState[direction] = newState[direction] || {};
-                      newState[direction].right =
-                        rightStatus === 1 ? "green" : "red";
-                    }
-                  }
-                });
-                return newState;
-              });
-
-              // Update crosswalk seconds
-              setCrosswalkSeconds((prevSeconds) => {
-                const newSeconds = { ...prevSeconds };
-                Object.entries(config).forEach(([direction, dirConfig]) => {
-                  if (direction !== "angle") {
-                    const leftChannelId = dirConfig.cross_walkLeft?.channel_id;
-                    const rightChannelId =
-                      dirConfig.cross_walkRight?.channel_id;
-
-                    // Check and update the left crosswalk countdown
-                    if (leftChannelId && channelStatuses[leftChannelId]) {
-                      newSeconds[direction] = newSeconds[direction] || {};
-                      newSeconds[direction].left =
-                        channelStatuses[leftChannelId].countdown;
-                    }
-
-                    // Check and update the right crosswalk countdown
-                    if (rightChannelId && channelStatuses[rightChannelId]) {
-                      newSeconds[direction] = newSeconds[direction] || {};
-                      newSeconds[direction].right =
-                        channelStatuses[rightChannelId].countdown;
-                    }
-                  }
-                });
-                return newSeconds;
-              });
+              setTrafficLights(newTrafficLights);
+              setSeconds(newSeconds);
+              setCrosswalks(newCrosswalks);
+              setCrosswalkSeconds(newCrosswalkSeconds);
             }
           } catch (error) {
             console.error("Error parsing WebSocket message:", error);

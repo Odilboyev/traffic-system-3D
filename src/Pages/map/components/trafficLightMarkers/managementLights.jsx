@@ -11,39 +11,40 @@ const TrafficLightContainer = ({ isInModal }) => {
   const [phase, setPhase] = useState([]);
   const [trafficSocket, setTrafficSocket] = useState(null);
   const [currentSvetoforId, setCurrentSvetoforId] = useState(null);
-  const [svetofor_id, setSvetofor_id] = useState(null);
   const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket(
-      `${
-        import.meta.env.VITE_TRAFFICLIGHT_SOCKET
-      }?svetofor_id=${svetofor_id}&token=${authToken}`
-    );
+    if (currentSvetoforId) {
+      const socket = new WebSocket(
+        `${
+          import.meta.env.VITE_TRAFFICLIGHT_SOCKET
+        }?svetofor_id=${currentSvetoforId}&token=${authToken}`
+      );
 
-    socket.onmessage = (event) => {
-      let message = event.data;
+      socket.onmessage = (event) => {
+        let message = event.data;
 
-      // Fix incomplete JSON message
-      message = fixIncompleteJSON(message);
-      try {
-        const data = JSON.parse(message);
-        if (data) updateTrafficLights(data);
-      } catch (error) {
-        throw new Error(error);
-      }
-    };
+        // Fix incomplete JSON message
+        message = fixIncompleteJSON(message);
+        try {
+          const data = JSON.parse(message);
+          if (data) updateTrafficLights(data);
+        } catch (error) {
+          throw new Error(error);
+        }
+      };
 
-    setTrafficSocket(socket);
-    socket.onclose = (e) => {
-      // console.log(e, "WebSocket closed");
-    };
-    return () => {
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, [svetofor_id]);
+      setTrafficSocket(socket);
+      socket.onclose = (e) => {
+        // console.log(e, "WebSocket closed");
+      };
+      return () => {
+        if (socket) {
+          socket.close();
+        }
+      };
+    }
+  }, [currentSvetoforId]);
 
   const updateTrafficLights = (data) => {
     if (data) {
@@ -69,7 +70,6 @@ const TrafficLightContainer = ({ isInModal }) => {
       setTrafficSocket(null);
     }
     setCurrentSvetoforId(null);
-    setSvetofor_id(null);
     setLastSuccessfulLocation(null);
   };
 
@@ -83,7 +83,6 @@ const TrafficLightContainer = ({ isInModal }) => {
         setTrafficLights={setTrafficLights}
         setCurrentSvetoforId={setCurrentSvetoforId}
         setTrafficSocket={setTrafficSocket}
-        setSvetofor_id={setSvetofor_id}
         phase={phase}
         setPhase={setPhase}
         currentSvetoforId={currentSvetoforId}

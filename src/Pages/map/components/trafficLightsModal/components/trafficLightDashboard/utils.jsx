@@ -240,3 +240,71 @@ export const defaultConfig = {
     ],
   },
 };
+
+export const updateTrafficStates = (config, channelStatuses) => {
+  const newTrafficLights = {};
+  const newSeconds = {};
+  const newCrosswalks = {};
+  const newCrosswalkSeconds = {};
+
+  Object.entries(config).forEach(([direction, dirConfig]) => {
+    if (direction !== "angle") {
+      // Handle traffic light updates
+      if (dirConfig.lanesRight.length > 0) {
+        const firstChannelId = dirConfig.lanesRight[0].channel_id;
+        if (firstChannelId && channelStatuses[firstChannelId]) {
+          const status = channelStatuses[firstChannelId].status;
+          newTrafficLights[direction] =
+            status === 1
+              ? "green"
+              : status === 9 || status === 3
+              ? "yellow"
+              : "red";
+        }
+        // Countdown for each lane in lanesRight
+        newSeconds[direction] = {};
+        dirConfig.lanesRight.forEach((lane) => {
+          if (lane.channel_id && channelStatuses[lane.channel_id]) {
+            newSeconds[direction][lane.channel_id] =
+              channelStatuses[lane.channel_id].countdown;
+          }
+        });
+      }
+
+      // Handle left lanes (similar structure)
+      dirConfig.lanesLeft.forEach((lane) => {
+        if (lane.channel_id && channelStatuses[lane.channel_id]) {
+          if (!newSeconds[direction]) newSeconds[direction] = {};
+          newSeconds[direction][lane.channel_id] =
+            channelStatuses[lane.channel_id].countdown;
+        }
+      });
+
+      // Handle crosswalk updates
+      ["cross_walkLeft", "cross_walkRight"].forEach((crosswalkType) => {
+        const channelId = dirConfig[crosswalkType]?.channel_id;
+        if (channelId && channelStatuses[channelId]) {
+          const status = channelStatuses[channelId].status;
+          const countdown = channelStatuses[channelId].countdown;
+
+          newCrosswalks[direction] = newCrosswalks[direction] || {};
+          newCrosswalks[direction][
+            crosswalkType === "cross_walkLeft" ? "left" : "right"
+          ] = status === 1 ? "green" : "red";
+
+          newCrosswalkSeconds[direction] = newCrosswalkSeconds[direction] || {};
+          newCrosswalkSeconds[direction][
+            crosswalkType === "cross_walkLeft" ? "left" : "right"
+          ] = countdown;
+        }
+      });
+    }
+  });
+
+  return {
+    newTrafficLights,
+    newSeconds,
+    newCrosswalks,
+    newCrosswalkSeconds,
+  };
+};

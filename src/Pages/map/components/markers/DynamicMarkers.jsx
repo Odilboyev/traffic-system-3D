@@ -38,11 +38,12 @@ const DynamicMarkers = ({
     }
   };
   useMapDataFetcher({
-    fetchData: useDynamicFetching ? fetchMarkers : () => {}, // Pass null if not using dynamic fetching
-    onClearData: useDynamicFetching ? clearMarkers : null,
-    onNewData: useDynamicFetching ? updateMarkers : null,
-    minZoom: 5,
-    fetchDistanceThreshold: 500,
+    use: useDynamicFetching ? true : false,
+    fetchData: useDynamicFetching ? fetchMarkers : () => {},
+    onClearData: useDynamicFetching ? clearMarkers : () => {},
+    onNewData: useDynamicFetching ? updateMarkers : () => {},
+    minZoom: useDynamicFetching ? 5 : null,
+    fetchDistanceThreshold: useDynamicFetching ? 500 : undefined,
     useDistanceThreshold: true,
   });
 
