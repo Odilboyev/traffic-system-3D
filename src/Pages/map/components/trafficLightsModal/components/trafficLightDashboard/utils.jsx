@@ -283,19 +283,24 @@ export const updateTrafficStates = (config, channelStatuses) => {
       // Handle crosswalk updates
       ["cross_walkLeft", "cross_walkRight"].forEach((crosswalkType) => {
         const channelId = dirConfig[crosswalkType]?.channel_id;
+        newCrosswalks[direction] = newCrosswalks[direction] || {};
+        newCrosswalkSeconds[direction] = newCrosswalkSeconds[direction] || {};
+
         if (channelId && channelStatuses[channelId]) {
           const status = channelStatuses[channelId].status;
           const countdown = channelStatuses[channelId].countdown;
 
-          newCrosswalks[direction] = newCrosswalks[direction] || {};
           newCrosswalks[direction][
             crosswalkType === "cross_walkLeft" ? "left" : "right"
           ] = status === 1 ? "green" : "red";
 
-          newCrosswalkSeconds[direction] = newCrosswalkSeconds[direction] || {};
           newCrosswalkSeconds[direction][
             crosswalkType === "cross_walkLeft" ? "left" : "right"
           ] = countdown;
+        } else {
+          newCrosswalkSeconds[direction][
+            crosswalkType === "cross_walkLeft" ? "left" : "right"
+          ] = 0; // Default value for missing data
         }
       });
     }
