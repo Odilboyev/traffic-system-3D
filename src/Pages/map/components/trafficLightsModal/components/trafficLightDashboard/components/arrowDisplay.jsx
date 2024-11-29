@@ -90,7 +90,7 @@ const ArrowDisplay = ({
             <span
               className={`${colorMappingText[trafficLights[roadName]]} ${
                 colorMappingGlow[trafficLights[roadName]]
-              } font-digital ${numberSizeClass} leading-none`}
+              } font-digital ${numberSizeClass} leading-none font-bold text-2xl`}
               style={{
                 transform: `rotate(${
                   roadName === "east" ? "90deg" : "-" + getRotationAngle()

@@ -34,24 +34,32 @@ const calculateDimensions = (direction, laneWidth, laneCount) => {
   }
 };
 
-const calculateCounterStyle = (direction, crosswalkPosition) => {
-  // If the direction is vertical
-  if (direction === "vertical") {
-    return {
-      left:
-        crosswalkPosition === "left" ? `calc(100% + 10px)` : `calc(0% - 50px)`, // Position on left or right side
-      top: "50%",
-      transform: "translateY(-50%)",
-    };
-  } else {
-    // If the direction is horizontal
-    return {
-      top:
-        crosswalkPosition === "right" ? `calc(100% + 10px)` : `calc(0% - 50px)`, // Position on top or bottom side
-      left: "50%",
-      transform: "translateX(-50%)",
-    };
-  }
+// const calculateCounterStyle = (direction, crosswalkPosition) => {
+//   // If the direction is vertical
+//   if (direction === "vertical") {
+//     return {
+//       left:
+//         crosswalkPosition === "left" ? `calc(100% + 10px)` : `calc(0% - 50px)`, // Position on left or right side
+//       top: "50%",
+//       transform: "translateY(-50%)",
+//     };
+//   } else {
+//     // If the direction is horizontal
+//     return {
+//       top:
+//         crosswalkPosition === "right" ? `calc(100% + 10px)` : `calc(0% - 50px)`, // Position on top or bottom side
+//       left: "50%",
+//       transform: "translateX(-50%)",
+//     };
+//   }
+// };
+const calculateCounterStyle = (direction, crosswalkWidth, crosswalkHeight) => {
+  // Center the counter based on crosswalk dimensions
+  return {
+    // top: `calc(50% - ${crosswalkHeight / 2}px)`,
+    // left: `calc(50% - ${crosswalkWidth / 2}px)`,
+    // transform: "translate(-50%, -50%)", // Center the element
+  };
 };
 
 // Function to generate the crosswalk component
@@ -90,11 +98,16 @@ const renderCrosswalks = (
       roadName
     );
 
-    const counterStyle = calculateCounterStyle(direction, side.toLowerCase());
+    const counterStyle = calculateCounterStyle(
+      direction,
+      crosswalkWidth,
+      crosswalkHeight
+    );
+
     return (
       <div
         key={side}
-        className="absolute z-[999]"
+        className="absolute z-[999] flex justify-center items-center"
         style={{
           width: `${crosswalkWidth}px`,
           height: `${crosswalkHeight}px`,
@@ -108,7 +121,7 @@ const renderCrosswalks = (
         }}
       >
         <div
-          className={`absolute border border-white/10 rounded-full px-2 py-1 ${colorMapping.text[crosswalkSignal]} ${colorMapping.glow[crosswalkSignal]} font-digital text-xl`}
+          className={`bg-white rounded-md p-1 font-medium ${colorMapping.text[crosswalkSignal]} ${colorMapping.glow[crosswalkSignal]} font-digital text-xl`}
           style={counterStyle}
         >
           {crosswalkTimer}

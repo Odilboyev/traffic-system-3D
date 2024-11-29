@@ -40,32 +40,50 @@ const IntersectionArrows = ({ trafficState }) => {
   const { primary, secondary } = getArrowDetails();
 
   const getArrowStyle = (direction) => {
+    const baseStyle = "absolute text-5xl transition-transform duration-300";
     switch (direction) {
       case "north":
-        return { transform: "rotate(0deg)" };
+        return { className: `${baseStyle} top-4`, rotation: "rotate(0deg)" }; // Pointing up
       case "south":
-        return { transform: "rotate(180deg)" };
+        return {
+          className: `${baseStyle} bottom-4`,
+          rotation: "rotate(180deg)",
+        }; // Pointing down
       case "east":
-        return { transform: "rotate(90deg)" };
+        return { className: `${baseStyle} right-4`, rotation: "rotate(90deg)" }; // Pointing right
       case "west":
-        return { transform: "rotate(270deg)" };
+        return { className: `${baseStyle} left-4`, rotation: "rotate(270deg)" }; // Pointing left
       default:
-        return {};
+        return { className: baseStyle, rotation: "" };
     }
   };
 
+  const getArrowColor = (direction) => {
+    return trafficLights[direction] === "green"
+      ? "text-green-500"
+      : "text-red-500";
+  };
+
+  const renderArrow = (direction) => {
+    if (!direction) return null;
+
+    const { className, rotation } = getArrowStyle(direction);
+    const colorClass = getArrowColor(direction);
+
+    return (
+      <div
+        className={`${className} ${colorClass}`}
+        style={{ transform: rotation }}
+      >
+        <HiArrowDown />
+      </div>
+    );
+  };
+
   return (
-    <div className="relative flex flex-col items-center z-50">
-      {primary && (
-        <div className="absolute " style={{ ...getArrowStyle(primary) }}>
-          <HiArrowDown />
-        </div>
-      )}
-      {secondary && (
-        <div className="absolute mt-14" style={{ ...getArrowStyle(secondary) }}>
-          <HiArrowDown />
-        </div>
-      )}
+    <div className="relative z-50 flex justify-center items-center h-64 w-64 bg-gray-800 rounded-md">
+      {renderArrow(primary)}
+      {renderArrow(secondary)}
     </div>
   );
 };
