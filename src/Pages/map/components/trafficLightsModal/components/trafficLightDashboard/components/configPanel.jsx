@@ -23,6 +23,31 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
     }));
   };
 
+  // Handle crosswalk existence changes
+  const handleCrosswalkChange = (direction, side, value) => {
+    console.log(direction, side, value, "handleCrosswalkChange");
+    setConfig((prevConfig) => ({
+      ...prevConfig,
+      [direction]: {
+        ...prevConfig[direction],
+        [`cross_walk${side}`]: {
+          ...prevConfig[direction][`cross_walk${side}`],
+          exists: value
+        }
+      },
+    }));
+    console.log({
+      ...config,
+      [direction]: {
+        ...config[direction],
+        [`cross_walk${side}`]: {
+          ...config[direction][`cross_walk${side}`],
+          exists: value
+        }
+      },
+    })
+  };
+
   // Generates lane icons based on lane count for the right side
   const getLaneIcons = (count, currentIcons) => {
     const baseIcons = ["TbArrowBackUp"]; // Base icon(s) for lanes
@@ -107,6 +132,7 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
 
   const handleSubmit = async () => {
     const jsonOutput = JSON.stringify(config, null, 2);
+    console.log(jsonOutput);
     try {
       setIsLoading(true);
       const res = await modifySvetofor(jsonOutput, id);
@@ -268,6 +294,26 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
                 updateLaneCount(direction, "lanesRight", value)
               }
             />
+          </div>
+
+          {/* Crosswalk Existence Toggle */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2">{t("Crosswalks")}</h3>
+            <div className="grid grid-cols-2 gap-4">
+              {["Left", "Right"].map((side) => (
+                <div key={side} className="flex items-center justify-between">
+                  <label className="capitalize">{t(side)}</label>
+                  <input
+                    type="checkbox"
+                    checked={config[direction]?.[`cross_walk${side}`]?.exists ?? false}
+                    onChange={(e) =>
+                      handleCrosswalkChange(direction, side, e.target.checked)
+                    }
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Lane Icon Controls with Channel ID */}

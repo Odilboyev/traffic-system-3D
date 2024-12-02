@@ -75,12 +75,13 @@ const renderCrosswalks = (
   const sides = ["Left", "Right"];
 
   return sides.map((side) => {
+   
     const isLeft = side === "Left";
     const laneKey = `lanes${side}`;
     const crosswalkKey = `cross_walk${side}`;
     const laneCount = roadConfig[laneKey].length;
     const laneWidth = getLaneWidth(); // Get lane width dynamically
-
+ if (!roadConfig[crosswalkKey].exists) return null;
     // Calculate crosswalk dimensions
     const { width: crosswalkWidth, height: crosswalkHeight } =
       calculateDimensions(direction, laneWidth, laneCount);

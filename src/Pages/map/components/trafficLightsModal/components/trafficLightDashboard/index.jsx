@@ -14,9 +14,10 @@ import useLocalStorageState from "../../../../../../customHooks/uselocalStorageS
 const TrafficLightDashboard = ({
   id,
   vendor,
-  markerData,
+  infoData,
   isInModal = false,
   onClose,
+  t,
 }) => {
   const role = atob(localStorage.getItem("its_user_role"));
   const [showConfig, setShowConfig] = useState(false);
@@ -151,19 +152,12 @@ const TrafficLightDashboard = ({
       };
     }
   }, [id, incomingConfig]);
-  const info = {
-    name: markerData?.cname,
-    crossroad_id: "12345",
-    IP: "192.168.1.1",
-    status: "Active",
-    traffic_volume: "High",
-  };
 
   // Remove the interval-based useEffect
   return (
     <div className={` no-scrollbar relative h-full flex items-center justify-`}>
       {wsConnectionStatus !== "connected" && incomingConfig && (
-        <div className="absolute top-4 right-4 px-4 py-2 rounded-md text-white bg-red-500">
+        <div className="absolute bottom-4 right-4 px-4 py-2 rounded-md text-white bg-red-500">
           {wsConnectionStatus === "disconnected"
             ? "Disconnected - Reconnecting..."
             : "Connection Error"}
@@ -200,7 +194,7 @@ const TrafficLightDashboard = ({
       {(showConfig || incomingConfig) && (
         <Intersection
           id={id}
-          // isInModal={false}
+          isInModal={isInModal}
           config={config}
           trafficLights={trafficLights}
           crosswalks={crosswalks}
@@ -209,7 +203,9 @@ const TrafficLightDashboard = ({
         />
       )}
       <InfoBarTrafficDash
-        info={info}
+        t={t}
+        info={infoData}
+        vendor={vendor}
         phase={phases}
         config={config}
         onClose={onClose}

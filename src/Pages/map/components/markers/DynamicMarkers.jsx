@@ -21,6 +21,7 @@ const DynamicMarkers = ({
   handleBoxModalOpen,
   handleLightsModalOpen,
   handleMarkerDragEnd,
+  t,
 }) => {
   const clusterRef = useRef(null);
   const markers = useSelector((state) => state.map.markers); // Assuming markers are stored in state.map.markers
@@ -67,6 +68,7 @@ const DynamicMarkers = ({
 
       return (
         <CustomMarker
+          t={t}
           key={i}
           marker={marker}
           L={L}

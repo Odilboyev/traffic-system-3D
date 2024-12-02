@@ -204,6 +204,7 @@ const MapComponent = ({ changedMarker, t }) => {
           />
         ) : ( */}
         <DynamicMarkers
+          t={t}
           usePieChartForClusteredMarkers={
             useClusteredMarkers === "clustered_dynamically"
           }
@@ -226,6 +227,7 @@ const MapComponent = ({ changedMarker, t }) => {
       </MapContainer>
 
       <MapModals
+        t={t}
         // crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}
         isBoxLoading={isBoxLoading}
         deviceModal={{ isOpen: isBoxModalOpen, device: activeBox }}

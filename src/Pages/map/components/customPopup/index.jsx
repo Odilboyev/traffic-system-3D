@@ -143,6 +143,9 @@ const CameraDetails = memo(
                 ))}
 
                 <p className="my-0">{marker?.cname}</p>
+                {marker.statuserror === 2 && (
+                  <p className=" text-center text-red-500">{t("offline")}</p>
+                )}
               </>
             ) : (
               <>

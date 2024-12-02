@@ -7,19 +7,10 @@ import { MdFlag } from "react-icons/md";
 import SelectField from "../../../../../../../components/SelectField";
 import { crossroadHandler } from "../utils";
 import { t } from "i18next";
+import { trafficLightVendors } from "../../../../../constants/trafficLights";
 
 // TrafficLightsFields-specific fields
 const TrafficLightsFields = ({ formData, handleInputChange }) => {
-  const [vendors, setVendors] = useState([
-    {
-      id: 1,
-      name: "HIKVISION",
-    },
-    {
-      id: 2,
-      name: "FAMA",
-    },
-  ]);
   const [selectedVendor, setSelectedVendor] = useState(
     formData.vendor_id || null
   );
@@ -70,18 +61,17 @@ const TrafficLightsFields = ({ formData, handleInputChange }) => {
         ))}
       </div>
       <div className="flex flex-col gap-3 w-2/3">
-        {vendors && (
-          <SelectField
-            icon={MdFlag}
-            label={t("vendor")}
-            options={vendors}
-            value={vendors.find((item) => item.id == selectedVendor)}
-            getOptionLabel={(option) => option.name || ""}
-            getOptionValue={(option) => option.id}
-            onChange={handleVendorChange}
-            zIndex={6000}
-          />
-        )}
+        <SelectField
+          icon={MdFlag}
+          label={t("vendor")}
+          options={trafficLightVendors}
+          value={trafficLightVendors.find((item) => item.id == selectedVendor)}
+          getOptionLabel={(option) => option.name || ""}
+          getOptionValue={(option) => option.id}
+          onChange={handleVendorChange}
+          zIndex={6000}
+        />
+
         {crossroads != null && selectedCrossroad != null && (
           <SelectField
             icon={MdFlag}

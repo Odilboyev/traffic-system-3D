@@ -12,6 +12,7 @@ const Intersection = ({
   crosswalks,
   seconds = {},
   crosswalkSeconds = {},
+  isInModal,
 }) => {
   const getMaxRoadWidth = () => {
     return (
@@ -132,7 +133,9 @@ const Intersection = ({
 
   return (
     <div
-      className={`relative no-scrollbar w-3/4 ml-0 left-0 h-full flex items-center justify-center overflow-hidden`}
+      className={`relative no-scrollbar ${
+        isInModal ? "w-full" : "w-3/4"
+      }  ml-0 left-0 h-full flex items-center justify-center overflow-hidden`}
       style={{
         transform: `rotate(${config.angle}deg)`,
       }}

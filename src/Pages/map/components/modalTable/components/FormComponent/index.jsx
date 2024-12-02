@@ -49,8 +49,13 @@ const FormComponent = ({
   };
   // Validate form data
   const validateFormData = () => {
-    for (const [key, value] of Object.entries(formData)) {
-      console.log(value, "valid");
+    const initialData = getInitialData(type); // Get the initial data for the current type
+    const relevantKeys = Object.keys(initialData); // Get the keys of the initial data
+
+    // Loop through the relevant keys and check if any of them are empty
+    for (const key of relevantKeys) {
+      const value = formData[key];
+
       if (!value || (value + "").trim() === "") {
         toast.error(`${key.replace(/_/g, " ")} is required`, {
           position: "top-right",
@@ -65,6 +70,7 @@ const FormComponent = ({
         return false;
       }
     }
+
     return true;
   };
 

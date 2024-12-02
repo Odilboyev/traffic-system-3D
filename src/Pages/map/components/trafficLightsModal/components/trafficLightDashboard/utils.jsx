@@ -116,9 +116,11 @@ export const defaultConfig = {
     lanesLeft: [[], [], [], []],
     cross_walkLeft: {
       channel_id: 12,
+      exists: true,
     },
     cross_walkRight: {
       channel_id: 12,
+      exists: true,
     },
     lanesRight: [
       {
@@ -153,9 +155,11 @@ export const defaultConfig = {
     lanesLeft: [{}, {}, {}, {}],
     cross_walkLeft: {
       channel_id: 3,
+      exists: true,
     },
     cross_walkRight: {
       channel_id: 3,
+      exists: true,
     },
     lanesRight: [
       {
@@ -191,9 +195,11 @@ export const defaultConfig = {
     lanesLeft: [{}, {}, {}, {}],
     cross_walkLeft: {
       channel_id: 8,
+      exists: true,
     },
     cross_walkRight: {
       channel_id: 8,
+      exists: true,
     },
     lanesRight: [
       {
@@ -216,9 +222,11 @@ export const defaultConfig = {
     lanesLeft: [[], [], [], []],
     cross_walkLeft: {
       channel_id: 4,
+      exists: true,
     },
     cross_walkRight: {
       channel_id: 4,
+      exists: true,
     },
     lanesRight: [
       {

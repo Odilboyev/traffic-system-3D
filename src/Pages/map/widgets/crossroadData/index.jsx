@@ -61,6 +61,9 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
   };
 
   const handleOpenModal = (section) => {
+    if (data?.length === 0) {
+      return;
+    }
     setSelectedSection(section);
     setOpenModal(true);
   };

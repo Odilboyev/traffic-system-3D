@@ -8,6 +8,7 @@ const MapModals = ({
   isLightsLoading,
   trafficLightsModal,
   onClose,
+  t,
 }) => {
   return (
     <>
@@ -23,6 +24,7 @@ const MapModals = ({
         onClose={onClose.device}
       />
       <TrafficLightsModal
+        t={t}
         isOpen={trafficLightsModal.isOpen}
         light={trafficLightsModal.light}
         isLoading={isLightsLoading}

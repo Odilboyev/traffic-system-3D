@@ -9,6 +9,7 @@ import { debounce } from "lodash";
 import { getCameraDetails } from "../../../../../api/api.handlers";
 
 const CustomMarker = memo(function CustomMarker({
+  t,
   marker,
   L,
   isDraggable,
@@ -88,7 +89,7 @@ const CustomMarker = memo(function CustomMarker({
       })}
       rotatedAngle={marker.type === 3 ? marker.rotated : 0}
     >
-      {isCamera(marker.type) ? (
+      {isCamera(marker.type) && marker.statuserror !== 2 ? (
         !isLoading &&
         // showPopup &&
         cameraData && (
@@ -102,6 +103,11 @@ const CustomMarker = memo(function CustomMarker({
       ) : (
         <Tooltip direction="top" className="rounded-md">
           <Typography className="my-0">{marker?.cname}</Typography>
+          {marker.statuserror === 2 && (
+            <Typography className="my-0 text-center text-red-500">
+              {t("offline")}
+            </Typography>
+          )}
         </Tooltip>
       )}
     </Marker>
