@@ -1,6 +1,8 @@
 import baseLayers, { layerSave } from "../configurations/mapLayers";
 import { createContext, useEffect, useState } from "react";
 
+import useLocalStorageState from "../customHooks/uselocalStorageState";
+
 export const ThemeContext = createContext();
 
 export const MyThemeProvider = ({ children }) => {
@@ -8,6 +10,27 @@ export const MyThemeProvider = ({ children }) => {
   const [currentLayer, setCurrentLayer] = useState(
     localStorage.getItem("selectedLayer") || baseLayers[0].name
   );
+  const [showTrafficJam, setShowTrafficJam] = useLocalStorageState(
+    "trafficJamEnabled",
+    false
+  );
+  const toggleTrafficJam = () => {
+    if (showTrafficJam) {
+      // Turning off traffic jam
+      setShowTrafficJam(false);
+      // Restore previous theme-appropriate layer
+     
+    } else {
+      // Turning on traffic jam
+      setShowTrafficJam(true);
+      // Switch to appropriate Yandex layer based on theme
+      if (theme === "dark") {
+        handleLayerChange("Yandex Dark");
+      } else {
+        handleLayerChange("Yandex");
+      }
+    }
+  };
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
@@ -21,6 +44,10 @@ export const MyThemeProvider = ({ children }) => {
   const handleLayerChange = (layerName) => {
     layerSave(layerName);
     setCurrentLayer(layerName);
+    // Only update traffic jam state if explicitly changing away from Yandex layers
+    if (!layerName.includes("Yandex")) {
+      setShowTrafficJam(false);
+    }
   };
   useEffect(() => {
     if (theme === "dark") {
@@ -40,7 +67,15 @@ export const MyThemeProvider = ({ children }) => {
 
   return (
     <ThemeContext.Provider
-      value={{ theme, toggleTheme, currentLayer, setCurrentLayer }}
+      value={{
+        theme,
+        toggleTheme,
+        currentLayer,
+        setCurrentLayer,
+        showTrafficJam,
+        setShowTrafficJam,
+        toggleTrafficJam,
+      }}
     >
       <div className={theme === "dark" ? "dark" : ""}>{children}</div>
     </ThemeContext.Provider>

@@ -2,13 +2,16 @@ import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
 } from "@heroicons/react/16/solid";
-import { FaFilter, FaLocationDot, FaMap } from "react-icons/fa6";
-import { IoIosArrowBack, IoIosArrowForward, IoMdSunny } from "react-icons/io";
+import { Checkbox, Typography } from "@material-tailwind/react";
+import { FaCar, FaFilter, FaLocationDot, FaMap, FaRoad, FaRoadLock } from "react-icons/fa6";
+import { IoIosArrowBack, IoIosArrowForward, IoMdCar, IoMdSunny } from "react-icons/io";
 import {
   MdBedtime,
   MdBubbleChart,
   MdHistory,
   MdOutlineLanguage,
+  MdOutlineTraffic,
+  MdTraffic,
   MdWidgets,
 } from "react-icons/md";
 import { TbBell, TbServerCog } from "react-icons/tb";
@@ -19,6 +22,7 @@ import CurrentAlarms from "../../sections/currentAlarms";
 import DateTime from "./components/time";
 import DeviceErrorHistory from "../../sections/deviceErrorHistory";
 import DeviceManagement from "../../sections/deviceManagement";
+import { FaCarCrash } from "react-icons/fa";
 import FilterControl from "../controls/filterControl";
 import { HiCog6Tooth } from "react-icons/hi2";
 import InfoWidget from "../../widgets/infoWidget";
@@ -50,7 +54,7 @@ const Sidebar = ({
   handleCloseCrossroadModal,
 }) => {
   const map = useMap();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, currentLayer, showTrafficJam, toggleTrafficJam } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useLocalStorageState(
     "is_sidebar_open_its",
     false
@@ -130,6 +134,7 @@ const Sidebar = ({
           )}
           {/* Sidebar items */}
           <div className="flex flex-col items-center space-y-2 w-full">
+
             <SidebarItem
               icon={<FaFilter className="w-4 h-4" />}
               label={"markerFilters"}
@@ -276,6 +281,10 @@ const Sidebar = ({
               <SidebarSecondaryItem
                 onClick={toggleFullSceen}
                 icon={fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
+              />
+               <SidebarSecondaryItem
+                onClick={toggleTrafficJam}
+                icon={FaCar}
               />
             </>
           )}

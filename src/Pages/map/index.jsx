@@ -1,9 +1,11 @@
 import { MapContainer, TileLayer } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
+import { CRS } from 'leaflet';
 import Control from "../../components/customControl/index.jsx";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
+import L from "leaflet";
 import MapEvents from "./components/MapEvents/index.jsx";
 import MapModals from "./components/MapModals/index.jsx";
 import PropTypes from "prop-types";
@@ -13,12 +15,38 @@ import TrafficLightContainer from "./components/trafficLightMarkers/managementLi
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import { safeParseJSON } from "../../redux/utils.js";
+import { useMap } from 'react-leaflet';
 import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../customHooks/useTheme.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
+
+const MapCRSHandler = ({ currentLayer }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (map) {
+      // Store current view state
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      
+      // Update CRS
+      map.options.crs = currentLayer.includes("Yandex") ? L.CRS.EPSG3395 : L.CRS.EPSG3857;
+      
+      // Force a re-render of the map
+      map.invalidateSize();
+      
+      // Reset view with new CRS
+      setTimeout(() => {
+        map.setView(center, zoom, { animate: false });
+      }, 100);
+    }
+  }, [currentLayer, map]);
+  
+  return null;
+};
 
 const MapComponent = ({ changedMarker, t }) => {
   const {
@@ -38,7 +66,7 @@ const MapComponent = ({ changedMarker, t }) => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   //theme
-  const { theme, currentLayer } = useTheme();
+  const { theme, currentLayer, showTrafficJam,  } = useTheme();
 
   // const
   const center = safeParseJSON("its_currentLocation", home);
@@ -60,12 +88,29 @@ const MapComponent = ({ changedMarker, t }) => {
   const [isLightsLoading, setIsLightsLoading] = useState(false);
   const [activeLight, setActiveLight] = useState(null);
 
+  const mapRef = useRef(null);
+
   const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
 
   useEffect(() => {
     getDataHandler();
     fetchAlarmsData();
   }, []);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      const map = mapRef.current;
+      if (currentLayer==="Yandex") {
+        map.options.crs = L.CRS.EPSG3395;
+      } else {
+        map.options.crs = L.CRS.EPSG3857;
+      }
+      map.invalidateSize();
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      map.setView(center, zoom, { animate: false });
+    }
+  }, [currentLayer]);
 
   const handleMarkerDragEnd = (id, type, event) => {
     const { lat, lng } = event.target.getLatLng();
@@ -130,10 +175,22 @@ const MapComponent = ({ changedMarker, t }) => {
     setActiveLight(null);
     setIsLightsLoading(false);
   };
+
+  const [trafficTimestamp, setTrafficTimestamp] = useState(Math.floor(Date.now() / 60000) * 60);
+  useEffect(() => {
+    if (showTrafficJam) {
+      const interval = setInterval(() => {
+        setTrafficTimestamp(Math.floor(Date.now() / 60000) * 60);
+      }, 60000); // Update every minute
+      
+      return () => clearInterval(interval);
+    }
+  }, [showTrafficJam]);
   return (
     <>
       <MapContainer
-        // ref={map}
+        ref={mapRef}
+        key={currentLayer}
         id="monitoring"
         attributionControl={false}
         center={center}
@@ -143,6 +200,7 @@ const MapComponent = ({ changedMarker, t }) => {
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
       >
+        <MapCRSHandler currentLayer={currentLayer} />
         <Sidebar
           t={t}
           // mapRef={map}
@@ -171,6 +229,15 @@ const MapComponent = ({ changedMarker, t }) => {
             maxZoom={20}
           />
         )}
+       {showTrafficJam && (
+  <>
+    <TileLayer
+     url={`https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`} maxNativeZoom={19}
+      tileSize={256}
+      zoomOffset={0}
+    />
+  </>
+)}
         {/* zoomcontrol */}{" "}
         <ZoomControl theme={theme} position={"bottomright"} />{" "}
         <Control position="bottomright">

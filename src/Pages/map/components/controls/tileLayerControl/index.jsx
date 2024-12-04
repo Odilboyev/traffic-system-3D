@@ -7,11 +7,10 @@ import { useTheme } from "../../../../../customHooks/useTheme";
 const TileLayerControl = ({ t }) => {
   const { theme, setCurrentLayer } = useTheme();
 
-  //layers
-
   const [selectedLayer, setSelectedLayer] = useState(
     localStorage.getItem("selectedLayer") || baseLayers[0].name
   );
+
   const filteredLayers =
     theme === "dark"
       ? baseLayers.filter((layer) => layer.name.includes("Dark"))
@@ -30,6 +29,7 @@ const TileLayerControl = ({ t }) => {
       !selectedLayer.includes("Transport") && handleLayerChange("Transport");
     }
   }, [theme]);
+
   return (
     <div className="flex flex-col min-w-[10vw]">
       {filteredLayers.map((layer) => (
