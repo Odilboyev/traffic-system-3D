@@ -28,6 +28,10 @@ const MapEvents = ({ changedMarker, setZoom }) => {
         "its_currentLocation",
         JSON.stringify([[41.2995, 69.2401]])
       );
+
+    const zoom = map.getZoom();
+    localStorage.setItem("its_currentZoom", zoom);
+    setZoom(zoom);
   });
   // Handle map movement and zoom events
   useMapEvents({

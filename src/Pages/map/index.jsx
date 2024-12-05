@@ -25,26 +25,26 @@ const home = [41.2995, 69.2401]; // Tashkent
 
 const MapCRSHandler = ({ currentLayer }) => {
   const map = useMap();
-  
+
   useEffect(() => {
     if (map) {
       // Store current view state
       const center = map.getCenter();
       const zoom = map.getZoom();
-      
+
       // Update CRS
       map.options.crs = currentLayer.includes("Yandex") ? L.CRS.EPSG3395 : L.CRS.EPSG3857;
-      
+
       // Force a re-render of the map
       map.invalidateSize();
-      
+
       // Reset view with new CRS
       setTimeout(() => {
         map.setView(center, zoom, { animate: false });
       }, 100);
     }
   }, [currentLayer, map]);
-  
+
   return null;
 };
 
@@ -66,7 +66,7 @@ const MapComponent = ({ changedMarker, t }) => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   //theme
-  const { theme, currentLayer, showTrafficJam,  } = useTheme();
+  const { theme, currentLayer, showTrafficJam, } = useTheme();
 
   // const
   const center = safeParseJSON("its_currentLocation", home);
@@ -100,7 +100,7 @@ const MapComponent = ({ changedMarker, t }) => {
   useEffect(() => {
     if (mapRef.current) {
       const map = mapRef.current;
-      if (currentLayer==="Yandex") {
+      if (currentLayer === "Yandex") {
         map.options.crs = L.CRS.EPSG3395;
       } else {
         map.options.crs = L.CRS.EPSG3857;
@@ -182,7 +182,7 @@ const MapComponent = ({ changedMarker, t }) => {
       const interval = setInterval(() => {
         setTrafficTimestamp(Math.floor(Date.now() / 60000) * 60);
       }, 60000); // Update every minute
-      
+
       return () => clearInterval(interval);
     }
   }, [showTrafficJam]);
@@ -199,6 +199,7 @@ const MapComponent = ({ changedMarker, t }) => {
         doubleClickZoom={false}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
+        maxZoom={showTrafficJam ? 18 : 22}
       >
         <MapCRSHandler currentLayer={currentLayer} />
         <Sidebar
@@ -218,7 +219,6 @@ const MapComponent = ({ changedMarker, t }) => {
           setMarkers={setMarkers}
           changedMarker={changedMarker}
           fetchAlarmsData={fetchAlarmsData}
-          // setZoom={setZoom}
         />
         {currentLayerDetails && (
           <TileLayer
@@ -226,18 +226,19 @@ const MapComponent = ({ changedMarker, t }) => {
             url={currentLayerDetails.url}
             attribution={currentLayerDetails.attribution}
             key={currentLayerDetails.name}
-            maxZoom={20}
+            maxZoom={22}
           />
         )}
-       {showTrafficJam && (
-  <>
-    <TileLayer
-     url={`https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`} maxNativeZoom={19}
-      tileSize={256}
-      zoomOffset={0}
-    />
-  </>
-)}
+        {showTrafficJam && (
+          <>
+            <TileLayer
+              url={`https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`} 
+              tileSize={256}
+              zoomOffset={0}
+              maxZoom={18} 
+            />
+          </>
+        )}
         {/* zoomcontrol */}{" "}
         <ZoomControl theme={theme} position={"bottomright"} />{" "}
         <Control position="bottomright">
@@ -246,30 +247,7 @@ const MapComponent = ({ changedMarker, t }) => {
           </div>
         </Control>
         {filter.trafficlights && <TrafficLightContainer />}
-        {/* <Control position="bottomcenter"> */}
-        {/* </Control> */}
-        {/* 
-        {useClusteredMarkers === "clustered" ||
-        useClusteredMarkers === "clustered_dynamically" ? (
-          <ClusteredMarkers
-            usePieChartForClusteredMarkers={
-              useClusteredMarkers === "clustered_dynamically"
-            }
-            key={useClusteredMarkers}
-            handleMonitorCrossroad={handleMonitorCrossroadOpen}
-            handleBoxModalOpen={handleBoxModalOpen}
-            handleLightsModalOpen={handleLightsModalOpen}
-            handleMarkerDragEnd={handleMarkerDragEnd}
-            markers={markers}
-            filter={filter}
-            isDraggable={isDraggable}
-            setMarkers={setMarkers}
-            clearMarkers={clearMarkers}
-            updateMarkers={updateMarkers}
-            changedMarker={changedMarker}
-            L={L}
-          />
-        ) : ( */}
+        
         <DynamicMarkers
           t={t}
           usePieChartForClusteredMarkers={
