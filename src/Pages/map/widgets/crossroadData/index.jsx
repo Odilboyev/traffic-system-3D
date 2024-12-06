@@ -57,6 +57,8 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
 
   const handleClose = () => {
     setData(null);
+    setSelectedSection(null);
+    setDevice(null);
     onClose();
   };
 

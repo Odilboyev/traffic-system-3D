@@ -32,6 +32,8 @@ const CrossroadDataModal = ({
     section === "camera_traffic";
 
   const renderContent = () => {
+    if (!data || !section) return null;
+
     if (isLoading) {
       return (
         <div className="flex items-center justify-center h-64">
@@ -58,7 +60,15 @@ const CrossroadDataModal = ({
       case "svetofor":
         return (
           <div className="h-[80vh] relative">
-            <TrafficLightDashboard t={t} id={data?.svetofor.svetofor_id} infoData={{ vendor_id: data?.svetofor?.vendor_id, crossroad_name: marker?.cname }} isInModal />
+            <TrafficLightDashboard
+              t={t}
+              id={data?.svetofor.svetofor_id}
+              infoData={{
+                vendor_id: data?.svetofor?.vendor_id,
+                crossroad_name: marker?.cname,
+              }}
+              isInModal
+            />
           </div>
         );
       case "statistics":
@@ -87,11 +97,9 @@ const CrossroadDataModal = ({
           <XMarkIcon className="w-5 h-5" />
         </IconButton>
       </DialogHeader>
-      
+
       <DialogBody className="max-h-[80vh] overflow-y-auto custom-scrollbar">
-        <div className="p-4">
-          {renderContent()}
-        </div>
+        <div className="p-4">{renderContent()}</div>
       </DialogBody>
       <DialogFooter>{""}</DialogFooter>
     </Dialog>
