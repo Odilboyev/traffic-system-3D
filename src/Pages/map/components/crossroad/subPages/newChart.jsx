@@ -1,6 +1,15 @@
+import {
+  Tab,
+  TabPanel,
+  Tabs,
+  TabsBody,
+  TabsHeader,
+  Typography,
+} from "@material-tailwind/react";
+
 import Chart from "react-apexcharts";
-import { Typography } from "@material-tailwind/react";
 import { t } from "i18next";
+import { useState } from "react";
 
 // Function to get chart options
 // Function to get chart options with contrast colors
@@ -121,11 +130,13 @@ const AreaChart = ({ data, title, isDarkMode }) => (
 );
 
 // Main CrossroadStats Component
-const CrossroadStats = ({ crossroadStats }) => {
+const CrossroadStats = ({ crossroadStats, selectedDate, onDateChange }) => {
   const { all_direction_data, by_direction_data } = crossroadStats;
+  const [activeTab, setActiveTab] = useState("all");
 
   // Format series data for charts
   const formatChartDataByDate = (chartData) => {
+    if (!chartData) return [];
     return [
       {
         name: t("counts"),
@@ -138,19 +149,20 @@ const CrossroadStats = ({ crossroadStats }) => {
   };
 
   const formatChartByHourData = (chartData) => {
+    if (!chartData) return [];
     return [
       {
         name: t("today"),
         data: chartData.map((entry) => ({
           x: entry.hour,
-          y: Number(entry.count_today),
+          y: Number(entry.count_today || 0),
         })),
       },
       {
         name: t("yesterday"),
         data: chartData.map((entry) => ({
           x: entry.hour,
-          y: Number(entry.count_yesterday),
+          y: Number(entry.count_yesterday || 0),
         })),
       },
     ];
@@ -161,63 +173,107 @@ const CrossroadStats = ({ crossroadStats }) => {
 
   return (
     <>
-      {/* Counts for all */}
-      <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500 dark:bg-gray-700 text-white">
-        <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-600">
-          <p className="dark:text-gray-200">{t("yesterday")}</p>
-          <b>{all_direction_data.counts_for_all.count_all_yesterday[0]}</b>
-        </div>
-        <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center">
-          <p className="dark:text-gray-200">{t("today")}</p>
-          <b>{all_direction_data.counts_for_all.count_all_today[0]}</b>
-        </div>
-      </div>
-      <div className="flex w-full">
-        <BarChart
-          data={formatChartDataByDate(all_direction_data.chart_data_by_date)}
-          title={t("Traffic Counts by Date for Direction")}
-          isDarkMode={isDarkMode}
-        />
-        <AreaChart
-          data={formatChartByHourData(all_direction_data.chart_by_hour)}
-          title={t("Traffic Counts by Hour for Direction")}
-          isDarkMode={isDarkMode}
-        />
-      </div>
+      <Tabs value={activeTab} className="w-full">
+        <TabsHeader>
+          <Tab
+            key="all"
+            value="all"
+            onClick={() => setActiveTab("all")}
+            className="px-4 py-2 text-sm h-auto"
+          >
+            {t("all_directions")}
+          </Tab>
+          {by_direction_data?.map((direction) => (
+            <Tab
+              key={direction.direction_id}
+              value={direction.direction_id}
+              onClick={() => setActiveTab(direction.direction_id)}
+              className="px-4 py-2 text-sm h-auto"
+            >
+              {direction.direction_name}
+            </Tab>
+          ))}
+        </TabsHeader>
 
-      {/* Direction-specific charts */}
-      {by_direction_data.map((direction, index) => (
-        <div
-          key={index}
-          className="mb-6 border-b border-gray-200 dark:border-gray-600 dark:text-white"
-        >
-          <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500 dark:bg-gray-700 text-white">
-            <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-600">
-              <p className="dark:text-gray-200">{t("yesterday")}</p>
-              <b>{direction.counts_for_direction.count_direction_yesterday}</b>
+        <TabsBody>
+          <TabPanel key="all" value="all">
+            {/* Counts for all */}
+            <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500 dark:bg-gray-700 text-white">
+              <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-600">
+                <p className="dark:text-gray-200">{t("yesterday")}</p>
+                <b>
+                  {all_direction_data?.counts_for_all
+                    ?.count_all_yesterday?.[0] || 0}
+                </b>
+              </div>
+              <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center">
+                <p className="dark:text-gray-200">{t("today")}</p>
+                <b>
+                  {all_direction_data?.counts_for_all?.count_all_today?.[0] ||
+                    0}
+                </b>
+              </div>
             </div>
-            <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center">
-              <p className="dark:text-gray-200">{t("today")}</p>
-              <b>{direction.counts_for_direction.count_direction_today}</b>
+
+            {/* Charts for all directions */}
+            <div className="mt-4 space-y-4">
+              <div className="p-4 rounded-lg bg-white dark:bg-gray-800">
+                <Typography variant="h6" className="mb-2">
+                  {t("hourly_counts")}
+                </Typography>
+                <BarChart
+                  data={formatChartByHourData(
+                    all_direction_data?.chart_by_hour
+                  )}
+                  title={t("hourly_counts")}
+                  isDarkMode={isDarkMode}
+                />
+              </div>
             </div>
-          </div>
-          <Typography className="mt-6 font-bold text-left text-gray-800 dark:text-gray-200">
-            {index + 1}. {direction.direction_name}
-          </Typography>
-          <div className="flex">
-            <BarChart
-              data={formatChartDataByDate(direction.chart_data_by_date)}
-              title={t("Traffic Counts by Date for Direction")}
-              isDarkMode={isDarkMode}
-            />
-            <AreaChart
-              data={formatChartByHourData(direction.chart_by_hour)}
-              title={t("Traffic Counts by Hour for Direction")}
-              isDarkMode={isDarkMode}
-            />
-          </div>
-        </div>
-      ))}
+          </TabPanel>
+
+          {by_direction_data?.map((direction) => (
+            <TabPanel
+              key={direction.direction_id}
+              value={direction.direction_id}
+            >
+              {/* Direction specific counts */}
+              <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500 dark:bg-gray-700 text-white">
+                <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-600">
+                  <p className="dark:text-gray-200">{t("yesterday")}</p>
+                  <b>
+                    {direction?.counts_for_direction
+                      ?.count_direction_yesterday || 0}
+                  </b>
+                </div>
+                <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center">
+                  <p className="dark:text-gray-200">{t("today")}</p>
+                  <b>
+                    {direction?.counts_for_direction?.count_direction_today ||
+                      0}
+                  </b>
+                </div>
+              </div>
+
+              {/* Direction specific charts */}
+              <div className="mt-4 space-y-4">
+                <div className="p-4 rounded-lg bg-white dark:bg-gray-800">
+                  <Typography variant="h6" className="mb-2">
+                    {t("hourly_counts")} - {direction.direction_name}
+                  </Typography>
+                  <BarChart
+                    data={formatChartByHourData(direction?.chart_by_hour)}
+                    title={`${t("hourly_counts")} - ${
+                      direction.direction_name
+                    }`}
+                    isDarkMode={isDarkMode}
+                  />
+                </div>
+              </div>
+            </TabPanel>
+          ))}
+        </TabsBody>
+      </Tabs>
     </>
   );
 };

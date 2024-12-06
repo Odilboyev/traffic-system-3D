@@ -2,6 +2,7 @@ import * as XLSX from "xlsx";
 
 import {
   Button,
+  Input,
   Spinner,
   Tab,
   TabPanel,
@@ -30,7 +31,14 @@ const CrossroadDashboard = ({ marker }) => {
   const [currentMode, setCurrentMode] = useState("chart");
   const [tableData, setTableData] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
 
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+    fetchStatsForTable(newDate);
+  };
   const fetchStats = async () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
     try {
@@ -51,10 +59,10 @@ const CrossroadDashboard = ({ marker }) => {
     }
   };
 
-  const fetchStatsForTable = async () => {
+  const fetchStatsForTable = async (date = selectedDate) => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
     try {
-      const response = await getTrafficStatsData(marker?.cid);
+      const response = await getTrafficStatsData(marker?.cid, { date });
       setTableData(response);
       setState((prev) => ({ ...prev, isLoading: false }));
     } catch (error) {
@@ -66,7 +74,6 @@ const CrossroadDashboard = ({ marker }) => {
       }));
     }
   };
-
   const exportToExcel = () => {
     if (!tableData) return;
 
@@ -79,14 +86,19 @@ const CrossroadDashboard = ({ marker }) => {
     XLSX.utils.book_append_sheet(wb, summaryWs, "All Directions");
 
     // Add sheets for each direction
-    tableData.by_direction_data.forEach((direction) => {
+    tableData.by_direction_data.forEach((direction, index) => {
       const directionData = direction.data.slice(1); // Skip header row
       const ws = XLSX.utils.json_to_sheet(directionData);
-      XLSX.utils.book_append_sheet(
-        wb,
-        ws,
-        `Direction ${direction.direction_id}`
-      );
+
+      // Create a shortened sheet name
+      let sheetName = direction.direction_name;
+      if (sheetName.length > 28) {
+        // If name is too long, truncate it and add direction number
+        sheetName = `${sheetName.substring(0, 25)}...${index + 1}`;
+      }
+
+      // Ensure sheet name is unique and within length limit
+      XLSX.utils.book_append_sheet(wb, ws, sheetName.substring(0, 31));
     });
 
     // Save file
@@ -105,12 +117,39 @@ const CrossroadDashboard = ({ marker }) => {
 
   const { data, isLoading, error, lastUpdated } = state;
 
+  // Fetch stats for the selected date
+  useEffect(() => {
+    if (marker?.cid) {
+      if (currentMode === "chart") {
+        fetchStats();
+      } else {
+        fetchStatsForTable(selectedDate);
+      }
+    }
+  }, [marker?.cid, currentMode, selectedDate]);
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }).format(date);
+  };
+
+  const getPreviousDay = (date) => {
+    const prevDate = new Date(date);
+    prevDate.setDate(prevDate.getDate() - 1);
+    return prevDate.toISOString().split("T")[0];
+  };
+
   if (error) {
     return (
       <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
         <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
         <button
-          onClick={currentMode === "chart" ? fetchStats : fetchStatsForTable}
+          onClick={() => {
+            currentMode === "chart" ? fetchStats() : fetchStatsForTable();
+          }}
           className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
         >
           Try again
@@ -129,8 +168,8 @@ const CrossroadDashboard = ({ marker }) => {
 
   if (!data && !tableData) {
     return (
-      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
+      <div className="p-4  dark:bg-gray-800 rounded-lg">
+        <p className="text-gray-600 dark:text-white text-medium text-sm">
           No statistics available for this crossroad
         </p>
       </div>
@@ -140,7 +179,9 @@ const CrossroadDashboard = ({ marker }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Crossroad Statistics</h3>
+        <h3 className="text-lg dark:text-white text-medium font-semibold">
+          Crossroad Statistics
+        </h3>
         <div className="flex items-center gap-4">
           <Tabs value={currentMode} className="w-fit">
             <TabsHeader>
@@ -153,7 +194,7 @@ const CrossroadDashboard = ({ marker }) => {
               <Tab value="table" onClick={() => setCurrentMode("table")}>
                 <div className="flex items-center gap-2">
                   <FaTable />
-                  {t("Table")}
+                  {t("table")}
                 </div>
               </Tab>
             </TabsHeader>
@@ -165,17 +206,39 @@ const CrossroadDashboard = ({ marker }) => {
         <CrossroadStats crossroadStats={state.data} />
       ) : (
         <>
-          {currentMode === "table" && tableData && (
-            <Button
-              size="sm"
-              color="green"
-              variant="outlined"
-              className="flex items-center gap-2 mb-4"
-              onClick={exportToExcel}
-            >
-              {t("Export to Excel")}
-            </Button>
+          <div className="flex w-full justify-between items-center">
+            {currentMode === "table" && (
+              <div className="mb-4">
+                <Input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-1/3"
+                  labelProps={{
+                    className: "before:content-none after:content-none",
+                  }}
+                />
+              </div>
+            )}
+            {currentMode === "table" && tableData && (
+              <Button
+                size="sm"
+                color="green"
+                variant="outlined"
+                className="flex items-center gap-2 mb-4"
+                onClick={exportToExcel}
+              >
+                {t("Export to Excel")}
+              </Button>
+            )}
+          </div>
+
+          {isLoading && (
+            <div className="">
+              <Spinner className="h-4 w-4" />
+            </div>
           )}
+
           <div className="overflow-x-auto">
             {tableData && (
               <Tabs value={activeTab} className="w-full">
@@ -202,30 +265,66 @@ const CrossroadDashboard = ({ marker }) => {
                   ))}
                 </TabsHeader>
                 <TabsBody>
-                  <TabPanel key="all" value="all">
+                  <TabPanel key="all" value="all" className="overflow-x-auto">
                     <Typography variant="h6" className="mb-4">
-                      {t("All Directions Traffic")}
+                      {t("all_directions_traffic")}
                     </Typography>
-                    <table className="w-full min-w-max table-auto text-left">
+                    <table className="w-full min-w-max table-auto text-left dark:text-white text-medium">
                       <thead>
                         <tr>
-                          <th className="border-b border-gray-200 bg-gray-50 p-4">
+                          <th className="border-b border-gray-200  p-4">
                             {t("time_period")}
                           </th>
-                          <th className="border-b border-gray-200 bg-gray-50 p-4">
+                          <th className="border-b border-gray-200  p-4">
                             {t("small_cars")}
                           </th>
-                          <th className="border-b border-gray-200 bg-gray-50 p-4">
+                          <th className="border-b border-gray-200  p-4">
                             {t("medium_cars")}
                           </th>
-                          <th className="border-b border-gray-200 bg-gray-50 p-4">
+                          <th className="border-b border-gray-200  p-4">
                             {t("large_cars")}
                           </th>
-                          <th className="border-b border-gray-200 bg-gray-50 p-4">
-                            {t("today")}
+                          <th className="border-b border-gray-200  p-4">
+                            {formatDate(selectedDate)}
                           </th>
-                          <th className="border-b border-gray-200 bg-gray-50 p-4">
-                            {t("yesterday")}
+                          <th className="border-b border-gray-200  p-4">
+                            {formatDate(getPreviousDay(selectedDate))}
+                          </th>
+                          <th className="border-b border-gray-200  p-4">
+                            {formatDate(
+                              tableData.all_direction_data[0]
+                                .count_yesterday_2_all
+                            )}
+                          </th>
+                          <th className="border-b border-gray-200  p-4">
+                            {formatDate(
+                              tableData.all_direction_data[0]
+                                .count_yesterday_3_all
+                            )}
+                          </th>
+                          <th className="border-b border-gray-200  p-4">
+                            {formatDate(
+                              tableData.all_direction_data[0]
+                                .count_yesterday_4_all
+                            )}
+                          </th>
+                          <th className="border-b border-gray-200  p-4">
+                            {formatDate(
+                              tableData.all_direction_data[0]
+                                .count_yesterday_5_all
+                            )}
+                          </th>
+                          <th className="border-b border-gray-200  p-4">
+                            {formatDate(
+                              tableData.all_direction_data[0]
+                                .count_yesterday_6_all
+                            )}
+                          </th>
+                          <th className="border-b border-gray-200  p-4">
+                            {formatDate(
+                              tableData.all_direction_data[0]
+                                .count_yesterday_7_all
+                            )}
                           </th>
                         </tr>
                       </thead>
@@ -243,6 +342,24 @@ const CrossroadDashboard = ({ marker }) => {
                               <td className="p-4">{row.count_carbig}</td>
                               <td className="p-4">{row.count_today_all}</td>
                               <td className="p-4">{row.count_yesterday_all}</td>
+                              <td className="p-4">
+                                {row.count_yesterday_2_all}
+                              </td>
+                              <td className="p-4">
+                                {row.count_yesterday_3_all}
+                              </td>
+                              <td className="p-4">
+                                {row.count_yesterday_4_all}
+                              </td>
+                              <td className="p-4">
+                                {row.count_yesterday_5_all}
+                              </td>
+                              <td className="p-4">
+                                {row.count_yesterday_6_all}
+                              </td>
+                              <td className="p-4">
+                                {row.count_yesterday_7_all}
+                              </td>
                             </tr>
                           ))}
                       </tbody>
@@ -253,30 +370,62 @@ const CrossroadDashboard = ({ marker }) => {
                     <TabPanel
                       key={direction.direction_id}
                       value={direction.direction_id.toString()}
+                      className="overflow-x-scroll"
                     >
                       <Typography variant="h6" className="mb-4">
                         {direction.direction_name}
                       </Typography>
-                      <table className="w-full min-w-max table-auto text-left">
+                      <table className="w-full min-w-max table-auto text-left dark:text-white text-medium">
                         <thead>
                           <tr>
-                            <th className="border-b border-gray-200 bg-gray-50 p-4">
+                            <th className="border-b border-gray-200  p-4">
                               {t("time_period")}
                             </th>
-                            <th className="border-b border-gray-200 bg-gray-50 p-4">
+                            <th className="border-b border-gray-200  p-4">
                               {t("small_cars")}
                             </th>
-                            <th className="border-b border-gray-200 bg-gray-50 p-4">
+                            <th className="border-b border-gray-200  p-4">
                               {t("medium_cars")}
                             </th>
-                            <th className="border-b border-gray-200 bg-gray-50 p-4">
+                            <th className="border-b border-gray-200  p-4">
                               {t("large_cars")}
                             </th>
-                            <th className="border-b border-gray-200 bg-gray-50 p-4">
-                              {t("today")}
+                            <th className="border-b border-gray-200  p-4">
+                              {formatDate(selectedDate)}
                             </th>
-                            <th className="border-b border-gray-200 bg-gray-50 p-4">
-                              {t("yesterday")}
+                            <th className="border-b border-gray-200  p-4">
+                              {formatDate(getPreviousDay(selectedDate))}
+                            </th>
+
+                            <th className="border-b border-gray-200  p-4">
+                              {formatDate(
+                                direction.data[0].count_yesterday_2_all
+                              )}
+                            </th>
+                            <th className="border-b border-gray-200  p-4">
+                              {formatDate(
+                                direction.data[0].count_yesterday_3_all
+                              )}
+                            </th>
+                            <th className="border-b border-gray-200  p-4">
+                              {formatDate(
+                                direction.data[0].count_yesterday_4_all
+                              )}
+                            </th>
+                            <th className="border-b border-gray-200  p-4">
+                              {formatDate(
+                                direction.data[0].count_yesterday_5_all
+                              )}
+                            </th>
+                            <th className="border-b border-gray-200  p-4">
+                              {formatDate(
+                                direction.data[0].count_yesterday_6_all
+                              )}
+                            </th>
+                            <th className="border-b border-gray-200  p-4">
+                              {formatDate(
+                                direction.data[0].count_yesterday_7_all
+                              )}
                             </th>
                           </tr>
                         </thead>
@@ -284,14 +433,44 @@ const CrossroadDashboard = ({ marker }) => {
                           {direction.data.slice(1).map((row, index) => (
                             <tr
                               key={index}
-                              className="border-b border-gray-200"
+                              className="border-b border-gray-200 "
                             >
-                              <td className="p-4">{`${row.hour_start} - ${row.hour_end}`}</td>
-                              <td className="p-4">{row.count_carsmall}</td>
-                              <td className="p-4">{row.count_carmid}</td>
-                              <td className="p-4">{row.count_carbig}</td>
-                              <td className="p-4">{row.count_today_all}</td>
-                              <td className="p-4">{row.count_yesterday_all}</td>
+                              <td className="p-4 dark:text-white text-medium">{`${row.hour_start} - ${row.hour_end}`}</td>
+                              <td className="p-4 dark:text-white text-medium">
+                                <p className="dark:text-white text-medium">
+                                  {row.count_carsmall}
+                                </p>
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_carmid}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_carbig}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_today_all}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_yesterday_all}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_yesterday_2_all}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_yesterday_3_all}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_yesterday_4_all}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_yesterday_5_all}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_yesterday_6_all}
+                              </td>
+                              <td className="p-4 dark:text-white text-medium">
+                                {row.count_yesterday_7_all}
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -303,12 +482,6 @@ const CrossroadDashboard = ({ marker }) => {
             )}
           </div>
         </>
-      )}
-
-      {isLoading && (
-        <div className="absolute top-2 right-2">
-          <Spinner className="h-4 w-4" />
-        </div>
       )}
     </div>
   );
