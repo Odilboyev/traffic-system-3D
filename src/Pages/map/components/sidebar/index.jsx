@@ -3,8 +3,20 @@ import {
   ArrowsPointingOutIcon,
 } from "@heroicons/react/16/solid";
 import { Checkbox, Typography } from "@material-tailwind/react";
-import { FaCar, FaFilter, FaLocationDot, FaMap, FaRoad, FaRoadLock } from "react-icons/fa6";
-import { IoIosArrowBack, IoIosArrowForward, IoMdCar, IoMdSunny } from "react-icons/io";
+import {
+  FaCar,
+  FaFilter,
+  FaLocationDot,
+  FaMap,
+  FaRoad,
+  FaRoadLock,
+} from "react-icons/fa6";
+import {
+  IoIosArrowBack,
+  IoIosArrowForward,
+  IoMdCar,
+  IoMdSunny,
+} from "react-icons/io";
 import {
   MdBedtime,
   MdBubbleChart,
@@ -54,7 +66,8 @@ const Sidebar = ({
   handleCloseCrossroadModal,
 }) => {
   const map = useMap();
-  const { theme, toggleTheme, currentLayer, showTrafficJam, toggleTrafficJam } = useTheme();
+  const { theme, toggleTheme, currentLayer, showTrafficJam, toggleTrafficJam } =
+    useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useLocalStorageState(
     "is_sidebar_open_its",
     false
@@ -99,7 +112,7 @@ const Sidebar = ({
         onPointerLeave={() => map.scrollWheelZoom.enable()}
         className={` ${
           isVisible ? "fixed" : "none"
-        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-xl  shadow-lg flex flex-col ${
+        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-2xl  shadow-lg flex flex-col ${
           isSidebarOpen ? "w-[15vw]" : "w-18"
         } transition-all duration-300 ease-in-out select-none`}
       >
@@ -134,7 +147,6 @@ const Sidebar = ({
           )}
           {/* Sidebar items */}
           <div className="flex flex-col items-center space-y-2 w-full">
-
             <SidebarItem
               icon={<FaFilter className="w-4 h-4" />}
               label={"markerFilters"}
@@ -282,10 +294,7 @@ const Sidebar = ({
                 onClick={toggleFullSceen}
                 icon={fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
               />
-               <SidebarSecondaryItem
-                onClick={toggleTrafficJam}
-                icon={FaCar}
-              />
+              <SidebarSecondaryItem onClick={toggleTrafficJam} icon={FaCar} />
             </>
           )}
         </div>

@@ -85,6 +85,9 @@ const modifyPTZCamera = async (data) =>
   putData(import.meta.env.VITE_OVERVIEW_CAMERA + "/ptz_control", data);
 const modifySvetofor = async (data, id) =>
   postData(import.meta.env.VITE_TRAFFIC_LIGHTS_UPDATE + "/" + id, data);
+const getTrafficStatsData = async (id) =>
+  getData(import.meta.env.VITE_TRAFFIC_STATS + "/" + id);
+
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -216,6 +219,7 @@ export {
   getTrafficLightsData,
   getUserRoles,
   getWeatherData,
+  getTrafficStatsData,
   listUsers,
   markerHandler,
   recoverUser,

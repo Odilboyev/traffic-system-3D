@@ -1,5 +1,5 @@
-import { Typography } from "@material-tailwind/react";
 import Chart from "react-apexcharts";
+import { Typography } from "@material-tailwind/react";
 import { t } from "i18next";
 
 // Function to get chart options
