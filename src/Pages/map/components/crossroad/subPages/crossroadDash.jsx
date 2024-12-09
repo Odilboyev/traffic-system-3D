@@ -180,7 +180,7 @@ const CrossroadDashboard = ({ marker }) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg dark:text-white text-medium font-semibold">
-          Crossroad Statistics
+          {t("traffic_dashboard")}
         </h3>
         <div className="flex items-center gap-4">
           <Tabs value={currentMode} className="w-fit">
@@ -211,9 +211,10 @@ const CrossroadDashboard = ({ marker }) => {
               <div className="mb-4">
                 <Input
                   type="date"
+                  color="white"
                   value={selectedDate}
                   onChange={(e) => handleDateChange(e.target.value)}
-                  className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-1/3"
+                  className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-1/3"
                   labelProps={{
                     className: "before:content-none after:content-none",
                   }}
@@ -264,15 +265,19 @@ const CrossroadDashboard = ({ marker }) => {
                     </Tab>
                   ))}
                 </TabsHeader>
-                <TabsBody>
-                  <TabPanel key="all" value="all" className="overflow-x-auto">
+                <TabsBody className="p-0">
+                  <TabPanel
+                    key="all"
+                    value="all"
+                    className="overflow-x-auto px-0 py-5"
+                  >
                     <Typography variant="h6" className="mb-4">
                       {t("all_directions_traffic")}
                     </Typography>
                     <table className="w-full min-w-max table-auto text-left dark:text-white text-medium">
                       <thead>
                         <tr>
-                          <th className="border-b border-gray-200  p-4">
+                          <th className="border-b rounded-tl-lg  border-gray-200  p-4">
                             {t("time_period")}
                           </th>
                           <th className="border-b border-gray-200  p-4">
@@ -320,7 +325,7 @@ const CrossroadDashboard = ({ marker }) => {
                                 .count_yesterday_6_all
                             )}
                           </th>
-                          <th className="border-b border-gray-200  p-4">
+                          <th className="border-b rounded-tr-lg  border-gray-200  p-4">
                             {formatDate(
                               tableData.all_direction_data[0]
                                 .count_yesterday_7_all
@@ -370,15 +375,15 @@ const CrossroadDashboard = ({ marker }) => {
                     <TabPanel
                       key={direction.direction_id}
                       value={direction.direction_id.toString()}
-                      className="overflow-x-scroll"
+                      className="overflow-x-scroll px-0 py-5"
                     >
                       <Typography variant="h6" className="mb-4">
                         {direction.direction_name}
                       </Typography>
-                      <table className="w-full min-w-max table-auto text-left dark:text-white text-medium">
-                        <thead>
+                      <table className="w-full rounded-t-lg min-w-max table-auto text-left dark:text-white text-medium">
+                        <thead className="text-white">
                           <tr>
-                            <th className="border-b border-gray-200  p-4">
+                            <th className="border-b rounded-tl-lg border-gray-200  p-4">
                               {t("time_period")}
                             </th>
                             <th className="border-b border-gray-200  p-4">
@@ -422,53 +427,53 @@ const CrossroadDashboard = ({ marker }) => {
                                 direction.data[0].count_yesterday_6_all
                               )}
                             </th>
-                            <th className="border-b border-gray-200  p-4">
+                            <th className="border-b rounded-tr-lg border-gray-200  p-4">
                               {formatDate(
                                 direction.data[0].count_yesterday_7_all
                               )}
                             </th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="dark:text-white">
                           {direction.data.slice(1).map((row, index) => (
                             <tr
                               key={index}
                               className="border-b border-gray-200 "
                             >
-                              <td className="p-4 dark:text-white text-medium">{`${row.hour_start} - ${row.hour_end}`}</td>
-                              <td className="p-4 dark:text-white text-medium">
-                                <p className="dark:text-white text-medium">
-                                  {row.count_carsmall}
-                                </p>
+                              <td className="p-4 dark:text-white">
+                                {`${row.hour_start} - ${row.hour_end}`}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
+                                {row.count_carsmall}
+                              </td>
+                              <td className="p-4 dark:text-white">
                                 {row.count_carmid}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_carbig}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_today_all}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_yesterday_all}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_yesterday_2_all}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_yesterday_3_all}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_yesterday_4_all}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_yesterday_5_all}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_yesterday_6_all}
                               </td>
-                              <td className="p-4 dark:text-white text-medium">
+                              <td className="p-4 dark:text-white">
                                 {row.count_yesterday_7_all}
                               </td>
                             </tr>

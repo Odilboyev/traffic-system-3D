@@ -120,7 +120,7 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
                       color="blue"
                       onClick={() => handleOpenModal(section)}
                     >
-                      {t("show_all")}
+                      {t("open")}
                     </Button>
                   </div>
                 ) : (
