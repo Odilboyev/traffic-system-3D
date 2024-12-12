@@ -2,7 +2,7 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
 import { memo, useEffect, useRef, useState } from "react";
 
-import { CRS } from 'leaflet';
+import { CRS } from "leaflet";
 import Control from "../../components/customControl/index.jsx";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import L from "leaflet";
@@ -15,7 +15,7 @@ import TrafficLightContainer from "./components/trafficLightMarkers/managementLi
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import { safeParseJSON } from "../../redux/utils.js";
-import { useMap } from 'react-leaflet';
+import { useMap } from "react-leaflet";
 import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 import { useSelector } from "react-redux";
@@ -33,7 +33,9 @@ const MapCRSHandler = ({ currentLayer }) => {
       const zoom = map.getZoom();
 
       // Update CRS
-      map.options.crs = currentLayer.includes("Yandex") ? L.CRS.EPSG3395 : L.CRS.EPSG3857;
+      map.options.crs = currentLayer.includes("Yandex")
+        ? L.CRS.EPSG3395
+        : L.CRS.EPSG3857;
 
       // Force a re-render of the map
       map.invalidateSize();
@@ -66,7 +68,7 @@ const MapComponent = ({ changedMarker, t }) => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
   //theme
-  const { theme, currentLayer, showTrafficJam, } = useTheme();
+  const { theme, currentLayer, showTrafficJam } = useTheme();
 
   // const
   const center = safeParseJSON("its_currentLocation", home);
@@ -176,7 +178,9 @@ const MapComponent = ({ changedMarker, t }) => {
     setIsLightsLoading(false);
   };
 
-  const [trafficTimestamp, setTrafficTimestamp] = useState(Math.floor(Date.now() / 60000) * 60);
+  const [trafficTimestamp, setTrafficTimestamp] = useState(
+    Math.floor(Date.now() / 60000) * 60
+  );
   useEffect(() => {
     if (showTrafficJam) {
       const interval = setInterval(() => {
@@ -213,13 +217,7 @@ const MapComponent = ({ changedMarker, t }) => {
           handleCloseCrossroadModal={handleCloseCrossroadModal}
         />
         <ToastContainer containerId="alarms" className="z-[9998]" />
-        <MapEvents
-          setMap={setMap}
-          setZoom={setZoom}
-          setMarkers={setMarkers}
-          changedMarker={changedMarker}
-          fetchAlarmsData={fetchAlarmsData}
-        />
+        <MapEvents changedMarker={changedMarker} />
         {currentLayerDetails && (
           <TileLayer
             maxNativeZoom={currentLayerDetails.maxNativeZoom}
@@ -232,22 +230,16 @@ const MapComponent = ({ changedMarker, t }) => {
         {showTrafficJam && (
           <>
             <TileLayer
-              url={`https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`} 
+              url={`https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`}
               tileSize={256}
               zoomOffset={0}
-              maxZoom={18} 
+              maxZoom={18}
             />
           </>
         )}
         {/* zoomcontrol */}{" "}
         <ZoomControl theme={theme} position={"bottomright"} />{" "}
-        <Control position="bottomright">
-          <div className="bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded">
-            Zoom: {zoom}
-          </div>
-        </Control>
         {filter.trafficlights && <TrafficLightContainer />}
-        
         <DynamicMarkers
           t={t}
           usePieChartForClusteredMarkers={

@@ -9,11 +9,10 @@ import { useMapMarkers } from "../../hooks/useMapMarkers";
  * Handles map events such as movement and zoom changes.
  *
  * @param {Object} changedMarker - changed marker data from the server
- * @param {Function} setZoom - function to update the zoom level in the state
  *
  * @returns {null}
  */
-const MapEvents = ({ changedMarker, setZoom }) => {
+const MapEvents = ({ changedMarker }) => {
   const map = useMap();
   const { markers, setMarkers } = useMapMarkers();
   const center = map.getCenter();
@@ -31,7 +30,6 @@ const MapEvents = ({ changedMarker, setZoom }) => {
 
     const zoom = map.getZoom();
     localStorage.setItem("its_currentZoom", zoom);
-    setZoom(zoom);
   });
   // Handle map movement and zoom events
   useMapEvents({
@@ -46,7 +44,6 @@ const MapEvents = ({ changedMarker, setZoom }) => {
     zoomend: () => {
       const zoom = map.getZoom();
       localStorage.setItem("its_currentZoom", zoom);
-      setZoom(zoom);
     },
   });
 

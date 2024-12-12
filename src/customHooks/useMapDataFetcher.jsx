@@ -19,7 +19,6 @@ const useMapDataFetcher = ({
     const center = map.getCenter();
     const zoom = map.getZoom();
     const currentLocation = L.latLng(center.lat, center.lng);
-
     if (zoom >= minZoom) {
       // Modified condition to check useDistanceThreshold prop
       if (
