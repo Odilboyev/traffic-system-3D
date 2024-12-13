@@ -8,15 +8,15 @@ import { FiExternalLink } from "react-icons/fi";
 import { IconButton } from "@material-tailwind/react";
 import PTZCameraModal from "./components/ptzModal";
 import Records from "./components/records";
-import { t } from "i18next";
 
 const CameraDetails = memo(
-  function CameraDetails({ marker = {}, isLoading, cameraData, isPTZ, L }) {
+  function CameraDetails({ marker = {}, t, isLoading, cameraData, isPTZ, L }) {
     const popupRef = useRef(null);
     const [isCollapsed, setIsCollapsed] = useState(true);
     const handleCollapseToggle = () => {
       setIsCollapsed((prev) => !prev);
     };
+    const [showToolTip, setShowToolTip] = useState(false);
 
     const handleOpenLink = () => {
       const { ip, http_port } = cameraData;
@@ -37,6 +37,12 @@ const CameraDetails = memo(
               const element = e.target.getElement();
               const draggable = new L.Draggable(element);
               draggable.enable();
+            },
+            popupopen: () => {
+              setShowToolTip(false);
+            },
+            popupclose: () => {
+              setShowToolTip(true);
             },
           }}
           ref={popupRef}
@@ -123,37 +129,39 @@ const CameraDetails = memo(
             t("loading")
           )}
         </Popup>
-        <Tooltip direction="top" className="rounded-md">
-          <div
-            style={{
-              minWidth: "8vw",
-              minHeight: "6vw",
-              overflow: "hidden",
-            }}
-          >
-            {!isLoading ? (
-              <>
-                {cameraData?.streams?.map((v, i) => (
-                  <img
-                    src={v.screenshot_url}
-                    key={i}
-                    className="w-full"
-                    alt=""
-                  />
-                ))}
+        {showToolTip && (
+          <Tooltip direction="top" className="rounded-md">
+            <div
+              style={{
+                minWidth: "8vw",
+                minHeight: "6vw",
+                overflow: "hidden",
+              }}
+            >
+              {!isLoading ? (
+                <>
+                  {cameraData?.streams?.map((v, i) => (
+                    <img
+                      src={v.screenshot_url}
+                      key={i}
+                      className="w-full"
+                      alt=""
+                    />
+                  ))}
 
-                <p className="my-0">{marker?.cname}</p>
-                {marker.statuserror === 2 && (
-                  <p className=" text-center text-red-500">{t("offline")}</p>
-                )}
-              </>
-            ) : (
-              <>
-                <p className="my-0">{t("loading")}</p>
-              </>
-            )}
-          </div>
-        </Tooltip>
+                  <p className="my-0">{marker?.cname}</p>
+                  {marker.statuserror === 2 && (
+                    <p className=" text-center text-red-500">{t("offline")}</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="my-0">{t("loading")}</p>
+                </>
+              )}
+            </div>
+          </Tooltip>
+        )}
         <PTZCameraModal
           showController={isPTZ}
           isOpen={isModalOpen}

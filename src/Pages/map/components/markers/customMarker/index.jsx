@@ -75,10 +75,9 @@ const CustomMarker = memo(function CustomMarker({
           else if (marker.type === 4) handleLightsModalOpen(marker);
         },
         dragend: (event) => handleMarkerDragEnd(marker.cid, marker.type, event),
-        mouseout: () => setShowPopup(false),
+
         mouseover: () => {
           fetchCameraDetails(marker.type, marker.cid);
-          setShowPopup(true); // Show popup
         },
       }}
       type={marker.type}
@@ -94,6 +93,8 @@ const CustomMarker = memo(function CustomMarker({
         // showPopup &&
         cameraData && (
           <CameraDetails
+            t={t}
+            isLoading={isLoading}
             marker={marker}
             cameraData={cameraData}
             isPTZ={marker.type === 5}
