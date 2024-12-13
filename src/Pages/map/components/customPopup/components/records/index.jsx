@@ -1,3 +1,5 @@
+import "./records.style.css";
+
 import { memo } from "react";
 import { useSelector } from "react-redux";
 
@@ -7,8 +9,8 @@ const Records = ({ videos, name }) => {
     <div
       className=" bg-gray-900/60 backdrop-blur-md text-white"
       style={{
-        minWidth: "14vw",
-        minHeight: "8vw",
+        minWidth: "16vw",
+        minHeight: "10vw",
         overflow: "hidden",
       }}
     >
@@ -21,15 +23,14 @@ const Records = ({ videos, name }) => {
             isHighQuality ? "1" : "0"
           );
           return (
-            <iframe
-              key={index}
-              className="space-x-0 space-y-0"
-              width="100%"
-              height="100%"
-              style={{ margin: "0 auto", border: "none", padding: 0 }}
-              src={updatedLink}
-              allowFullScreen
-            ></iframe>
+            <div key={index} className="aspect-w-16 aspect-h-9 w-full h-auto">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={updatedLink}
+                allowFullScreen
+                style={{ border: "none" }}
+              ></iframe>
+            </div>
           );
         })}
       </div>

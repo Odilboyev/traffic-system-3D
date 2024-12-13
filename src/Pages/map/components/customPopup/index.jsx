@@ -48,6 +48,7 @@ const CameraDetails = memo(
           ref={popupRef}
           maxWidth={"100%"}
           minHeight={"100%"}
+          height={"100%"}
           interactive
           closeOnClick={false}
           autoClose={false}
