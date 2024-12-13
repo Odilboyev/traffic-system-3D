@@ -1,9 +1,7 @@
 import { MapContainer, TileLayer } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState, useCallback } from "react";
 
-import { CRS } from "leaflet";
-import Control from "../../components/customControl/index.jsx";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import L from "leaflet";
 import MapEvents from "./components/MapEvents/index.jsx";
@@ -23,24 +21,63 @@ import { useTheme } from "../../customHooks/useTheme.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
 
+const TrafficJamLayer = memo(({ showTrafficJam }) => {
+  const [trafficTimestamp, setTrafficTimestamp] = useState(
+    Math.floor(Date.now() / 60000) * 60
+  );
+
+  const updateTrafficTimestamp = useCallback(() => {
+    const newTimestamp = Math.floor(Date.now() / 60000) * 60;
+    setTrafficTimestamp(newTimestamp);
+  }, []);
+
+  useEffect(() => {
+    let intervalId;
+    if (showTrafficJam) {
+      intervalId = setInterval(updateTrafficTimestamp, 60000);
+      
+      return () => {
+        if (intervalId) clearInterval(intervalId);
+      };
+    }
+  }, [showTrafficJam, updateTrafficTimestamp]);
+
+  const trafficJamLayerUrl = useMemo(
+    () =>
+      `https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`,
+    [trafficTimestamp]
+  );
+
+  if (!showTrafficJam) return null;
+
+  return (
+    <TileLayer
+      key={`traffic-jam-layer-${trafficTimestamp}`} 
+      url={trafficJamLayerUrl}
+      tileSize={256}
+      zoomOffset={0}
+      maxNativeZoom={20}
+      maxZoom={20}
+    />
+  );
+}, (prevProps, nextProps) => {
+  return prevProps.showTrafficJam === nextProps.showTrafficJam;
+});
+
 const MapCRSHandler = ({ currentLayer }) => {
   const map = useMap();
 
   useEffect(() => {
     if (map) {
-      // Store current view state
       const center = map.getCenter();
       const zoom = map.getZoom();
 
-      // Update CRS
       map.options.crs = currentLayer.includes("Yandex")
         ? L.CRS.EPSG3395
         : L.CRS.EPSG3857;
 
-      // Force a re-render of the map
       map.invalidateSize();
 
-      // Reset view with new CRS
       setTimeout(() => {
         map.setView(center, zoom, { animate: false });
       }, 100);
@@ -64,21 +101,12 @@ const MapComponent = ({ changedMarker, t }) => {
   const [map, setMap] = useState(null);
   const { fetchAlarmsData } = useMapAlarms();
 
-  // sidebar visibility
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
-  //theme
   const { theme, currentLayer, showTrafficJam } = useTheme();
 
-  // const
   const center = safeParseJSON("its_currentLocation", home);
-
-  const [zoom, setZoom] = useState(
-    localStorage.getItem("mapZoom") ? localStorage.getItem("mapZoom") : 13
-  );
-
-  //variables
-  /// ----------------------------------------------------------------
+  
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
 
@@ -125,7 +153,6 @@ const MapComponent = ({ changedMarker, t }) => {
     }
   };
 
-  // handle visibility of modals
   const handleMonitorCrossroadOpen = (marker) => {
     setActiveMarker(marker);
     setIsbigMonitorOpen(true);
@@ -156,7 +183,6 @@ const MapComponent = ({ changedMarker, t }) => {
       setIsLightsModalOpen(true);
     }
   };
-  // ----------------------------------------------------------------
 
   const handleCloseCrossroadModal = () => {
     // setIsSidebarVisible(true);
@@ -178,18 +204,6 @@ const MapComponent = ({ changedMarker, t }) => {
     setIsLightsLoading(false);
   };
 
-  const [trafficTimestamp, setTrafficTimestamp] = useState(
-    Math.floor(Date.now() / 60000) * 60
-  );
-  useEffect(() => {
-    if (showTrafficJam) {
-      const interval = setInterval(() => {
-        setTrafficTimestamp(Math.floor(Date.now() / 60000) * 60);
-      }, 60000); // Update every minute
-
-      return () => clearInterval(interval);
-    }
-  }, [showTrafficJam]);
   return (
     <>
       <MapContainer
@@ -227,18 +241,7 @@ const MapComponent = ({ changedMarker, t }) => {
             maxZoom={20}
           />
         )}
-        {showTrafficJam && (
-          <>
-            <TileLayer
-              url={`https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`}
-              tileSize={256}
-              zoomOffset={0}
-              maxNativeZoom={20}
-              maxZoom={20}
-            />
-          </>
-        )}
-        {/* zoomcontrol */}{" "}
+        <TrafficJamLayer showTrafficJam={showTrafficJam} />
         <ZoomControl theme={theme} position={"bottomright"} />{" "}
         {filter.trafficlights && <TrafficLightContainer />}
         <DynamicMarkers
@@ -261,7 +264,6 @@ const MapComponent = ({ changedMarker, t }) => {
           L={L}
           useDynamicFetching={useClusteredMarkers === "dynamic"}
         />
-        {/* )} */}
       </MapContainer>
 
       <MapModals

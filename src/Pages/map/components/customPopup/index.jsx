@@ -16,7 +16,7 @@ const CameraDetails = memo(
     const handleCollapseToggle = () => {
       setIsCollapsed((prev) => !prev);
     };
-    const [showToolTip, setShowToolTip] = useState(false);
+    const [showToolTip, setShowToolTip] = useState(true);
 
     const handleOpenLink = () => {
       const { ip, http_port } = cameraData;
