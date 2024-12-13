@@ -55,21 +55,21 @@ const baseLayers = [
   {
     name: "Yandex",
     checked: false,
-    maxNativeZoom: 19,
+    maxNativeZoom: 20,
     url: "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}&scale=1&lang=ru_RU",
     attribution: "Yandex",
   },
   {
     name: "Yandex Dark",
     checked: false,
-    maxNativeZoom: 19,
+    maxNativeZoom: 20,
     url: "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}&scale=1&theme=dark&lang=ru_RU",
     attribution: "Yandex",
   },
 ];
 
 const layerSave = (layer) => {
-  if (typeof layer === 'string') {
+  if (typeof layer === "string") {
     localStorage.setItem("selectedLayer", layer);
   } else {
     localStorage.setItem("selectedLayer", layer.name);
