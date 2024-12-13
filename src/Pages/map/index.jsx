@@ -203,7 +203,7 @@ const MapComponent = ({ changedMarker, t }) => {
         doubleClickZoom={false}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
-        maxZoom={showTrafficJam ? 18 : 22}
+        maxZoom={20}
       >
         <MapCRSHandler currentLayer={currentLayer} />
         <Sidebar
@@ -224,7 +224,7 @@ const MapComponent = ({ changedMarker, t }) => {
             url={currentLayerDetails.url}
             attribution={currentLayerDetails.attribution}
             key={currentLayerDetails.name}
-            maxZoom={22}
+            maxZoom={20}
           />
         )}
         {showTrafficJam && (
@@ -233,7 +233,8 @@ const MapComponent = ({ changedMarker, t }) => {
               url={`https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`}
               tileSize={256}
               zoomOffset={0}
-              maxZoom={18}
+              maxNativeZoom={20}
+              maxZoom={20}
             />
           </>
         )}
