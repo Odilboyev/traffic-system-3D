@@ -62,14 +62,16 @@ export function SignIn() {
     >
       <div
         className={
-          "w-full md:w-2/5 mx-auto p-[5%] shadow-lg backdrop-blur-md dark:bg-blue-gray-900/85 bg-white/85 border-blue-gray-200/20 border dark:!text-white rounded-xl"
+          "w-3/5 md:w-2/5 mx-auto p-[5%] shadow-lg backdrop-blur-md dark:bg-blue-gray-900/85 bg-white/85 border-blue-gray-200/20 border dark:!text-white rounded-xl"
         }
       >
-        <div className="w-full flex items-center gap-5  mb-[12%]">
-          <div className="w-1/4">
+        <div className="w-full flex justify-between items-center gap-5  mb-[12%]">
+          <div className="w-1/4 lg:w-1/6">
             <img src={logo} alt="logo" className="w-full" />
           </div>
-          <div className="w-2/4 text-2xl font-semibold">{t("logo_name")}</div>
+          <div className="w-2/4 lg:w-full text-[2vw] font-semibold">
+            {t("logo_name")}
+          </div>
         </div>
         <form onSubmit={(e) => submitHandler(e)} className="my-2  mx-auto ">
           <div className="m flex flex-col gap-1 text-left">
