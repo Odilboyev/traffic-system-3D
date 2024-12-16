@@ -1,5 +1,5 @@
 // MarkerComponent.jsx
-import { Marker, Tooltip } from "react-leaflet";
+import { Marker, Tooltip, useMap } from "react-leaflet";
 import { memo, useRef, useState } from "react";
 
 import CameraDetails from "../../customPopup";
@@ -11,6 +11,7 @@ import { getCameraDetails } from "../../../../../api/api.handlers";
 const CustomMarker = memo(function CustomMarker({
   t,
   marker,
+  zoom,
   L,
   isDraggable,
   handleMonitorCrossroad,
@@ -58,9 +59,12 @@ const CustomMarker = memo(function CustomMarker({
       }
     }
   };
-
-  const debouncedFetchCameraDetails = debounce(fetchCameraDetails, 300);
-
+  const map = useMap();
+  const zoomer = (location) => {
+    map.flyTo(location, 17, {
+      duration: 0.3,
+    });
+  };
   return (
     <Marker
       key={`${marker.lat}-${marker.lng}-${marker.cid}`}
@@ -71,7 +75,10 @@ const CustomMarker = memo(function CustomMarker({
       rotationAngle={marker.rotated}
       eventHandlers={{
         click: () => {
-          if (marker.type === 2) handleMonitorCrossroad(marker);
+          if (marker.type === 2)
+            zoom > 16
+              ? handleMonitorCrossroad(marker)
+              : zoomer([marker.lat, marker.lng]);
           else if (marker.type === 3) handleBoxModalOpen(marker);
           else if (marker.type === 4) handleLightsModalOpen(marker);
         },
@@ -84,7 +91,8 @@ const CustomMarker = memo(function CustomMarker({
       type={marker.type}
       statuserror={marker.statuserror}
       icon={
-        customIcon || L.icon({
+        customIcon ||
+        L.icon({
           iconUrl: `icons/${marker.icon}`,
           iconSize: marker.type === 2 ? [24, 24] : [40, 40],
         })

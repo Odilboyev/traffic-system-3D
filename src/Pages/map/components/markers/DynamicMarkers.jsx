@@ -118,6 +118,7 @@ const DynamicMarkers = ({
       return (
         <CustomMarker
           t={t}
+          zoom={zoom}
           key={i}
           marker={marker}
           L={L}
