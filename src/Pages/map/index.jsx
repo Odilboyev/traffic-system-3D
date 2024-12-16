@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
-import { memo, useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import L from "leaflet";
@@ -21,48 +21,51 @@ import { useTheme } from "../../customHooks/useTheme.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
 
-const TrafficJamLayer = memo(({ showTrafficJam }) => {
-  const [trafficTimestamp, setTrafficTimestamp] = useState(
-    Math.floor(Date.now() / 60000) * 60
-  );
+const TrafficJamLayer = memo(
+  ({ showTrafficJam }) => {
+    const [trafficTimestamp, setTrafficTimestamp] = useState(
+      Math.floor(Date.now() / 60000) * 60
+    );
 
-  const updateTrafficTimestamp = useCallback(() => {
-    const newTimestamp = Math.floor(Date.now() / 60000) * 60;
-    setTrafficTimestamp(newTimestamp);
-  }, []);
+    const updateTrafficTimestamp = useCallback(() => {
+      const newTimestamp = Math.floor(Date.now() / 60000) * 60;
+      setTrafficTimestamp(newTimestamp);
+    }, []);
 
-  useEffect(() => {
-    let intervalId;
-    if (showTrafficJam) {
-      intervalId = setInterval(updateTrafficTimestamp, 60000);
-      
-      return () => {
-        if (intervalId) clearInterval(intervalId);
-      };
-    }
-  }, [showTrafficJam, updateTrafficTimestamp]);
+    useEffect(() => {
+      let intervalId;
+      if (showTrafficJam) {
+        intervalId = setInterval(updateTrafficTimestamp, 60000);
 
-  const trafficJamLayerUrl = useMemo(
-    () =>
-      `https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`,
-    [trafficTimestamp]
-  );
+        return () => {
+          if (intervalId) clearInterval(intervalId);
+        };
+      }
+    }, [showTrafficJam, updateTrafficTimestamp]);
 
-  if (!showTrafficJam) return null;
+    const trafficJamLayerUrl = useMemo(
+      () =>
+        `https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`,
+      [trafficTimestamp]
+    );
 
-  return (
-    <TileLayer
-      key={`traffic-jam-layer-${trafficTimestamp}`} 
-      url={trafficJamLayerUrl}
-      tileSize={256}
-      zoomOffset={0}
-      maxNativeZoom={20}
-      maxZoom={20}
-    />
-  );
-}, (prevProps, nextProps) => {
-  return prevProps.showTrafficJam === nextProps.showTrafficJam;
-});
+    if (!showTrafficJam) return null;
+
+    return (
+      <TileLayer
+        key={`traffic-jam-layer-${trafficTimestamp}`}
+        url={trafficJamLayerUrl}
+        tileSize={256}
+        zoomOffset={0}
+        maxNativeZoom={20}
+        maxZoom={20}
+      />
+    );
+  },
+  (prevProps, nextProps) => {
+    return prevProps.showTrafficJam === nextProps.showTrafficJam;
+  }
+);
 
 const MapCRSHandler = ({ currentLayer }) => {
   const map = useMap();
@@ -87,7 +90,7 @@ const MapCRSHandler = ({ currentLayer }) => {
   return null;
 };
 
-const MapComponent = ({ changedMarker, t }) => {
+const MapComponent = ({ changedMarkers, t }) => {
   const {
     markers,
     setMarkers,
@@ -106,7 +109,7 @@ const MapComponent = ({ changedMarker, t }) => {
   const { theme, currentLayer, showTrafficJam } = useTheme();
 
   const center = safeParseJSON("its_currentLocation", home);
-  
+
   const [isbigMonitorOpen, setIsbigMonitorOpen] = useState(false);
   const [activeMarker, setActiveMarker] = useState(null);
 
@@ -223,7 +226,7 @@ const MapComponent = ({ changedMarker, t }) => {
         <Sidebar
           t={t}
           // mapRef={map}
-          changedMarker={changedMarker}
+          changedMarker={changedMarkers}
           isVisible={isSidebarVisible}
           setIsVisible={setIsSidebarVisible}
           isbigMonitorOpen={isbigMonitorOpen}
@@ -231,7 +234,7 @@ const MapComponent = ({ changedMarker, t }) => {
           handleCloseCrossroadModal={handleCloseCrossroadModal}
         />
         <ToastContainer containerId="alarms" className="z-[9998]" />
-        <MapEvents changedMarker={changedMarker} />
+        <MapEvents changedMarkers={changedMarkers} />
         {currentLayerDetails && (
           <TileLayer
             maxNativeZoom={currentLayerDetails.maxNativeZoom}
@@ -260,7 +263,6 @@ const MapComponent = ({ changedMarker, t }) => {
           setMarkers={setMarkers}
           clearMarkers={clearMarkers}
           updateMarkers={updateMarkers}
-          changedMarker={changedMarker}
           L={L}
           useDynamicFetching={useClusteredMarkers === "dynamic"}
         />

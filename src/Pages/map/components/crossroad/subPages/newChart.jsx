@@ -1,13 +1,10 @@
 import {
-  Tab,
-  TabPanel,
-  Tabs,
-  TabsBody,
-  TabsHeader,
-  Typography,
-} from "@material-tailwind/react";
+  CustomTab,
+  CustomTabs,
+} from "../../../../../components/customTabs/custom.tabs";
 
 import Chart from "react-apexcharts";
+import { Typography } from "@material-tailwind/react";
 import { t } from "i18next";
 import { useState } from "react";
 
@@ -177,6 +174,7 @@ const AreaChart = ({ data, title, isDarkMode }) => (
 const CrossroadStats = ({ crossroadStats, selectedDate, onDateChange }) => {
   const { all_direction_data, by_direction_data } = crossroadStats;
   const [activeTab, setActiveTab] = useState("all");
+  const [isTabLoading, setIsTabLoading] = useState(false);
 
   // Format series data for charts
   const formatChartDataByDate = (chartData) => {
@@ -217,30 +215,27 @@ const CrossroadStats = ({ crossroadStats, selectedDate, onDateChange }) => {
 
   return (
     <>
-      <Tabs value={activeTab} className="w-full">
-        <TabsHeader>
-          <Tab
-            key="all"
-            value="all"
-            onClick={() => setActiveTab("all")}
-            className="px-4 py-2 text-sm h-auto"
+      <CustomTabs
+        value={activeTab}
+        onChange={setActiveTab}
+        className="w-full"
+        isLoading={isTabLoading}
+        loadingText={t("loading_direction_data")}
+      >
+        <CustomTab value="all">{t("all_directions")}</CustomTab>
+        {by_direction_data?.map((direction) => (
+          <CustomTab
+            key={direction.direction_id}
+            value={direction.direction_id}
           >
-            {t("all_directions")}
-          </Tab>
-          {by_direction_data?.map((direction) => (
-            <Tab
-              key={direction.direction_id}
-              value={direction.direction_id}
-              onClick={() => setActiveTab(direction.direction_id)}
-              className="px-4 py-2 text-sm h-auto"
-            >
-              {direction.direction_name}
-            </Tab>
-          ))}
-        </TabsHeader>
+            {direction.direction_name}
+          </CustomTab>
+        ))}
+      </CustomTabs>
 
-        <TabsBody className="p-0">
-          <TabPanel key="all" value="all" className="px-0 py-5">
+      <div className="mt-4">
+        {activeTab === "all" ? (
+          <div className="px-0 py-5">
             {/* Counts for all */}
             <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500 dark:bg-gray-700 text-white">
               <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-600">
@@ -280,57 +275,57 @@ const CrossroadStats = ({ crossroadStats, selectedDate, onDateChange }) => {
                 </div>
               </div>
             </div>
-          </TabPanel>
-
-          {by_direction_data?.map((direction) => (
-            <TabPanel
-              key={direction.direction_id}
-              value={direction.direction_id}
-              className="px-0 py-5"
-            >
-              {/* Direction specific counts */}
-              <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500 dark:bg-gray-700 text-white">
-                <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-600">
-                  <p className="dark:text-gray-200">{t("yesterday")}</p>
-                  <b>
-                    {direction?.counts_for_direction?.count_direction_yesterday.toLocaleString() ||
-                      0}
-                  </b>
+          </div>
+        ) : (
+          by_direction_data
+            ?.filter((direction) => direction.direction_id === activeTab)
+            .map((direction) => (
+              <div key={direction.direction_id} className="px-0 py-5">
+                {/* Direction specific counts */}
+                <div className="flex w-full rounded-md text-center items-center bg-blue-gray-500 dark:bg-gray-700 text-white">
+                  <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center border-r border-gray-200 dark:border-gray-600">
+                    <p className="dark:text-gray-200">{t("yesterday")}</p>
+                    <b>
+                      {direction?.counts_for_direction?.count_direction_yesterday.toLocaleString() ||
+                        0}
+                    </b>
+                  </div>
+                  <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center">
+                    <p className="dark:text-gray-200">{t("today")}</p>
+                    <b>
+                      {direction?.counts_for_direction?.count_direction_today.toLocaleString() ||
+                        0}
+                    </b>
+                  </div>
                 </div>
-                <div className="w-1/2 h-[8vh] flex flex-col items-center justify-center">
-                  <p className="dark:text-gray-200">{t("today")}</p>
-                  <b>
-                    {direction?.counts_for_direction?.count_direction_today.toLocaleString() ||
-                      0}
-                  </b>
-                </div>
-              </div>
 
-              {/* Direction specific charts */}
-              <div className="mt-4 space-y-4">
-                <div className="p-4 rounded-lg bg-white dark:bg-gray-800">
-                  <div className="flex w-full">
-                    <BarChart
-                      data={formatChartDataByDate(direction.chart_data_by_date)}
-                      title={`${t("daily_counts")} - ${
-                        direction.direction_name
-                      }`}
-                      isDarkMode={isDarkMode}
-                    />
-                    <AreaChart
-                      data={formatChartByHourData(direction?.chart_by_hour)}
-                      title={`${t("hourly_counts")} - ${
-                        direction.direction_name
-                      }`}
-                      isDarkMode={isDarkMode}
-                    />
+                {/* Direction specific charts */}
+                <div className="mt-4 space-y-4">
+                  <div className="p-4 rounded-lg bg-white dark:bg-gray-800">
+                    <div className="flex w-full">
+                      <BarChart
+                        data={formatChartDataByDate(
+                          direction.chart_data_by_date
+                        )}
+                        title={`${t("daily_counts")} - ${
+                          direction.direction_name
+                        }`}
+                        isDarkMode={isDarkMode}
+                      />
+                      <AreaChart
+                        data={formatChartByHourData(direction?.chart_by_hour)}
+                        title={`${t("hourly_counts")} - ${
+                          direction.direction_name
+                        }`}
+                        isDarkMode={isDarkMode}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </TabPanel>
-          ))}
-        </TabsBody>
-      </Tabs>
+            ))
+        )}
+      </div>
     </>
   );
 };

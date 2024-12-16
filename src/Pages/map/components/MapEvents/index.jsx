@@ -1,20 +1,41 @@
+import { useEffect, useReducer } from "react";
 import { useMap, useMapEvents } from "react-leaflet";
 
 import PropTypes from "prop-types";
 import toaster from "../../../../tools/toastconfig";
-import { useEffect } from "react";
 import { useMapMarkers } from "../../hooks/useMapMarkers";
+
+// Create a reducer function to handle marker updates efficiently
+const markersReducer = (state, action) => {
+  switch (action.type) {
+    case "BATCH_UPDATE_MARKERS": {
+      // Create a map of markers to update for efficient lookup
+      const updateMap = new Map(
+        action.payload.map((marker) => [`${marker.cid}-${marker.type}`, marker])
+      );
+
+      return state.map((marker) => {
+        const key = `${marker.cid}-${marker.type}`;
+        return updateMap.has(key) ? updateMap.get(key) : marker;
+      });
+    }
+    default:
+      return state;
+  }
+};
 
 /**
  * Handles map events such as movement and zoom changes.
  *
- * @param {Object} changedMarker - changed marker data from the server
+ * @param {Array} changedMarkers - changed marker data from the server
  *
  * @returns {null}
  */
-const MapEvents = ({ changedMarker }) => {
+const MapEvents = ({ changedMarkers = [] }) => {
   const map = useMap();
-  const { markers, setMarkers } = useMapMarkers();
+  const { markers: initialMarkers } = useMapMarkers();
+  const [markers, dispatchMarkers] = useReducer(markersReducer, initialMarkers);
+
   const center = map.getCenter();
   useEffect(() => {
     if (center)
@@ -31,6 +52,7 @@ const MapEvents = ({ changedMarker }) => {
     const zoom = map.getZoom();
     localStorage.setItem("its_currentZoom", zoom);
   });
+
   // Handle map movement and zoom events
   useMapEvents({
     moveend: () => {
@@ -47,26 +69,33 @@ const MapEvents = ({ changedMarker }) => {
     },
   });
 
-  // Add useEffect to handle changedMarker updates
+  // Add useEffect to handle changedMarkers updates
   useEffect(() => {
-    if (changedMarker) {
-      toaster(changedMarker, map);
+    if (changedMarkers && changedMarkers.length > 0) {
+      // Batch process notifications
+      changedMarkers.forEach((changedMarker) => {
+        toaster(changedMarker, map);
+      });
 
-      setMarkers(
-        markers.map((marker) =>
-          marker.cid === changedMarker.cid && marker.type === changedMarker.type
-            ? changedMarker
-            : marker
-        )
-      );
+      // Dispatch batch marker update
+      dispatchMarkers({
+        type: "BATCH_UPDATE_MARKERS",
+        payload: changedMarkers,
+      });
     }
-  }, [changedMarker]);
+  }, [changedMarkers]);
+
+  // Optional: Expose markers to parent components if needed
+  useEffect(() => {
+    // You might want to update the markers in the parent component or context
+    // This depends on how your state management is set up
+  }, [markers]);
 
   return null;
 };
 
 MapEvents.propTypes = {
-  changedMarkers: PropTypes.object,
+  changedMarkers: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default MapEvents;

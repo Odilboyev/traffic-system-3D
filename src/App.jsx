@@ -1,6 +1,6 @@
 import "react-toastify/dist/ReactToastify.css";
 
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import MapComponent from "./Pages/map/index.jsx";
 import { ThemeContext } from "./context/themeContext.jsx";
@@ -13,36 +13,81 @@ import { t } from "i18next";
 const App = () => {
   const { theme } = useContext(ThemeContext);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  //
-  const [changedMarker, setChangedMarker] = useState(null);
+  const [changedMarkers, setChangedMarkers] = useState([]);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const notificationQueueRef = useRef([]);
+  const processingRef = useRef(false);
+
+  const processNotificationQueue = useCallback(() => {
+    if (processingRef.current) return;
+
+    processingRef.current = true;
+    const queue = notificationQueueRef.current;
+    notificationQueueRef.current = [];
+
+    // Deduplicate notifications
+    const uniqueNotifications = Array.from(
+      new Map(
+        queue.map((item) => [`${item.data.cid}-${item.data.type}`, item])
+      ).values()
+    );
+
+    // Process notifications
+    if (uniqueNotifications.length > 0) {
+      const latestNotification =
+        uniqueNotifications[uniqueNotifications.length - 1];
+
+      setChangedMarkers(
+        uniqueNotifications.map((notification) => notification.data)
+      );
+
+      // Play sound based on the latest notification
+      const sound = new Audio();
+      sound.volume = 0.2;
+      if (latestNotification.data.statuserror === 1) {
+        sound.src = dangerSound;
+      } else if (latestNotification.data.statuserror === 0) {
+        sound.src = positiveSound;
+      } else if (latestNotification.data.statuserror === 2) {
+        sound.src = dangerSound;
+      }
+      sound.play();
+    }
+
+    processingRef.current = false;
+
+    // Check if more notifications arrived during processing
+    if (notificationQueueRef.current.length > 0) {
+      processNotificationQueue();
+    }
+  }, []);
+
+  useEffect(() => {
+    const processQueueInterval = setInterval(() => {
+      if (notificationQueueRef.current.length > 0) {
+        processNotificationQueue();
+      }
+    }, 100); // Process queue every 100ms
+
+    return () => clearInterval(processQueueInterval);
+  }, [processNotificationQueue]);
 
   useEffect(() => {
     if (!isSubscribed) {
-      subscribeToCurrentAlarms(onWSDataReceived);
+      subscribeToCurrentAlarms((data) => {
+        // Prevent duplicate processing of the same data
+        if (
+          !notificationQueueRef.current.some(
+            (item) => item.data.eventdate === data.data.eventdate
+          )
+        ) {
+          notificationQueueRef.current.push(data);
+          setIsSubscribed(true);
+        }
+      });
     }
   }, [isSubscribed]);
 
-  const onWSDataReceived = (data) => {
-    // Prevent duplicate processing of the same data
-    if (changedMarker?.eventdate === data.data.eventdate) {
-      return;
-    }
-    setIsSubscribed(true);
-    setChangedMarker(data.data);
-    const sound = new Audio();
-    sound.volume = 0.2;
-    if (data.data.statuserror === 1) {
-      sound.src = dangerSound;
-    } else if (data.data.statuserror === 0) {
-      sound.src = positiveSound;
-    } else if (data.data.statuserror === 2) {
-      sound.src = dangerSound;
-    }
-    sound.play();
-  };
-
-  //
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
@@ -60,22 +105,16 @@ const App = () => {
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
+
   return (
     <div
       className={`min-h-screen app-container relative ${
         theme === "dark" ? "bg-gray-900 text-white" : "text-black"
       }`}
     >
-      {/* <button
-        onClick={toggleSidebar}
-        className="fixed z-[10000000000000] top-4 left-4 p-2 bg-blue-500 text-white rounded-md shadow-lg focus:outline-none"
-      >
-        {isSidebarOpen ? "Close Sidebar" : "Open Sidebar"}
-      </button> */}
-
       {!isOnline && <WarningMessage />}
 
-      <MapComponent changedMarker={changedMarker} t={t} />
+      <MapComponent changedMarkers={changedMarkers} t={t} />
     </div>
   );
 };

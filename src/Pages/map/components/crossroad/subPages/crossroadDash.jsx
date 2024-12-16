@@ -1,16 +1,10 @@
 import * as XLSX from "xlsx";
 
+import { Button, Input, Spinner, Typography } from "@material-tailwind/react";
 import {
-  Button,
-  Input,
-  Spinner,
-  Tab,
-  TabPanel,
-  Tabs,
-  TabsBody,
-  TabsHeader,
-  Typography,
-} from "@material-tailwind/react";
+  CustomTab,
+  CustomTabs,
+} from "../../../../../components/customTabs/custom.tabs";
 import { FaChartBar, FaTable } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import {
@@ -110,23 +104,13 @@ const CrossroadDashboard = ({ marker }) => {
       if (currentMode === "chart") {
         fetchStats();
       } else {
-        fetchStatsForTable();
-      }
-    }
-  }, [marker?.cid, currentMode]);
-
-  const { data, isLoading, error, lastUpdated } = state;
-
-  // Fetch stats for the selected date
-  useEffect(() => {
-    if (marker?.cid) {
-      if (currentMode === "chart") {
-        fetchStats();
-      } else {
         fetchStatsForTable(selectedDate);
       }
     }
   }, [marker?.cid, currentMode, selectedDate]);
+
+  const { data, isLoading, error } = state;
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
@@ -183,22 +167,25 @@ const CrossroadDashboard = ({ marker }) => {
           {t("traffic_dashboard")}
         </h3>
         <div className="flex items-center gap-4">
-          <Tabs value={currentMode} className="w-fit">
-            <TabsHeader>
-              <Tab value="chart" onClick={() => setCurrentMode("chart")}>
-                <div className="flex items-center gap-2">
-                  <FaChartBar />
-                  {t("chart")}
-                </div>
-              </Tab>
-              <Tab value="table" onClick={() => setCurrentMode("table")}>
-                <div className="flex items-center gap-2">
-                  <FaTable />
-                  {t("table")}
-                </div>
-              </Tab>
-            </TabsHeader>
-          </Tabs>
+          <CustomTabs
+            value={currentMode}
+            onChange={setCurrentMode}
+            isLoading={isLoading}
+            loadingText={t("loading_traffic_modes")}
+          >
+            <CustomTab value="chart">
+              <div className="flex items-center gap-2">
+                <FaChartBar />
+                {t("chart")}
+              </div>
+            </CustomTab>
+            <CustomTab value="table">
+              <div className="flex items-center gap-2">
+                <FaTable />
+                {t("table")}
+              </div>
+            </CustomTab>
+          </CustomTabs>
         </div>
       </div>
 
@@ -242,35 +229,27 @@ const CrossroadDashboard = ({ marker }) => {
 
           <div className="overflow-x-auto">
             {tableData && (
-              <Tabs value={activeTab} className="w-full">
-                <TabsHeader>
-                  <Tab
-                    key="all"
-                    value="all"
-                    onClick={() => setActiveTab("all")}
-                    className="px-4 py-2 text-sm h-auto"
+              <CustomTabs
+                value={activeTab}
+                onChange={setActiveTab}
+                isLoading={isLoading}
+                loadingText={t("loading_direction_data")}
+              >
+                <CustomTab value="all">{t("all_directions")}</CustomTab>
+                {tableData.by_direction_data.map((direction) => (
+                  <CustomTab
+                    key={direction.direction_id}
+                    value={direction.direction_id.toString()}
                   >
-                    {t("all_directions")}
-                  </Tab>
-                  {tableData.by_direction_data.map((direction) => (
-                    <Tab
-                      key={direction.direction_id}
-                      value={direction.direction_id.toString()}
-                      onClick={() =>
-                        setActiveTab(direction.direction_id.toString())
-                      }
-                      className="px-4 py-2 text-sm h-auto"
-                    >
-                      {direction.direction_name}
-                    </Tab>
-                  ))}
-                </TabsHeader>
-                <TabsBody className="p-0">
-                  <TabPanel
-                    key="all"
-                    value="all"
-                    className="overflow-x-auto px-0 py-5"
-                  >
+                    {direction.direction_name}
+                  </CustomTab>
+                ))}
+              </CustomTabs>
+            )}
+            {tableData && (
+              <div className="overflow-x-auto">
+                {activeTab === "all" ? (
+                  <div className="overflow-x-auto px-0 py-5">
                     <Typography variant="h6" className="mb-4">
                       {t("all_directions_traffic")}
                     </Typography>
@@ -369,121 +348,125 @@ const CrossroadDashboard = ({ marker }) => {
                           ))}
                       </tbody>
                     </table>
-                  </TabPanel>
+                  </div>
+                ) : (
+                  tableData.by_direction_data
+                    .filter(
+                      (direction) =>
+                        direction.direction_id.toString() === activeTab
+                    )
+                    .map((direction) => (
+                      <div
+                        key={direction.direction_id}
+                        className="overflow-x-scroll px-0 py-5"
+                      >
+                        <Typography variant="h6" className="mb-4">
+                          {direction.direction_name}
+                        </Typography>
+                        <table className="w-full rounded-t-lg min-w-max table-auto text-left dark:text-white text-medium">
+                          <thead className="text-white">
+                            <tr>
+                              <th className="border-b rounded-tl-lg border-gray-200  p-4">
+                                {t("time_period")}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {t("small_cars")}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {t("medium_cars")}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {t("large_cars")}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {formatDate(selectedDate)}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {formatDate(getPreviousDay(selectedDate))}
+                              </th>
 
-                  {tableData.by_direction_data.map((direction) => (
-                    <TabPanel
-                      key={direction.direction_id}
-                      value={direction.direction_id.toString()}
-                      className="overflow-x-scroll px-0 py-5"
-                    >
-                      <Typography variant="h6" className="mb-4">
-                        {direction.direction_name}
-                      </Typography>
-                      <table className="w-full rounded-t-lg min-w-max table-auto text-left dark:text-white text-medium">
-                        <thead className="text-white">
-                          <tr>
-                            <th className="border-b rounded-tl-lg border-gray-200  p-4">
-                              {t("time_period")}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {t("small_cars")}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {t("medium_cars")}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {t("large_cars")}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {formatDate(selectedDate)}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {formatDate(getPreviousDay(selectedDate))}
-                            </th>
-
-                            <th className="border-b border-gray-200  p-4">
-                              {formatDate(
-                                direction.data[0].count_yesterday_2_all
-                              )}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {formatDate(
-                                direction.data[0].count_yesterday_3_all
-                              )}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {formatDate(
-                                direction.data[0].count_yesterday_4_all
-                              )}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {formatDate(
-                                direction.data[0].count_yesterday_5_all
-                              )}
-                            </th>
-                            <th className="border-b border-gray-200  p-4">
-                              {formatDate(
-                                direction.data[0].count_yesterday_6_all
-                              )}
-                            </th>
-                            <th className="border-b rounded-tr-lg border-gray-200  p-4">
-                              {formatDate(
-                                direction.data[0].count_yesterday_7_all
-                              )}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="dark:text-white">
-                          {direction.data.slice(1).map((row, index) => (
-                            <tr
-                              key={index}
-                              className="border-b border-gray-200 "
-                            >
-                              <td className="p-4 dark:text-white">
-                                {`${row.hour_start} - ${row.hour_end}`}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_carsmall}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_carmid}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_carbig}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_today_all}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_yesterday_all}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_yesterday_2_all}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_yesterday_3_all}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_yesterday_4_all}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_yesterday_5_all}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_yesterday_6_all}
-                              </td>
-                              <td className="p-4 dark:text-white">
-                                {row.count_yesterday_7_all}
-                              </td>
+                              <th className="border-b border-gray-200  p-4">
+                                {formatDate(
+                                  direction.data[0].count_yesterday_2_all
+                                )}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {formatDate(
+                                  direction.data[0].count_yesterday_3_all
+                                )}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {formatDate(
+                                  direction.data[0].count_yesterday_4_all
+                                )}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {formatDate(
+                                  direction.data[0].count_yesterday_5_all
+                                )}
+                              </th>
+                              <th className="border-b border-gray-200  p-4">
+                                {formatDate(
+                                  direction.data[0].count_yesterday_6_all
+                                )}
+                              </th>
+                              <th className="border-b rounded-tr-lg border-gray-200  p-4">
+                                {formatDate(
+                                  direction.data[0].count_yesterday_7_all
+                                )}
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </TabPanel>
-                  ))}
-                </TabsBody>
-              </Tabs>
+                          </thead>
+                          <tbody className="dark:text-white">
+                            {direction.data.slice(1).map((row, index) => (
+                              <tr
+                                key={index}
+                                className="border-b border-gray-200 "
+                              >
+                                <td className="p-4 dark:text-white">
+                                  {`${row.hour_start} - ${row.hour_end}`}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_carsmall}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_carmid}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_carbig}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_today_all}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_yesterday_all}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_yesterday_2_all}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_yesterday_3_all}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_yesterday_4_all}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_yesterday_5_all}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_yesterday_6_all}
+                                </td>
+                                <td className="p-4 dark:text-white">
+                                  {row.count_yesterday_7_all}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))
+                )}
+              </div>
             )}
           </div>
         </>
