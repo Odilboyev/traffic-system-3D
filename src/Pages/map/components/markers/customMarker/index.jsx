@@ -17,6 +17,7 @@ const CustomMarker = memo(function CustomMarker({
   handleBoxModalOpen,
   handleLightsModalOpen,
   handleMarkerDragEnd,
+  customIcon,
 }) {
   const isCamera = (type) => type == 1 || type == 5 || type == 6;
 
@@ -82,10 +83,12 @@ const CustomMarker = memo(function CustomMarker({
       }}
       type={marker.type}
       statuserror={marker.statuserror}
-      icon={L.icon({
-        iconUrl: `icons/${marker.icon}`,
-        iconSize: marker.type === 2 ? [24, 24] : [40, 40],
-      })}
+      icon={
+        customIcon || L.icon({
+          iconUrl: `icons/${marker.icon}`,
+          iconSize: marker.type === 2 ? [24, 24] : [40, 40],
+        })
+      }
       rotatedAngle={marker.type === 3 ? marker.rotated : 0}
     >
       {isCamera(marker.type) && marker.statuserror !== 2 ? (
@@ -123,5 +126,6 @@ CustomMarker.propTypes = {
   handleBoxModalOpen: PropTypes.func,
   handleLightsModalOpen: PropTypes.func,
   handleMarkerDragEnd: PropTypes.func,
+  customIcon: PropTypes.object,
 };
 export default memo(CustomMarker); // CustomMarker;

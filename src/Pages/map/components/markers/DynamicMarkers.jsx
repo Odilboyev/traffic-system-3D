@@ -1,12 +1,15 @@
+import { useEffect, useRef, useState } from "react";
+
 import CustomMarker from "./customMarker";
+import { FaTrafficLight } from "react-icons/fa6";
 import L from "leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { PieChart } from "react-minimal-pie-chart";
 import PropTypes from "prop-types";
 import { getAllMarkers } from "../../../../api/api.handlers";
 import { renderToString } from "react-dom/server";
+import { useMap } from "react-leaflet";
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
-import { useRef } from "react";
 import { useSelector } from "react-redux";
 
 const DynamicMarkers = ({
@@ -23,8 +26,31 @@ const DynamicMarkers = ({
   handleMarkerDragEnd,
   t,
 }) => {
+  const map = useMap();
+  const [zoom, setZoom] = useState(map.getZoom());
   const clusterRef = useRef(null);
   const markers = useSelector((state) => state.map.markers); // Assuming markers are stored in state.map.markers
+
+  // Add zoom and dragend event listeners
+  useEffect(() => {
+    const handleZoomEnd = () => {
+      setZoom(map.getZoom());
+    };
+
+    const handleDragEnd = () => {
+      setZoom(map.getZoom());
+    };
+
+    map.on("zoomend", handleZoomEnd);
+    map.on("dragend", handleDragEnd);
+
+    // Cleanup event listeners
+    return () => {
+      map.off("zoomend", handleZoomEnd);
+      map.off("dragend", handleDragEnd);
+    };
+  }, [map]);
+
   const fetchMarkers = async (body) => {
     try {
       const response = await getAllMarkers(body);
@@ -51,20 +77,43 @@ const DynamicMarkers = ({
   // Render function for markers
   const renderMarkers = () =>
     markers.map((marker, i) => {
+      // Check if marker should be filtered out based on zoom and type
       if (
+        // Existing filter conditions
         (marker.type === 1 && !filter.cameratraffic) ||
         (marker.type === 2 && !filter.crossroad) ||
         (marker.type === 3 && !filter.boxcontroller) ||
         (marker.type === 4 && !filter.trafficlights) ||
         (marker.type === 5 && !filter.cameraview) ||
-        (marker.type === 6 && !filter.camerapdd)
+        (marker.type === 6 && !filter.camerapdd) ||
+        // Zoom-based filtering logic
+        (zoom <= 16 && marker.type !== 2) || // Only show crossroads at zoom 16 and below
+        isNaN(Number(marker.lat)) ||
+        isNaN(Number(marker.lng))
       ) {
         return null;
       }
 
-      if (isNaN(Number(marker.lat)) || isNaN(Number(marker.lng))) {
-        return null;
-      }
+      // Custom crossroad icon for type 2 markers
+      const createCrossroadIcon = (marker) => {
+        const iconHtml = renderToString(
+          <div className="relative flex items-center justify-center">
+            <div className="absolute w-12 h-12 bg-cyan-500/20 rounded-full backdrop-blur-md " />
+            <div className="relative flex justify-center items-center w-6 h-6 bg-blue-600 rounded-full shadow-lg border border-white">
+              <FaTrafficLight className="text-white w-3 h-3" />
+            </div>
+          </div>
+        );
+
+        return L.divIcon({
+          className: "custom-crossroad-marker",
+          html: iconHtml,
+          iconAnchor: [8, 8],
+        });
+      };
+
+      // Use custom icon for crossroads
+      const customIcon = marker.type === 2 ? createCrossroadIcon(marker) : null;
 
       return (
         <CustomMarker
@@ -77,6 +126,7 @@ const DynamicMarkers = ({
           handleBoxModalOpen={handleBoxModalOpen}
           handleLightsModalOpen={handleLightsModalOpen}
           handleMarkerDragEnd={handleMarkerDragEnd}
+          customIcon={customIcon}
         />
       );
     });
@@ -186,7 +236,7 @@ const ClusterIcon = (cluster, useCrossRoadCount) => {
           segmentsShift={1}
           radius={42}
           labelStyle={{
-            fill: "#fff",
+            fill: "#ffffff",
             fontSize: "1.1rem",
             fontWeight: "bolder",
           }}
@@ -196,7 +246,7 @@ const ClusterIcon = (cluster, useCrossRoadCount) => {
         />
         {useCrossRoadCount && crossroadPieChartData.length > 0 && (
           <div
-            className="absolute top-1/2 left-1/2 transform bg-white w-10 h-10 text-blue-gray-900 rounded-full flex items-center justify-center -translate-x-1/2 -translate-y-1/2  font-bold text-lg"
+            className="absolute top-1/2 left-1/2 transform bg-blue-600 text-white w-10 h-10 rounded-full border flex items-center justify-center -translate-x-1/2 -translate-y-1/2  font-bold text-lg"
             style={{
               pointerEvents: "none",
             }}
