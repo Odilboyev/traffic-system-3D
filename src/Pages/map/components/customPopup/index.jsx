@@ -2,12 +2,15 @@ import "./popup.style.css";
 
 import { FaMinus, FaPlus, FaVideo } from "react-icons/fa6";
 import { Popup, Tooltip } from "react-leaflet";
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { FiExternalLink } from "react-icons/fi";
 import { IconButton } from "@material-tailwind/react";
 import PTZCameraModal from "./components/ptzModal";
 import Records from "./components/records";
+import TrafficLightCounter from "./components/TrafficLightCounter";
+import { authToken } from "../../../../api/api.config";
+import { fixIncompleteJSON } from "../../components/trafficLightMarkers/utils";
 
 const CameraDetails = memo(
   function CameraDetails({ marker = {}, t, isLoading, cameraData, isPTZ, L }) {
@@ -17,6 +20,76 @@ const CameraDetails = memo(
       setIsCollapsed((prev) => !prev);
     };
     const [showToolTip, setShowToolTip] = useState(true);
+    const [trafficLightSeconds, setTrafficLightSeconds] = useState(null);
+    const [trafficLightSocket, setTrafficLightSocket] = useState(null);
+
+    // WebSocket connection management
+    const connectTrafficLightSocket = (svetoforId) => {
+      // Prevent multiple connections for the same svetofor_id
+      if (trafficLightSocket) {
+        return trafficLightSocket;
+      }
+
+      const socket = new WebSocket(
+        `${
+          import.meta.env.VITE_TRAFFICLIGHT_SOCKET
+        }?svetofor_id=${svetoforId}&token=${authToken}`
+      );
+
+      socket.onopen = () => {
+        console.log(`WebSocket connected for svetofor_id: ${svetoforId}`);
+      };
+
+      socket.onclose = () => {
+        console.log(`WebSocket closed for svetofor_id: ${svetoforId}`);
+        setTrafficLightSocket(null);
+      };
+
+      socket.onmessage = (event) => {
+        let message = event.data;
+        message = fixIncompleteJSON(message);
+
+        try {
+          const data = JSON.parse(message);
+          if (data?.channel) {
+            const channelSeconds = data.channel.reduce((acc, channel) => {
+              acc[channel.id] = {
+                countdown: channel.countdown,
+                status: channel.status,
+              };
+              return acc;
+            }, {});
+            setTrafficLightSeconds((prev) => {
+              // Only update if the value has changed to prevent unnecessary re-renders
+              const isChanged =
+                JSON.stringify(prev) !== JSON.stringify(channelSeconds);
+              return isChanged ? channelSeconds : prev;
+            });
+          }
+        } catch (error) {
+          console.error(
+            "Error parsing traffic light WebSocket message:",
+            error
+          );
+        }
+      };
+
+      setTrafficLightSocket(socket);
+      return socket;
+    };
+
+    // Manage WebSocket connection based on marker type
+    useEffect(() => {
+      if (marker.type === 1 && marker.svetofor_id) {
+        const socket = connectTrafficLightSocket(marker.svetofor_id);
+
+        return () => {
+          if (socket) {
+            socket.close();
+          }
+        };
+      }
+    }, [marker.svetofor_id, marker.type]);
 
     const handleOpenLink = () => {
       const { ip, http_port } = cameraData;
@@ -30,7 +103,6 @@ const CameraDetails = memo(
     const closeModal = () => setModalOpen(false);
     return (
       <>
-        {" "}
         <Popup
           eventHandlers={{
             mouseover: (e) => {
@@ -92,15 +164,17 @@ const CameraDetails = memo(
                 <Records videos={cameraData.streams} name={cameraData.name} />
               )}
 
+              {/* Traffic Light Seconds Display */}
+              {marker.type === 1 && trafficLightSeconds && marker.link_id && (
+                <TrafficLightCounter
+                  channelId={marker.link_id}
+                  seconds={trafficLightSeconds[marker.link_id].countdown}
+                  status={trafficLightSeconds[marker.link_id].status}
+                  t={t}
+                />
+              )}
+
               {/* Collapsible Description */}
-
-              {/* <button
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md mb-2 hover:bg-blue-700"
-                  onClick={handleCollapseToggle}
-                >
-                  {isCollapsed ? t("Show Details") : t("Hide Details")}
-                </button> */}
-
               {!isCollapsed && (
                 <div className="text-sm bg-transparent backdrop-blur-md  rounded-b-xl p-2">
                   <p>
@@ -111,20 +185,8 @@ const CameraDetails = memo(
                     <strong>{t("ip")}: </strong>
                     {cameraData.ip}
                   </p>
-                  {/* <p>
-                    <strong>{t("Updated_On")}: </strong>
-                    {cameraData.dateupdate}
-                  </p> */}
                 </div>
               )}
-
-              {/* Open Link Button */}
-              {/* <button
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-                onClick={handleOpenLink}
-              >
-                {t("Open Camera in New Tab")}
-              </button> */}
             </div>
           ) : (
             t("loading")
@@ -172,11 +234,13 @@ const CameraDetails = memo(
       </>
     );
   },
+  // Modify the memo comparison to prevent re-renders for trafficLightSeconds changes
   (prevProps, nextProps) => {
-    // Only re-render if marker data changes
     return (
       prevProps.marker.cid === nextProps.marker.cid &&
-      prevProps.marker.type === nextProps.marker.type
+      prevProps.marker.type === nextProps.marker.type &&
+      prevProps.isLoading === nextProps.isLoading &&
+      prevProps.cameraData === nextProps.cameraData
     );
   }
 );
