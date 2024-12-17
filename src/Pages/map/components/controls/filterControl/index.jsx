@@ -1,7 +1,7 @@
 import { Checkbox, Typography } from "@material-tailwind/react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { updateFilter } from "../../../../../redux/mapSlice";
+import { updateFilter } from "../../../../../redux/slices/mapslice";
 import { useCallback } from "react";
 
 const FilterControl = ({ t }) => {

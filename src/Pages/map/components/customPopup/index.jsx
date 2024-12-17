@@ -2,8 +2,9 @@ import "./popup.style.css";
 
 import { FaMinus, FaPlus, FaVideo } from "react-icons/fa6";
 import { Popup, Tooltip } from "react-leaflet";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import CustomPopup from "./components/CustomPopup";
 import { FiExternalLink } from "react-icons/fi";
 import { IconButton } from "@material-tailwind/react";
 import PTZCameraModal from "./components/ptzModal";
@@ -11,75 +12,85 @@ import Records from "./components/records";
 import TrafficLightCounter from "./components/TrafficLightCounter";
 import { authToken } from "../../../../api/api.config";
 import { fixIncompleteJSON } from "../../components/trafficLightMarkers/utils";
+import { updateTrafficLightSeconds } from "../../../../redux/slices/trafficLightSecondsSlice";
+import { useDispatch } from "react-redux";
 
 const CameraDetails = memo(
   function CameraDetails({ marker = {}, t, isLoading, cameraData, isPTZ, L }) {
     const popupRef = useRef(null);
+    const dispatch = useDispatch();
     const [isCollapsed, setIsCollapsed] = useState(true);
     const handleCollapseToggle = () => {
       setIsCollapsed((prev) => !prev);
     };
     const [showToolTip, setShowToolTip] = useState(true);
-    const [trafficLightSeconds, setTrafficLightSeconds] = useState(null);
+
+    // Store the latest traffic light seconds in a ref
+    const trafficLightSecondsRef = useRef(null);
     const [trafficLightSocket, setTrafficLightSocket] = useState(null);
-
-    // WebSocket connection management
-    const connectTrafficLightSocket = (svetoforId) => {
-      // Prevent multiple connections for the same svetofor_id
-      if (trafficLightSocket) {
-        return trafficLightSocket;
-      }
-
-      const socket = new WebSocket(
-        `${
-          import.meta.env.VITE_TRAFFICLIGHT_SOCKET
-        }?svetofor_id=${svetoforId}&token=${authToken}`
-      );
-
-      socket.onopen = () => {
-        console.log(`WebSocket connected for svetofor_id: ${svetoforId}`);
-      };
-
-      socket.onclose = () => {
-        console.log(`WebSocket closed for svetofor_id: ${svetoforId}`);
-        setTrafficLightSocket(null);
-      };
-
-      socket.onmessage = (event) => {
-        let message = event.data;
-        message = fixIncompleteJSON(message);
-
-        try {
-          const data = JSON.parse(message);
-          if (data?.channel) {
-            const channelSeconds = data.channel.reduce((acc, channel) => {
-              acc[channel.id] = {
-                countdown: channel.countdown,
-                status: channel.status,
-              };
-              return acc;
-            }, {});
-            setTrafficLightSeconds((prev) => {
-              // Only update if the value has changed to prevent unnecessary re-renders
-              const isChanged =
-                JSON.stringify(prev) !== JSON.stringify(channelSeconds);
-              return isChanged ? channelSeconds : prev;
-            });
-          }
-        } catch (error) {
-          console.error(
-            "Error parsing traffic light WebSocket message:",
-            error
-          );
-        }
-      };
-
-      setTrafficLightSocket(socket);
-      return socket;
-    };
 
     // Manage WebSocket connection based on marker type
     useEffect(() => {
+      // WebSocket connection management
+      const connectTrafficLightSocket = (svetoforId) => {
+        // Prevent multiple connections for the same svetofor_id
+        if (trafficLightSocket) {
+          return trafficLightSocket;
+        }
+
+        const socket = new WebSocket(
+          `${
+            import.meta.env.VITE_TRAFFICLIGHT_SOCKET
+          }?svetofor_id=${svetoforId}&token=${authToken}`
+        );
+
+        socket.onopen = () => {
+          console.log(`WebSocket connected for svetofor_id: ${svetoforId}`);
+        };
+
+        socket.onclose = () => {
+          console.log(`WebSocket closed for svetofor_id: ${svetoforId}`);
+          setTrafficLightSocket(null);
+        };
+
+        socket.onmessage = (event) => {
+          let message = event.data;
+          message = fixIncompleteJSON(message);
+
+          try {
+            const data = JSON.parse(message);
+            if (data?.channel) {
+              const channelSeconds = data.channel.reduce((acc, channel) => {
+                acc[channel.id] = {
+                  countdown: channel.countdown,
+                  status: channel.status,
+                };
+                return acc;
+              }, {});
+
+              // Update ref immediately
+              trafficLightSecondsRef.current = channelSeconds;
+
+              // Dispatch action to update Redux store
+              dispatch(
+                updateTrafficLightSeconds({
+                  camera_id: marker.link_id,
+                  countdown: channelSeconds[marker.link_id].countdown,
+                  status: channelSeconds[marker.link_id].status,
+                })
+              );
+            }
+          } catch (error) {
+            console.error(
+              "Error parsing traffic light WebSocket message:",
+              error
+            );
+          }
+        };
+
+        setTrafficLightSocket(socket);
+        return socket;
+      };
       if (marker.type === 1 && marker.svetofor_id) {
         const socket = connectTrafficLightSocket(marker.svetofor_id);
 
@@ -89,7 +100,7 @@ const CameraDetails = memo(
           }
         };
       }
-    }, [marker.svetofor_id, marker.type]);
+    }, [marker.svetofor_id, marker.type, marker.link_id]);
 
     const handleOpenLink = () => {
       const { ip, http_port } = cameraData;
@@ -101,37 +112,22 @@ const CameraDetails = memo(
 
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
+    console.log("rerender", popupRef.current);
+
     return (
       <>
-        <Popup
-          eventHandlers={{
-            mouseover: (e) => {
-              const element = e.target.getElement();
-              const draggable = new L.Draggable(element);
-              draggable.enable();
-            },
-            popupopen: () => {
-              setShowToolTip(false);
-            },
-            popupclose: () => {
-              setShowToolTip(true);
-            },
-          }}
-          ref={popupRef}
-          maxWidth={"100%"}
-          minHeight={"100%"}
-          height={"100%"}
-          interactive
-          closeOnClick={false}
-          autoClose={false}
-          keepInView={false}
-          autoPan={false}
-          className="!p-0 !m-0 z-[50000000] custom-popup text-white"
-        >
+        <CustomPopup popupRef={popupRef} setShowToolTip={setShowToolTip}>
           {!isLoading && cameraData ? (
-            <div className="rounded-xl bg-gray-900/60 backdrop-blur-md text-white ">
+            <div className="rounded-xl bg-gray-900/60 backdrop-blur-md text-white">
+              <Records videos={cameraData?.streams} name={cameraData.name} />
+              {/* Traffic Light Seconds Display */}
+
+              {marker.type === 1 && marker.link_id && (
+                <TrafficLightCounter channelId={marker.link_id} />
+              )}
+
               {/* Header Section */}
-              <div className="flex w-full gap-2">
+              <div className="flex w-full gap-2 justify-center p-2">
                 {" "}
                 <IconButton
                   size="sm"
@@ -159,21 +155,6 @@ const CameraDetails = memo(
                 </IconButton>
               </div>
 
-              {/* Streams Section */}
-              {cameraData?.streams?.length > 0 && (
-                <Records videos={cameraData.streams} name={cameraData.name} />
-              )}
-
-              {/* Traffic Light Seconds Display */}
-              {marker.type === 1 && trafficLightSeconds && marker.link_id && (
-                <TrafficLightCounter
-                  channelId={marker.link_id}
-                  seconds={trafficLightSeconds[marker.link_id].countdown}
-                  status={trafficLightSeconds[marker.link_id].status}
-                  t={t}
-                />
-              )}
-
               {/* Collapsible Description */}
               {!isCollapsed && (
                 <div className="text-sm bg-transparent backdrop-blur-md  rounded-b-xl p-2">
@@ -191,7 +172,7 @@ const CameraDetails = memo(
           ) : (
             t("loading")
           )}
-        </Popup>
+        </CustomPopup>
         {showToolTip && (
           <Tooltip direction="top" className="rounded-md">
             <div
@@ -234,7 +215,7 @@ const CameraDetails = memo(
       </>
     );
   },
-  // Modify the memo comparison to prevent re-renders for trafficLightSeconds changes
+  // Prevent re-renders for minor changes
   (prevProps, nextProps) => {
     return (
       prevProps.marker.cid === nextProps.marker.cid &&

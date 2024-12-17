@@ -3,7 +3,7 @@ import { memo, useCallback } from "react";
 import {
   updateIsDraggable,
   updateIsHighQuality,
-} from "../../../../../redux/mapSlice";
+} from "../../../../../redux/slices/mapslice";
 import { useDispatch, useSelector } from "react-redux";
 
 import PropTypes from "prop-types";

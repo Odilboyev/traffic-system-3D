@@ -3,7 +3,7 @@ import {
   updateLoadingState,
   updateMarkers,
   updateUseClusteredMarkers,
-} from "../../../redux/mapSlice";
+} from "../../../redux/slices/mapslice";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

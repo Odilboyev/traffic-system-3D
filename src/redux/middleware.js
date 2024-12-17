@@ -1,4 +1,4 @@
-import { getInitialState } from "./mapSlice";
+import { getInitialState } from "./slices/mapslice";
 
 const localStorageMiddleware = (store) => (next) => (action) => {
   const result = next(action);

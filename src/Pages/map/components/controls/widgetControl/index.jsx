@@ -2,7 +2,7 @@ import { Checkbox, Typography } from "@material-tailwind/react";
 import { useDispatch, useSelector } from "react-redux";
 
 import PropTypes from "prop-types";
-import { updateWidgets } from "../../../../../redux/mapSlice";
+import { updateWidgets } from "../../../../../redux/slices/mapslice";
 import { useCallback } from "react";
 
 const WidgetControl = ({ t }) => {

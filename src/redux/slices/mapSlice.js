@@ -1,4 +1,4 @@
-import { migrateLocalStorage, safeParseJSON } from "./utils";
+import { migrateLocalStorage, safeParseJSON } from "../utils";
 
 import { createSlice } from "@reduxjs/toolkit";
 
