@@ -1,14 +1,14 @@
 import "./popup.style.css";
 
 import { FaMinus, FaPlus, FaVideo } from "react-icons/fa6";
-import { Popup, Tooltip } from "react-leaflet";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
-import CustomPopup from "./components/CustomPopup";
+import CustomPopup from "./components/customPopup/CustomPopup";
 import { FiExternalLink } from "react-icons/fi";
 import { IconButton } from "@material-tailwind/react";
 import PTZCameraModal from "./components/ptzModal";
 import Records from "./components/records";
+import { Tooltip } from "react-leaflet";
 import TrafficLightCounter from "./components/TrafficLightCounter";
 import { authToken } from "../../../../api/api.config";
 import { fixIncompleteJSON } from "../../components/trafficLightMarkers/utils";

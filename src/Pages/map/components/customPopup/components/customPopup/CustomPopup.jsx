@@ -1,9 +1,10 @@
+import "./style.popup.css";
+
 import React, { memo } from "react";
 
 import { Popup } from "react-leaflet";
 
 const CustomPopup = ({ popupRef, setShowToolTip, children }) => {
-  console.log("popup rerender");
   return (
     <Popup
       key="fixed-popup"
@@ -32,7 +33,7 @@ const CustomPopup = ({ popupRef, setShowToolTip, children }) => {
       keepInView={false}
       autoPan={false}
       draggable
-      className="!p-0 !m-0 z-[50000000] custom-popup text-white"
+      className="!p-0 !m-0 z-[50000000] custom-popup text-white custom-popup-no-tip"
     >
       {children}
     </Popup>

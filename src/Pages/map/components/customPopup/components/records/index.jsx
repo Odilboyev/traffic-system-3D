@@ -11,8 +11,8 @@ const Records = memo(
       <div
         className="bg-gray-900/60 backdrop-blur-md text-white"
         style={{
-          minWidth: "16vw",
-          minHeight: "10vw",
+          minWidth: "14vw",
+          minHeight: "8vw",
           overflow: "hidden",
         }}
       >
