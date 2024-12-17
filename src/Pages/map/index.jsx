@@ -232,6 +232,7 @@ const MapComponent = ({ changedMarkers, t }) => {
           isbigMonitorOpen={isbigMonitorOpen}
           activeMarker={activeMarker}
           handleCloseCrossroadModal={handleCloseCrossroadModal}
+          reloadMarkers={getDataHandler}
         />
         <ToastContainer containerId="alarms" className="z-[9998]" />
         <MapEvents changedMarkers={changedMarkers} />

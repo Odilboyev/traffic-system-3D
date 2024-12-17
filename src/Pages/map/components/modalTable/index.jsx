@@ -191,6 +191,8 @@ const ModalTable = ({
               setIsSubPageOpen(false);
               settypeToShow("");
               setCurrentPage(1);
+              tableDataCallback();
+              map.scrollWheelZoom.enable();
             }
       }
       title={typeToShow}

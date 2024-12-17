@@ -64,6 +64,7 @@ const Sidebar = ({
   isbigMonitorOpen,
   activeMarker,
   handleCloseCrossroadModal,
+  reloadMarkers,
 }) => {
   const map = useMap();
   const { theme, toggleTheme, currentLayer, showTrafficJam, toggleTrafficJam } =
@@ -192,6 +193,7 @@ const Sidebar = ({
                     setIsSidebarVisible={setIsVisible}
                     activeSidePanel={activeSidePanel}
                     setActiveSidePanel={setActiveSidePanel}
+                    reloadMarkers={reloadMarkers}
                   />
                 }
                 t={t}

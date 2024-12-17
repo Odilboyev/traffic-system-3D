@@ -16,9 +16,9 @@ import { t } from "i18next";
 import { toast } from "react-toastify";
 
 const DeviceManagement = ({
-  activeSidePanel,
   setActiveSidePanel,
   setIsSidebarVisible,
+  reloadMarkers,
 }) => {
   // const { getDataHandler: refreshHandler } = useMapMarkers();
   const [deviceType, setDeviceType] = useState(""); // Default type
@@ -120,12 +120,16 @@ const DeviceManagement = ({
         );
       } finally {
         const newFilter =
-          method === "delete" ? 1 : method === "patch" ? 0 : filter;
-        fetchData(type, 1, newFilter);
-        // refreshHandler();
+          method === "delete" ? 0 : method === "patch" ? 1 : filter;
+
+        // Ensure we always reload the data with the correct filter
+        await fetchData(type, 1, newFilter);
+
+        // Optional: Add a marker refresh mechanism if available
+        // refreshHandler && refreshHandler();
       }
     },
-    [fetchData]
+    [fetchData, filter]
   );
 
   const createNewItem = (bool) => {
@@ -271,6 +275,7 @@ const DeviceManagement = ({
       {isDeviceOpen && (
         <ModalTable
           open={isDeviceOpen}
+          tableDataCallback={reloadMarkers}
           handleOpen={() => {
             setIsSidebarVisible(true);
             setDeviceTotalPages(null);

@@ -67,7 +67,7 @@ const App = () => {
       if (notificationQueueRef.current.length > 0) {
         processNotificationQueue();
       }
-    }, 100); // Process queue every 100ms
+    }, 1000); // Process queue every 1000ms
 
     return () => clearInterval(processQueueInterval);
   }, [processNotificationQueue]);
