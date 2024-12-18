@@ -6,6 +6,8 @@ import { getInfoForCards } from "../../../../api/api.handlers";
 
 const InfoWidget = ({ t, changedMarker, isSideBarOpen }) => {
   const [cardsInfoData, setCardsInfoData] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
   useEffect(() => {
     const fetchCardsInfoData = async () => {
       try {
@@ -16,7 +18,17 @@ const InfoWidget = ({ t, changedMarker, isSideBarOpen }) => {
       }
     };
     fetchCardsInfoData();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [changedMarker]);
+
+  if (isMobile) return null;
+
   return (
     <div className={`fixed bottom-1 left-0 right-0 z-[999] px-5 mx-auto `}>
       <div

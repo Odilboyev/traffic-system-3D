@@ -27,6 +27,7 @@ import {
   MdWidgets,
 } from "react-icons/md";
 import { TbBell, TbServerCog } from "react-icons/tb";
+import { useEffect, useState } from "react";
 import { useMap, useMapEvents } from "react-leaflet";
 
 import CrossroadWidget from "../../widgets/crossroadData";
@@ -52,7 +53,6 @@ import WidgetControl from "../controls/widgetControl";
 import { isPermitted } from "../../constants/roles";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 import { useTheme } from "../../../../customHooks/useTheme";
 
 // Sidebar Component
@@ -73,10 +73,22 @@ const Sidebar = ({
     "is_sidebar_open_its",
     false
   );
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [currentLocation, setCurrentLocation] = useLocalStorageState(
     "its_currentLocation"
   );
   const widgets = useSelector((state) => state.map.widgets);
+
+  // Add resize event listener
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useMapEvents({
     moveend: () => {
       const center = map.getCenter();
@@ -114,7 +126,7 @@ const Sidebar = ({
         className={` ${
           isVisible ? "fixed" : "none"
         } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-2xl  shadow-lg flex flex-col ${
-          isSidebarOpen ? "w-[15vw]" : "w-18"
+          isSidebarOpen ? (isMobile ? "w-[80vw]" : "w-[15vw]") : "w-18"
         } transition-all duration-300 ease-in-out select-none`}
       >
         {/* Toggle button */}

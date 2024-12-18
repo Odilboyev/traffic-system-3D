@@ -94,7 +94,7 @@ const CustomMarker = memo(function CustomMarker({
         customIcon ||
         L.icon({
           iconUrl: `icons/${marker.icon}`,
-          iconSize: marker.type === 2 ? [24, 24] : [40, 40],
+          iconSize: marker.type === 2 ? [26, 26] : [24, 24],
         })
       }
       rotatedAngle={marker.type === 3 ? marker.rotated : 0}

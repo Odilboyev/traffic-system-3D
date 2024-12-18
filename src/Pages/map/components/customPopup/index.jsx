@@ -17,11 +17,13 @@ import { useDispatch } from "react-redux";
 
 const CameraDetails = memo(
   function CameraDetails({ marker = {}, t, isLoading, cameraData, isPTZ, L }) {
-    const popupRef = useRef(null);
     const dispatch = useDispatch();
     const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isPopupDraggable, setIsPopupDraggable] = useState(true);
+
     const handleCollapseToggle = () => {
       setIsCollapsed((prev) => !prev);
+      setIsPopupDraggable((prev) => !prev);
     };
     const [showToolTip, setShowToolTip] = useState(true);
 
@@ -112,11 +114,13 @@ const CameraDetails = memo(
 
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
-    console.log("rerender", popupRef.current);
 
     return (
       <>
-        <CustomPopup popupRef={popupRef} setShowToolTip={setShowToolTip}>
+        <CustomPopup
+          isDraggable={isPopupDraggable}
+          setShowToolTip={setShowToolTip}
+        >
           {!isLoading && cameraData ? (
             <div className="rounded-lg bg-gray-200/30 dark:bg-gray-900/60 backdrop-blur-md ">
               <Records videos={cameraData?.streams} name={cameraData.name} />

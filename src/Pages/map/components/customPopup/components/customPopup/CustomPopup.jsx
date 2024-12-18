@@ -1,23 +1,41 @@
 import "./style.popup.css";
 
-import React, { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
+import L from "leaflet";
 import { Popup } from "react-leaflet";
 
-const CustomPopup = ({ popupRef, setShowToolTip, children }) => {
+const CustomPopup = ({ setShowToolTip, isDraggable, children }) => {
+  const [draggableInstance, setDraggableInstance] = useState(null);
+  const [isPopupDraggable, setIsPopupDraggable] = useState(isDraggable);
+
+  useEffect(() => {
+    setIsPopupDraggable(isDraggable);
+    console.log(isDraggable, "isDraggable");
+  }, [isDraggable]);
+  console.log(isPopupDraggable, "isPopupDraggable");
   return (
     <Popup
-      key="fixed-popup"
-      ref={(popup) => {
-        popupRef.current = popup;
-      }}
       eventHandlers={{
         mouseover: (e) => {
+          // Create draggable instance only once when popup opens
+
           const element = e.target.getElement();
-          const draggable = new L.Draggable(element);
-          draggable.enable();
+          const draggableRef = new L.Draggable(element);
+          setDraggableInstance(draggableRef);
+          // Enable or disable dragging based on prop
+          if (isPopupDraggable) {
+            draggableRef.enable();
+            console.log("enabled");
+          } else {
+            draggableRef.disable();
+            console.log("disabled");
+          }
         },
-        popupopen: () => {
+        mouseout: (e) => {
+          draggableInstance?.disable();
+        },
+        popupopen: (e) => {
           setShowToolTip(false);
         },
         popupclose: () => {
@@ -32,7 +50,7 @@ const CustomPopup = ({ popupRef, setShowToolTip, children }) => {
       autoClose={false}
       keepInView={false}
       autoPan={false}
-      draggable
+      draggable={false} // Explicitly set to false to use our custom dragging
       className="!p-0 !m-0 z-[50000000] custom-popup text-white custom-popup-no-tip"
     >
       {children}
