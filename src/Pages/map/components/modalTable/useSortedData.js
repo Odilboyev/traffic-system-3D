@@ -1,6 +1,6 @@
+import { sortData } from "./utils";
 // useSortedData.js
 import { useMemo } from "react";
-import { sortData } from "./utils";
 
 export const useSortedData = (
   data,
@@ -22,15 +22,27 @@ export const useSortedData = (
       }
     });
 
-    // Apply search filter
+    // Apply search filter with name prioritization
     if (searchTerm) {
-      filteredData = filteredData.filter((item) =>
-        Object.values(item).some(
-          (val) =>
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      filteredData = filteredData.filter((item) => {
+        // First, check if name matches
+        const nameMatch =
+          item.name &&
+          item.name.toString().toLowerCase().includes(lowerSearchTerm);
+
+        // If name matches, return true
+        if (nameMatch) return true;
+
+        // Otherwise, check other fields
+        return Object.entries(item).some(
+          ([key, val]) =>
             val &&
-            val.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
+            val.toString().toLowerCase().includes(lowerSearchTerm) &&
+            // Exclude certain keys that might not be relevant for searching
+            !["id", "created_at", "updated_at"].includes(key)
+        );
+      });
     }
 
     // Apply selected filter

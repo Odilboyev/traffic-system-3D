@@ -9,14 +9,14 @@ const Records = memo(
 
     return (
       <div
-        className="bg-gray-900/60 backdrop-blur-md text-white"
+        className="bg-gray-900/60 backdrop-blur-md text-white  rounded-t-lg"
         style={{
           minWidth: "14vw",
           minHeight: "8vw",
           overflow: "hidden",
         }}
       >
-        <p className="!my-1 pl-2">{name}</p>
+        <p className="!my-1 pl-2 py-2">{name}</p>
         <div className="flex flex-col w-full">
           {videos?.map((video, index) => {
             const updatedLink = video.mselink.replace(

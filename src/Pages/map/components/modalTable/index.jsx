@@ -151,6 +151,7 @@ const ModalTable = ({
     editButtonCallback(true);
     backButtonProps.onClick(true);
     setEditData(data);
+    setSearchTerm("");
   };
 
   // Calculate paginated data
@@ -176,6 +177,17 @@ const ModalTable = ({
     }));
   };
 
+  const deleteHandler = (data) => {
+    deleteButtonCallback(data);
+    // Clear search term when delete button is used
+    setSearchTerm("");
+  };
+
+  const activateHandler = (data) => {
+    activateButtonCallback(data);
+    // Clear search term when activate button is used
+    setSearchTerm("");
+  };
   return (
     <Modal
       height={modalHeight}
@@ -322,9 +334,9 @@ const ModalTable = ({
                           isSubPageOpen={isSubPageOpen}
                           locationHandler={locationHandler}
                           historyHandler={historyHandler}
-                          deleteButtonCallback={deleteButtonCallback}
+                          deleteButtonCallback={deleteHandler}
                           editButtonCallback={editHandler}
-                          activateButtonCallback={activateButtonCallback}
+                          activateButtonCallback={activateHandler}
                           tableDataCallback={tableDataCallback}
                           tableSelectOptions={tableSelectOptions}
                         />

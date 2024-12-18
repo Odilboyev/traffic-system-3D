@@ -118,54 +118,57 @@ const CameraDetails = memo(
       <>
         <CustomPopup popupRef={popupRef} setShowToolTip={setShowToolTip}>
           {!isLoading && cameraData ? (
-            <div className="rounded-xl bg-gray-900/60 backdrop-blur-md text-white">
+            <div className="rounded-lg bg-gray-200/30 dark:bg-gray-900/60 backdrop-blur-md ">
               <Records videos={cameraData?.streams} name={cameraData.name} />
               {/* Traffic Light Seconds Display */}
 
-              {marker.type === 1 && marker.link_id && (
-                <TrafficLightCounter channelId={marker.link_id} />
-              )}
-
               {/* Header Section */}
-              <div className="flex w-full gap-2 justify-center p-2">
+              <div className="flex w-full justify-between gap-2 items-center px-4">
                 {" "}
-                <IconButton
-                  size="sm"
-                  variant={"outlined"}
-                  onClick={openModal}
-                  className="text-white"
-                >
-                  <FaVideo />
-                </IconButton>
-                <IconButton
-                  size="sm"
-                  variant={"outlined"}
-                  className="text-white"
-                  onClick={handleCollapseToggle}
-                >
-                  {isCollapsed ? <FaPlus /> : <FaMinus />}
-                </IconButton>
-                <IconButton
-                  size="sm"
-                  variant={"outlined"}
-                  className="text-white"
-                  onClick={handleOpenLink}
-                >
-                  <FiExternalLink className="w-4 h-4" />
-                </IconButton>
+                <div className="flex gap-2">
+                  <IconButton
+                    size="sm"
+                    variant={"outlined"}
+                    onClick={openModal}
+                    className="dark:text-white"
+                  >
+                    <FaVideo />
+                  </IconButton>
+                  <IconButton
+                    size="sm"
+                    variant={"outlined"}
+                    className="dark:text-white"
+                    onClick={handleCollapseToggle}
+                  >
+                    {isCollapsed ? <FaPlus /> : <FaMinus />}
+                  </IconButton>
+                  <IconButton
+                    size="sm"
+                    variant={"outlined"}
+                    className="dark:text-white"
+                    onClick={handleOpenLink}
+                  >
+                    <FiExternalLink className="w-4 h-4" />
+                  </IconButton>
+                </div>
+                <div className="w-full p-2 ">
+                  {marker.type === 1 && marker.link_id && (
+                    <TrafficLightCounter channelId={marker.link_id} />
+                  )}
+                </div>
               </div>
 
               {/* Collapsible Description */}
               {!isCollapsed && (
-                <div className="text-sm bg-transparent backdrop-blur-md  rounded-b-xl p-2">
-                  <p>
+                <div className="text-sm flex flex-col border-t gap-4 bg-transparent backdrop-blur-md p-4 dark:text-white  rounded-b-xl">
+                  <div>
                     <strong>{t("Crossroad_Name")}: </strong>
                     {cameraData.crossroad_name}
-                  </p>
-                  <p>
+                  </div>
+                  <div>
                     <strong>{t("ip")}: </strong>
                     {cameraData.ip}
-                  </p>
+                  </div>
                 </div>
               )}
             </div>
