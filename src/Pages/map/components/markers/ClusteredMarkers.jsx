@@ -22,7 +22,6 @@ const ClusteredMarkers = ({
   const clusterRef = useRef(null);
   // Access markers and changedMarker from Redux store
   const markers = useSelector((state) => state.map.markers); // Assuming markers are stored in state.map.markers
-  const changedMarker = useSelector((state) => state.map.changedMarker); // Assuming changedMarker is stored in state.map.changedMarker
 
   const markerUpdate = markers?.length || 0;
   return (

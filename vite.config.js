@@ -1,8 +1,9 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { createServer } from "vite";
+import { defineConfig } from "vite";
+import manifestForPlugIn from "./manifest";
 import mkcert from "vite-plugin-mkcert";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   // server: {
@@ -15,7 +16,7 @@ export default defineConfig({
   define: {
     "process.env": {},
   },
-  plugins: [react(), mkcert()],
+  plugins: [react(), mkcert(), VitePWA(manifestForPlugIn)],
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
   },

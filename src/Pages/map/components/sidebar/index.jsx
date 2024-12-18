@@ -67,8 +67,7 @@ const Sidebar = ({
   reloadMarkers,
 }) => {
   const map = useMap();
-  const { theme, toggleTheme, currentLayer, showTrafficJam, toggleTrafficJam } =
-    useTheme();
+  const { theme, toggleTheme, toggleTrafficJam } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useLocalStorageState(
     "is_sidebar_open_its",
     false

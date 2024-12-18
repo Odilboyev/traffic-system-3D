@@ -129,7 +129,7 @@ const CameraDetails = memo(
               {/* Header Section */}
               <div className="flex w-full justify-between gap-2 items-center px-4">
                 {" "}
-                <div className="flex gap-2">
+                <div className="flex gap-2 mx-auto py-2">
                   <IconButton
                     size="sm"
                     variant={"outlined"}
@@ -155,11 +155,11 @@ const CameraDetails = memo(
                     <FiExternalLink className="w-4 h-4" />
                   </IconButton>
                 </div>
-                <div className="w-full p-2 ">
-                  {marker.type === 1 && marker.link_id && (
+                {marker.type === 1 && marker.link_id && (
+                  <div className="w-full p-2 ">
                     <TrafficLightCounter channelId={marker.link_id} />
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
               {/* Collapsible Description */}

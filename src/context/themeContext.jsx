@@ -19,7 +19,8 @@ export const MyThemeProvider = ({ children }) => {
       // Turning off traffic jam
       setShowTrafficJam(false);
       // Restore previous theme-appropriate layer
-     
+      const previousLayer = currentLayer;
+      setCurrentLayer(previousLayer);
     } else {
       // Turning on traffic jam
       setShowTrafficJam(true);
@@ -31,8 +32,14 @@ export const MyThemeProvider = ({ children }) => {
       }
     }
   };
+
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+    localStorage.setItem("trafficTheme", theme);
+    if (showTrafficJam && !currentLayer.includes("Yandex")) {
+      const yandexThemeLayer = theme === "dark" ? "Yandex Dark" : "Yandex";
+      handleLayerChange(yandexThemeLayer);
+    }
   };
 
   useEffect(() => {
