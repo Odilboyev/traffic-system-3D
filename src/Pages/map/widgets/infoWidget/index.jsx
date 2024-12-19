@@ -20,7 +20,7 @@ const InfoWidget = ({ t, changedMarker, isSideBarOpen }) => {
     fetchCardsInfoData();
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      setIsMobile(window.innerWidth <= 1024);
     };
 
     window.addEventListener("resize", handleResize);
