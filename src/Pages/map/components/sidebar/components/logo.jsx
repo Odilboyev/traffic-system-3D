@@ -24,7 +24,7 @@ const Logo = ({ t, isSidebarOpen }) => {
           <div className="text-base font-bold">{t("logo_name")}</div>
         </>
       ) : (
-        <div className="w-[2vw]">
+        <div className="w-[4vw] md:w-[2vw]">
           <img src={logo} alt="logo" className="w-full" />
         </div>
       )}

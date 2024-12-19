@@ -127,7 +127,7 @@ const CameraDetails = memo(
               {/* Traffic Light Seconds Display */}
 
               {/* Header Section */}
-              <div className="flex w-full justify-between gap-2 items-center px-4">
+              <div className="flex flex-col pb-2 md:pb-0 md:flex-row md:gap-2 w-full justify-between items-center px-4">
                 {" "}
                 <div className="flex gap-2 mx-auto py-2">
                   <IconButton
@@ -156,7 +156,7 @@ const CameraDetails = memo(
                   </IconButton>
                 </div>
                 {marker.type === 1 && marker.link_id && (
-                  <div className="w-full p-2 ">
+                  <div className="w-full md:py-2">
                     <TrafficLightCounter channelId={marker.link_id} />
                   </div>
                 )}
