@@ -143,7 +143,7 @@ const Sidebar = ({
           )}
         </button>
         {/* main content of sidebar */}
-        <div className="no-scrollbar pb-[40%] flex flex-col items-center space-y-3 gap-1 overflow-y-auto ">
+        <div className="overflow-y-scroll scrollbar-hide pb-[40%] flex flex-col items-center space-y-3 gap-1 h-[calc(100vh-100px)]">
           {/* Widgets */}
           <Logo t={t} isSidebarOpen={isSidebarOpen} />
           <UserName t={t} isSidebarOpen={isSidebarOpen} />

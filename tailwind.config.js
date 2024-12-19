@@ -14,4 +14,5 @@ module.exports = withMT({
     },
   },
   darkMode: "class",
+  plugins: [require("tailwind-scrollbar-hide")],
 });

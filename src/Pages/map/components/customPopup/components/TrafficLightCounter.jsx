@@ -19,7 +19,7 @@ const TrafficLightCounter = memo(
             : "dark:bg-red-500/40 dark:text-red-300 bg-red-500/40 text-red-300"
         }`}
       >
-        {cameraData.countdown}
+        <div className="mx-2">{cameraData.countdown}</div>
       </div>
     );
   },
