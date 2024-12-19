@@ -1,7 +1,6 @@
 import { VitePWA } from "vite-plugin-pwa";
-import { createServer } from "vite";
 import { defineConfig } from "vite";
-import manifestForPlugIn from "./manifest";
+import manifestForPlugIn from "./public/manifest";
 import mkcert from "vite-plugin-mkcert";
 import react from "@vitejs/plugin-react";
 
