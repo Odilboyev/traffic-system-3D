@@ -146,7 +146,6 @@ const Sidebar = ({
         <div className="overflow-y-scroll scrollbar-hide pb-[40%] flex flex-col items-center space-y-3 gap-1 h-[calc(100vh-100px)]">
           {/* Widgets */}
           <Logo t={t} isSidebarOpen={isSidebarOpen} />
-          <UserName t={t} isSidebarOpen={isSidebarOpen} />
           {widgets.time && (
             <DateTime
               t={t}
@@ -256,60 +255,65 @@ const Sidebar = ({
             {/* </ErrorBoundary> */}
           </div>
         </div>
+
         <div
-          className={`w-full max-w-full no-scrollbar gap-2 items-center bg-blue-gray-100 backdrop-blur dark:bg-gray-900  border-t border-gray-500/20
-            flex items-center absolute bottom-0 left-0 ${
-              isSidebarOpen
-                ? "justify-evenly px-4 py-3"
-                : "justify-center px-2 py-3"
+          className={`w-full max-w-full no-scrollbar gap-2 items-center bg-blue-gray-100/30 backdrop-blur dark:bg-gray-900  border-t border-gray-500/20
+            flex flex-col absolute bottom-0  py-3 left-0 ${
+              isSidebarOpen ? "justify-evenly " : "justify-center"
             } `}
         >
-          <SidebarSecondaryItem
-            onClick={toggleTheme}
-            icon={theme === "light" ? MdBedtime : IoMdSunny}
-          />
-
-          {isSidebarOpen && (
-            <>
-              <SidebarSecondaryItem
-                icon={MdOutlineLanguage}
-                label="language"
-                activeSecondaryPanel={activeSecondaryPanel}
-                setActiveSecondaryPanel={setActiveSecondaryPanel}
-                component={
-                  <LanguageSwitcher
-                    setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
-                  />
-                }
-              />
-              <SidebarSecondaryItem
-                icon={HiCog6Tooth}
-                label={"settings"}
-                activeSecondaryPanel={activeSecondaryPanel}
-                setActiveSecondaryPanel={setActiveSecondaryPanel}
-                component={<MarkerControl t={t} />}
-              />
-              <SidebarSecondaryItem
-                icon={FaMap}
-                label={"tile_layer_control"}
-                activeSecondaryPanel={activeSecondaryPanel}
-                setActiveSecondaryPanel={setActiveSecondaryPanel}
-                component={<TileLayerControl t={t} />}
-              />
-              <SidebarSecondaryItem
-                icon={MdBubbleChart}
-                label={"clusterization"}
-                activeSecondaryPanel={activeSecondaryPanel}
-                setActiveSecondaryPanel={setActiveSecondaryPanel}
-                component={<MarkerClusterType t={t} />}
-              />
-              <SidebarSecondaryItem
-                onClick={toggleFullSceen}
-                icon={fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon}
-              />
-              <SidebarSecondaryItem onClick={toggleTrafficJam} icon={FaCar} />
-            </>
-          )}
+          <div className="mb-2 w-full">
+            <UserName t={t} isSidebarOpen={isSidebarOpen} />
+          </div>
+          <div className="flex items-center  w-full justify-evenly">
+            <SidebarSecondaryItem
+              onClick={toggleTheme}
+              icon={theme === "light" ? MdBedtime : IoMdSunny}
+            />{" "}
+            {isSidebarOpen && (
+              <>
+                <SidebarSecondaryItem
+                  icon={MdOutlineLanguage}
+                  label="language"
+                  activeSecondaryPanel={activeSecondaryPanel}
+                  setActiveSecondaryPanel={setActiveSecondaryPanel}
+                  component={
+                    <LanguageSwitcher
+                      setIsSidebarOpen={() => setActiveSecondaryPanel(null)}
+                    />
+                  }
+                />
+                <SidebarSecondaryItem
+                  icon={HiCog6Tooth}
+                  label={"settings"}
+                  activeSecondaryPanel={activeSecondaryPanel}
+                  setActiveSecondaryPanel={setActiveSecondaryPanel}
+                  component={<MarkerControl t={t} />}
+                />
+                <SidebarSecondaryItem
+                  icon={FaMap}
+                  label={"tile_layer_control"}
+                  activeSecondaryPanel={activeSecondaryPanel}
+                  setActiveSecondaryPanel={setActiveSecondaryPanel}
+                  component={<TileLayerControl t={t} />}
+                />
+                <SidebarSecondaryItem
+                  icon={MdBubbleChart}
+                  label={"clusterization"}
+                  activeSecondaryPanel={activeSecondaryPanel}
+                  setActiveSecondaryPanel={setActiveSecondaryPanel}
+                  component={<MarkerClusterType t={t} />}
+                />
+                <SidebarSecondaryItem
+                  onClick={toggleFullSceen}
+                  icon={
+                    fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon
+                  }
+                />
+                <SidebarSecondaryItem onClick={toggleTrafficJam} icon={FaCar} />
+              </>
+            )}
+          </div>
         </div>
       </div>
       {widgets.bottomsection && (

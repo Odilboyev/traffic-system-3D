@@ -40,9 +40,9 @@ const UserName = ({ t, isSidebarOpen }) => {
     <div
       className={`${
         isSidebarOpen
-          ? "justify-between "
-          : "justify-center hover:bg-gray-700 cursor-pointer "
-      } bg-blue-gray-900/10 px-4 py-3 backdrop-blur-xl flex  w-full`}
+          ? "justify-between"
+          : "justify-center hover:bg-gray-700 cursor-pointer"
+      }   w-full bg-blue-gray-900/10 gap-5 px-4 py-3 backdrop-blur-xl flex  w-full`}
     >
       {isSidebarOpen ? (
         <>
@@ -71,7 +71,7 @@ const UserName = ({ t, isSidebarOpen }) => {
         <DialogHeader className="dark:text-white">
           <div className="">{t("confirm_logout")}</div>{" "}
         </DialogHeader>
-        <DialogBody className=" dark:text-gray-300">
+        <DialogBody className=" dark:text-gray-300 ">
           {/* Are you sure you want to logout? */}
           <div className="text-lg font-bold">{userInfo?.name}</div>
           {t("confirm_logout_message")}

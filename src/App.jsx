@@ -37,9 +37,9 @@ const App = () => {
       const latestNotification =
         uniqueNotifications[uniqueNotifications.length - 1];
 
-      setChangedMarkers(
-        uniqueNotifications.map((notification) => notification.data)
-      );
+      // setChangedMarkers(
+      //   uniqueNotifications.map((notification) => notification.data)
+      // );
 
       // Play sound based on the latest notification
       const sound = new Audio();

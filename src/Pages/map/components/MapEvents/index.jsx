@@ -70,26 +70,26 @@ const MapEvents = ({ changedMarkers = [] }) => {
   });
 
   // Add useEffect to handle changedMarkers updates
-  useEffect(() => {
-    if (changedMarkers && changedMarkers.length > 0) {
-      // Batch process notifications
-      changedMarkers.forEach((changedMarker) => {
-        toaster(changedMarker, map);
-      });
+  // useEffect(() => {
+  //   if (changedMarkers && changedMarkers.length > 0) {
+  //     // Batch process notifications
+  //     changedMarkers.forEach((changedMarker) => {
+  //       toaster(changedMarker, map);
+  //     });
 
-      // Dispatch batch marker update
-      dispatchMarkers({
-        type: "BATCH_UPDATE_MARKERS",
-        payload: changedMarkers,
-      });
-    }
-  }, [changedMarkers]);
+  //     // Dispatch batch marker update
+  //     dispatchMarkers({
+  //       type: "BATCH_UPDATE_MARKERS",
+  //       payload: changedMarkers,
+  //     });
+  //   }
+  // }, [changedMarkers]);
 
   // Optional: Expose markers to parent components if needed
-  useEffect(() => {
-    // You might want to update the markers in the parent component or context
-    // This depends on how your state management is set up
-  }, [markers]);
+  // useEffect(() => {
+  //   // You might want to update the markers in the parent component or context
+  //   // This depends on how your state management is set up
+  // }, [markers]);
 
   return null;
 };
