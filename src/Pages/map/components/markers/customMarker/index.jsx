@@ -61,7 +61,7 @@ const CustomMarker = memo(function CustomMarker({
   };
   const map = useMap();
   const zoomer = (location) => {
-    map.flyTo(location, 17, {
+    map.flyTo(location, 18, {
       duration: 0.3,
     });
   };
@@ -94,7 +94,7 @@ const CustomMarker = memo(function CustomMarker({
         customIcon ||
         L.icon({
           iconUrl: `icons/${marker.icon}`,
-          iconSize: marker.type === 2 ? [26, 26] : [24, 24],
+          iconSize: marker.type === 2 ? [22, 22] : [24, 24],
         })
       }
       rotatedAngle={marker.type === 3 ? marker.rotated : 0}

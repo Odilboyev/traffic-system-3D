@@ -6,34 +6,41 @@ import L from "leaflet";
 import { Popup } from "react-leaflet";
 
 const CustomPopup = ({ setShowToolTip, isDraggable, children }) => {
-  const [draggableInstance, setDraggableInstance] = useState(null);
-  const [isPopupDraggable, setIsPopupDraggable] = useState(isDraggable);
+  const draggableRef = useRef(null);
+  const popupElementRef = useRef(null);
 
   useEffect(() => {
-    setIsPopupDraggable(isDraggable);
-    console.log(isDraggable, "isDraggable");
+    // Ensure draggable instance exists and update its state
+    if (popupElementRef.current && isDraggable) {
+      if (!draggableRef.current) {
+        draggableRef.current = new L.Draggable(popupElementRef.current);
+      }
+      draggableRef.current.enable();
+    } else if (draggableRef.current) {
+      draggableRef.current.disable();
+    }
   }, [isDraggable]);
-  console.log(isPopupDraggable, "isPopupDraggable");
+
   return (
     <Popup
       eventHandlers={{
         mouseover: (e) => {
-          // Create draggable instance only once when popup opens
+          // Store the popup element for dragging
+          popupElementRef.current = e.target.getElement();
 
-          const element = e.target.getElement();
-          const draggableRef = new L.Draggable(element);
-          setDraggableInstance(draggableRef);
-          // Enable or disable dragging based on prop
-          if (isPopupDraggable) {
-            draggableRef.enable();
-            console.log("enabled");
-          } else {
-            draggableRef.disable();
-            console.log("disabled");
+          // Create and manage draggable instance
+          if (isDraggable) {
+            if (!draggableRef.current) {
+              draggableRef.current = new L.Draggable(popupElementRef.current);
+            }
+            draggableRef.current.enable();
           }
         },
-        mouseout: (e) => {
-          draggableInstance?.disable();
+        mouseout: () => {
+          // Disable dragging on mouseout if not draggable
+          if (!isDraggable && draggableRef.current) {
+            draggableRef.current.disable();
+          }
         },
         popupopen: (e) => {
           setShowToolTip(false);
