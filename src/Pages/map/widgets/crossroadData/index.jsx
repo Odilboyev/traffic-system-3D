@@ -12,7 +12,7 @@ const CrossroadWidget = ({ t, isOpen, onClose, marker, isVisible }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [device, setDevice] = useState(null);
-
+  console.log(isOpen, marker, "marker");
   const fetchData = async (id) => {
     setIsLoading(true);
     try {

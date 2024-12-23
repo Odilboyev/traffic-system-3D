@@ -36,7 +36,6 @@ const CustomMarker = memo(function CustomMarker({
   };
   const [cameraData, setCameraData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
 
   const fetchedDataMap = useRef(new Map()); // Store fetched data
 
@@ -75,10 +74,11 @@ const CustomMarker = memo(function CustomMarker({
       rotationAngle={marker.rotated}
       eventHandlers={{
         click: () => {
-          if (marker.type === 2)
-            zoom > 16
-              ? handleMonitorCrossroad(marker)
-              : zoomer([marker.lat, marker.lng]);
+          // if (marker.type === 2)
+          //   zoom > 16
+          //     ? handleMonitorCrossroad(marker)
+          //     : zoomer([marker.lat, marker.lng]);
+          if (marker.type === 2) handleMonitorCrossroad(marker);
           else if (marker.type === 3) handleBoxModalOpen(marker);
           else if (marker.type === 4) handleLightsModalOpen(marker);
         },

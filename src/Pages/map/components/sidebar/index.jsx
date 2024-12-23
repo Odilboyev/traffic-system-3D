@@ -44,6 +44,7 @@ import Logo from "./components/logo";
 import MarkerClusterType from "../../sections/markerClusterType";
 import MarkerControl from "../controls/markerControl";
 import RegionControl from "../controls/regionControl";
+import RoadDrawerControl from "./components/RoadDrawerControl";
 import SidebarItem from "./components/sidebarItem";
 import SidebarSecondaryItem from "./components/sidebarSecondaryItem";
 import TileLayerControl from "../controls/tileLayerControl";
@@ -73,6 +74,9 @@ const Sidebar = ({
     false
   );
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth > 768 && window.innerWidth <= 1024
+  );
   const [currentLocation, setCurrentLocation] = useLocalStorageState(
     "its_currentLocation"
   );
@@ -82,6 +86,7 @@ const Sidebar = ({
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
+      setIsTablet(window.innerWidth > 768 && window.innerWidth <= 1024);
     };
 
     window.addEventListener("resize", handleResize);
@@ -125,7 +130,13 @@ const Sidebar = ({
         className={` ${
           isVisible ? "fixed" : "none"
         } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-2xl  shadow-lg flex flex-col ${
-          isSidebarOpen ? (isMobile ? "w-[80vw]" : "w-[15vw]") : "w-18"
+          isSidebarOpen
+            ? isMobile
+              ? "w-[80vw]"
+              : isTablet
+              ? "w-[40vw]"
+              : "w-[15vw]"
+            : "w-18"
         } transition-all duration-300 ease-in-out select-none`}
       >
         {/* Toggle button */}
@@ -190,7 +201,17 @@ const Sidebar = ({
               setActiveSidePanel={setActiveSidePanel}
               extraContent={<WidgetControl t={t} />} // Another custom component
             />
-            {isPermitted && (
+            {/* <SidebarItem
+              icon={<FaRoad className="w-4 h-4" />}
+              label="roadDrawer"
+              t={t}
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+              activeSidePanel={activeSidePanel}
+              setActiveSidePanel={setActiveSidePanel}
+              extraContent={<RoadDrawerControl map={map} t={t} />}
+            /> */}
+            {/* {isPermitted && (
               <SidebarItem
                 icon={<TbServerCog className="w-4 h-4" />}
                 isSidebarOpen={isSidebarOpen}
@@ -208,7 +229,7 @@ const Sidebar = ({
                 }
                 t={t}
               />
-            )}
+            )} */}
             <SidebarItem
               icon={<TbBell className="w-4 h-4" />}
               isSidebarOpen={isSidebarOpen}

@@ -3,10 +3,14 @@ import { getBoxData, markerHandler } from "../../api/api.handlers.js";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
+import FindMeControl from "./components/controls/findMeControl/findme.control.jsx";
+import HeatMap from "./components/heatmap/index.jsx";
 import L from "leaflet";
 import MapEvents from "./components/MapEvents/index.jsx";
 import MapModals from "./components/MapModals/index.jsx";
 import PropTypes from "prop-types";
+import RoadDrawer from "../../components/roadDrawer/drawer.jsx";
+import RoadDrawerControl from "../../components/roadDrawer/control.jsx";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
@@ -223,6 +227,16 @@ const MapComponent = ({ changedMarkers, t }) => {
         maxZoom={20}
       >
         <MapCRSHandler currentLayer={currentLayer} />
+        {/* <RoadDrawerControl />
+        <RoadDrawer /> */}
+        {/* <HeatMap
+          t={t}
+          coordinates={[
+            { lat: 41.350781, lng: 69.352264 },
+            // Add more crossroad coordinates as needed
+          ]}
+          intensity={[0.5, 0.7, 0.3, 0.6]}
+        /> */}
         <Sidebar
           t={t}
           // mapRef={map}
@@ -234,6 +248,7 @@ const MapComponent = ({ changedMarkers, t }) => {
           handleCloseCrossroadModal={handleCloseCrossroadModal}
           reloadMarkers={getDataHandler}
         />
+        {/* {!isbigMonitorOpen ? <FindMeControl /> : ""} */}
         <ToastContainer containerId="alarms" className="z-[9998]" />
         <MapEvents changedMarkers={changedMarkers} />
         {currentLayerDetails && (
