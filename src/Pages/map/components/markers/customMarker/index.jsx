@@ -60,7 +60,7 @@ const CustomMarker = memo(function CustomMarker({
   };
   const map = useMap();
   const zoomer = (location) => {
-    map.flyTo(location, 18, {
+    map.flyTo(location, 19, {
       duration: 0.3,
     });
   };
@@ -74,11 +74,10 @@ const CustomMarker = memo(function CustomMarker({
       rotationAngle={marker.rotated}
       eventHandlers={{
         click: () => {
-          // if (marker.type === 2)
-          //   zoom > 16
-          //     ? handleMonitorCrossroad(marker)
-          //     : zoomer([marker.lat, marker.lng]);
-          if (marker.type === 2) handleMonitorCrossroad(marker);
+          if (marker.type === 2)
+            zoom > 16
+              ? handleMonitorCrossroad(marker)
+              : zoomer([marker.lat, marker.lng]);
           else if (marker.type === 3) handleBoxModalOpen(marker);
           else if (marker.type === 4) handleLightsModalOpen(marker);
         },
