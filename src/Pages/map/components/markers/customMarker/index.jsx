@@ -5,7 +5,6 @@ import { memo, useRef, useState } from "react";
 import CameraDetails from "../../customPopup";
 import PropTypes from "prop-types";
 import { Typography } from "@material-tailwind/react";
-import { debounce } from "lodash";
 import { getCameraDetails } from "../../../../../api/api.handlers";
 
 const CustomMarker = memo(function CustomMarker({
@@ -113,10 +112,10 @@ const CustomMarker = memo(function CustomMarker({
         )
       ) : (
         <Tooltip direction="top" className="rounded-md">
-          <Typography className="my-0">{marker?.cname}</Typography>
+          <Typography className="my-0">{marker?.cname || ""}</Typography>
           {marker.statuserror === 2 && (
             <Typography className="my-0 text-center text-red-500">
-              {t("offline")}
+              {t("offline") || "Offline"}
             </Typography>
           )}
         </Tooltip>
@@ -134,5 +133,7 @@ CustomMarker.propTypes = {
   handleLightsModalOpen: PropTypes.func,
   handleMarkerDragEnd: PropTypes.func,
   customIcon: PropTypes.object,
+  zoom: PropTypes.number,
+  t: PropTypes.func,
 };
 export default memo(CustomMarker); // CustomMarker;

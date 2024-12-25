@@ -1,23 +1,22 @@
+import "maplibre-gl/dist/maplibre-gl.css";
+
 import { MapContainer, TileLayer } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
-import FindMeControl from "./components/controls/findMeControl/findme.control.jsx";
-import HeatMap from "./components/heatmap/index.jsx";
 import L from "leaflet";
+import MapCRSHandler from "./utils/mapCsrHandler.jsx";
 import MapEvents from "./components/MapEvents/index.jsx";
 import MapModals from "./components/MapModals/index.jsx";
 import PropTypes from "prop-types";
-import RoadDrawer from "../../components/roadDrawer/drawer.jsx";
-import RoadDrawerControl from "../../components/roadDrawer/control.jsx";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
+import TrafficJamLayer from "./utils/trafficJamTilelayer.jsx";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import { safeParseJSON } from "../../redux/utils.js";
-import { useMap } from "react-leaflet";
 import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 import { useSelector } from "react-redux";
@@ -25,76 +24,7 @@ import { useTheme } from "../../customHooks/useTheme.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
 
-const TrafficJamLayer = memo(
-  ({ showTrafficJam }) => {
-    const [trafficTimestamp, setTrafficTimestamp] = useState(
-      Math.floor(Date.now() / 60000) * 60
-    );
-
-    const updateTrafficTimestamp = useCallback(() => {
-      const newTimestamp = Math.floor(Date.now() / 60000) * 60;
-      setTrafficTimestamp(newTimestamp);
-    }, []);
-
-    useEffect(() => {
-      let intervalId;
-      if (showTrafficJam) {
-        intervalId = setInterval(updateTrafficTimestamp, 60000);
-
-        return () => {
-          if (intervalId) clearInterval(intervalId);
-        };
-      }
-    }, [showTrafficJam, updateTrafficTimestamp]);
-
-    const trafficJamLayerUrl = useMemo(
-      () =>
-        `https://core-jams-rdr-cache.maps.yandex.net/1.1/tiles?l=trf&lang=ru_RU&x={x}&y={y}&z={z}&scale=1&tm=${trafficTimestamp}`,
-      [trafficTimestamp]
-    );
-
-    if (!showTrafficJam) return null;
-
-    return (
-      <TileLayer
-        key={`traffic-jam-layer-${trafficTimestamp}`}
-        url={trafficJamLayerUrl}
-        tileSize={256}
-        zoomOffset={0}
-        maxNativeZoom={20}
-        maxZoom={20}
-      />
-    );
-  },
-  (prevProps, nextProps) => {
-    return prevProps.showTrafficJam === nextProps.showTrafficJam;
-  }
-);
-
-const MapCRSHandler = ({ currentLayer }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (map) {
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-
-      map.options.crs = currentLayer.includes("Yandex")
-        ? L.CRS.EPSG3395
-        : L.CRS.EPSG3857;
-
-      map.invalidateSize();
-
-      setTimeout(() => {
-        map.setView(center, zoom, { animate: false });
-      }, 100);
-    }
-  }, [currentLayer, map]);
-
-  return null;
-};
-
-const MapComponent = ({ changedMarkers, t }) => {
+const MapComponent = memo(({ changedMarkers, t }) => {
   const {
     markers,
     setMarkers,
@@ -105,7 +35,6 @@ const MapComponent = ({ changedMarkers, t }) => {
   } = useMapMarkers();
   const isDraggable = useSelector((state) => state.map.isDraggable);
   const filter = useSelector((state) => state.map.filter);
-  const [map, setMap] = useState(null);
   const { fetchAlarmsData } = useMapAlarms();
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -210,7 +139,6 @@ const MapComponent = ({ changedMarkers, t }) => {
     setActiveLight(null);
     setIsLightsLoading(false);
   };
-
   return (
     <>
       <MapContainer
@@ -227,19 +155,8 @@ const MapComponent = ({ changedMarkers, t }) => {
         maxZoom={20}
       >
         <MapCRSHandler currentLayer={currentLayer} />
-        {/* <RoadDrawerControl />
-        <RoadDrawer /> */}
-        {/* <HeatMap
-          t={t}
-          coordinates={[
-            { lat: 41.350781, lng: 69.352264 },
-            // Add more crossroad coordinates as needed
-          ]}
-          intensity={[0.5, 0.7, 0.3, 0.6]}
-        /> */}
         <Sidebar
           t={t}
-          // mapRef={map}
           changedMarker={changedMarkers}
           isVisible={isSidebarVisible}
           setIsVisible={setIsSidebarVisible}
@@ -299,11 +216,11 @@ const MapComponent = ({ changedMarkers, t }) => {
       />
     </>
   );
-};
+});
 
 MapComponent.propTypes = {
-  changedMarker: PropTypes.object,
+  changedMarkers: PropTypes.array,
   t: PropTypes.func,
 };
 
-export default memo(MapComponent);
+export default MapComponent;

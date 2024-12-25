@@ -11,6 +11,8 @@ const SidebarSecondaryItem = memo(
     activeSecondaryPanel,
     setActiveSecondaryPanel,
     component,
+    className,
+    iconClassName,
     ...rest
   }) => {
     const { theme } = useTheme();
@@ -37,11 +39,12 @@ const SidebarSecondaryItem = memo(
       </DropPanel>
     ) : (
       <IconButton
+        className={className}
         onClick={rest.onClick}
         color={theme === "dark" ? "black" : "white"}
         size="sm"
       >
-        <Icon className="w-6 h-6" />
+        <Icon className={`${iconClassName} w-6 h-6`} />
       </IconButton>
     );
   }

@@ -14,6 +14,15 @@ export const MyThemeProvider = ({ children }) => {
     "trafficJamEnabled",
     false
   );
+  const [show3DLayer, setShow3DLayer] = useLocalStorageState(
+    "3DLayerEnabled",
+    false
+  );
+
+  const toggle3DLayer = () => {
+    setShow3DLayer((prev) => !prev);
+  };
+
   const toggleTrafficJam = () => {
     if (showTrafficJam) {
       // Turning off traffic jam
@@ -82,6 +91,10 @@ export const MyThemeProvider = ({ children }) => {
         showTrafficJam,
         setShowTrafficJam,
         toggleTrafficJam,
+        show3DLayer,
+        setShow3DLayer,
+        toggle3DLayer,
+        handleLayerChange,
       }}
     >
       <div className={theme === "dark" ? "dark" : ""}>{children}</div>

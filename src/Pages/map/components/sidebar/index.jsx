@@ -15,6 +15,7 @@ import {
   IoIosArrowBack,
   IoIosArrowForward,
   IoMdCar,
+  IoMdCube,
   IoMdSunny,
 } from "react-icons/io";
 import {
@@ -68,7 +69,14 @@ const Sidebar = ({
   reloadMarkers,
 }) => {
   const map = useMap();
-  const { theme, toggleTheme, toggleTrafficJam } = useTheme();
+  const {
+    theme,
+    toggleTheme,
+    toggleTrafficJam,
+    showTrafficJam,
+    toggle3DLayer,
+    show3DLayer,
+  } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useLocalStorageState(
     "is_sidebar_open_its",
     false
@@ -211,7 +219,7 @@ const Sidebar = ({
               setActiveSidePanel={setActiveSidePanel}
               extraContent={<RoadDrawerControl map={map} t={t} />}
             /> */}
-            {/* {isPermitted && (
+            {isPermitted && (
               <SidebarItem
                 icon={<TbServerCog className="w-4 h-4" />}
                 isSidebarOpen={isSidebarOpen}
@@ -229,7 +237,7 @@ const Sidebar = ({
                 }
                 t={t}
               />
-            )} */}
+            )}
             <SidebarItem
               icon={<TbBell className="w-4 h-4" />}
               isSidebarOpen={isSidebarOpen}
@@ -288,11 +296,21 @@ const Sidebar = ({
           </div>
           <div className="flex items-center  w-full justify-evenly">
             <SidebarSecondaryItem
-              onClick={toggleTheme}
-              icon={theme === "light" ? MdBedtime : IoMdSunny}
-            />{" "}
+              onClick={toggleTrafficJam}
+              icon={IoMdCar}
+              className={showTrafficJam ? "relative overflow-hidden" : ""}
+              iconClassName={
+                showTrafficJam
+                  ? "text-blue-500 transform scale-110" // Highlight when active
+                  : ""
+              }
+            />
             {isSidebarOpen && (
               <>
+                <SidebarSecondaryItem
+                  onClick={toggleTheme}
+                  icon={theme === "light" ? MdBedtime : IoMdSunny}
+                />{" "}
                 <SidebarSecondaryItem
                   icon={MdOutlineLanguage}
                   label="language"
@@ -331,7 +349,20 @@ const Sidebar = ({
                     fulscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon
                   }
                 />
-                <SidebarSecondaryItem onClick={toggleTrafficJam} icon={FaCar} />
+                <>
+                  <SidebarSecondaryItem
+                    onClick={toggle3DLayer}
+                    icon={IoMdCube}
+                    className={show3DLayer ? "relative" : ""}
+                    iconClassName={
+                      show3DLayer
+                        ? "text-blue-500 transform scale-110" // Highlight when active
+                        : ""
+                    }
+                    label="3D Layer"
+                  />
+                  {/* Other existing sidebar items */}
+                </>
               </>
             )}
           </div>
