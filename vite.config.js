@@ -22,5 +22,6 @@ export default defineConfig({
 
   optimizeDeps: {
     exclude: ["js-big-decimal"],
+    include: ["leaflet-polylinedecorator"],
   },
 });

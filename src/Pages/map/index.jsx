@@ -1,8 +1,6 @@
-import "maplibre-gl/dist/maplibre-gl.css";
-
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import L from "leaflet";
@@ -17,12 +15,38 @@ import TrafficLightContainer from "./components/trafficLightMarkers/managementLi
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
 import { safeParseJSON } from "../../redux/utils.js";
+import toaster from "../../tools/toastconfig.jsx";
 import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../customHooks/useTheme.jsx";
 
 const home = [41.2995, 69.2401]; // Tashkent
+
+const MapMarkerToaster = ({ changedMarkers }) => {
+  const map = useMap();
+  const handleToaster = useCallback(
+    (changedMarker) => {
+      toaster(changedMarker, map);
+    },
+    [map]
+  );
+  useEffect(() => {
+    if (changedMarkers && changedMarkers.length > 0) {
+      // Batch process notifications
+      changedMarkers.forEach((changedMarker) => {
+        handleToaster(changedMarker);
+      });
+      // // Dispatch batch marker update
+      // dispatchMarkers({
+      //   type: "BATCH_UPDATE_MARKERS",
+      //   payload: changedMarkers,
+      // });
+    }
+  }, [changedMarkers, handleToaster]);
+
+  return null;
+};
 
 const MapComponent = memo(({ changedMarkers, t }) => {
   const {
@@ -33,6 +57,7 @@ const MapComponent = memo(({ changedMarkers, t }) => {
     updateMarkers,
     useClusteredMarkers,
   } = useMapMarkers();
+
   const isDraggable = useSelector((state) => state.map.isDraggable);
   const filter = useSelector((state) => state.map.filter);
   const { fetchAlarmsData } = useMapAlarms();
@@ -62,6 +87,7 @@ const MapComponent = memo(({ changedMarkers, t }) => {
     getDataHandler();
     fetchAlarmsData();
   }, []);
+  // Add useEffect to handle changedMarkers updates
 
   useEffect(() => {
     if (mapRef.current) {
@@ -139,6 +165,7 @@ const MapComponent = memo(({ changedMarkers, t }) => {
     setActiveLight(null);
     setIsLightsLoading(false);
   };
+
   return (
     <>
       <MapContainer
@@ -155,6 +182,7 @@ const MapComponent = memo(({ changedMarkers, t }) => {
         maxZoom={20}
       >
         <MapCRSHandler currentLayer={currentLayer} />
+        <MapMarkerToaster changedMarker={changedMarkers} />
         <Sidebar
           t={t}
           changedMarker={changedMarkers}
@@ -200,7 +228,6 @@ const MapComponent = memo(({ changedMarkers, t }) => {
           useDynamicFetching={useClusteredMarkers === "dynamic"}
         />
       </MapContainer>
-
       <MapModals
         t={t}
         // crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}

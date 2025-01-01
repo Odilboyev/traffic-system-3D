@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { memo, useCallback, useEffect, useReducer } from "react";
 import { useMap, useMapEvents } from "react-leaflet";
 
 import PropTypes from "prop-types";
@@ -31,7 +31,7 @@ const markersReducer = (state, action) => {
  *
  * @returns {null}
  */
-const MapEvents = ({ changedMarkers = [] }) => {
+const MapEvents = memo(({ changedMarkers = [] }) => {
   const map = useMap();
   const { markers: initialMarkers } = useMapMarkers();
   const [markers, dispatchMarkers] = useReducer(markersReducer, initialMarkers);
@@ -52,6 +52,12 @@ const MapEvents = ({ changedMarkers = [] }) => {
     const zoom = map.getZoom();
     localStorage.setItem("its_currentZoom", zoom);
   });
+  const handleToaster = useCallback(
+    (changedMarker) => {
+      toaster(changedMarker, map);
+    },
+    [map]
+  );
 
   // Handle map movement and zoom events
   useMapEvents({
@@ -74,7 +80,7 @@ const MapEvents = ({ changedMarkers = [] }) => {
     if (changedMarkers && changedMarkers.length > 0) {
       // Batch process notifications
       changedMarkers.forEach((changedMarker) => {
-        toaster(changedMarker, map);
+        handleToaster(changedMarker);
       });
       // // Dispatch batch marker update
       // dispatchMarkers({
@@ -82,16 +88,16 @@ const MapEvents = ({ changedMarkers = [] }) => {
       //   payload: changedMarkers,
       // });
     }
-  }, [changedMarkers]);
+  }, [changedMarkers, handleToaster]);
 
-  // Optional: Expose markers to parent components if needed
-  useEffect(() => {
-    // You might want to update the markers in the parent component or context
-    // This depends on how your state management is set up
-  }, [markers]);
+  // // Optional: Expose markers to parent components if needed
+  // useEffect(() => {
+  //   // You might want to update the markers in the parent component or context
+  //   // This depends on how your state management is set up
+  // }, [markers]);
 
   return null;
-};
+});
 
 MapEvents.propTypes = {
   changedMarkers: PropTypes.arrayOf(PropTypes.object),

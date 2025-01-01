@@ -1,6 +1,6 @@
 // MarkerComponent.jsx
 import { Marker, Tooltip, useMap } from "react-leaflet";
-import { memo, useRef, useState } from "react";
+import { memo, useRef, useState, useMemo } from "react";
 
 import CameraDetails from "../../customPopup";
 import PropTypes from "prop-types";
@@ -18,6 +18,7 @@ const CustomMarker = memo(function CustomMarker({
   handleLightsModalOpen,
   handleMarkerDragEnd,
   customIcon,
+  disableUpdates = false,
 }) {
   const isCamera = (type) => type == 1 || type == 5 || type == 6;
 
@@ -63,12 +64,28 @@ const CustomMarker = memo(function CustomMarker({
       duration: 0.3,
     });
   };
+
+  const markerIcon = useMemo(() => 
+    customIcon || L.icon({
+      iconUrl: `icons/${marker.icon}`,
+      iconSize: marker.type === 2 ? [22, 22] : [24, 24],
+    })
+  , [customIcon, marker.icon, marker.type]);
+
+  const markerPosition = useMemo(() => 
+    [marker.lat, marker.lng]
+  , [marker.lat, marker.lng]);
+
+  if (disableUpdates) {
+    return null;
+  }
+
   return (
     <Marker
       key={`${marker.lat}-${marker.lng}-${marker.cid}`}
       markerId={marker.cid}
       markerType={marker.type}
-      position={[marker.lat, marker.lng]}
+      position={markerPosition}
       draggable={isDraggable}
       rotationAngle={marker.rotated}
       eventHandlers={{
@@ -81,25 +98,19 @@ const CustomMarker = memo(function CustomMarker({
           else if (marker.type === 4) handleLightsModalOpen(marker);
         },
         dragend: (event) => handleMarkerDragEnd(marker.cid, marker.type, event),
-
         mouseover: () => {
-          fetchCameraDetails(marker.type, marker.cid);
+          if (!disableUpdates) {
+            fetchCameraDetails(marker.type, marker.cid);
+          }
         },
       }}
       type={marker.type}
       statuserror={marker.statuserror}
-      icon={
-        customIcon ||
-        L.icon({
-          iconUrl: `icons/${marker.icon}`,
-          iconSize: marker.type === 2 ? [22, 22] : [24, 24],
-        })
-      }
+      icon={markerIcon}
       rotatedAngle={marker.type === 3 ? marker.rotated : 0}
     >
-      {isCamera(marker.type) && marker.statuserror !== 2 ? (
+      {!disableUpdates && isCamera(marker.type) && marker.statuserror !== 2 ? (
         !isLoading &&
-        // showPopup &&
         cameraData && (
           <CameraDetails
             t={t}
@@ -122,6 +133,19 @@ const CustomMarker = memo(function CustomMarker({
       )}
     </Marker>
   );
+}, (prevProps, nextProps) => {
+  if (nextProps.disableUpdates) {
+    return true; // Skip update if updates are disabled
+  }
+  // Only update if essential props changed
+  return (
+    prevProps.marker.lat === nextProps.marker.lat &&
+    prevProps.marker.lng === nextProps.marker.lng &&
+    prevProps.marker.statuserror === nextProps.marker.statuserror &&
+    prevProps.marker.rotated === nextProps.marker.rotated &&
+    prevProps.marker.icon === nextProps.marker.icon &&
+    prevProps.zoom === nextProps.zoom
+  );
 });
 
 CustomMarker.propTypes = {
@@ -135,5 +159,7 @@ CustomMarker.propTypes = {
   customIcon: PropTypes.object,
   zoom: PropTypes.number,
   t: PropTypes.func,
+  disableUpdates: PropTypes.bool,
 };
-export default memo(CustomMarker); // CustomMarker;
+
+export default memo(CustomMarker);

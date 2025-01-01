@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import CustomMarker from "./customMarker";
 import { FaTrafficLight } from "react-icons/fa6";
@@ -173,7 +173,8 @@ DynamicMarkers.propTypes = {
   handleMarkerDragEnd: PropTypes.func.isRequired,
 };
 
-export default DynamicMarkers;
+export default memo(DynamicMarkers);
+
 // Cluster icon logic
 const ClusterIcon = (cluster, useCrossRoadCount) => {
   const childMarkers = cluster.getAllChildMarkers();
