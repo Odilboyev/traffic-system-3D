@@ -50,7 +50,7 @@ const TrafficlightMarkers = ({
 
   return (
     <>
-      {trafficLights.map((v, i) => (
+      {trafficLights?.map((v, i) => (
         <Marker
           key={i}
           position={[v.lat, v.lng]}
