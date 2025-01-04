@@ -7,11 +7,19 @@ const ThreeArrowsIcon = () => (
     fill="currentColor"
     width="40px"
     height="40px"
+    style={{ transform: "rotate(-90deg)" }}
   >
-    <path d="M12 2L8 6H11V10H13V6H16L12 2Z" />
-    <path d="M12 22L16 18H13V10H11V18H8L12 22Z" />
-    <path d="M22 12L18 8V11H14V13H18V16L22 12Z" />
-    <path d="M11 10H13V14H11V10Z" />
+    {/* Right arrow with tail */}
+    <path d="M22 12L18 8V11H2V13H18V16L22 12Z" />
+
+    {/* Top arrow with tail */}
+    <path d="M12 2L8 6H11V14H13V6H16L12 2Z" />
+
+    {/* Bottom arrow with tail */}
+    <path d="M12 22L16 18H13V14H11V18H8L12 22Z" />
+
+    {/* Center connector */}
+    <path d="M11 13H13V15H11V13Z" />
   </svg>
 );
 
