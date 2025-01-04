@@ -2,12 +2,12 @@ import L from "leaflet";
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
+import { useTheme } from "../../../customHooks/useTheme";
 
 const LOCALSTORAGE_CSR_KEY = "its_mapCsrLayer";
 
 const MapCRSHandler = ({ currentLayer }) => {
   const map = useMap();
-
   useEffect(() => {
     if (map) {
       // Retrieve or set initial CSR

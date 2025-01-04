@@ -87,7 +87,8 @@ const modifySvetofor = async (data, id) =>
   postData(import.meta.env.VITE_TRAFFIC_LIGHTS_UPDATE + "/" + id, data);
 const getTrafficStatsData = async (id, params) =>
   getDataWithParams(import.meta.env.VITE_TRAFFIC_STATS + "/" + id, params);
-
+const getTrafficJamLines = async () =>
+  getData(import.meta.env.VITE_TRAFFICJAM_LINES);
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -220,6 +221,7 @@ export {
   getUserRoles,
   getWeatherData,
   getTrafficStatsData,
+  getTrafficJamLines,
   listUsers,
   markerHandler,
   recoverUser,

@@ -1,0 +1,19 @@
+/* Base styles for traffic lines */
+.traffic-line-low,
+.traffic-line-moderate,
+.traffic-line-high,
+.traffic-line-severe {
+  transition: all 0.3s ease;
+}
+
+/* Tooltip styling */
+.traffic-tooltip {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border: none !important;
+  border-radius: 4px !important;
+  color: white !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}

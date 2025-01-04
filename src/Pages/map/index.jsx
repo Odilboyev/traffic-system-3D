@@ -1,16 +1,21 @@
+import "./components/TrafficJamPolylines/styles.css";
+
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
+import BaseLayerHandler from "./components/BaseLayerHandler";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 import L from "leaflet";
 import MapCRSHandler from "./utils/mapCsrHandler.jsx";
 import MapEvents from "./components/MapEvents/index.jsx";
+import MapLibreLayer from "./components/MapLibreLayer";
 import MapModals from "./components/MapModals/index.jsx";
 import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
 import TrafficJamLayer from "./utils/trafficJamTilelayer.jsx";
+import TrafficJamPolylines from "./components/TrafficJamPolylines";
 import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
 import ZoomControl from "./components/controls/customZoomControl/index.jsx";
 import baseLayers from "../../configurations/mapLayers.js";
@@ -64,7 +69,7 @@ const MapComponent = memo(({ changedMarkers, t }) => {
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
-  const { theme, currentLayer, showTrafficJam } = useTheme();
+  const { theme, currentLayer, showTrafficJam, show3DLayer } = useTheme();
 
   const center = safeParseJSON("its_currentLocation", home);
 
@@ -173,14 +178,18 @@ const MapComponent = memo(({ changedMarkers, t }) => {
         key={currentLayer}
         id="monitoring"
         attributionControl={false}
-        center={center}
-        zoom={JSON.parse(localStorage.getItem("its_currentZoom")) ?? 13}
+        center={home}
+        zoom={11}
         zoomDelta={0.6}
         doubleClickZoom={false}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
         maxZoom={20}
+        className="h-screen w-screen"
       >
+        {/* <BaseLayerHandler /> */}
+        <MapLibreLayer />
+        {!show3DLayer && <TrafficJamPolylines />}
         <MapCRSHandler currentLayer={currentLayer} />
         <MapMarkerToaster changedMarker={changedMarkers} />
         <Sidebar
@@ -196,7 +205,7 @@ const MapComponent = memo(({ changedMarkers, t }) => {
         {/* {!isbigMonitorOpen ? <FindMeControl /> : ""} */}
         <ToastContainer containerId="alarms" className="z-[9998]" />
         <MapEvents changedMarkers={changedMarkers} />
-        {currentLayerDetails && (
+        {currentLayerDetails && !show3DLayer && (
           <TileLayer
             maxNativeZoom={currentLayerDetails.maxNativeZoom}
             url={currentLayerDetails.url}
@@ -208,25 +217,27 @@ const MapComponent = memo(({ changedMarkers, t }) => {
         <TrafficJamLayer showTrafficJam={showTrafficJam} />
         <ZoomControl theme={theme} position={"bottomright"} />{" "}
         {filter.trafficlights && <TrafficLightContainer />}
-        <DynamicMarkers
-          t={t}
-          usePieChartForClusteredMarkers={
-            useClusteredMarkers === "clustered_dynamically"
-          }
-          key={useClusteredMarkers}
-          handleMonitorCrossroad={handleMonitorCrossroadOpen}
-          handleBoxModalOpen={handleBoxModalOpen}
-          handleLightsModalOpen={handleLightsModalOpen}
-          handleMarkerDragEnd={handleMarkerDragEnd}
-          markers={markers}
-          filter={filter}
-          isDraggable={isDraggable}
-          setMarkers={setMarkers}
-          clearMarkers={clearMarkers}
-          updateMarkers={updateMarkers}
-          L={L}
-          useDynamicFetching={useClusteredMarkers === "dynamic"}
-        />
+        {!show3DLayer && (
+          <DynamicMarkers
+            t={t}
+            usePieChartForClusteredMarkers={
+              useClusteredMarkers === "clustered_dynamically"
+            }
+            key={useClusteredMarkers}
+            handleMonitorCrossroad={handleMonitorCrossroadOpen}
+            handleBoxModalOpen={handleBoxModalOpen}
+            handleLightsModalOpen={handleLightsModalOpen}
+            handleMarkerDragEnd={handleMarkerDragEnd}
+            markers={markers}
+            filter={filter}
+            isDraggable={isDraggable}
+            setMarkers={setMarkers}
+            clearMarkers={clearMarkers}
+            updateMarkers={updateMarkers}
+            L={L}
+            useDynamicFetching={useClusteredMarkers === "dynamic"}
+          />
+        )}
       </MapContainer>
       <MapModals
         t={t}
