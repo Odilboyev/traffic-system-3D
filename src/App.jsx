@@ -3,6 +3,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import MapComponent from "./Pages/map/index.jsx";
+import NotificationBox from "./components/NotificationBox/index.jsx";
 import { ThemeContext } from "./context/themeContext.jsx";
 import WarningMessage from "./components/offlineWarning/index.jsx";
 import dangerSound from "../src/assets/audio/danger.mp3";
@@ -15,6 +16,7 @@ const App = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [changedMarkers, setChangedMarkers] = useState([]);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const notificationQueueRef = useRef([]);
   const processingRef = useRef(false);
 
@@ -40,6 +42,9 @@ const App = () => {
       setChangedMarkers(
         uniqueNotifications.map((notification) => notification.data)
       );
+
+      // Add new notifications to the list
+      setNotifications((prev) => [...prev, ...uniqueNotifications]);
 
       // Play sound based on the latest notification
       const sound = new Audio();
@@ -113,8 +118,11 @@ const App = () => {
       }`}
     >
       {!isOnline && <WarningMessage />}
-
-      <MapComponent changedMarkers={changedMarkers} t={t} />
+      <MapComponent
+        changedMarkers={changedMarkers}
+        t={t}
+        notifications={notifications}
+      />
     </div>
   );
 };

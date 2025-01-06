@@ -37,9 +37,6 @@ const useMapMarkers = () => {
       dispatch(updateLoadingState(false));
     }
   }, [dispatch]);
-  useEffect(() => {
-    getDataHandler();
-  }, []);
 
   const clearMarkers = useCallback(() => {
     dispatch(updateMarkers([]));

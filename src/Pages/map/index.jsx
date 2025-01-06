@@ -11,6 +11,7 @@ import MapCRSHandler from "./utils/mapCsrHandler.jsx";
 import MapEvents from "./components/MapEvents/index.jsx";
 import MapLibreLayer from "./components/MapLibreLayer";
 import MapModals from "./components/MapModals/index.jsx";
+import NotificationBox from "../../components/NotificationBox/index.jsx";
 import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
@@ -53,7 +54,7 @@ const MapMarkerToaster = ({ changedMarkers }) => {
   return null;
 };
 
-const MapComponent = memo(({ changedMarkers, t }) => {
+const MapComponent = memo(({ changedMarkers, notifications, t }) => {
   const {
     markers,
     setMarkers,
@@ -89,10 +90,12 @@ const MapComponent = memo(({ changedMarkers, t }) => {
   const currentLayerDetails = baseLayers.find((v) => v.name === currentLayer);
 
   useEffect(() => {
-    getDataHandler();
-    fetchAlarmsData();
-  }, []);
-  // Add useEffect to handle changedMarkers updates
+    const fetchData = async () => {
+      await getDataHandler();
+      await fetchAlarmsData();
+    };
+    fetchData();
+  }, [filter]); // Only re-fetch when filter changes
 
   useEffect(() => {
     if (mapRef.current) {
@@ -187,6 +190,7 @@ const MapComponent = memo(({ changedMarkers, t }) => {
         maxZoom={20}
         className="h-screen w-screen"
       >
+        <NotificationBox notifications={notifications} />
         {/* <BaseLayerHandler /> */}
         <MapLibreLayer />
         {!show3DLayer && <TrafficJamPolylines />}
@@ -215,7 +219,7 @@ const MapComponent = memo(({ changedMarkers, t }) => {
           />
         )}
         <TrafficJamLayer showTrafficJam={showTrafficJam} />
-        <ZoomControl theme={theme} position={"bottomright"} />{" "}
+        <ZoomControl theme={theme} position={"topright"} />{" "}
         {filter.trafficlights && <TrafficLightContainer />}
         {!show3DLayer && (
           <DynamicMarkers

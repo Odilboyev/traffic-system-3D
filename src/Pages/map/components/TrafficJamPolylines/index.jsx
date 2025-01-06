@@ -148,12 +148,31 @@ const TrafficJamPolylines = () => {
     // Save current map position and zoom level when unmounting
     return () => {
       clearInterval(interval);
-      polylines.forEach((polyline) => map.removeLayer(polyline));
-      localStorage.setItem(
-        "its_currentLocation",
-        JSON.stringify(map.getCenter())
-      );
-      localStorage.setItem("its_currentZoom", JSON.stringify(map.getZoom()));
+      // Safely remove polylines if they exist
+      if (polylines && polylines.length > 0) {
+        polylines.forEach((polyline) => {
+          if (polyline && map) {
+            try {
+              map.removeLayer(polyline);
+            } catch (error) {
+              console.warn('Error removing polyline:', error);
+            }
+          }
+        });
+      }
+      
+      // Safely save map position and zoom
+      try {
+        if (map && map.getCenter && map.getZoom) {
+          localStorage.setItem(
+            "its_currentLocation",
+            JSON.stringify(map.getCenter())
+          );
+          localStorage.setItem("its_currentZoom", JSON.stringify(map.getZoom()));
+        }
+      } catch (error) {
+        console.warn('Error saving map position:', error);
+      }
     };
   }, [map, isVisible]);
 
