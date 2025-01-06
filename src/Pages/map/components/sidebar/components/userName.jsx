@@ -66,32 +66,54 @@ const UserName = ({ t, isSidebarOpen }) => {
       <Dialog
         open={isLogoutModalOpen}
         handler={() => setIsLogoutModalOpen(false)}
-        className="dark:bg-gray-800"
+        className="dark:bg-gray-800 min-w-[320px] max-w-[400px] rounded-xl"
+        animate={{
+          mount: { scale: 1, opacity: 1 },
+          unmount: { scale: 0.9, opacity: 0 },
+        }}
+        size="sm"
       >
-        <DialogHeader className="dark:text-white">
-          <div className="">{t("confirm_logout")}</div>{" "}
+        <DialogHeader className="dark:text-white flex pl-5 items-center gap-3 border-b dark:border-gray-700 pb-3">
+          <FiLogOut className="w-6 h-6 text-red-500" />
+          <span>{t("confirm_logout")}</span>
         </DialogHeader>
-        <DialogBody className=" dark:text-gray-300 ">
-          {/* Are you sure you want to logout? */}
-          <div className="text-lg font-bold">{userInfo?.name}</div>
-          {t("confirm_logout_message")}
+        <DialogBody className="dark:text-gray-300 py-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 bg-gray-900/10 p-3 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <span className="text-lg font-bold text-blue-500">
+                  {userInfo?.name?.[0]?.toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <div className="font-medium text-gray-900 dark:text-white">
+                  {userInfo?.name}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {t(userInfo?.role)}
+                </div>
+              </div>
+            </div>
+          </div>
         </DialogBody>
-        <DialogFooter>
+        <DialogFooter className="flex gap-2 border-t dark:border-gray-700 pt-3">
           <Button
             variant="text"
             color="gray"
             onClick={() => setIsLogoutModalOpen(false)}
-            className="mr-1 dark:text-gray-300 dark:hover:bg-gray-700"
+            className="flex-1 dark:text-gray-300 dark:hover:bg-gray-700 normal-case"
+            ripple={true}
           >
-            Cancel
+            <span>{t("cancel")}</span>
           </Button>
           <Button
-            variant="gradient"
+            variant="filled"
             color="red"
             onClick={confirmLogout}
-            className="dark:bg-red-600 dark:hover:bg-red-700"
+            className="flex-1 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 normal-case"
+            ripple={true}
           >
-            Logout
+            <span>{t("logout")}</span>
           </Button>
         </DialogFooter>
       </Dialog>

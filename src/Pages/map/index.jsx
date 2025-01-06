@@ -178,8 +178,8 @@ const MapComponent = memo(({ changedMarkers, t }) => {
         key={currentLayer}
         id="monitoring"
         attributionControl={false}
-        center={home}
-        zoom={11}
+        center={JSON.parse(localStorage.getItem("its_currentLocation")) || home}
+        zoom={JSON.parse(localStorage.getItem("its_currentZoom")) || 11}
         zoomDelta={0.6}
         doubleClickZoom={false}
         style={{ height: "100vh", width: "100%" }}
