@@ -6,7 +6,7 @@ import TrafficlightMarkers from ".";
 import { authToken } from "../../../../api/api.config";
 import { fixIncompleteJSON } from "./utils";
 
-const TrafficLightContainer = ({ isInModal }) => {
+const TrafficLightContainer = ({ isInModal, handleMarkerDragEnd }) => {
   const [trafficLights, setTrafficLights] = useState([]);
   const [phase, setPhase] = useState([]);
   const [trafficSocket, setTrafficSocket] = useState(null);
@@ -79,6 +79,7 @@ const TrafficLightContainer = ({ isInModal }) => {
   return (
     <>
       <TrafficlightMarkers
+        handleMarkerDragEnd={handleMarkerDragEnd}
         trafficLights={trafficLights}
         setTrafficLights={setTrafficLights}
         setCurrentSvetoforId={setCurrentSvetoforId}

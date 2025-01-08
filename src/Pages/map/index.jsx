@@ -112,11 +112,18 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
     }
   }, [currentLayer]);
 
-  const handleMarkerDragEnd = (id, type, event) => {
+  const handleMarkerDragEnd = (id, type, event, svetofor_id) => {
+    console.log(event);
     const { lat, lng } = event.target.getLatLng();
 
     try {
-      markerHandler({ lat: lat + "", lng: lng + "", id, type });
+      markerHandler({
+        lat: lat,
+        lng: lng,
+        id,
+        type,
+        svetofor_id: svetofor_id ? svetofor_id : undefined,
+      });
       // getData();
     } catch (error) {
       getDataHandler();
@@ -220,7 +227,9 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
         )}
         <TrafficJamLayer showTrafficJam={showTrafficJam} />
         <ZoomControl theme={theme} position={"topright"} />{" "}
-        {filter.trafficlights && <TrafficLightContainer />}
+        {filter.trafficlights && (
+          <TrafficLightContainer handleMarkerDragEnd={handleMarkerDragEnd} />
+        )}
         <DynamicMarkers
           t={t}
           usePieChartForClusteredMarkers={
