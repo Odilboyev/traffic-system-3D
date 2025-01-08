@@ -29,7 +29,7 @@ const NeonIcon = ({
     neonTextShadowStyles[status] || neonTextShadowStyles[0];
 
   // Determine the classes for the container
-  let containerClasses = `flex items-center justify-center p-2 shadow-sm  text-green-300 rounded-full drop-shadow-neon`;
+  let containerClasses = `flex items-center justify-center shadow-sm  text-green-300 rounded-full drop-shadow-neon`;
   if (isRounded && Icon) {
     // If `isRounded` is true and `Icon` exists, add ring and background color
     containerClasses += ` rounded-full ring-1 ${statusClass}`;
@@ -56,9 +56,7 @@ const NeonIcon = ({
           )}
         </div>
       ) : (
-        <Typography
-          className={`mx-2 min-w-4 font-bold text-2xl ${textShadowClass}`}
-        >
+        <Typography className={`mx-1 font-semibold text-xl ${textShadowClass}`}>
           {text}
         </Typography>
       )}

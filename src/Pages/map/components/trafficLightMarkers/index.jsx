@@ -1,6 +1,8 @@
+import { Marker, Tooltip } from "react-leaflet";
+
 import L from "leaflet";
-import { Marker } from "react-leaflet";
 import NeonIcon from "../../../../components/neonIcon";
+import { Typography } from "@material-tailwind/react";
 import { getNearbyTrafficLights } from "../../../../api/api.handlers";
 import iconSelector from "./icons/iconSelector";
 import { renderToString } from "react-dom/server";
@@ -56,6 +58,8 @@ const TrafficlightMarkers = ({
           position={[v.lat, v.lng]}
           icon={L.divIcon({
             className: "rounded-full flex items-center justify-center",
+            iconSize: [30, 30],
+            iconAnchor: [15, 15], // Center the icon
             html: renderToString(
               <NeonIcon
                 isRounded={false}
@@ -69,7 +73,11 @@ const TrafficlightMarkers = ({
                 }
                 status={v.status === 1 ? 0 : v.status === 2 ? 2 : 1}
                 text={v.type === 100 && (v.countdown || "0")}
-              />
+              >
+                <Tooltip direction="top" className="rounded-md">
+                  <Typography className="my-0">{v.id}</Typography>
+                </Tooltip>
+              </NeonIcon>
             ),
           })}
         />

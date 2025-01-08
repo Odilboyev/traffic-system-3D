@@ -35,98 +35,91 @@ const TrafficJamPolylines = () => {
     return [lat, lng, height];
   };
 
-  useEffect(() => {
-    const checkZoomLevel = () => {
-      const currentZoom = map.getZoom();
-      setIsVisible(currentZoom > 15);
-    };
-
-    // Check initial zoom level
-    checkZoomLevel();
-
-    // Add zoom change listener
-    map.on("zoomend", checkZoomLevel);
-
-    // Cleanup
-    return () => {
-      map.off("zoomend", checkZoomLevel);
-    };
-  }, [map]);
-
+  // Fetch and draw traffic lines
   useEffect(() => {
     const fetchAndDrawLines = async () => {
       try {
         const lines = await getTrafficJamLines();
+
         if (lines?.data && layerGroupRef.current) {
           // Clear existing layers
           layerGroupRef.current.clearLayers();
 
-          // Create new polylines with styling
+          // Create lines and markers for each traffic line
           lines.data.forEach((line) => {
             // Parse the traffic_line string to get coordinates
             const positions = JSON.parse(line.traffic_line);
-            const coordinates = positions.map((pos) => [pos.lat, pos.lng]);
 
-            const getTrafficStyle = (ball) => {
-              // Common style properties
-              const baseStyle = {
-                weight: 9,
-                opacity: show3DLayer ? 0.7 : 0.9, // Slightly more transparent in 3D mode
-                lineCap: "round",
-                lineJoin: "round",
-                // Add elevation profile for 3D mode
-                elevation: show3DLayer
-                  ? {
-                      sampling: 100, // Sample points for smooth elevation
-                      simplify: 0.5,
-                      height: 5, // Height above terrain in meters
-                    }
-                  : undefined,
-              };
-
-              // Define colors for different traffic levels
-              const styles = {
-                low: {
-                  ...baseStyle,
-                  color: "#28a745", // Green (0-5)
-                  className: "traffic-line-low",
-                },
-                moderate: {
-                  ...baseStyle,
-                  color: "#ffc107", // Yellow (6-7)
-                  className: "traffic-line-moderate",
-                },
-                high: {
-                  ...baseStyle,
-                  color: "#fd7e14", // Orange (8-9)
-                  className: "traffic-line-high",
-                },
-                severe: {
-                  ...baseStyle,
-                  color: "#dc3545", // Red (9-10)
-                  className: "traffic-line-severe",
-                },
-              };
-
-              // Determine traffic level based on specified ranges
-              if (ball < 6) return styles.low; // 0 <= traffic_count < 6
-              if (ball < 8) return styles.moderate; // 6 <= traffic_count < 8
-              if (ball < 9) return styles.high; // 8 <= traffic_count < 9
-              return styles.severe; // 9 <= traffic_count <= 10
+            // Determine color based on traffic ball
+            const getTrafficColor = (ball) => {
+              if (ball < 6) return "#28a745"; // Green (low)
+              if (ball < 8) return "#ffc107"; // Yellow (moderate)
+              if (ball < 9) return "#fd7e14"; // Orange (high)
+              return "#dc3545"; // Red (severe)
             };
 
-            const style = getTrafficStyle(line.traffic_ball);
+            const lineColor = getTrafficColor(line.traffic_ball);
 
-            // Create polyline with coordinates
+            // Create a custom icon
+            const createTrafficIcon = (color) => {
+              return L.divIcon({
+                className: "custom-traffic-marker",
+                html: `
+                  <div style="
+                    width: 3px; 
+                    height: 3px; 
+                    border-radius: 50%; 
+                    background-color: ${color};
+                  "></div>
+                `,
+                iconSize: [3, 3],
+                iconAnchor: [1.5, 1.5],
+              });
+            };
+
+            const trafficIcon = createTrafficIcon(lineColor);
+
+            // Prepare coordinates and markers
+            const coordinates = [];
+            const markers = [];
+
+            // Create markers and collect coordinates
+            positions.forEach((pos, index) => {
+              const coordinate = [pos.lat, pos.lng];
+              coordinates.push(coordinate);
+
+              // Create a marker for each point
+              const marker = L.marker(coordinate, {
+                icon: trafficIcon,
+                interactive: true,
+                title: `Traffic Level: ${line.traffic_ball}`,
+              });
+
+              // Add tooltip with additional information
+              marker.bindTooltip(`Traffic Ball: ${line.traffic_ball}`, {
+                permanent: false,
+                direction: "top",
+              });
+
+              markers.push(marker);
+            });
+
+            // Create polyline connecting the points
             const polyline = L.polyline(coordinates, {
-              ...style,
-              // Add smooth animation for style changes
-              smoothFactor: 1,
+              color: lineColor,
+              weight: 10,
+              opacity: 0.9,
               interactive: true,
             });
 
             // Only add to layer group if zoom level is appropriate
             if (isVisible) {
+              // Add markers
+              markers.forEach((marker) => {
+                layerGroupRef.current.addLayer(marker);
+              });
+
+              // Add connecting line
               layerGroupRef.current.addLayer(polyline);
             }
           });
