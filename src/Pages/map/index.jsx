@@ -188,9 +188,9 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
         maxZoom={20}
-        className="h-screen w-screen"
+        className="h-screen w-screen !bg-transparent"
       >
-        <NotificationBox notifications={notifications} />
+        <NotificationBox notifications={notifications} map={mapRef.current} />
         {/* <BaseLayerHandler /> */}
         <MapLibreLayer />
         {!show3DLayer && <TrafficJamPolylines />}

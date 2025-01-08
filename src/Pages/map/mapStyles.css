@@ -129,3 +129,8 @@
   transform: translateZ(0);
   backface-visibility: hidden;
 }
+
+/* Remove tile borders */
+.leaflet-tile {
+  border: none !important;
+}

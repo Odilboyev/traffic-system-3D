@@ -5,9 +5,12 @@ import { IoCheckmarkCircle, IoWarning } from "react-icons/io5";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import Control from "../customControl";
+import { HiOutlineLocationMarker } from "react-icons/hi";
+import { IconButton } from "@material-tailwind/react";
 import { TbDeviceComputerCamera } from "react-icons/tb";
 import { ThemeContext } from "../../context/themeContext";
 import { t } from "i18next";
+import { useMap } from "react-leaflet";
 
 const getStatusStyle = (statuserror, type_name, theme) => {
   const isLight = theme === "light";
@@ -58,7 +61,7 @@ const getStatusStyle = (statuserror, type_name, theme) => {
   }
 };
 
-const NotificationBox = ({ notifications }) => {
+const NotificationBox = ({ notifications, map }) => {
   const scrollRef = useRef(null);
   const [animatingItems, setAnimatingItems] = useState(new Set());
   const { theme } = useContext(ThemeContext);
@@ -73,7 +76,7 @@ const NotificationBox = ({ notifications }) => {
       // Remove animation class after animation completes
       setTimeout(() => {
         setAnimatingItems(new Set());
-      }, 500);
+      }, 2100); // 300ms slide + (600ms × 3) blink + 100ms buffer
     }
   }, [notifications]);
 
@@ -122,7 +125,9 @@ const NotificationBox = ({ notifications }) => {
                 notification.data.type_name,
                 theme
               );
-              const itemKey = `${notification.data.cid}-${notification.data.type}-${notifications.length - index}`;
+              const itemKey = `${notification.data.cid}-${
+                notification.data.type
+              }-${notifications.length - index}`;
               const isAnimating = animatingItems.has(itemKey);
 
               return (
@@ -135,8 +140,17 @@ const NotificationBox = ({ notifications }) => {
                   } border-b transition-all duration-300 border-l-2 ${
                     status.border
                   } ${status.hoverBg} ${status.hoverBorder} ${
-                    isAnimating ? "animate-slide-right" : ""
-                  }`}
+                    isAnimating
+                      ? `animate-slide-right ${
+                          notification.data.statuserror === 1 ||
+                          notification.data.statuserror === 2
+                            ? "status-error"
+                            : notification.data.statuserror === 0
+                            ? "status-success"
+                            : "status-default"
+                        }`
+                      : ""
+                  } cursor-pointer hover:scale-[1.02] active:scale-[0.98] transform`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
@@ -147,7 +161,7 @@ const NotificationBox = ({ notifications }) => {
                         <p
                           className={`font-mono text-sm ${
                             theme === "light" ? "text-sky-600" : "text-sky-400"
-                          } truncate`}
+                          } truncate flex-1`}
                         >
                           {notification.data.crossroad_name}
                         </p>
@@ -176,6 +190,34 @@ const NotificationBox = ({ notifications }) => {
                         >
                           {notification.data.sensor_name}
                         </p>
+                        {notification.data.lat && notification.data.lng && (
+                          <>
+                            <span
+                              className={
+                                theme === "light"
+                                  ? "text-sky-600/40"
+                                  : "text-sky-400/40"
+                              }
+                            >
+                              |
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                map.flyTo(
+                                  [
+                                    +notification.data.lat,
+                                    +notification.data.lng,
+                                  ],
+                                  18
+                                );
+                              }}
+                              className={`flex items-center gap-1 ${status.hoverBg} ${status.text} transition-transform duration-200 hover:scale-110 active:scale-90 transform`}
+                            >
+                              <HiOutlineLocationMarker className="text-base" />
+                            </button>
+                          </>
+                        )}
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <p
