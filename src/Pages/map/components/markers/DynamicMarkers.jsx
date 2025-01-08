@@ -11,6 +11,7 @@ import { renderToString } from "react-dom/server";
 import { useMap } from "react-leaflet";
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
 import { useSelector } from "react-redux";
+import { useTheme } from "../../../../customHooks/useTheme";
 
 const DynamicMarkers = ({
   useDynamicFetching,
@@ -30,6 +31,7 @@ const DynamicMarkers = ({
   const [zoom, setZoom] = useState(map.getZoom());
   const clusterRef = useRef(null);
   const markers = useSelector((state) => state.map.markers); // Assuming markers are stored in state.map.markers
+  const { show3DLayer } = useTheme();
 
   // Add zoom and dragend event listeners
   useEffect(() => {
@@ -74,6 +76,23 @@ const DynamicMarkers = ({
     useDistanceThreshold: true,
   });
 
+  // Convert coordinates for 3D display
+  const convert2Dto3D = (lat, lng) => {
+    if (!show3DLayer) return { lat, lng };
+    
+    // Get the terrain height at this point (if available)
+    let height = 0;
+    if (map.getTerrain && map.getTerrain()) {
+      height = map.getTerrain().getHeight([lat, lng]) || 0;
+    }
+    
+    return {
+      lat: lat,
+      lng: lng,
+      alt: height // Add altitude for 3D positioning
+    };
+  };
+
   // Render function for markers
   const renderMarkers = () =>
     markers.map((marker, i) => {
@@ -93,6 +112,9 @@ const DynamicMarkers = ({
       ) {
         return null;
       }
+
+      // Convert coordinates for 3D if needed
+      const position = convert2Dto3D(Number(marker.lat), Number(marker.lng));
 
       // Custom crossroad icon for type 2 markers
       const createCrossroadIcon = (marker) => {
@@ -128,6 +150,7 @@ const DynamicMarkers = ({
           handleLightsModalOpen={handleLightsModalOpen}
           handleMarkerDragEnd={handleMarkerDragEnd}
           customIcon={customIcon}
+          position={position}
         />
       );
     });

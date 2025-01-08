@@ -1,10 +1,7 @@
 import "@maplibre/maplibre-gl-leaflet";
 import "maplibre-gl/dist/maplibre-gl.css";
-
 import * as maplibregl from "maplibre-gl";
-
 import { useCallback, useEffect, useRef } from "react";
-
 import L from "leaflet";
 import baseLayers from "../../../../configurations/mapLayers";
 import { useMap } from "react-leaflet";
@@ -71,22 +68,32 @@ const MapLibreLayer = () => {
     if (!maplibreLayerRef.current || !show3DLayer) return;
 
     const maplibreMap = maplibreLayerRef.current.getMaplibreMap();
+    if (!maplibreMap || !maplibreMap.loaded()) {
+      setTimeout(convertToMapLibreMarkers, 100);
+      return;
+    }
+
+    // Wait for Leaflet markers to be rendered
     const leafletMarkers = document.querySelectorAll(".leaflet-marker-icon");
+    if (leafletMarkers.length === 0) {
+      setTimeout(convertToMapLibreMarkers, 100);
+      return;
+    }
 
     // Remove existing MapLibre markers
     maplibreMarkersRef.current.forEach((marker) => marker.remove());
     maplibreMarkersRef.current.clear();
 
-    // Hide all Leaflet markers
+    // Hide all Leaflet markers and create MapLibre markers
     leafletMarkers.forEach((leafletMarker) => {
       const markerInstance = leafletMarker._leaflet_events?.click?.[0]?.ctx;
       if (!markerInstance) return;
 
       // Hide Leaflet marker
-      leafletMarker.style.visibility = "hidden";
+      leafletMarker.style.display = "none";
       const parentNode = leafletMarker.parentNode;
       if (parentNode) {
-        parentNode.style.visibility = "hidden";
+        parentNode.style.display = "none";
       }
 
       // Create and store MapLibre marker
@@ -103,10 +110,10 @@ const MapLibreLayer = () => {
   const restoreLeafletMarkers = useCallback(() => {
     const leafletMarkers = document.querySelectorAll(".leaflet-marker-icon");
     leafletMarkers.forEach((marker) => {
-      marker.style.visibility = "visible";
+      marker.style.display = "";
       const parentNode = marker.parentNode;
       if (parentNode) {
-        parentNode.style.visibility = "visible";
+        parentNode.style.display = "";
       }
     });
 
@@ -123,12 +130,10 @@ const MapLibreLayer = () => {
         maplibreLayerRef.current = null;
       }
 
-      if (!show3DLayer) return;
-
-      // Determine CRS based on current layer
-      const crs = currentLayer.includes("Yandex")
-        ? L.CRS.EPSG3395
-        : L.CRS.EPSG3857;
+      if (!show3DLayer) {
+        restoreLeafletMarkers();
+        return;
+      }
 
       // Create MapLibre GL layer
       maplibreLayerRef.current = L.maplibreGL({
@@ -139,8 +144,7 @@ const MapLibreLayer = () => {
               type: "raster",
               tiles: [baseLayer.url.replace("{s}", "a")],
               tileSize: 256,
-              attribution:
-                baseLayer.attribution || " OpenStreetMap contributors",
+              attribution: baseLayer.attribution || " OpenStreetMap contributors",
               maxzoom: baseLayer.maxNativeZoom,
             },
           },
@@ -159,9 +163,6 @@ const MapLibreLayer = () => {
         antialias: true,
       });
 
-      // Set the CRS before adding the layer
-      map.options.crs = crs;
-
       // Add the layer to the map
       maplibreLayerRef.current.addTo(map);
 
@@ -171,17 +172,22 @@ const MapLibreLayer = () => {
       const center = map.getCenter();
       const zoom = map.getZoom();
 
-      // Force a map redraw
-      map.invalidateSize({ animate: false });
-
       // Reset view and set initial pitch after the map is loaded
       maplibreMap.on("load", () => {
         map.setView(center, zoom, { animate: false });
-        if (show3DLayer) {
-          maplibreMap.setPitch(45);
-          maplibreMap.setBearing(0);
-          convertToMapLibreMarkers();
-        }
+        maplibreMap.setPitch(45);
+        maplibreMap.setBearing(0);
+        
+        // Add markers after a short delay
+        setTimeout(convertToMapLibreMarkers, 100);
+      });
+
+      // Prevent marker conversion on zoom
+      maplibreMap.on('zoom', () => {
+        // Update only the necessary view state without re-creating markers
+        const newCenter = map.getCenter();
+        const newZoom = map.getZoom();
+        map.setView(newCenter, newZoom, { animate: false });
       });
 
       // Add keyboard controls for pitch and bearing
@@ -211,49 +217,35 @@ const MapLibreLayer = () => {
 
       document.addEventListener("keydown", handleKeyDown);
 
-      // Handle 3D mode changes
-      if (show3DLayer) {
-        convertToMapLibreMarkers();
-      } else {
-        restoreLeafletMarkers();
-      }
-
-      // Maintain minimum pitch during map movement
-      maplibreMap.on("moveend", () => {
-        if (show3DLayer && maplibreMap.getPitch() < 30) {
-          maplibreMap.setPitch(30);
-        }
-      });
-
       return () => {
-        if (maplibreLayerRef.current) {
-          const maplibreMap = maplibreLayerRef.current.getMaplibreMap();
-          if (maplibreMap) {
-            maplibreMap.off("moveend");
-            maplibreMap.off("move");
-            document.removeEventListener("keydown", handleKeyDown);
-          }
-          restoreLeafletMarkers();
-          map.removeLayer(maplibreLayerRef.current);
-          maplibreLayerRef.current = null;
-        }
+        document.removeEventListener("keydown", handleKeyDown);
       };
     };
 
-    // Initialize or cleanup based on show3DLayer
     if (map) {
       map.whenReady(() => {
         requestAnimationFrame(initializeMapLibre);
       });
     }
-  }, [
-    map,
-    show3DLayer,
-    currentLayer,
-    baseLayer,
-    convertToMapLibreMarkers,
-    restoreLeafletMarkers,
-  ]);
+
+    return () => {
+      if (maplibreLayerRef.current) {
+        restoreLeafletMarkers();
+        map.removeLayer(maplibreLayerRef.current);
+        maplibreLayerRef.current = null;
+      }
+    };
+  }, [map, show3DLayer, baseLayer.url, baseLayer.maxNativeZoom, baseLayer.attribution]);
+
+  // Handle 3D mode changes and marker updates
+  useEffect(() => {
+    if (show3DLayer && maplibreLayerRef.current) {
+      // Only convert markers when 3D mode is enabled or markers actually change
+      convertToMapLibreMarkers();
+    } else {
+      restoreLeafletMarkers();
+    }
+  }, [show3DLayer, markers.length]);
 
   return null;
 };

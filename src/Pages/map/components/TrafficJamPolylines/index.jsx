@@ -1,13 +1,39 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import L from "leaflet";
 import { getTrafficJamLines } from "../../../../api/api.handlers";
 import { useMap } from "react-leaflet";
+import { useTheme } from "../../../../customHooks/useTheme";
 
 const TrafficJamPolylines = () => {
   const map = useMap();
-  const [polylines, setPolylines] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
+  const { show3DLayer } = useTheme();
+  const layerGroupRef = useRef(null);
+
+  // Initialize layer group
+  useEffect(() => {
+    layerGroupRef.current = L.layerGroup().addTo(map);
+    return () => {
+      if (layerGroupRef.current) {
+        layerGroupRef.current.clearLayers();
+        map.removeLayer(layerGroupRef.current);
+      }
+    };
+  }, [map]);
+
+  // Convert coordinates for 3D display
+  const convert2Dto3D = (lat, lng) => {
+    if (!show3DLayer) return [lat, lng];
+
+    // Get the terrain height at this point (if available)
+    let height = 0;
+    if (map.getTerrain && map.getTerrain()) {
+      height = map.getTerrain().getHeight([lat, lng]) || 0;
+    }
+
+    return [lat, lng, height];
+  };
 
   useEffect(() => {
     const checkZoomLevel = () => {
@@ -19,11 +45,11 @@ const TrafficJamPolylines = () => {
     checkZoomLevel();
 
     // Add zoom change listener
-    map.on('zoomend', checkZoomLevel);
+    map.on("zoomend", checkZoomLevel);
 
     // Cleanup
     return () => {
-      map.off('zoomend', checkZoomLevel);
+      map.off("zoomend", checkZoomLevel);
     };
   }, [map]);
 
@@ -31,12 +57,12 @@ const TrafficJamPolylines = () => {
     const fetchAndDrawLines = async () => {
       try {
         const lines = await getTrafficJamLines();
-        if (lines?.data) {
-          // Remove existing polylines
-          polylines.forEach((polyline) => map.removeLayer(polyline));
+        if (lines?.data && layerGroupRef.current) {
+          // Clear existing layers
+          layerGroupRef.current.clearLayers();
 
           // Create new polylines with styling
-          const newPolylines = lines.data.map((line) => {
+          lines.data.forEach((line) => {
             // Parse the traffic_line string to get coordinates
             const positions = JSON.parse(line.traffic_line);
             const coordinates = positions.map((pos) => [pos.lat, pos.lng]);
@@ -45,9 +71,17 @@ const TrafficJamPolylines = () => {
               // Common style properties
               const baseStyle = {
                 weight: 9,
-                opacity: 0.9,
+                opacity: show3DLayer ? 0.7 : 0.9, // Slightly more transparent in 3D mode
                 lineCap: "round",
                 lineJoin: "round",
+                // Add elevation profile for 3D mode
+                elevation: show3DLayer
+                  ? {
+                      sampling: 100, // Sample points for smooth elevation
+                      simplify: 0.5,
+                      height: 5, // Height above terrain in meters
+                    }
+                  : undefined,
               };
 
               // Define colors for different traffic levels
@@ -83,98 +117,32 @@ const TrafficJamPolylines = () => {
 
             const style = getTrafficStyle(line.traffic_ball);
 
-            // Create the polyline with enhanced styling
-            const polyline = L.polyline(coordinates, style);
-
-            // Add interactive features
-            polyline.on("mouseover", function (e) {
-              this.setStyle({
-                weight: style.weight + 2,
-                opacity: 1,
-              });
-
-              // // Show tooltip with traffic info
-              // const tooltipContent = `
-              //   <div class="traffic-tooltip">
-              //     <strong>Traffic Level: ${line.traffic_ball}/10</strong>
-              //     <br/>
-              //     ${
-              //       line.traffic_ball < 6
-              //         ? "Low Traffic"
-              //         : line.traffic_ball < 8
-              //         ? "Moderate Traffic"
-              //         : line.traffic_ball < 9
-              //         ? "High Traffic"
-              //         : "Severe Traffic"
-              //     }
-              //   </div>
-              // `;
-
-              // this.bindTooltip(tooltipContent, {
-              //   className: "traffic-tooltip",
-              //   direction: "top",
-              // }).openTooltip();
+            // Create polyline with coordinates
+            const polyline = L.polyline(coordinates, {
+              ...style,
+              // Add smooth animation for style changes
+              smoothFactor: 1,
+              interactive: true,
             });
 
-            polyline.on("mouseout", function (e) {
-              this.setStyle({
-                weight: style.weight,
-                opacity: 0.9,
-              });
-              this.closeTooltip();
-            });
-
-            // Add the polyline to the map only if zoom level is appropriate
+            // Only add to layer group if zoom level is appropriate
             if (isVisible) {
-              polyline.addTo(map);
+              layerGroupRef.current.addLayer(polyline);
             }
-
-            return polyline;
           });
-
-          setPolylines(newPolylines);
         }
       } catch (error) {
         console.error("Error fetching traffic jam lines:", error);
       }
     };
 
-    // Initial fetch
-    fetchAndDrawLines();
-
-    // Set up periodic updates every minute
-    const interval = setInterval(fetchAndDrawLines, 60000); // Update every minute
-
-    // Save current map position and zoom level when unmounting
-    return () => {
-      clearInterval(interval);
-      // Safely remove polylines if they exist
-      if (polylines && polylines.length > 0) {
-        polylines.forEach((polyline) => {
-          if (polyline && map) {
-            try {
-              map.removeLayer(polyline);
-            } catch (error) {
-              console.warn('Error removing polyline:', error);
-            }
-          }
-        });
-      }
-      
-      // Safely save map position and zoom
-      try {
-        if (map && map.getCenter && map.getZoom) {
-          localStorage.setItem(
-            "its_currentLocation",
-            JSON.stringify(map.getCenter())
-          );
-          localStorage.setItem("its_currentZoom", JSON.stringify(map.getZoom()));
-        }
-      } catch (error) {
-        console.warn('Error saving map position:', error);
-      }
-    };
-  }, [map, isVisible]);
+    // Fetch and draw lines initially and set up interval
+    if (isVisible) {
+      fetchAndDrawLines();
+      const interval = setInterval(fetchAndDrawLines, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [map, isVisible, show3DLayer]);
 
   // Handle zoom level changes
   useEffect(() => {
@@ -186,9 +154,13 @@ const TrafficJamPolylines = () => {
         setIsVisible(shouldBeVisible);
 
         if (shouldBeVisible) {
-          polylines.forEach((polyline) => polyline.addTo(map));
+          if (layerGroupRef.current) {
+            layerGroupRef.current.addTo(map);
+          }
         } else {
-          polylines.forEach((polyline) => map.removeLayer(polyline));
+          if (layerGroupRef.current) {
+            map.removeLayer(layerGroupRef.current);
+          }
         }
       }
       // Save zoom level on change
@@ -211,7 +183,7 @@ const TrafficJamPolylines = () => {
       map.off("zoomend", handleZoomEnd);
       map.off("moveend", handleMoveEnd);
     };
-  }, [map, polylines, isVisible]);
+  }, [map, isVisible, layerGroupRef]);
 
   return null;
 };

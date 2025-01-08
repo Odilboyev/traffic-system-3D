@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { getCurrentAlarms } from "../../../api/api.handlers";
+import { useState } from "react";
 
 export const useMapAlarms = () => {
   const [currentAlarms, setCurrentAlarms] = useState(null);

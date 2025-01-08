@@ -35,6 +35,8 @@ const generateToastContent = (sensorData) => (
 );
 
 const toaster = (sensorData, map) => {
+  if (toastConfig.enabled === false) return null;
+  
   const toastId = `${sensorData?.sensor_name}-${sensorData?.eventdate}`;
   console.log(toastId, "toaster working");
   if (toast.isActive(toastId)) {
@@ -73,13 +75,15 @@ const toaster = (sensorData, map) => {
 const toastConfig = {
   containerId: "alarms",
   position: "top-right",
-  autoClose: 10000,
-  hideProgressBar: false,
+  autoClose: false,
+  hideProgressBar: true,
   closeOnClick: true,
   pauseOnHover: true,
   draggable: false,
   progress: undefined,
-  theme: "colored",
+  theme: "light",
+  className: "pointer-events-auto",
+  enabled: false,
 };
 export const modalToastConfig = {
   position: "bottom-right",

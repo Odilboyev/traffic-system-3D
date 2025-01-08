@@ -115,3 +115,17 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   transform: perspective(1000px) rotateX(30deg);
 }
+
+.maplibre-marker-3d {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.maplibre-marker-3d .marker-icon {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

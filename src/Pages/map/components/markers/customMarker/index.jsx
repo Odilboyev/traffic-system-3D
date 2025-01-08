@@ -1,6 +1,7 @@
 // MarkerComponent.jsx
 import { Marker, Tooltip, useMap } from "react-leaflet";
 import { memo, useRef, useState, useMemo } from "react";
+import { useTheme } from "../../../../../customHooks/useTheme";
 
 import CameraDetails from "../../customPopup";
 import PropTypes from "prop-types";
@@ -18,6 +19,7 @@ const CustomMarker = memo(function CustomMarker({
   handleLightsModalOpen,
   handleMarkerDragEnd,
   customIcon,
+  position,
   disableUpdates = false,
 }) {
   const isCamera = (type) => type == 1 || type == 5 || type == 6;
@@ -72,9 +74,12 @@ const CustomMarker = memo(function CustomMarker({
     })
   , [customIcon, marker.icon, marker.type]);
 
-  const markerPosition = useMemo(() => 
-    [marker.lat, marker.lng]
-  , [marker.lat, marker.lng]);
+  const markerPosition = useMemo(() => {
+    if (position) {
+      return position.alt !== undefined ? [position.lat, position.lng, position.alt] : [position.lat, position.lng];
+    }
+    return [marker.lat, marker.lng];
+  }, [position, marker.lat, marker.lng]);
 
   if (disableUpdates) {
     return null;
@@ -159,6 +164,7 @@ CustomMarker.propTypes = {
   customIcon: PropTypes.object,
   zoom: PropTypes.number,
   t: PropTypes.func,
+  position: PropTypes.object,
   disableUpdates: PropTypes.bool,
 };
 

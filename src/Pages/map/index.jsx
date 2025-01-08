@@ -195,7 +195,7 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
         <MapLibreLayer />
         {!show3DLayer && <TrafficJamPolylines />}
         <MapCRSHandler currentLayer={currentLayer} />
-        <MapMarkerToaster changedMarker={changedMarkers} />
+        {/* <MapMarkerToaster changedMarker={changedMarkers} /> */}
         <Sidebar
           t={t}
           changedMarker={changedMarkers}
@@ -221,27 +221,25 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
         <TrafficJamLayer showTrafficJam={showTrafficJam} />
         <ZoomControl theme={theme} position={"topright"} />{" "}
         {filter.trafficlights && <TrafficLightContainer />}
-        {!show3DLayer && (
-          <DynamicMarkers
-            t={t}
-            usePieChartForClusteredMarkers={
-              useClusteredMarkers === "clustered_dynamically"
-            }
-            key={useClusteredMarkers}
-            handleMonitorCrossroad={handleMonitorCrossroadOpen}
-            handleBoxModalOpen={handleBoxModalOpen}
-            handleLightsModalOpen={handleLightsModalOpen}
-            handleMarkerDragEnd={handleMarkerDragEnd}
-            markers={markers}
-            filter={filter}
-            isDraggable={isDraggable}
-            setMarkers={setMarkers}
-            clearMarkers={clearMarkers}
-            updateMarkers={updateMarkers}
-            L={L}
-            useDynamicFetching={useClusteredMarkers === "dynamic"}
-          />
-        )}
+        <DynamicMarkers
+          t={t}
+          usePieChartForClusteredMarkers={
+            useClusteredMarkers === "clustered_dynamically"
+          }
+          key={useClusteredMarkers}
+          handleMonitorCrossroad={handleMonitorCrossroadOpen}
+          handleBoxModalOpen={handleBoxModalOpen}
+          handleLightsModalOpen={handleLightsModalOpen}
+          handleMarkerDragEnd={handleMarkerDragEnd}
+          markers={markers}
+          filter={filter}
+          isDraggable={isDraggable}
+          setMarkers={setMarkers}
+          clearMarkers={clearMarkers}
+          updateMarkers={updateMarkers}
+          L={L}
+          useDynamicFetching={useClusteredMarkers === "dynamic"}
+        />
       </MapContainer>
       <MapModals
         t={t}

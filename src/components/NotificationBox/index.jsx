@@ -1,42 +1,58 @@
+import "./notificationBox.style.css";
+
 import { BiBell, BiError } from "react-icons/bi";
 import { IoCheckmarkCircle, IoWarning } from "react-icons/io5";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import Control from "../customControl";
 import { TbDeviceComputerCamera } from "react-icons/tb";
+import { ThemeContext } from "../../context/themeContext";
 import { t } from "i18next";
 
-const getStatusStyle = (statuserror, type_name) => {
+const getStatusStyle = (statuserror, type_name, theme) => {
+  const isLight = theme === "light";
   switch (statuserror) {
     case 1:
     case 2:
       return {
-        border: "border-l-red-500/50",
-        bg: "bg-red-500/10",
-        text: "text-red-400",
-        statusBg: "bg-red-500/20",
-        icon: <BiError className="text-red-400 text-lg" />,
-        hoverBg: "hover:bg-red-500/10",
+        border: isLight ? "border-l-red-500" : "border-l-red-500/50",
+        bg: isLight ? "bg-red-50" : "bg-red-500/10",
+        text: isLight ? "text-red-600" : "text-red-400",
+        statusBg: isLight ? "bg-red-100" : "bg-red-500/20",
+        icon: (
+          <BiError
+            className={isLight ? "text-red-600" : "text-red-400 text-lg"}
+          />
+        ),
+        hoverBg: isLight ? "hover:bg-red-50" : "hover:bg-red-500/10",
         hoverBorder: "hover:border-l-red-500",
       };
     case 0:
       return {
-        border: "border-l-teal-500/50",
-        bg: "bg-teal-500/10",
-        text: "text-teal-400",
-        statusBg: "bg-teal-500/20",
-        icon: <IoCheckmarkCircle className="text-teal-400 text-lg" />,
-        hoverBg: "hover:bg-teal-500/10",
+        border: isLight ? "border-l-teal-500" : "border-l-teal-500/50",
+        bg: isLight ? "bg-teal-50" : "bg-teal-500/10",
+        text: isLight ? "text-teal-600" : "text-teal-400",
+        statusBg: isLight ? "bg-teal-100" : "bg-teal-500/20",
+        icon: (
+          <IoCheckmarkCircle
+            className={isLight ? "text-teal-600" : "text-teal-400 text-lg"}
+          />
+        ),
+        hoverBg: isLight ? "hover:bg-teal-50" : "hover:bg-teal-500/10",
         hoverBorder: "hover:border-l-teal-500",
       };
     default:
       return {
-        border: "border-l-sky-500/50",
-        bg: "bg-sky-500/10",
-        text: "text-sky-400",
-        statusBg: "bg-sky-500/20",
-        icon: <TbDeviceComputerCamera className="text-sky-400 text-lg" />,
-        hoverBg: "hover:bg-sky-500/10",
+        border: isLight ? "border-l-sky-500" : "border-l-sky-500/50",
+        bg: isLight ? "bg-sky-50" : "bg-sky-500/10",
+        text: isLight ? "text-sky-600" : "text-sky-400",
+        statusBg: isLight ? "bg-sky-100" : "bg-sky-500/20",
+        icon: (
+          <TbDeviceComputerCamera
+            className={isLight ? "text-sky-600" : "text-sky-400 text-lg"}
+          />
+        ),
+        hoverBg: isLight ? "hover:bg-sky-50" : "hover:bg-sky-500/10",
         hoverBorder: "hover:border-l-sky-500",
       };
   }
@@ -45,35 +61,38 @@ const getStatusStyle = (statuserror, type_name) => {
 const NotificationBox = ({ notifications }) => {
   const scrollRef = useRef(null);
   const [animatingItems, setAnimatingItems] = useState(new Set());
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-
     // Add animation class to new notifications
     if (notifications.length > 0) {
       const latestNotification = notifications[notifications.length - 1];
-      const newItemKey = `${latestNotification.data.cid}-${
-        latestNotification.data.type
-      }-${notifications.length - 1}`;
-      setAnimatingItems((prev) => new Set([...prev, newItemKey]));
+      const newItemKey = `${latestNotification.data.cid}-${latestNotification.data.type}-${notifications.length}`;
+      setAnimatingItems(new Set([newItemKey])); // Reset and only animate the newest notification
 
       // Remove animation class after animation completes
       setTimeout(() => {
-        setAnimatingItems((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(newItemKey);
-          return newSet;
-        });
+        setAnimatingItems(new Set());
       }, 500);
     }
   }, [notifications]);
 
   return (
     <Control position="bottomright">
-      <div className="w-96 max-h-[300px] bg-gray-900/50 backdrop-blur-lg rounded-lg overflow-hidden border border-gray-700/20 shadow-lg">
-        <div className="px-4 py-3 bg-gray-900/30 backdrop-blur-xl border-b border-gray-700/20">
+      <div
+        className={`w-96 max-h-[300px] ${
+          theme === "light" ? "bg-white/90" : "bg-gray-900/50"
+        } backdrop-blur-lg rounded-lg overflow-hidden ${
+          theme === "light" ? "border-gray-200/20" : "border-gray-700/20"
+        } border shadow-lg`}
+      >
+        <div
+          className={`px-4 py-3 ${
+            theme === "light" ? "bg-gray-100/80" : "bg-gray-900/30"
+          } backdrop-blur-xl ${
+            theme === "light" ? "border-gray-200/20" : "border-gray-700/20"
+          } border-b`}
+        >
           <div className="flex items-center gap-2">
             <BiBell className="text-sky-400" />
             <h3 className="text-sm font-mono font-medium text-sky-400">
@@ -88,28 +107,35 @@ const NotificationBox = ({ notifications }) => {
         </div>
         <div
           ref={scrollRef}
-          className="overflow-y-auto max-h-[250px] scrollbar-thin backdrop-blur-md"
+          className={`overflow-y-auto max-h-[250px] scrollbar-thin backdrop-blur-md ${
+            theme === "light" ? "bg-white/50" : ""
+          }`}
         >
           {notifications.length === 0 ? (
             <div className="flex items-center justify-center h-[100px] text-sm font-mono text-sky-400/60">
               {t("no_active_notifications")}
             </div>
           ) : (
-            notifications.map((notification, index) => {
+            [...notifications].reverse().map((notification, index) => {
               const status = getStatusStyle(
                 notification.data.statuserror,
-                notification.data.type_name
+                notification.data.type_name,
+                theme
               );
-              const itemKey = `${notification.data.cid}-${notification.data.type}-${index}`;
+              const itemKey = `${notification.data.cid}-${notification.data.type}-${notifications.length - index}`;
               const isAnimating = animatingItems.has(itemKey);
 
               return (
                 <div
                   key={itemKey}
-                  className={`group px-4 py-2.5 border-b border-gray-700/10 transition-all duration-300 border-l-2 ${
+                  className={`group px-4 py-2.5 ${
+                    theme === "light"
+                      ? "border-gray-200/10"
+                      : "border-gray-700/10"
+                  } border-b transition-all duration-300 border-l-2 ${
                     status.border
                   } ${status.hoverBg} ${status.hoverBorder} ${
-                    isAnimating ? "animate-slide-up" : ""
+                    isAnimating ? "animate-slide-right" : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -118,7 +144,11 @@ const NotificationBox = ({ notifications }) => {
                         <span className="transform transition-transform duration-300 group-hover:scale-110">
                           {status.icon}
                         </span>
-                        <p className="font-mono text-sm text-sky-400 truncate">
+                        <p
+                          className={`font-mono text-sm ${
+                            theme === "light" ? "text-sky-600" : "text-sky-400"
+                          } truncate`}
+                        >
                           {notification.data.crossroad_name}
                         </p>
                       </div>
@@ -128,19 +158,45 @@ const NotificationBox = ({ notifications }) => {
                         >
                           {notification.data.status_name}
                         </span>
-                        <span className="text-sky-400/40">|</span>
-                        <p className="font-mono text-xs text-sky-400/60">
+                        <span
+                          className={
+                            theme === "light"
+                              ? "text-sky-600/40"
+                              : "text-sky-400/40"
+                          }
+                        >
+                          |
+                        </span>
+                        <p
+                          className={`font-mono text-xs ${
+                            theme === "light"
+                              ? "text-sky-600/70"
+                              : "text-sky-400/60"
+                          }`}
+                        >
                           {notification.data.sensor_name}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
-                        <p className="font-mono text-xs text-sky-400/60">
+                        <p
+                          className={`font-mono text-xs ${
+                            theme === "light"
+                              ? "text-sky-600/70"
+                              : "text-sky-400/60"
+                          }`}
+                        >
                           {notification.data.type_name} |{" "}
                           {notification.data.device_name}
                         </p>
                       </div>
                     </div>
-                    <time className="font-mono text-xs text-sky-400/60 whitespace-nowrap">
+                    <time
+                      className={`font-mono text-xs ${
+                        theme === "light"
+                          ? "text-sky-600/70"
+                          : "text-sky-400/60"
+                      } whitespace-nowrap`}
+                    >
                       {notification.data.eventdate.split(" ")[1]}
                     </time>
                   </div>
