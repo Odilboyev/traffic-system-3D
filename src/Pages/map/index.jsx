@@ -113,7 +113,6 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
   }, [currentLayer]);
 
   const handleMarkerDragEnd = (id, type, event, svetofor_id) => {
-    console.log(event);
     const { lat, lng } = event.target.getLatLng();
 
     try {

@@ -17,24 +17,30 @@ const TrafficlightMarkers = ({
   clearTrafficLights,
   updateTrafficLights,
   handleMarkerDragEnd,
+  trafficSocket,
+  setIsPaused,
 }) => {
   // Fetching function passed to custom hook
   const fetchTrafficLights = async (body) => {
     try {
       const response = await getNearbyTrafficLights(body);
+      console.log("Fetch response:", response);
 
       if (response.status === "error") {
         console.error(response.message);
         clearTrafficLights(); // Clear state and close WebSocket on error
         return;
       }
-
       setTrafficLights(response.data);
 
       // Only open a new WebSocket if the svetofor_id has changed
       if (currentSvetoforId !== response.svetofor_id) {
+        console.log("Setting new svetofor_id:", response.svetofor_id);
         setCurrentSvetoforId(response.svetofor_id);
+      } else {
+        console.log("Svetofor_id unchanged:", currentSvetoforId);
       }
+      return response;
     } catch (error) {
       console.error("Error fetching traffic lights:", error);
       clearTrafficLights();
@@ -52,32 +58,62 @@ const TrafficlightMarkers = ({
   });
 
   return (
-    <>
+    <div key={trafficLights}>
       {trafficLights?.map((v, i) => (
         <Marker
           key={i}
           position={[v.lat, v.lng]}
           draggable={true}
           eventHandlers={{
+            click: () => {
+              // Pause WebSocket updates when starting to drag
+              setIsPaused(true);
+            },
+
             dragend: async (e) => {
+              // Resume WebSocket updates after successful drag
+              setIsPaused(false);
               const { lat, lng } = e.target.getLatLng();
+              setTrafficLights((prevLights) =>
+                prevLights.map((light) =>
+                  light.id === v.id ? { ...light, lat, lng } : light
+                )
+              );
               try {
                 await handleMarkerDragEnd(v.id, 7, e, +v.svetofor_id);
-                // Update local state immediately
+
                 setTrafficLights((prevLights) =>
                   prevLights.map((light) =>
                     light.id === v.id ? { ...light, lat, lng } : light
                   )
                 );
-                // Refetch traffic lights
+              } catch (error) {
                 const response = await fetchTrafficLights({
                   lat: lat.toString(),
                   lng: lng.toString(),
                   zoom: 20,
                 });
-              } catch (error) {
-                console.error("Error updating marker position:", error);
+                console.error("Error during dragend:", error);
               }
+
+              // const { lat, lng } = e.target.getLatLng();
+              // try {
+              //   await handleMarkerDragEnd(v.id, 7, e, +v.svetofor_id);
+              //   // Update local state immediately
+              //   setTrafficLights((prevLights) =>
+              //     prevLights.map((light) =>
+              //       light.id === v.id ? { ...light, lat, lng } : light
+              //     )
+              //   );
+              //   // Refetch traffic lights
+
+              //   // Resume WebSocket updates after successful drag
+              //   setIsPaused(false);
+              // } catch (error) {
+              //   console.error("Error updating marker position:", error);
+              //   // Resume WebSocket updates even if there was an error
+              //   setIsPaused(false);
+              // }
             },
           }}
           icon={L.divIcon({
@@ -106,7 +142,7 @@ const TrafficlightMarkers = ({
           })}
         />
       ))}
-    </>
+    </div>
   );
 };
 

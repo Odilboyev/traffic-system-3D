@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-
 import PhasesDisplay from "../crossroad/components/phases";
-// import Svetoforlar from "./Svetoforlar"; // Adjust path as necessary
 import TrafficlightMarkers from ".";
 import { authToken } from "../../../../api/api.config";
 import { fixIncompleteJSON } from "./utils";
@@ -12,9 +10,11 @@ const TrafficLightContainer = ({ isInModal, handleMarkerDragEnd }) => {
   const [trafficSocket, setTrafficSocket] = useState(null);
   const [currentSvetoforId, setCurrentSvetoforId] = useState(null);
   const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (currentSvetoforId) {
+    if (currentSvetoforId && !isPaused) {
+      console.log("Creating new socket, paused:", isPaused);
       const socket = new WebSocket(
         `${
           import.meta.env.VITE_TRAFFICLIGHT_SOCKET
@@ -23,8 +23,6 @@ const TrafficLightContainer = ({ isInModal, handleMarkerDragEnd }) => {
 
       socket.onmessage = (event) => {
         let message = event.data;
-
-        // Fix incomplete JSON message
         message = fixIncompleteJSON(message);
         try {
           const data = JSON.parse(message);
@@ -44,10 +42,10 @@ const TrafficLightContainer = ({ isInModal, handleMarkerDragEnd }) => {
         }
       };
     }
-  }, [currentSvetoforId]);
+  }, [currentSvetoforId, isPaused]);
 
   const updateTrafficLights = (data) => {
-    if (data) {
+    if (data && !isPaused) {
       const updatedLights = trafficLights.map((light) => {
         const update = data.channel.find((v) => v.id === light.link_id);
         return update
@@ -73,9 +71,6 @@ const TrafficLightContainer = ({ isInModal, handleMarkerDragEnd }) => {
     setLastSuccessfulLocation(null);
   };
 
-  // Add your `fetchTrafficLights` and other related functions here, using
-  // setTrafficLights, setWssLink, setLastSuccessfulLocation, etc., as needed.
-
   return (
     <>
       <TrafficlightMarkers
@@ -92,6 +87,8 @@ const TrafficLightContainer = ({ isInModal, handleMarkerDragEnd }) => {
         trafficSocket={trafficSocket}
         clearTrafficLights={clearTrafficLights}
         updateTrafficLights={updateTrafficLights}
+        isPaused={isPaused}
+        setIsPaused={setIsPaused}
       />
       {isInModal && phase?.length > 0 && <PhasesDisplay phases={phase} />}
     </>
