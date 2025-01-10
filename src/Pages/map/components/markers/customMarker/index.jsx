@@ -6,6 +6,7 @@ import CameraDetails from "../../customPopup";
 import PropTypes from "prop-types";
 import { Typography } from "@material-tailwind/react";
 import { getCameraDetails } from "../../../../../api/api.handlers";
+import { useSelector } from "react-redux";
 import { useTheme } from "../../../../../customHooks/useTheme";
 
 const CustomMarker = memo(
@@ -14,7 +15,6 @@ const CustomMarker = memo(
     marker,
     zoom,
     L,
-    isDraggable,
     handleMonitorCrossroad,
     handleBoxModalOpen,
     handleLightsModalOpen,
@@ -23,6 +23,7 @@ const CustomMarker = memo(
     position,
     disableUpdates = false,
   }) {
+    const isDraggable = useSelector((state) => state.map.isDraggable);
     const isCamera = (type) => type == 1 || type == 5 || type == 6;
 
     const cameraType = (type) => {

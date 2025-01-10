@@ -16,7 +16,6 @@ import { useTheme } from "../../../../customHooks/useTheme";
 const DynamicMarkers = ({
   useDynamicFetching,
   usePieChartForClusteredMarkers,
-  isDraggable,
   filter,
   setMarkers,
   clearMarkers,
@@ -79,17 +78,17 @@ const DynamicMarkers = ({
   // Convert coordinates for 3D display
   const convert2Dto3D = (lat, lng) => {
     if (!show3DLayer) return { lat, lng };
-    
+
     // Get the terrain height at this point (if available)
     let height = 0;
     if (map.getTerrain && map.getTerrain()) {
       height = map.getTerrain().getHeight([lat, lng]) || 0;
     }
-    
+
     return {
       lat: lat,
       lng: lng,
-      alt: height // Add altitude for 3D positioning
+      alt: height, // Add altitude for 3D positioning
     };
   };
 
@@ -144,7 +143,6 @@ const DynamicMarkers = ({
           key={i}
           marker={marker}
           L={L}
-          isDraggable={isDraggable}
           handleMonitorCrossroad={handleMonitorCrossroad}
           handleBoxModalOpen={handleBoxModalOpen}
           handleLightsModalOpen={handleLightsModalOpen}
@@ -185,7 +183,6 @@ const DynamicMarkers = ({
 DynamicMarkers.propTypes = {
   useDynamicFetching: PropTypes.bool.isRequired,
   usePieChartForClusteredMarkers: PropTypes.bool,
-  isDraggable: PropTypes.bool.isRequired,
   filter: PropTypes.object.isRequired,
   setMarkers: PropTypes.func.isRequired,
   clearMarkers: PropTypes.func.isRequired,

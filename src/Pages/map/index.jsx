@@ -64,7 +64,6 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
     useClusteredMarkers,
   } = useMapMarkers();
 
-  const isDraggable = useSelector((state) => state.map.isDraggable);
   const filter = useSelector((state) => state.map.filter);
   const { fetchAlarmsData } = useMapAlarms();
 
@@ -241,7 +240,6 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
           handleMarkerDragEnd={handleMarkerDragEnd}
           markers={markers}
           filter={filter}
-          isDraggable={isDraggable}
           setMarkers={setMarkers}
           clearMarkers={clearMarkers}
           updateMarkers={updateMarkers}

@@ -7,6 +7,7 @@ import { getNearbyTrafficLights } from "../../../../api/api.handlers";
 import iconSelector from "./icons/iconSelector";
 import { renderToString } from "react-dom/server";
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
+import { useSelector } from "react-redux";
 
 const TrafficlightMarkers = ({
   trafficLights,
@@ -20,6 +21,8 @@ const TrafficlightMarkers = ({
   trafficSocket,
   setIsPaused,
 }) => {
+  const isDraggable = useSelector((state) => state.map.isDraggable);
+  console.log(isDraggable);
   // Fetching function passed to custom hook
   const fetchTrafficLights = async (body) => {
     try {
@@ -63,7 +66,7 @@ const TrafficlightMarkers = ({
         <Marker
           key={i}
           position={[v.lat, v.lng]}
-          draggable={true}
+          draggable={isDraggable}
           eventHandlers={{
             click: () => {
               // Pause WebSocket updates when starting to drag
