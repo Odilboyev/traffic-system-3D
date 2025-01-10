@@ -1,0 +1,161 @@
+.map-orientation-control {
+  width: 62px;
+  height: 62px;
+  position: relative;
+  background: white;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px;
+  margin: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid #fff;
+}
+
+.map-orientation-control:hover {
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 10px;
+}
+
+.rotation-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+
+.rotation-ring::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.rotation-ring::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: #1976d2;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px white;
+}
+
+.rotation-ring:active {
+  cursor: grabbing;
+}
+
+.toggle-3d-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #e0e0e0;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+  padding: 0;
+}
+
+.toggle-3d-button:hover {
+  color: #1976d2;
+  border-color: #1976d2;
+  background: #f8f8f8;
+}
+
+.toggle-3d-button.active {
+  background: #e3f2fd;
+  color: #1976d2;
+  border-color: #1976d2;
+}
+
+.compass-marker {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: #1976d2;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Compass directions */
+.compass-directions {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.compass-direction {
+  position: absolute;
+  font-size: 10px;
+  color: #666;
+  font-weight: 500;
+}
+
+.compass-direction.east {
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.compass-direction.west {
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.compass-direction.south {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Tick marks */
+.tick-marks {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tick-mark {
+  position: absolute;
+  width: 1px;
+  height: 6px;
+  background: #e0e0e0;
+  transform-origin: center 29px;
+}
+
+.tick-mark.major {
+  height: 8px;
+  width: 2px;
+  background: #bdbdbd;
+}
+
+@media (hover: hover) {
+  .map-orientation-control:hover .rotation-ring::before {
+    border-color: #1976d2;
+  }
+}

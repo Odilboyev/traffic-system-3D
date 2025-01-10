@@ -1,4 +1,5 @@
 import "./components/TrafficJamPolylines/styles.css";
+import "leaflet-rotate-map";
 
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import { getBoxData, markerHandler } from "../../api/api.handlers.js";
@@ -11,6 +12,7 @@ import MapCRSHandler from "./utils/mapCsrHandler.jsx";
 import MapEvents from "./components/MapEvents/index.jsx";
 import MapLibreLayer from "./components/MapLibreLayer";
 import MapModals from "./components/MapModals/index.jsx";
+import MapOrientationControl from "./components/controls/MapOrientationControl";
 import NotificationBox from "../../components/NotificationBox/index.jsx";
 import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
@@ -37,19 +39,19 @@ const MapMarkerToaster = ({ changedMarkers }) => {
     },
     [map]
   );
-  useEffect(() => {
-    if (changedMarkers && changedMarkers.length > 0) {
-      // Batch process notifications
-      changedMarkers.forEach((changedMarker) => {
-        handleToaster(changedMarker);
-      });
-      // // Dispatch batch marker update
-      // dispatchMarkers({
-      //   type: "BATCH_UPDATE_MARKERS",
-      //   payload: changedMarkers,
-      // });
-    }
-  }, [changedMarkers, handleToaster]);
+  // useEffect(() => {
+  //   if (changedMarkers && changedMarkers.length > 0) {
+  //     // Batch process notifications
+  //     changedMarkers.forEach((changedMarker) => {
+  //       handleToaster(changedMarker);
+  //     });
+  //     // // Dispatch batch marker update
+  //     // dispatchMarkers({
+  //     //   type: "BATCH_UPDATE_MARKERS",
+  //     //   payload: changedMarkers,
+  //     // });
+  //   }
+  // }, [changedMarkers, handleToaster]);
 
   return null;
 };
@@ -186,21 +188,23 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
         key={currentLayer}
         id="monitoring"
         attributionControl={false}
-        center={JSON.parse(localStorage.getItem("its_currentLocation")) || home}
-        zoom={JSON.parse(localStorage.getItem("its_currentZoom")) || 11}
+        center={home}
+        zoom={12}
+        minZoom={5}
+        maxZoom={20}
         zoomDelta={0.6}
         doubleClickZoom={false}
         style={{ height: "100vh", width: "100%" }}
         zoomControl={false}
-        maxZoom={20}
+        rotate={true}
+        rotateControl={false}
+        bearing={0}
         className="h-screen w-screen !bg-transparent"
       >
         <NotificationBox notifications={notifications} map={mapRef.current} />
-        {/* <BaseLayerHandler /> */}
         <MapLibreLayer />
         {!show3DLayer && <TrafficJamPolylines />}
         <MapCRSHandler currentLayer={currentLayer} />
-        {/* <MapMarkerToaster changedMarker={changedMarkers} /> */}
         <Sidebar
           t={t}
           changedMarker={changedMarkers}
@@ -211,7 +215,6 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
           handleCloseCrossroadModal={handleCloseCrossroadModal}
           reloadMarkers={getDataHandler}
         />
-        {/* {!isbigMonitorOpen ? <FindMeControl /> : ""} */}
         <ToastContainer containerId="alarms" className="z-[9998]" />
         <MapEvents changedMarkers={changedMarkers} />
         {currentLayerDetails && !show3DLayer && (
@@ -224,7 +227,8 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
           />
         )}
         <TrafficJamLayer showTrafficJam={showTrafficJam} />
-        <ZoomControl theme={theme} position={"topright"} />{" "}
+        <ZoomControl theme={theme} position={"topright"} />
+        <MapOrientationControl />
         {filter.trafficlights && (
           <TrafficLightContainer handleMarkerDragEnd={handleMarkerDragEnd} />
         )}
@@ -250,9 +254,7 @@ const MapComponent = memo(({ changedMarkers, notifications, t }) => {
       <MapModals
         t={t}
         // crossroadModal={{ isOpen: isbigMonitorOpen, marker: activeMarker }}
-        isBoxLoading={isBoxLoading}
         deviceModal={{ isOpen: isBoxModalOpen, device: activeBox }}
-        isLightsLoading={isLightsLoading}
         trafficLightsModal={{ isOpen: isLightsModalOpen, light: activeLight }}
         onClose={{
           crossroad: handleCloseCrossroadModal,

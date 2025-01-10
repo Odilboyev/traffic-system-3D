@@ -13,7 +13,7 @@ import { useState } from "react";
 
 export function SignIn() {
   const navigate = useNavigate();
-  console.log("page login");
+
   const [loginName, setLoginName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // Added state for error message

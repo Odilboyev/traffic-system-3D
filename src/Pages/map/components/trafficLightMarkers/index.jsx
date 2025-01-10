@@ -22,7 +22,7 @@ const TrafficlightMarkers = ({
   setIsPaused,
 }) => {
   const isDraggable = useSelector((state) => state.map.isDraggable);
-  console.log(isDraggable);
+
   // Fetching function passed to custom hook
   const fetchTrafficLights = async (body) => {
     try {

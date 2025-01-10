@@ -1,9 +1,14 @@
 import "@maplibre/maplibre-gl-leaflet";
 import "maplibre-gl/dist/maplibre-gl.css";
+
 import * as maplibregl from "maplibre-gl";
+
 import { useCallback, useEffect, useRef } from "react";
+
+import CameraMarker3D from "./CameraMarker3D";
 import L from "leaflet";
 import baseLayers from "../../../../configurations/mapLayers";
+import { renderToString } from "react-dom/server";
 import { useMap } from "react-leaflet";
 import { useMapMarkers } from "../../hooks/useMapMarkers";
 import { useTheme } from "../../../../customHooks/useTheme";
@@ -21,27 +26,41 @@ const MapLibreLayer = () => {
     if (!markerInstance) return null;
 
     const latlng = markerInstance.getLatLng();
+    const markerData = markerInstance.options?.markerData;
+    const isCamera =
+      markerData?.device_type === "camera" || markerData?.type === "camera";
 
     // Create marker element
     const el = document.createElement("div");
-    el.className = "maplibre-marker-3d";
+    el.className = isCamera
+      ? "maplibre-marker-3d camera"
+      : "maplibre-marker-3d";
 
-    // Copy styles from Leaflet marker
-    const markerIcon = leafletMarker.querySelector("img") || leafletMarker;
-    el.style.width = markerIcon.style.width || "24px";
-    el.style.height = markerIcon.style.height || "24px";
+    if (isCamera) {
+      // Render camera marker with Three.js
+      el.innerHTML = renderToString(
+        <CameraMarker3D rotation={markerData?.rotate || 0} />
+      );
+      el.style.width = "40px";
+      el.style.height = "40px";
+    } else {
+      // Copy styles from Leaflet marker for non-camera markers
+      const markerIcon = leafletMarker.querySelector("img") || leafletMarker;
+      el.style.width = markerIcon.style.width || "24px";
+      el.style.height = markerIcon.style.height || "24px";
 
-    // Create marker icon
-    const iconImg = document.createElement("div");
-    iconImg.className = "marker-icon";
-    iconImg.style.backgroundImage =
-      markerIcon.style.backgroundImage || `url(${markerIcon.src})`;
-    iconImg.style.backgroundSize = "contain";
-    iconImg.style.backgroundRepeat = "no-repeat";
-    iconImg.style.width = "100%";
-    iconImg.style.height = "100%";
+      // Create marker icon
+      const iconImg = document.createElement("div");
+      iconImg.className = "marker-icon";
+      iconImg.style.backgroundImage =
+        markerIcon.style.backgroundImage || `url(${markerIcon.src})`;
+      iconImg.style.backgroundSize = "contain";
+      iconImg.style.backgroundRepeat = "no-repeat";
+      iconImg.style.width = "100%";
+      iconImg.style.height = "100%";
 
-    el.appendChild(iconImg);
+      el.appendChild(iconImg);
+    }
 
     // Create and configure MapLibre marker
     const marker = new maplibregl.Marker({
@@ -144,7 +163,8 @@ const MapLibreLayer = () => {
               type: "raster",
               tiles: [baseLayer.url.replace("{s}", "a")],
               tileSize: 256,
-              attribution: baseLayer.attribution || " OpenStreetMap contributors",
+              attribution:
+                baseLayer.attribution || " OpenStreetMap contributors",
               maxzoom: baseLayer.maxNativeZoom,
             },
           },
@@ -177,13 +197,13 @@ const MapLibreLayer = () => {
         map.setView(center, zoom, { animate: false });
         maplibreMap.setPitch(45);
         maplibreMap.setBearing(0);
-        
+
         // Add markers after a short delay
         setTimeout(convertToMapLibreMarkers, 100);
       });
 
       // Prevent marker conversion on zoom
-      maplibreMap.on('zoom', () => {
+      maplibreMap.on("zoom", () => {
         // Update only the necessary view state without re-creating markers
         const newCenter = map.getCenter();
         const newZoom = map.getZoom();
@@ -235,7 +255,13 @@ const MapLibreLayer = () => {
         maplibreLayerRef.current = null;
       }
     };
-  }, [map, show3DLayer, baseLayer.url, baseLayer.maxNativeZoom, baseLayer.attribution]);
+  }, [
+    map,
+    show3DLayer,
+    baseLayer.url,
+    baseLayer.maxNativeZoom,
+    baseLayer.attribution,
+  ]);
 
   // Handle 3D mode changes and marker updates
   useEffect(() => {
