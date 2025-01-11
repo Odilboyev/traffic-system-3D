@@ -41,12 +41,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             </MyThemeProvider>
           </HashRouter>
         </PopupProvider>
-
-        {/* <App /> */}
       </ThemeProvider>
-      {/* </MapMarkersProvider> */}
     </Provider>
   </I18nextProvider>
-
   // </React.StrictMode>
 );

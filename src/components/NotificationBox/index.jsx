@@ -81,174 +81,172 @@ const NotificationBox = ({ notifications, map }) => {
   }, [notifications]);
 
   return (
-    <Control position="bottomright">
+    // <Control position="bottomright">
+    <div
+      className={`w-96 fixed bottom-4 right-4 z-50 pointer-events-auto max-h-[300px] ${
+        theme === "light" ? "bg-white/90" : "bg-gray-900/50"
+      } backdrop-blur-lg rounded-lg overflow-hidden ${
+        theme === "light" ? "border-gray-200/20" : "border-gray-700/20"
+      } border shadow-lg`}
+    >
       <div
-        className={`w-96 max-h-[300px] ${
-          theme === "light" ? "bg-white/90" : "bg-gray-900/50"
-        } backdrop-blur-lg rounded-lg overflow-hidden ${
+        className={`px-4 py-3 ${
+          theme === "light" ? "bg-gray-100/80" : "bg-gray-900/30"
+        } backdrop-blur-xl ${
           theme === "light" ? "border-gray-200/20" : "border-gray-700/20"
-        } border shadow-lg`}
+        } border-b`}
       >
-        <div
-          className={`px-4 py-3 ${
-            theme === "light" ? "bg-gray-100/80" : "bg-gray-900/30"
-          } backdrop-blur-xl ${
-            theme === "light" ? "border-gray-200/20" : "border-gray-700/20"
-          } border-b`}
-        >
-          <div className="flex items-center gap-2">
-            <BiBell className="text-sky-400" />
-            <h3 className="text-sm font-mono font-medium text-sky-400">
-              {t("notifications")}
-            </h3>
-            {notifications.length > 0 && (
-              <span className="px-2 py-0.5 text-xs font-mono font-medium text-sky-400 bg-sky-500/10 rounded-full border border-gray-500/50 ml-auto">
-                {notifications.length}
-              </span>
-            )}
-          </div>
-        </div>
-        <div
-          ref={scrollRef}
-          className={`overflow-y-auto max-h-[250px] scrollbar-thin backdrop-blur-md ${
-            theme === "light" ? "bg-white/50" : ""
-          }`}
-        >
-          {notifications.length === 0 ? (
-            <div className="flex items-center justify-center h-[100px] text-sm font-mono text-sky-400/60">
-              {t("no_active_notifications")}
-            </div>
-          ) : (
-            [...notifications].reverse().map((notification, index) => {
-              const status = getStatusStyle(
-                notification.data.statuserror,
-                notification.data.type_name,
-                theme
-              );
-              const itemKey = `${notification.data.cid}-${
-                notification.data.type
-              }-${notifications.length - index}`;
-              const isAnimating = animatingItems.has(itemKey);
-
-              return (
-                <div
-                  key={itemKey}
-                  className={`group px-4 py-2.5 ${
-                    theme === "light"
-                      ? "border-gray-200/10"
-                      : "border-gray-700/10"
-                  } border-b transition-all duration-300 border-l-2 ${
-                    status.border
-                  } ${status.hoverBg} ${status.hoverBorder} ${
-                    isAnimating
-                      ? `animate-slide-right ${
-                          notification.data.statuserror === 1 ||
-                          notification.data.statuserror === 2
-                            ? "status-error"
-                            : notification.data.statuserror === 0
-                            ? "status-success"
-                            : "status-default"
-                        }`
-                      : ""
-                  } cursor-pointer hover:scale-[1.02] active:scale-[0.98] transform`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="transform transition-transform duration-300 group-hover:scale-110">
-                          {status.icon}
-                        </span>
-                        <p
-                          className={`font-mono text-sm ${
-                            theme === "light" ? "text-sky-600" : "text-sky-400"
-                          } truncate flex-1`}
-                        >
-                          {notification.data.crossroad_name}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <span
-                          className={`px-2 py-0.5 text-xs font-mono font-medium ${status.text} ${status.statusBg} rounded transition-all duration-300 group-hover:scale-105`}
-                        >
-                          {notification.data.status_name}
-                        </span>
-                        <span
-                          className={
-                            theme === "light"
-                              ? "text-sky-600/40"
-                              : "text-sky-400/40"
-                          }
-                        >
-                          |
-                        </span>
-                        <p
-                          className={`font-mono text-xs ${
-                            theme === "light"
-                              ? "text-sky-600/70"
-                              : "text-sky-400/60"
-                          }`}
-                        >
-                          {notification.data.sensor_name}
-                        </p>
-                        {notification.data.lat && notification.data.lng && (
-                          <>
-                            <span
-                              className={
-                                theme === "light"
-                                  ? "text-sky-600/40"
-                                  : "text-sky-400/40"
-                              }
-                            >
-                              |
-                            </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                map.flyTo(
-                                  [
-                                    +notification.data.lat,
-                                    +notification.data.lng,
-                                  ],
-                                  18
-                                );
-                              }}
-                              className={`flex items-center gap-1 ${status.hoverBg} ${status.text} transition-transform duration-200 hover:scale-110 active:scale-90 transform`}
-                            >
-                              <HiOutlineLocationMarker className="text-base" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p
-                          className={`font-mono text-xs ${
-                            theme === "light"
-                              ? "text-sky-600/70"
-                              : "text-sky-400/60"
-                          }`}
-                        >
-                          {notification.data.type_name} |{" "}
-                          {notification.data.device_name}
-                        </p>
-                      </div>
-                    </div>
-                    <time
-                      className={`font-mono text-xs ${
-                        theme === "light"
-                          ? "text-sky-600/70"
-                          : "text-sky-400/60"
-                      } whitespace-nowrap`}
-                    >
-                      {notification.data.eventdate.split(" ")[1]}
-                    </time>
-                  </div>
-                </div>
-              );
-            })
+        <div className="flex items-center gap-2">
+          <BiBell className="text-sky-400" />
+          <h3 className="text-sm font-mono font-medium text-sky-400">
+            {t("notifications")}
+          </h3>
+          {notifications.length > 0 && (
+            <span className="px-2 py-0.5 text-xs font-mono font-medium text-sky-400 bg-sky-500/10 rounded-full border border-gray-500/50 ml-auto">
+              {notifications.length}
+            </span>
           )}
         </div>
       </div>
-    </Control>
+      <div
+        ref={scrollRef}
+        className={`overflow-y-auto max-h-[250px] scrollbar-thin backdrop-blur-md ${
+          theme === "light" ? "bg-white/50" : ""
+        }`}
+      >
+        {notifications.length === 0 ? (
+          <div className="flex items-center justify-center h-[100px] text-sm font-mono text-sky-400/60">
+            {t("no_active_notifications")}
+          </div>
+        ) : (
+          [...notifications].reverse().map((notification, index) => {
+            const status = getStatusStyle(
+              notification.data.statuserror,
+              notification.data.type_name,
+              theme
+            );
+            const itemKey = `${notification.data.cid}-${
+              notification.data.type
+            }-${notifications.length - index}`;
+            const isAnimating = animatingItems.has(itemKey);
+
+            return (
+              <div
+                key={itemKey}
+                className={`group px-4 py-2.5 ${
+                  theme === "light"
+                    ? "border-gray-200/10"
+                    : "border-gray-700/10"
+                } border-b transition-all duration-300 border-l-2 ${
+                  status.border
+                } ${status.hoverBg} ${status.hoverBorder} ${
+                  isAnimating
+                    ? `animate-slide-right ${
+                        notification.data.statuserror === 1 ||
+                        notification.data.statuserror === 2
+                          ? "status-error"
+                          : notification.data.statuserror === 0
+                          ? "status-success"
+                          : "status-default"
+                      }`
+                    : ""
+                } cursor-pointer hover:scale-[1.02] active:scale-[0.98] transform`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="transform transition-transform duration-300 group-hover:scale-110">
+                        {status.icon}
+                      </span>
+                      <p
+                        className={`font-mono text-sm ${
+                          theme === "light" ? "text-sky-600" : "text-sky-400"
+                        } truncate flex-1`}
+                      >
+                        {notification.data.crossroad_name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span
+                        className={`px-2 py-0.5 text-xs font-mono font-medium ${status.text} ${status.statusBg} rounded transition-all duration-300 group-hover:scale-105`}
+                      >
+                        {notification.data.status_name}
+                      </span>
+                      <span
+                        className={
+                          theme === "light"
+                            ? "text-sky-600/40"
+                            : "text-sky-400/40"
+                        }
+                      >
+                        |
+                      </span>
+                      <p
+                        className={`font-mono text-xs ${
+                          theme === "light"
+                            ? "text-sky-600/70"
+                            : "text-sky-400/60"
+                        }`}
+                      >
+                        {notification.data.sensor_name}
+                      </p>
+                      {notification.data.lat && notification.data.lng && (
+                        <>
+                          <span
+                            className={
+                              theme === "light"
+                                ? "text-sky-600/40"
+                                : "text-sky-400/40"
+                            }
+                          >
+                            |
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              map.flyTo(
+                                [
+                                  +notification.data.lat,
+                                  +notification.data.lng,
+                                ],
+                                18
+                              );
+                            }}
+                            className={`flex items-center gap-1 ${status.hoverBg} ${status.text} transition-transform duration-200 hover:scale-110 active:scale-90 transform`}
+                          >
+                            <HiOutlineLocationMarker className="text-base" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p
+                        className={`font-mono text-xs ${
+                          theme === "light"
+                            ? "text-sky-600/70"
+                            : "text-sky-400/60"
+                        }`}
+                      >
+                        {notification.data.type_name} |{" "}
+                        {notification.data.device_name}
+                      </p>
+                    </div>
+                  </div>
+                  <time
+                    className={`font-mono text-xs ${
+                      theme === "light" ? "text-sky-600/70" : "text-sky-400/60"
+                    } whitespace-nowrap`}
+                  >
+                    {notification.data.eventdate.split(" ")[1]}
+                  </time>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+    // </Control>
   );
 };
 

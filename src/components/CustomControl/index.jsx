@@ -1,5 +1,6 @@
-import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
+
+import L from "leaflet";
 import { useMap } from "react-leaflet";
 
 const POSITION_CLASSES = {

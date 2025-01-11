@@ -104,9 +104,9 @@ const MapOrientationControl = () => {
       const onRotate = () => {
         setBearing(-maplibreMap.getBearing());
       };
-      maplibreMap.on('rotate', onRotate);
+      maplibreMap.on("rotate", onRotate);
       return () => {
-        maplibreMap.off('rotate', onRotate);
+        maplibreMap.off("rotate", onRotate);
       };
     }
   }, [getMapLibreInstance]);
@@ -115,7 +115,7 @@ const MapOrientationControl = () => {
   const tickMarks = Array.from({ length: 36 }, (_, i) => (
     <div
       key={i}
-      className={`tick-mark ${i % 9 === 0 ? 'major' : ''}`}
+      className={`tick-mark ${i % 9 === 0 ? "major" : ""}`}
       style={{
         transform: `rotate(${i * 10}deg)`,
       }}
@@ -124,7 +124,7 @@ const MapOrientationControl = () => {
 
   return (
     <Control position="topright">
-      <div 
+      <div
         className="map-orientation-control"
         style={{ transform: `rotate(${bearing}deg)` }}
       >

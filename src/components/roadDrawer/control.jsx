@@ -5,22 +5,22 @@ import { FaRoad } from "react-icons/fa";
 import { useMap } from "react-leaflet";
 
 const RoadDrawerControl = () => {
-  const map = useMap();
+  // const map = useMap();
   const [isRoadDrawerEnabled, setIsRoadDrawerEnabled] = useState(false);
   const handleToggleRoadDrawer = () => {
     const newState = !isRoadDrawerEnabled;
     setIsRoadDrawerEnabled(newState);
 
     // Emit map events to control drawing
-    if (newState) {
-      map.fire("roadDrawer:start");
-    } else {
-      map.fire("roadDrawer:stop");
-    }
+    // if (newState) {
+    //   map.fire("roadDrawer:start");
+    // } else {
+    //   map.fire("roadDrawer:stop");
+    // }
   };
 
   return (
-    <Control>
+    // <Control>
       <button
         className={`leaflet-control-road-drawer ${
           isRoadDrawerEnabled ? "active" : ""

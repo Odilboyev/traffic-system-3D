@@ -68,7 +68,7 @@ const Sidebar = ({
   handleCloseCrossroadModal,
   reloadMarkers,
 }) => {
-  const map = useMap();
+  // const map = useMap();
   const {
     theme,
     toggleTheme,
@@ -101,12 +101,12 @@ const Sidebar = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useMapEvents({
-    moveend: () => {
-      const center = map.getCenter();
-      setCurrentLocation([+center.lat, +center.lng]);
-    },
-  });
+  // useMapEvents({
+  //   moveend: () => {
+  //     const center = map.getCenter();
+  //     setCurrentLocation([+center.lat, +center.lng]);
+  //   },
+  // });
 
   const [activeSidePanel, setActiveSidePanel] = useState(null);
   const [activeSecondaryPanel, setActiveSecondaryPanel] = useState(null);
@@ -130,14 +130,14 @@ const Sidebar = ({
     }
   };
   return (
-    <>
+    <div className="pointer-events-none">
       {" "}
       <div
-        onPointerEnter={() => map.scrollWheelZoom?.disable()}
-        onPointerLeave={() => map.scrollWheelZoom.enable()}
+        // onPointerEnter={() => map.scrollWheelZoom?.disable()}
+        // onPointerLeave={() => map.scrollWheelZoom.enable()}
         className={` ${
           isVisible ? "fixed" : "none"
-        } z-[9999] top-0 left-0 h-full max-h-full no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-2xl  shadow-lg flex flex-col ${
+        } z-10 top-0 left-0 h-full max-h-full max-w-[80vw] pointer-events-auto no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-2xl  shadow-lg flex flex-col ${
           isSidebarOpen
             ? isMobile
               ? "w-[80vw]"
@@ -187,7 +187,7 @@ const Sidebar = ({
               t={t}
               extraContent={<FilterControl t={t} />} // Include your custom component here
             />
-            <SidebarItem
+            {/* <SidebarItem
               icon={<FaLocationDot className="w-4 h-4" />}
               label="regionControl"
               isSidebarOpen={isSidebarOpen}
@@ -198,7 +198,7 @@ const Sidebar = ({
               extraContent={
                 <RegionControl t={t} activeSidePanel={activeSidePanel} />
               } // Another custom component
-            />
+            /> */}
             <SidebarItem
               icon={<MdWidgets className="w-4 h-4" />}
               label="widgetControl"
@@ -386,7 +386,7 @@ const Sidebar = ({
       ) : (
         <div style={{ display: "none" }}></div>
       )}
-    </>
+    </div>
   );
 };
 

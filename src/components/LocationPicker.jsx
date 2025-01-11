@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   MapContainer,
   Marker,
@@ -6,10 +5,12 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import { useTheme } from "../customHooks/useTheme";
-import baseLayers from "../configurations/mapLayers";
+
 import { MdLocationOn } from "react-icons/md";
+import baseLayers from "../configurations/mapLayers";
 import { t } from "i18next";
+import { useEffect } from "react";
+import { useTheme } from "../customHooks/useTheme";
 
 const DraggableMarker = ({ position, setPosition }) => {
   useMapEvents({
@@ -17,13 +18,13 @@ const DraggableMarker = ({ position, setPosition }) => {
       setPosition(e.latlng);
     },
   });
-  const map = useMap();
-  useEffect(() => {
-    map.flyTo(position, map.getZoom(), {
-      animate: true,
-      duration: 1,
-    });
-  }, position);
+  // const map = useMap();
+  // useEffect(() => {
+  //   map.flyTo(position, map.getZoom(), {
+  //     animate: true,
+  //     duration: 1,
+  //   });
+  // }, position);
 
   return (
     <Marker

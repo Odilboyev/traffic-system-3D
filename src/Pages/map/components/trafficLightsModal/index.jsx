@@ -17,13 +17,13 @@ const TrafficLightsModal = ({ light, isOpen, onClose, t }) => {
           onClose={handleClose}
         >
           <DialogBody className="max-h-screen p-0 h-full no-scrollbar overflow-y-scroll dark:bg-blue-gray-900 dark:text-white">
-            <TrafficLightDashboard
+            {/* <TrafficLightDashboard
               id={light?.cid}
               vendor={light?.vendor_id}
               infoData={light}
               onClose={onClose}
               t={t}
-            />
+            /> */}
           </DialogBody>
         </Dialog>
       )}

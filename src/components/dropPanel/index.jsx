@@ -20,11 +20,11 @@ const DropPanel = ({
   // Determine position classes based on menuPlacement
   const positionClass =
     menuPlacement === "top" ? "bottom-full mb-2" : "top-full mt-2";
-  const map = useMap();
+  // const map = useMap();
   return (
     <div
       className={wrapperClass}
-      onPointerLeave={() => map.scrollWheelZoom.enable()}
+      // onPointerLeave={() => map.scrollWheelZoom.enable()}
     >
       <IconButton
         size="sm"
@@ -38,7 +38,7 @@ const DropPanel = ({
         <div
           className={`${sndWrapperClass} ${positionClass} absolute left-0 rounded-md  bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5`}
           role="menu"
-          onPointerLeave={() => map.scrollWheelZoom.enable()}
+          // onPointerLeave={() => map.scrollWheelZoom.enable()}
           aria-orientation="vertical"
           aria-labelledby="options-menu"
         >
@@ -53,7 +53,7 @@ const DropPanel = ({
                 size="sm"
                 variant="text"
                 onClick={() => {
-                  map.scrollWheelZoom.enable();
+                  // map.scrollWheelZoom.enable();
                   hanleDropDownOpen(false);
                 }}
               >
@@ -65,7 +65,7 @@ const DropPanel = ({
           {/* Content */}
           <div
             className="bg-gray-900/30 backdrop-blur-md rounded-b-lg p-2"
-            onPointerLeave={() => map.scrollWheelZoom.enable()}
+            // onPointerLeave={() => map.scrollWheelZoom.enable()}
           >
             {children}
           </div>

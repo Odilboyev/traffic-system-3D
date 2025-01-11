@@ -23,13 +23,13 @@ const MapModals = ({
         isLoading={isBoxLoading}
         onClose={onClose.device}
       />
-      <TrafficLightsModal
+      {/* <TrafficLightsModal
         t={t}
         isOpen={trafficLightsModal.isOpen}
         light={trafficLightsModal.light}
         isLoading={isLightsLoading}
         onClose={onClose.trafficLights}
-      />
+      /> */}
     </>
   );
 };

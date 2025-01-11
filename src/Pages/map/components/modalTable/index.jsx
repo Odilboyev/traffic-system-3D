@@ -16,7 +16,7 @@ import { ToastContainer } from "react-toastify";
 // ModalTable.js
 import { t } from "i18next";
 import useLocalStorageState from "../../../../customHooks/uselocalStorageState";
-import { useMap } from "react-leaflet";
+// import { useMap } from "react-leaflet";
 import { useSortedData } from "./useSortedData";
 import { useTheme } from "../../../../customHooks/useTheme";
 
@@ -108,14 +108,14 @@ const ModalTable = ({
     );
     setSortedColumn(keyName);
   };
-  const map = useMap();
+  // const map = useMap();
 
   const locationHandler = (lat, lng) => {
     if (lat && lng)
-      map.flyTo([lat, lng], 20, {
-        animate: true,
-        duration: 1,
-      });
+      // map.flyTo([lat, lng], 20, {
+      //   animate: true,
+      //   duration: 1,
+      // });
 
     handleOpen();
   };
