@@ -7,9 +7,7 @@ import {
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getMarkerData } from "../../../api/api.handlers";
-
-// Adjust the import path
+import { getAllMarkers } from "../../../api/api.handlers";
 
 const useMapMarkers = () => {
   const dispatch = useDispatch();
@@ -26,13 +24,34 @@ const useMapMarkers = () => {
   const getDataHandler = useCallback(async () => {
     dispatch(updateLoadingState(true));
     try {
-      const myData = await getMarkerData();
-      dispatch(updateMarkers(myData.data));
+      const response = await getAllMarkers({
+        bounds: {
+          north: 41.4,  // Default bounds for Tashkent
+          south: 41.2,
+          east: 69.4,
+          west: 69.1
+        }
+      });
+      console.log('Fetched marker data:', response);
+      if (response?.data) {
+        const formattedMarkers = response.data.map(marker => ({
+          ...marker,
+          id: marker.id || Math.random().toString(36).substr(2, 9),
+          lat: marker.lat || marker.latitude,
+          lng: marker.lng || marker.longitude,
+          type: marker.type || 'default',
+          status: marker.status || 'offline'
+        }));
+        console.log('Formatted markers:', formattedMarkers);
+        dispatch(updateMarkers(formattedMarkers));
+      }
     } catch (error) {
+      console.error('Error fetching markers:', error);
       if (error.code === "ERR_NETWORK") {
         dispatch(updateErrorMessage("You are offline. Please try again"));
+      } else {
+        dispatch(updateErrorMessage("Failed to fetch markers"));
       }
-      console.error(error);
     } finally {
       dispatch(updateLoadingState(false));
     }
@@ -44,14 +63,24 @@ const useMapMarkers = () => {
 
   const setMarkers = useCallback(
     (data) => {
-      if (data) dispatch(updateMarkers(data));
+      if (data) {
+        const formattedMarkers = data.map(marker => ({
+          ...marker,
+          id: marker.id || Math.random().toString(36).substr(2, 9),
+          lat: marker.lat || marker.latitude,
+          lng: marker.lng || marker.longitude,
+          type: marker.type || 'default',
+          status: marker.status || 'offline'
+        }));
+        dispatch(updateMarkers(formattedMarkers));
+      }
     },
     [dispatch]
   );
 
   const setUseClusteredMarkers = useCallback(
-    (newClusteredType) => {
-      dispatch(updateUseClusteredMarkers(newClusteredType));
+    (value) => {
+      dispatch(updateUseClusteredMarkers(value));
     },
     [dispatch]
   );

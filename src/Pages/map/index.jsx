@@ -1,68 +1,27 @@
-import "./components/TrafficJamPolylines/styles.css";
-import "leaflet-rotate-map";
+import "./styles.css";
 
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 
-import BaseLayerHandler from "./components/BaseLayerHandler";
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
-import L from "leaflet";
-import MapCRSHandler from "./utils/mapCsrHandler.jsx";
-import MapEvents from "./components/MapEvents/index.jsx";
-import MapLibreLayer from "./components/MapLibreLayer";
+// import MapLibreLayer from "./components/MapLibreLayer";
 import MapModals from "./components/MapModals/index.jsx";
-import MapOrientationControl from "./components/controls/MapOrientationControl";
+import MaplibreLayer from "./components/MapLibreLayer/reactBased.jsx";
 import NotificationBox from "../../components/NotificationBox/index.jsx";
 import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
-import TrafficJamLayer from "./utils/trafficJamTilelayer.jsx";
-import TrafficJamPolylines from "./components/TrafficJamPolylines";
-import TrafficLightContainer from "./components/trafficLightMarkers/managementLights.jsx";
-import ZoomControl from "./components/controls/customZoomControl/index.jsx";
-import baseLayers from "../../configurations/mapLayers.js";
-import { safeParseJSON } from "../../redux/utils.js";
 import toaster from "../../tools/toastconfig.jsx";
-import { useMapAlarms } from "./hooks/useMapAlarms.js";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
-import { useSelector } from "react-redux";
 import { useTheme } from "../../customHooks/useTheme.jsx";
-
-const home = [41.2995, 69.2401]; // Tashkent
-
-const MapMarkerToaster = ({ changedMarkers }) => {
-  const map = useMap();
-  const handleToaster = useCallback(
-    (changedMarker) => {
-      toaster(changedMarker, map);
-    },
-    [map]
-  );
-  // useEffect(() => {
-  //   if (changedMarkers && changedMarkers.length > 0) {
-  //     // Batch process notifications
-  //     changedMarkers.forEach((changedMarker) => {
-  //       handleToaster(changedMarker);
-  //     });
-  //     // // Dispatch batch marker update
-  //     // dispatchMarkers({
-  //     //   type: "BATCH_UPDATE_MARKERS",
-  //     //   payload: changedMarkers,
-  //     // });
-  //   }
-  // }, [changedMarkers, handleToaster]);
-
-  return null;
-};
 
 const MapComponent = memo(({ notifications, t }) => {
   const {
     markers,
     setMarkers,
+    getDataHandler,
     clearMarkers,
     updateMarkers,
-    filter,
-    changedMarker,
-    setChangedMarker,
+    useClusteredMarkers,
   } = useMapMarkers();
 
   const [crossroadModal, setCrossroadModal] = useState({
@@ -71,76 +30,103 @@ const MapComponent = memo(({ notifications, t }) => {
   });
   const [deviceModal, setDeviceModal] = useState({
     isOpen: false,
-    device: null,
+    marker: null,
   });
   const [trafficLightsModal, setTrafficLightsModal] = useState({
     isOpen: false,
-    light: null,
+    marker: null,
   });
-  const [isBoxLoading, setIsBoxLoading] = useState(false);
+  const [isBoxLoading] = useState(false);
   const [isLightsLoading] = useState(false);
+  const [changedMarker, setChangedMarker] = useState(null);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [activeSidePanel, setActiveSidePanel] = useState(null);
+
+  const { show3DLayer } = useTheme();
+
+  // Fetch markers on mount
+  useEffect(() => {
+    getDataHandler();
+  }, [getDataHandler]);
 
   // Debug markers data
   useEffect(() => {
-    console.log('Current markers:', markers);
+    console.log("Current markers:", markers);
   }, [markers]);
 
-  const handleMonitorCrossroadOpen = (marker) => {
-    setCrossroadModal({ isOpen: true, marker });
-  };
-
-  const handleBoxModalOpen = async (box) => {
-    setIsBoxLoading(true);
-    setDeviceModal({ isOpen: true, device: box });
-    setIsBoxLoading(false);
-  };
-
-  const handleLightsModalOpen = (light) => {
-    setTrafficLightsModal({ isOpen: true, light });
-  };
-
-  const handleCloseCrossroadModal = () => {
-    setCrossroadModal({ isOpen: false, marker: null });
-  };
-
-  const handleCloseDeviceModal = () => {
-    setDeviceModal({ isOpen: false, device: null });
-  };
-
-  const handleCloseTrafficLightsModal = () => {
-    setTrafficLightsModal({ isOpen: false, light: null });
-  };
+  const handleMarkerClick = useCallback((marker) => {
+    switch (marker.type) {
+      case "crossroad":
+        setCrossroadModal({ isOpen: true, marker });
+        break;
+      case "device":
+        setDeviceModal({ isOpen: true, marker });
+        break;
+      case "trafficLights":
+        setTrafficLightsModal({ isOpen: true, marker });
+        break;
+      default:
+        console.warn("Unknown marker type:", marker.type);
+    }
+  }, []);
 
   return (
     <div className="map-page w-screen h-screen relative overflow-hidden">
       <div className="map-wrapper absolute inset-0">
-        <MapLibreLayer 
-          markers={markers} 
-          onMarkerClick={(marker) => setChangedMarker(marker)} 
-        />
-      </div>
-      <div className="absolute inset-0 pointer-events-none">
-        <Sidebar t={t} changedMarker={changedMarker} />
-        <NotificationBox notifications={notifications} />
-        <MapModals
-          crossroadModal={crossroadModal}
-          deviceModal={deviceModal}
-          trafficLightsModal={trafficLightsModal}
-          isBoxLoading={isBoxLoading}
-          isLightsLoading={isLightsLoading}
-          onClose={{
-            crossroad: handleCloseCrossroadModal,
-            device: handleCloseDeviceModal,
-            lights: handleCloseTrafficLightsModal,
-          }}
+        {/* <MapLibreLayer
+          markers={markers}
+          onMarkerClick={handleMarkerClick}
+          useClusteredMarkers={useClusteredMarkers}
+        /> */}
+        <MaplibreLayer />
+
+        {/* <DynamicMarkers
+          useDynamicFetching={true}
+          filter={{}}
+          handleMonitorCrossroad={handleMonitorCrossroadOpen}
+          handleBoxModalOpen={handleBoxModalOpen}
+          handleLightsModalOpen={handleLightsModalOpen}
+          handleMarkerDragEnd={handleMarkerDragEnd}
           t={t}
-        />
-        <ToastContainer className="pointer-events-auto" />
+        /> */}
       </div>
+
+      <Sidebar
+        isVisible={isSidebarVisible}
+        setIsVisible={setIsSidebarVisible}
+        activePanel={activeSidePanel}
+        setActivePanel={setActiveSidePanel}
+        reloadMarkers={getDataHandler}
+        t={t}
+      />
+
+      <MapModals
+        crossroadModal={crossroadModal}
+        deviceModal={deviceModal}
+        trafficLightsModal={trafficLightsModal}
+        onClose={{
+          handleCloseCrossroadModal: () =>
+            setCrossroadModal({ isOpen: false, marker: null }),
+          handleCloseDeviceModal: () =>
+            setDeviceModal({ isOpen: false, marker: null }),
+          handleCloseTrafficLightsModal: () =>
+            setTrafficLightsModal({ isOpen: false, marker: null }),
+        }}
+        isBoxLoading={isBoxLoading}
+        isLightsLoading={isLightsLoading}
+        changedMarker={changedMarker}
+        t={t}
+      />
+
+      <NotificationBox notifications={notifications} />
+      <ToastContainer {...toaster} />
     </div>
   );
 });
 
-MapComponent.displayName = "MapComponent";
+MapComponent.propTypes = {
+  notifications: PropTypes.array,
+  t: PropTypes.func.isRequired,
+};
 
 export default MapComponent;

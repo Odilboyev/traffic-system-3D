@@ -1,156 +1,177 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useRef, useState } from "react";
-import maplibregl from "maplibre-gl";
-import { useTheme } from "../../../../customHooks/useTheme";
-import baseLayers from "../../../../configurations/mapLayers";
-import { createRoot } from "react-dom/client";
 
-const createMarkerElement = (type, status) => {
-  const el = document.createElement('div');
-  el.className = 'marker-container';
-  
-  // Create marker content similar to the old implementation
-  const markerContent = document.createElement('div');
-  markerContent.className = `marker-content ${status === "online" ? "online" : "offline"}`;
-  
+import Map, { NavigationControl } from "@vis.gl/react-maplibre";
+import { useEffect, useRef, useState } from "react";
+
+import Supercluster from "supercluster";
+import ThreeJsMarker from "../ThreeJsMarker";
+import { useTheme } from "../../../../customHooks/useTheme";
+
+const MAPTILER_KEY = "M31vd8Hi9hD0D3NWtZce";
+const MAP_STYLE =
+  "https://api.maptiler.com/maps/e6b564e1-da27-4cfd-9e87-d9928b008cdd/style.json?key={key}";
+
+const createMarkerElement = (markerData) => {
+  const el = document.createElement("div");
+  el.className = "marker-container";
+
+  // Create marker content
+  const markerContent = document.createElement("div");
+  markerContent.className = `marker-content ${
+    markerData.status === "online" ? "online" : "offline"
+  }`;
+
   // Add icon based on type
-  const icon = document.createElement('div');
-  icon.className = `marker-icon ${type}`;
-  
+  const icon = document.createElement("div");
+  icon.className = `marker-icon ${markerData.type || "default"}`;
+
   markerContent.appendChild(icon);
   el.appendChild(markerContent);
-  
+
   return el;
 };
 
-const MapLibreLayer = ({ markers = [], onMarkerClick }) => {
-  const mapContainer = useRef(null);
-  const map = useRef(null);
-  const markersRef = useRef({});
-  const { show3DLayer, currentLayer } = useTheme();
-  const baseLayer = baseLayers.find((v) => v.name === currentLayer) || baseLayers.find(v => v.checked);
+const createClusterMarker = (count) => {
+  const el = document.createElement("div");
+  el.className = "cluster-marker";
 
-  // Debug markers
-  useEffect(() => {
-    console.log('Markers received:', markers);
-  }, [markers]);
+  const inner = document.createElement("div");
+  inner.className = "cluster-marker-inner";
+  inner.textContent = count;
 
-  // Handle marker updates
-  useEffect(() => {
-    if (!map.current) return;
-
-    console.log('Updating markers:', markers);
-
-    // Remove old markers
-    Object.values(markersRef.current).forEach(marker => marker.remove());
-    markersRef.current = {};
-
-    // Add new markers
-    markers.forEach(marker => {
-      if (!marker.lng || !marker.lat) {
-        console.warn('Invalid marker coordinates:', marker);
-        return;
-      }
-
-      const el = createMarkerElement(marker.type, marker.status);
-      
-      const markerObj = new maplibregl.Marker({
-        element: el,
-        anchor: 'bottom'
-      })
-        .setLngLat([marker.lng, marker.lat])
-        .addTo(map.current);
-
-      // Add click handler
-      el.addEventListener('click', () => {
-        onMarkerClick?.(marker);
-      });
-
-      markersRef.current[marker.id] = markerObj;
-    });
-  }, [markers, onMarkerClick]);
-
-  useEffect(() => {
-    if (map.current) return;
-
-    const tileUrl = baseLayer.url
-      .replace('{s}', 'a')
-      .replace('{z}', '{z}')
-      .replace('{x}', '{x}')
-      .replace('{y}', '{y}');
-
-    map.current = new maplibregl.Map({
-      container: mapContainer.current,
-      style: {
-        version: 8,
-        sources: {
-          'raster-tiles': {
-            type: 'raster',
-            tiles: [tileUrl],
-            tileSize: 256,
-            maxzoom: baseLayer.maxNativeZoom
-          }
-        },
-        layers: [{
-          id: 'raster-tiles',
-          type: 'raster',
-          source: 'raster-tiles',
-          minzoom: 0,
-          maxzoom: baseLayer.maxNativeZoom
-        }]
-      },
-      center: [69.2401, 41.2995],
-      zoom: 12,
-      pitch: show3DLayer ? 45 : 0,
-      bearing: 0,
-      antialias: true
-    });
-
-    map.current.addControl(new maplibregl.NavigationControl());
-
-    // Debug map initialization
-    map.current.on('load', () => {
-      console.log('Map loaded');
-    });
-
-    return () => {
-      map.current?.remove();
-      map.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!map.current) return;
-
-    map.current.easeTo({
-      pitch: show3DLayer ? 45 : 0,
-      duration: 300
-    });
-  }, [show3DLayer]);
-
-  useEffect(() => {
-    if (!map.current) return;
-
-    const newBaseLayer = baseLayers.find((v) => v.name === currentLayer) || baseLayers.find(v => v.checked);
-    const source = map.current.getSource('raster-tiles');
-    
-    if (source && newBaseLayer) {
-      const tileUrl = newBaseLayer.url
-        .replace('{s}', 'a')
-        .replace('{z}', '{z}')
-        .replace('{x}', '{x}')
-        .replace('{y}', '{y}');
-      
-      source.setTiles([tileUrl]);
-    }
-  }, [currentLayer]);
-
-  return (
-    <div 
-      ref={mapContainer} 
-      className="absolute inset-0 w-full h-full pointer-events-auto"
-    />
-  );
+  el.appendChild(inner);
+  return el;
 };
 
-export default MapLibreLayer;
+const MapMarkers = ({ markers, useClusteredMarkers, onMarkerClick }) => {
+  const [visibleMarkers, setVisibleMarkers] = useState([]);
+  const [supercluster, setSupercluster] = useState(null);
+
+  useEffect(() => {
+    if (!useClusteredMarkers) {
+      setVisibleMarkers(
+        markers.map((marker) => ({
+          type: "Feature",
+          properties: { ...marker, cluster: false },
+          geometry: {
+            type: "Point",
+            coordinates: [
+              marker.lng || marker.longitude,
+              marker.lat || marker.latitude,
+            ],
+          },
+        }))
+      );
+      return;
+    }
+
+    const cluster = new Supercluster({
+      radius: 40,
+      maxZoom: 16,
+      minPoints: 2,
+    });
+
+    if (markers.length > 0) {
+      const points = markers.map((marker) => ({
+        type: "Feature",
+        properties: { ...marker },
+        geometry: {
+          type: "Point",
+          coordinates: [
+            marker.lng || marker.longitude,
+            marker.lat || marker.latitude,
+          ],
+        },
+      }));
+
+      cluster.load(points);
+      setSupercluster(cluster);
+      updateClusters(cluster);
+    }
+  }, [markers, useClusteredMarkers]);
+
+  const updateClusters = (cluster) => {
+    if (!cluster) return;
+
+    const clusters = cluster.getClusters([-180, -85, 180, 85], 0);
+
+    setVisibleMarkers(clusters);
+  };
+
+  return visibleMarkers.map((point, index) => {
+    const [lng, lat] = point.geometry.coordinates;
+    const { cluster, cluster_id, point_count } = point.properties;
+
+    if (cluster) {
+      return (
+        <div
+          key={`cluster-${cluster_id}`}
+          style={{
+            position: "absolute",
+            left: `${lng}px`,
+            top: `${lat}px`,
+            transform: `translate(-50%, -50%)`,
+          }}
+        >
+          {createClusterMarker(point_count)}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        key={`marker-${point.properties.id || index}`}
+        style={{
+          position: "absolute",
+          left: `${lng}px`,
+          top: `${lat}px`,
+          transform: `translate(-50%, -50%)`,
+        }}
+      >
+        {createMarkerElement(point.properties)}
+      </div>
+    );
+  });
+};
+
+export default function MapLibreLayer({
+  markers = [],
+  onMarkerClick,
+  useClusteredMarkers = true,
+}) {
+  const { show3DLayer } = useTheme();
+
+  return (
+    <div style={{ width: "100%", height: "100%" }}>
+      <Map
+        initialViewState={{
+          longitude: 69.30783347820702,
+          latitude: 41.30512407773824,
+          zoom: 15,
+          pitch: 0,
+          bearing: 0,
+        }}
+        style={{ width: "100%", height: "100%" }}
+        mapStyle={MAP_STYLE}
+        transformRequest={(url, resourceType) => {
+          if (url.includes("{key}")) {
+            return {
+              url: url.replace("{key}", MAPTILER_KEY),
+            };
+          }
+        }}
+      >
+        <NavigationControl />
+        <MapMarkers
+          markers={markers}
+          useClusteredMarkers={useClusteredMarkers}
+          onMarkerClick={onMarkerClick}
+        />
+        <ThreeJsMarker
+          longitude={69.30783347820702}
+          latitude={41.30512407773824}
+        />
+      </Map>
+    </div>
+  );
+}

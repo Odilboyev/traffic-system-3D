@@ -8,8 +8,9 @@ import { PieChart } from "react-minimal-pie-chart";
 import PropTypes from "prop-types";
 import { getAllMarkers } from "../../../../api/api.handlers";
 import { renderToString } from "react-dom/server";
-import { useMap } from "react-leaflet";
-import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
+// import { useMap } from "react-leaflet";
+// import { useMapDataFetcher } from "../../../../customHooks/useMapDataFetcher";
+import { useMapMarkers } from "../../hooks/useMapMarkers";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../../../customHooks/useTheme";
 
@@ -26,71 +27,89 @@ const DynamicMarkers = ({
   handleMarkerDragEnd,
   t,
 }) => {
-  const map = useMap();
-  const [zoom, setZoom] = useState(map.getZoom());
+  // const map = useMap();
+  const [zoom, setZoom] = useState(19);
   const clusterRef = useRef(null);
-  const markers = useSelector((state) => state.map.markers); // Assuming markers are stored in state.map.markers
-  const { show3DLayer } = useTheme();
+  const {
+    markers,
+    areMarkersLoading,
+    errorMessage,
+    getDataHandler,
+    useClusteredMarkers,
+    setUseClusteredMarkers,
+  } = useMapMarkers();
+  const lastFetchRef = useRef(Date.now());
 
-  // Add zoom and dragend event listeners
-  useEffect(() => {
-    const handleZoomEnd = () => {
-      setZoom(map.getZoom());
-    };
+  // Fetch markers data
+  const fetchMarkers = async (bounds) => {
+    if (Date.now() - lastFetchRef.current < 1000) {
+      return; // Throttle requests to once per second
+    }
+    lastFetchRef.current = Date.now();
 
-    const handleDragEnd = () => {
-      setZoom(map.getZoom());
-    };
-
-    map.on("zoomend", handleZoomEnd);
-    map.on("dragend", handleDragEnd);
-
-    // Cleanup event listeners
-    return () => {
-      map.off("zoomend", handleZoomEnd);
-      map.off("dragend", handleDragEnd);
-    };
-  }, [map]);
-
-  const fetchMarkers = async (body) => {
     try {
-      const response = await getAllMarkers(body);
-      if (response.status === "error") {
-        clearMarkers();
-        return;
+      const response = await getAllMarkers({
+        ...filter,
+        bounds: {
+          north: bounds.getNorth(),
+          south: bounds.getSouth(),
+          east: bounds.getEast(),
+          west: bounds.getWest(),
+        },
+      });
+
+      if (response?.data) {
+        const newMarkers = response.data.map((marker) => ({
+          ...marker,
+          lat: marker.lat || marker.latitude,
+          lng: marker.lng || marker.longitude,
+        }));
+
+        if (updateMarkers) {
+          updateMarkers(newMarkers);
+        } else {
+          setMarkers(newMarkers);
+        }
       }
-      setMarkers(response.data);
     } catch (error) {
       console.error("Error fetching markers:", error);
-      clearMarkers();
     }
   };
-  useMapDataFetcher({
-    use: useDynamicFetching ? true : false,
-    fetchData: useDynamicFetching ? fetchMarkers : () => {},
-    onClearData: useDynamicFetching ? clearMarkers : () => {},
-    onNewData: useDynamicFetching ? updateMarkers : () => {},
-    minZoom: useDynamicFetching ? 5 : null,
-    fetchDistanceThreshold: useDynamicFetching ? 500 : undefined,
-    useDistanceThreshold: true,
-  });
 
-  // Convert coordinates for 3D display
-  const convert2Dto3D = (lat, lng) => {
-    if (!show3DLayer) return { lat, lng };
+  // Use the map data fetcher hook for dynamic fetching
+  // useMapDataFetcher({
+  //   fetchData: fetchMarkers,
+  //   onClearData: clearMarkers,
+  //   onNewData: setMarkers,
+  //   minZoom: 19,
+  //   fetchDistanceThreshold: 100,
+  //   useDistanceThreshold: useDynamicFetching,
+  // });
 
-    // Get the terrain height at this point (if available)
-    let height = 0;
-    if (map.getTerrain && map.getTerrain()) {
-      height = map.getTerrain().getHeight([lat, lng]) || 0;
-    }
+  // Debug log for markers
+  useEffect(() => {
+    console.log("DynamicMarkers - Current markers:", markers);
+  }, [markers]);
 
-    return {
-      lat: lat,
-      lng: lng,
-      alt: height, // Add altitude for 3D positioning
-    };
-  };
+  // Add zoom and dragend event listeners
+  // useEffect(() => {
+  //   const handleZoomEnd = () => {
+  //     setZoom(map.getZoom());
+  //   };
+
+  //   const handleDragEnd = () => {
+  //     setZoom(map.getZoom());
+  //   };
+
+  //   map.on("zoomend", handleZoomEnd);
+  //   map.on("dragend", handleDragEnd);
+
+  //   // Cleanup event listeners
+  //   return () => {
+  //     map.off("zoomend", handleZoomEnd);
+  //     map.off("dragend", handleDragEnd);
+  //   };
+  // }, [map]);
 
   // Render function for markers
   const renderMarkers = () =>
@@ -113,7 +132,6 @@ const DynamicMarkers = ({
       }
 
       // Convert coordinates for 3D if needed
-      const position = convert2Dto3D(Number(marker.lat), Number(marker.lng));
 
       // Custom crossroad icon for type 2 markers
       const createCrossroadIcon = (marker) => {
@@ -148,7 +166,6 @@ const DynamicMarkers = ({
           handleLightsModalOpen={handleLightsModalOpen}
           handleMarkerDragEnd={handleMarkerDragEnd}
           customIcon={customIcon}
-          position={position}
         />
       );
     });
@@ -156,41 +173,42 @@ const DynamicMarkers = ({
   // Render component
   return (
     <div>
-      {useDynamicFetching ? (
+      {/* {useDynamicFetching ? (
         <>{renderMarkers()}</>
-      ) : (
-        <MarkerClusterGroup
-          ref={clusterRef}
-          spiderfyOnMaxZoom={false}
-          showCoverageOnHover={false}
-          disableClusteringAtZoom={17}
-          zoomToBoundsOnClick={true}
-          animate={true}
-          animateAddingMarkers={false}
-          iconCreateFunction={
-            usePieChartForClusteredMarkers
-              ? (e) => ClusterIcon(e)
-              : (e) => ClusterIcon(e, true)
-          }
-        >
-          {renderMarkers()}
-        </MarkerClusterGroup>
-      )}
+      ) : ( */}
+      <MarkerClusterGroup
+        ref={clusterRef}
+        spiderfyOnMaxZoom={false}
+        showCoverageOnHover={false}
+        disableClusteringAtZoom={17}
+        zoomToBoundsOnClick={true}
+        animate={true}
+        animateAddingMarkers={false}
+        iconCreateFunction={
+          usePieChartForClusteredMarkers
+            ? (e) => ClusterIcon(e)
+            : (e) => ClusterIcon(e, true)
+        }
+      >
+        {renderMarkers()}
+      </MarkerClusterGroup>
+      {/* )} */}
     </div>
   );
 };
 
 DynamicMarkers.propTypes = {
-  useDynamicFetching: PropTypes.bool.isRequired,
+  useDynamicFetching: PropTypes.bool,
   usePieChartForClusteredMarkers: PropTypes.bool,
-  filter: PropTypes.object.isRequired,
-  setMarkers: PropTypes.func.isRequired,
-  clearMarkers: PropTypes.func.isRequired,
+  filter: PropTypes.object,
+  setMarkers: PropTypes.func,
+  clearMarkers: PropTypes.func,
   updateMarkers: PropTypes.func,
-  handleMonitorCrossroad: PropTypes.func.isRequired,
-  handleBoxModalOpen: PropTypes.func.isRequired,
-  handleLightsModalOpen: PropTypes.func.isRequired,
-  handleMarkerDragEnd: PropTypes.func.isRequired,
+  handleMonitorCrossroad: PropTypes.func,
+  handleBoxModalOpen: PropTypes.func,
+  handleLightsModalOpen: PropTypes.func,
+  handleMarkerDragEnd: PropTypes.func,
+  t: PropTypes.func,
 };
 
 export default memo(DynamicMarkers);

@@ -137,7 +137,7 @@ const Sidebar = ({
         // onPointerLeave={() => map.scrollWheelZoom.enable()}
         className={` ${
           isVisible ? "fixed" : "none"
-        } z-10 top-0 left-0 h-full max-h-full max-w-[80vw] pointer-events-auto no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-2xl  shadow-lg flex flex-col ${
+        } z-10 top-0 left-0 h-full max-h-full  pointer-events-auto no-scrollbar transition-all duration-200 ease-in-out bg-gray-100/30  dark:bg-gray-900/30 backdrop-blur-2xl  shadow-lg flex flex-col ${
           isSidebarOpen
             ? isMobile
               ? "w-[80vw]"
