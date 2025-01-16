@@ -4,8 +4,8 @@ import { memo, useCallback, useEffect, useState } from "react";
 
 import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 // import MapLibreLayer from "./components/MapLibreLayer";
+import MapLibreContainer from "./components/MapLibreLayer/MapLibreContainer";
 import MapModals from "./components/MapModals/index.jsx";
-import MaplibreLayer from "./components/MapLibreLayer/reactBased.jsx";
 import NotificationBox from "../../components/NotificationBox/index.jsx";
 import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
@@ -78,7 +78,7 @@ const MapComponent = memo(({ notifications, t }) => {
           onMarkerClick={handleMarkerClick}
           useClusteredMarkers={useClusteredMarkers}
         /> */}
-        <MaplibreLayer />
+        <MapLibreContainer />
 
         {/* <DynamicMarkers
           useDynamicFetching={true}
@@ -118,7 +118,7 @@ const MapComponent = memo(({ notifications, t }) => {
         t={t}
       />
 
-      <NotificationBox notifications={notifications} />
+      {/* <NotificationBox notifications={notifications} /> */}
       <ToastContainer {...toaster} />
     </div>
   );

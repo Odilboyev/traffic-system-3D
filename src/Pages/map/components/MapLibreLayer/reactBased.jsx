@@ -1,18 +1,25 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
+import * as Threebox from "threebox-plugin";
+
 import {
+  FullscreenControl,
   GeolocateControl,
   Map,
   Marker,
   NavigationControl,
+  Popup,
+  ScaleControl,
 } from "@vis.gl/react-maplibre";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import ProjectMarker from "../ProjectMarker";
 import PropTypes from "prop-types";
 import ThreeJsMarker from "../ThreeJsMarker";
-import ProjectMarker from "../ProjectMarker";
+import ThreeJsMarkerRenderer from "../ThreeJsMarker/ThreeJsMarkerRenderer";
 import { darkLayer } from "./utils/darkLayer";
 import { lightLayer } from "./utils/lightLayer";
+import maplibregl from "maplibre-gl";
 
 // Map styles for light and dark modes
 const MAP_STYLES = {
@@ -96,7 +103,7 @@ const MaplibreLayer = ({
     bearing: 0,
   },
 }) => {
-  const mapInstanceRef = useRef(null);
+  const mapRef = useRef(null);
   const [style, setStyle] = useState(null);
   const [viewState, setViewState] = useState(initialViewState);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -109,6 +116,37 @@ const MaplibreLayer = ({
       }),
       {}
     )
+  );
+  const [threeBox, setThreeBox] = useState(null);
+  const [threeDObjects, setThreeDObjects] = useState([]);
+
+  // Function to calculate scale based on zoom level
+  const calculateScale = (zoom) => {
+    // Base scale at zoom level 12
+    const baseScale = 1;
+    const baseZoom = 12;
+
+    // Calculate scale factor (decrease by half every 3 zoom levels out)
+    const scaleFactor = Math.pow(2, (zoom - baseZoom) / 3);
+    return baseScale * scaleFactor;
+  };
+
+  // Update object scales when zoom changes
+  const updateObjectScales = useCallback(
+    (zoom) => {
+      if (threeDObjects.length > 0) {
+        const newScale = calculateScale(zoom);
+        threeDObjects.forEach((obj) => {
+          if (obj && obj.setScale) {
+            obj.setScale(newScale);
+          }
+        });
+        if (threeBox) {
+          threeBox.update();
+        }
+      }
+    },
+    [threeDObjects, threeBox]
   );
 
   const toggleTheme = useCallback(() => {
@@ -157,6 +195,66 @@ const MaplibreLayer = ({
     setStyle(currentMapStyle);
   }, [currentMapStyle]);
 
+  useEffect(() => {
+    if (mapRef.current && !threeBox) {
+      const map = mapRef.current.getMap();
+
+      // Wait for the map to be loaded
+      map.on("style.load", () => {
+        // Initialize Threebox
+        const tb = new window.Threebox(
+          map,
+          map.getCanvas().getContext("webgl"),
+          {
+            defaultLights: true,
+            enableSelectingObjects: true,
+            enableTooltips: true,
+            enableDraggingObjects: true,
+            enableRotatingObjects: true,
+          }
+        );
+
+        setThreeBox(tb);
+
+        // Add a custom layer for 3D objects
+        map.addLayer({
+          id: "3d-objects",
+          type: "custom",
+          renderingMode: "3d",
+          onAdd: function () {
+            // Example: Load a 3D model
+            tb.loadObj({
+              obj: "/models/traffic.obj",
+              type: "obj",
+              scale: calculateScale(map.getZoom()),
+              units: "meters",
+              rotation: { x: 90, y: 0, z: 0 },
+              callback: function (model) {
+                if (model) {
+                  // Add the model to the map at specific coordinates
+                  const obj = tb.add(model, {
+                    coordinates: [69.2401, 41.2995],
+                    adjustment: { x: 0, y: 0, z: 0 },
+                    rotation: { x: 0, y: 0, z: 0 },
+                  });
+                  setThreeDObjects((prev) => [...prev, obj]);
+                }
+              },
+            });
+          },
+          render: function () {
+            tb.update();
+          },
+        });
+
+        // Add zoom change listener
+        map.on("zoom", () => {
+          updateObjectScales(map.getZoom());
+        });
+      });
+    }
+  }, [mapRef.current, updateObjectScales]);
+
   const onMove = useCallback(({ viewState }) => {
     setViewState(viewState);
   }, []);
@@ -168,20 +266,49 @@ const MaplibreLayer = ({
   return (
     <div className="relative w-full h-full">
       <Map
-        ref={mapInstanceRef}
+        ref={mapRef}
         onLoad={(e) => {
           setStyle(e.target.getStyle());
         }}
         mapStyle={currentMapStyle}
         {...viewState}
         onMove={(e) => setViewState(e.viewState)}
+        maxPitch={85}
+        minPitch={0}
+        maxZoom={22}
+        minZoom={0}
+        dragRotate={true}
+        touchZoomRotate={true}
+        keyboard={true}
       >
-        <GeolocateControl position="top-left" />
-        <NavigationControl position="top-left" />
-        <ThemeToggle isDark={isDarkMode} onToggle={toggleTheme} />
+        <ThreeJsMarkerRenderer
+          modelUrl="/models/traffic.gltf"
+          coordinates={[41.2995, 69.2401]} // [latitude, longitude]
+          altitude={0}
+          rotation={{ x: Math.PI / 2, y: 0, z: 0 }}
+          onClick={(intersection) =>
+            console.log("Model clicked:", intersection)
+          }
+          onLoaded={() => console.log("Model loaded")}
+        />
+        <FullscreenControl position="top-right" />
+        <ScaleControl
+          position="top-right"
+          maxWidth={100}
+          unit="metric"
+          customUnit="km"
+        />
+        <GeolocateControl position="top-right" />
+        <NavigationControl
+          position="top-right"
+          showCompass={true}
+          showZoom={true}
+          visualizePitch={true}
+        />
+        {/* <ThemeToggle isDark={isDarkMode} onToggle={toggleTheme} />
         <LayerControl layers={layers} toggleLayer={toggleLayer} />
         <ThreeJsMarker longitude={69.2401} latitude={41.2995} />
-        <ProjectMarker longitude={69.2501} latitude={41.3095} />
+        <ProjectMarker longitude={69.2501} latitude={41.3095} /> */}
       </Map>
     </div>
   );
