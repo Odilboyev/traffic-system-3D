@@ -1,16 +1,44 @@
 import "maplibre-gl/dist/maplibre-gl.css";
+import "./styles.css";
 
 import * as THREE from "three";
 
 import { useEffect, useRef } from "react";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import Supercluster from "supercluster";
 import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
+import { useMapMarkers } from "../../hooks/useMapMarkers";
 
 const MapLibreContainer = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
+  const supercluster = useRef(null);
+
+  const {
+    markers,
+    setMarkers,
+    getDataHandler,
+    clearMarkers,
+    updateMarkers: updateMarkerData,
+    useClusteredMarkers,
+  } = useMapMarkers();
+
+  const isCamera = (type) => type === 1 || type === 5 || type === 6;
+
+  const cameraType = (type) => {
+    switch (type) {
+      case 1:
+        return "cameratraffic";
+      case 5:
+        return "cameraview";
+      case 6:
+        return "camerapdd";
+      default:
+        return "";
+    }
+  };
 
   useEffect(() => {
     if (map.current) return;
@@ -27,15 +55,155 @@ const MapLibreContainer = () => {
     });
 
     // Add navigation controls
-    map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
-    map.current.addControl(new maplibregl.FullscreenControl(), 'top-right');
-    map.current.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-    map.current.addControl(new maplibregl.GeolocateControl({
-      positionOptions: {
-        enableHighAccuracy: true
-      },
-      trackUserLocation: true
-    }), 'top-right');
+    map.current.addControl(new maplibregl.NavigationControl(), "top-right");
+    map.current.addControl(new maplibregl.FullscreenControl(), "top-right");
+    map.current.addControl(new maplibregl.ScaleControl(), "bottom-left");
+    map.current.addControl(
+      new maplibregl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        trackUserLocation: true,
+      }),
+      "top-right"
+    );
+
+    // Initialize supercluster
+    supercluster.current = new Supercluster({
+      radius: 40,
+      maxZoom: 16,
+    });
+
+    const renderMarkers = () => {
+      if (!markers.length || !map.current) return;
+
+      try {
+        // Load marker data into supercluster
+        const points = markers
+          .map((marker) => ({
+            type: "Feature",
+            properties: {
+              ...marker,
+              coordinates: [parseFloat(marker.lng), parseFloat(marker.lat)],
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [parseFloat(marker.lng), parseFloat(marker.lat)],
+            },
+          }))
+          .filter(
+            (point) =>
+              !isNaN(point.geometry.coordinates[0]) &&
+              !isNaN(point.geometry.coordinates[1])
+          );
+
+        if (!points.length) return;
+
+        supercluster.current.load(points);
+
+        const bounds = map.current.getBounds();
+        const bbox = [
+          bounds.getWest(),
+          bounds.getSouth(),
+          bounds.getEast(),
+          bounds.getNorth(),
+        ];
+        const zoom = Math.floor(map.current.getZoom());
+        const clusters = supercluster.current.getClusters(bbox, zoom);
+
+        // Remove existing markers
+        const existingMarkers =
+          document.getElementsByClassName("marker-container");
+        Array.from(existingMarkers).forEach((marker) => marker.remove());
+
+        clusters.forEach((cluster) => {
+          const coordinates = cluster.geometry.coordinates;
+          const props = cluster.properties;
+
+          if (props.cluster) {
+            // Create cluster marker
+            const el = document.createElement("div");
+            el.className = "marker-container cluster-marker";
+            el.innerHTML = `<div class="cluster-count bg-green-500">${props.point_count}</div>`;
+
+            const marker = new maplibregl.Marker(el)
+              .setLngLat(coordinates)
+              .addTo(map.current);
+
+            // Add click handler to expand cluster
+            el.addEventListener("click", () => {
+              const expansionZoom =
+                supercluster.current.getClusterExpansionZoom(props.cluster_id);
+              map.current.flyTo({
+                center: coordinates,
+                zoom: expansionZoom,
+              });
+            });
+          } else {
+            // Create individual marker
+            const el = document.createElement("div");
+            const markerClasses = ["marker-container"];
+
+            if (isCamera(props.type)) {
+              markerClasses.push("camera-marker");
+            }
+            if (props.statuserror) {
+              markerClasses.push("error-marker");
+            }
+
+            el.className = markerClasses.join(" ");
+
+            const iconName = props.icon;
+            const iconElement = document.createElement("img");
+            iconElement.src = `icons/${iconName}`;
+            iconElement.alt = "marker";
+            el.appendChild(iconElement);
+            el.onclick = () => {
+              console.log("Marker clicked:", props);
+            };
+            const marker = new maplibregl.Marker(el)
+              .setLngLat(coordinates)
+              .addTo(map.current);
+
+            // Add popup with camera name if it exists
+            if (props.cname) {
+              const popup = new maplibregl.Popup({
+                closeButton: false,
+                closeOnClick: false,
+              });
+
+              el.addEventListener("mouseenter", () => {
+                popup
+                  .setLngLat(coordinates)
+                  .setHTML(`<div class="marker-popup">${props.cname}</div>`)
+                  .addTo(map.current);
+              });
+
+              el.addEventListener("mouseleave", () => {
+                popup.remove();
+              });
+            }
+
+            // Add click handler for camera details
+            if (isCamera(props.type)) {
+              el.addEventListener("click", () => {
+                // Handle camera click - you can implement your camera details logic here
+                console.log("Camera clicked:", props);
+              });
+            }
+          }
+        });
+      } catch (error) {
+        console.error("Error rendering markers:", error);
+      }
+    };
+
+    map.current.on("load", renderMarkers);
+    map.current.on("moveend", renderMarkers);
+    map.current.on("zoomend", renderMarkers);
+
+    // Initial data fetch
+    getDataHandler();
 
     // Wait for map to load before adding custom layer
     map.current.on("load", () => {
