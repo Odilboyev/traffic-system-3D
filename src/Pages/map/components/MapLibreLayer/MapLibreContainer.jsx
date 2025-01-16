@@ -18,12 +18,24 @@ const MapLibreContainer = () => {
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: lightLayer,
-      zoom: 18,
-      center: [69.254643, 41.321151], // Tashkent coordinates
-      pitch: 60,
+      zoom: 16,
+      center: [69.254643, 41.321151],
+      pitch: 0,
       bearing: 0,
+
       canvasContextAttributes: { antialias: true },
     });
+
+    // Add navigation controls
+    map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
+    map.current.addControl(new maplibregl.FullscreenControl(), 'top-right');
+    map.current.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+    map.current.addControl(new maplibregl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true
+      },
+      trackUserLocation: true
+    }), 'top-right');
 
     // Wait for map to load before adding custom layer
     map.current.on("load", () => {
