@@ -70,139 +70,192 @@ const MapLibreContainer = () => {
 
     // Initialize supercluster
     supercluster.current = new Supercluster({
-      radius: 40,
+      radius: 100,
       maxZoom: 16,
     });
 
-    const renderMarkers = () => {
+    const loadClusterData = () => {
+      if (!markers.length || !map.current) return;
+
+      const points = markers
+        .map((marker) => ({
+          type: "Feature",
+          properties: {
+            ...marker,
+            coordinates: [parseFloat(marker.lng), parseFloat(marker.lat)],
+          },
+          geometry: {
+            type: "Point",
+            coordinates: [parseFloat(marker.lng), parseFloat(marker.lat)],
+          },
+        }))
+        .filter(
+          (point) =>
+            !isNaN(point.geometry.coordinates[0]) &&
+            !isNaN(point.geometry.coordinates[1])
+        );
+
+      if (!points.length) return;
+      supercluster.current.load(points);
+    };
+
+    const renderClusters = () => {
       if (!markers.length || !map.current) return;
 
       try {
-        // Load marker data into supercluster
-        const points = markers
-          .map((marker) => ({
-            type: "Feature",
-            properties: {
-              ...marker,
-              coordinates: [parseFloat(marker.lng), parseFloat(marker.lat)],
-            },
-            geometry: {
-              type: "Point",
-              coordinates: [parseFloat(marker.lng), parseFloat(marker.lat)],
-            },
-          }))
-          .filter(
-            (point) =>
-              !isNaN(point.geometry.coordinates[0]) &&
-              !isNaN(point.geometry.coordinates[1])
-          );
-
-        if (!points.length) return;
-
-        supercluster.current.load(points);
+        // Clear existing cluster markers only
+        document
+          .querySelectorAll(".cluster-marker")
+          .forEach((marker) => marker.remove());
 
         const bounds = map.current.getBounds();
-        const bbox = [
-          bounds.getWest(),
-          bounds.getSouth(),
-          bounds.getEast(),
-          bounds.getNorth(),
-        ];
         const zoom = Math.floor(map.current.getZoom());
-        const clusters = supercluster.current.getClusters(bbox, zoom);
 
-        // Remove existing markers
-        const existingMarkers =
-          document.getElementsByClassName("marker-container");
-        Array.from(existingMarkers).forEach((marker) => marker.remove());
+        // Get only clusters
+        const clusters = supercluster.current
+          .getClusters(
+            [
+              bounds.getWest(),
+              bounds.getSouth(),
+              bounds.getEast(),
+              bounds.getNorth(),
+            ],
+            zoom
+          )
+          .filter((props) => props.properties.cluster);
 
-        clusters.forEach((cluster) => {
-          const coordinates = cluster.geometry.coordinates;
-          const props = cluster.properties;
-
-          if (props.cluster) {
-            // Create cluster marker
-            const el = document.createElement("div");
-            el.className = "marker-container cluster-marker";
-            el.innerHTML = `<div class="cluster-count bg-green-500">${props.point_count}</div>`;
-
-            const marker = new maplibregl.Marker(el)
-              .setLngLat(coordinates)
-              .addTo(map.current);
-
-            // Add click handler to expand cluster
-            el.addEventListener("click", () => {
-              const expansionZoom =
-                supercluster.current.getClusterExpansionZoom(props.cluster_id);
-              map.current.flyTo({
-                center: coordinates,
-                zoom: expansionZoom,
-              });
+        clusters.forEach((props) => {
+          const coordinates = props.geometry.coordinates;
+          // Create cluster marker
+          const el = document.createElement("div");
+          el.className = "marker-container cluster-marker";
+          el.innerHTML = `<div class="cluster-count">${props.properties.point_count}</div>`;
+          el.addEventListener("click", () => {
+            const expansionZoom = supercluster.current.getClusterExpansionZoom(
+              props.properties.cluster_id
+            );
+            map.current.flyTo({
+              center: coordinates,
+              zoom: expansionZoom,
+              duration: 300,
             });
-          } else {
-            // Create individual marker
-            const el = document.createElement("div");
-            const markerClasses = ["marker-container"];
-
-            if (isCamera(props.type)) {
-              markerClasses.push("camera-marker");
-            }
-            if (props.statuserror) {
-              markerClasses.push("error-marker");
-            }
-
-            el.className = markerClasses.join(" ");
-
-            const iconName = props.icon;
-            const iconElement = document.createElement("img");
-            iconElement.src = `icons/${iconName}`;
-            iconElement.alt = "marker";
-            el.appendChild(iconElement);
-            el.onclick = () => {
-              console.log("Marker clicked:", props);
-            };
-            const marker = new maplibregl.Marker(el)
-              .setLngLat(coordinates)
-              .addTo(map.current);
-
-            // Add popup with camera name if it exists
-            if (props.cname) {
-              const popup = new maplibregl.Popup({
-                closeButton: false,
-                closeOnClick: false,
-              });
-
-              el.addEventListener("mouseenter", () => {
-                popup
-                  .setLngLat(coordinates)
-                  .setHTML(`<div class="marker-popup">${props.cname}</div>`)
-                  .addTo(map.current);
-              });
-
-              el.addEventListener("mouseleave", () => {
-                popup.remove();
-              });
-            }
-
-            // Add click handler for camera details
-            if (isCamera(props.type)) {
-              el.addEventListener("click", () => {
-                // Handle camera click - you can implement your camera details logic here
-                console.log("Camera clicked:", props);
-              });
-            }
-          }
+          });
+          new maplibregl.Marker({
+            element: el,
+            trackPointer: true,
+          })
+            .setLngLat(coordinates)
+            .addTo(map.current);
         });
       } catch (error) {
-        console.error("Error rendering markers:", error);
+        console.error("Error rendering clusters:", error);
       }
     };
 
-    map.current.on("load", renderMarkers);
-    map.current.on("moveend", renderMarkers);
-    map.current.on("zoomend", renderMarkers);
+    const renderIndividualMarkers = () => {
+      if (!markers.length || !map.current) return;
 
-    // Initial data fetch
+      try {
+        // Clear existing individual markers
+        document
+          .querySelectorAll(".marker-container:not(.cluster-marker)")
+          .forEach((marker) => marker.remove());
+
+        const bounds = map.current.getBounds();
+        const zoom = Math.floor(map.current.getZoom());
+
+        // Get only non-clustered points
+        const points = supercluster.current
+          .getClusters(
+            [
+              bounds.getWest(),
+              bounds.getSouth(),
+              bounds.getEast(),
+              bounds.getNorth(),
+            ],
+            zoom
+          )
+          .filter((props) => !props.properties.cluster);
+
+        points.forEach((props) => {
+          const coordinates = props.geometry.coordinates;
+          // Create individual marker
+          const el = document.createElement("img");
+          el.src = `/icons/${props.properties.icon}`;
+          el.onclick = () => {
+            console.log("Marker clicked:", props.properties);
+          };
+          const markerClasses = ["marker-container"];
+
+          if (isCamera(props.properties.type)) {
+            markerClasses.push("camera-marker");
+          }
+          if (props.properties.statuserror) {
+            markerClasses.push("error-marker");
+          }
+
+          el.className = markerClasses.join(" ");
+
+          // Add popup with camera name if it exists
+          if (props.properties.cname) {
+            const popup = new maplibregl.Popup({
+              closeButton: false,
+              closeOnClick: false,
+            });
+
+            el.addEventListener("mouseenter", () => {
+              popup
+                .setLngLat(coordinates)
+                .setHTML(
+                  `<div class="marker-popup">${props.properties.cname}</div>`
+                )
+                .addTo(map.current);
+            });
+
+            el.addEventListener("mouseleave", () => {
+              popup.remove();
+            });
+          }
+
+          new maplibregl.Marker({
+            element: el,
+            trackPointer: true,
+          })
+            .setLngLat(coordinates)
+            .addTo(map.current);
+
+          // Add click handler for camera details
+          if (isCamera(props.properties.type)) {
+            el.addEventListener("click", () => {
+              console.log("Camera clicked:", props.properties);
+            });
+          }
+        });
+      } catch (error) {
+        console.error("Error rendering individual markers:", error);
+      }
+    };
+
+    map.current.on("load", () => {
+      loadClusterData();
+      renderClusters();
+      // renderIndividualMarkers();
+    });
+
+    // Update only clusters during map movement
+    map.current.on("move", renderClusters);
+
+    // Update individual markers when movement ends
+    // map.current.on("moveend", renderIndividualMarkers);
+
+    // map.current.on("zoom", renderClusters);
+    // Update everything on zoom end
+    map.current.on("zoomend", () => {
+      renderClusters();
+      renderIndividualMarkers();
+    });
+
+    // Initial data fetch and setup
     getDataHandler();
 
     // Wait for map to load before adding custom layer
