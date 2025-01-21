@@ -10,10 +10,12 @@ import Supercluster from "supercluster";
 import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
 import { useMapMarkers } from "../../hooks/useMapMarkers";
+import { useMapContext } from "../../context/MapContext";
+import TrafficLightContainer from "../trafficLightMarkers/managementLights";
 
 const MapLibreContainer = () => {
   const mapContainer = useRef(null);
-  const map = useRef(null);
+  const { map, setMap } = useMapContext();
   const supercluster = useRef(null);
 
   const {
@@ -41,24 +43,32 @@ const MapLibreContainer = () => {
   };
 
   useEffect(() => {
-    if (map.current) return;
+    if (map) return;
 
-    map.current = new maplibregl.Map({
+    console.log('Initializing MapLibre map');
+    const newMap = new maplibregl.Map({
       container: mapContainer.current,
       style: lightLayer,
-      zoom: 16,
+      zoom: 14,
       center: [69.254643, 41.321151],
       pitch: 0,
       bearing: 0,
+      maxZoom: 20,
+      minZoom: 10,
 
       canvasContextAttributes: { antialias: true },
     });
 
+    newMap.on('load', () => {
+      console.log('Map loaded');
+      setMap(newMap);
+    });
+
     // Add navigation controls
-    map.current.addControl(new maplibregl.NavigationControl(), "top-right");
-    map.current.addControl(new maplibregl.FullscreenControl(), "top-right");
-    map.current.addControl(new maplibregl.ScaleControl(), "bottom-left");
-    map.current.addControl(
+    newMap.addControl(new maplibregl.NavigationControl(), "top-right");
+    newMap.addControl(new maplibregl.FullscreenControl(), "top-right");
+    newMap.addControl(new maplibregl.ScaleControl(), "bottom-left");
+    newMap.addControl(
       new maplibregl.GeolocateControl({
         positionOptions: {
           enableHighAccuracy: true,
@@ -75,7 +85,7 @@ const MapLibreContainer = () => {
     });
 
     const loadClusterData = () => {
-      if (!markers.length || !map.current) return;
+      if (!markers.length || !newMap) return;
 
       const points = markers
         .map((marker) => ({
@@ -100,7 +110,7 @@ const MapLibreContainer = () => {
     };
 
     const renderClusters = () => {
-      if (!markers.length || !map.current) return;
+      if (!markers.length || !newMap) return;
 
       try {
         // Clear existing cluster markers only
@@ -108,8 +118,8 @@ const MapLibreContainer = () => {
           .querySelectorAll(".cluster-marker")
           .forEach((marker) => marker.remove());
 
-        const bounds = map.current.getBounds();
-        const zoom = Math.floor(map.current.getZoom());
+        const bounds = newMap.getBounds();
+        const zoom = Math.floor(newMap.getZoom());
 
         // Get only clusters
         const clusters = supercluster.current
@@ -134,7 +144,7 @@ const MapLibreContainer = () => {
             const expansionZoom = supercluster.current.getClusterExpansionZoom(
               props.properties.cluster_id
             );
-            map.current.flyTo({
+            newMap.flyTo({
               center: coordinates,
               zoom: expansionZoom,
               duration: 300,
@@ -142,10 +152,9 @@ const MapLibreContainer = () => {
           });
           new maplibregl.Marker({
             element: el,
-            trackPointer: true,
           })
             .setLngLat(coordinates)
-            .addTo(map.current);
+            .addTo(newMap);
         });
       } catch (error) {
         console.error("Error rendering clusters:", error);
@@ -153,7 +162,7 @@ const MapLibreContainer = () => {
     };
 
     const renderIndividualMarkers = () => {
-      if (!markers.length || !map.current) return;
+      if (!markers.length || !newMap) return;
 
       try {
         // Clear existing individual markers
@@ -161,8 +170,8 @@ const MapLibreContainer = () => {
           .querySelectorAll(".marker-container:not(.cluster-marker)")
           .forEach((marker) => marker.remove());
 
-        const bounds = map.current.getBounds();
-        const zoom = Math.floor(map.current.getZoom());
+        const bounds = newMap.getBounds();
+        const zoom = Math.floor(newMap.getZoom());
 
         // Get only non-clustered points
         const points = supercluster.current
@@ -209,7 +218,7 @@ const MapLibreContainer = () => {
                 .setHTML(
                   `<div class="marker-popup">${props.properties.cname}</div>`
                 )
-                .addTo(map.current);
+                .addTo(newMap);
             });
 
             el.addEventListener("mouseleave", () => {
@@ -219,10 +228,10 @@ const MapLibreContainer = () => {
 
           new maplibregl.Marker({
             element: el,
-            trackPointer: true,
+            subpixelPositioning: true,
           })
             .setLngLat(coordinates)
-            .addTo(map.current);
+            .addTo(newMap);
 
           // Add click handler for camera details
           if (isCamera(props.properties.type)) {
@@ -236,21 +245,21 @@ const MapLibreContainer = () => {
       }
     };
 
-    map.current.on("load", () => {
+    newMap.on("load", () => {
       loadClusterData();
       renderClusters();
       // renderIndividualMarkers();
     });
 
     // Update only clusters during map movement
-    map.current.on("move", renderClusters);
+    newMap.on("move", renderClusters);
 
     // Update individual markers when movement ends
-    // map.current.on("moveend", renderIndividualMarkers);
+    // newMap.on("moveend", renderIndividualMarkers);
 
-    // map.current.on("zoom", renderClusters);
+    // newMap.on("zoom", renderClusters);
     // Update everything on zoom end
-    map.current.on("zoomend", () => {
+    newMap.on("zoomend", () => {
       renderClusters();
       renderIndividualMarkers();
     });
@@ -259,7 +268,7 @@ const MapLibreContainer = () => {
     getDataHandler();
 
     // Wait for map to load before adding custom layer
-    map.current.on("load", () => {
+    newMap.on("load", () => {
       // parameters to ensure the model is georeferenced correctly on the map
       const modelOrigin = [69.254643, 41.321151];
       const modelAltitude = 0;
@@ -401,20 +410,30 @@ const MapLibreContainer = () => {
         },
       };
 
-      map.current.addLayer(customLayer);
+      newMap.addLayer(customLayer);
     });
 
-    return () => map.current?.remove();
+    return () => {
+      newMap.remove();
+      setMap(null);
+    };
   }, []);
 
+  useEffect(() => {
+    if (!map) return;
+    console.log('Map instance updated:', map);
+  }, [map]);
+
   return (
-    <div
-      ref={mapContainer}
-      style={{
-        width: "100%",
-        height: "100vh",
-      }}
-    />
+    <div ref={mapContainer} className="map-container">
+      {map && <TrafficLightContainer />}
+      <div
+        style={{
+          width: "100%",
+          height: "100vh",
+        }}
+      />
+    </div>
   );
 };
 
