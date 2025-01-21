@@ -51,16 +51,23 @@ const MapLibreContainer = () => {
     if (map) return;
 
     console.log("Initializing MapLibre map with theme:", theme);
+    
+    // Get saved position from localStorage or use defaults
+    const savedMapState = JSON.parse(localStorage.getItem('mapState')) || {
+      center: [69.254643, 41.321151],
+      zoom: 14
+    };
+
+    console.log("Loading saved map state:", savedMapState);
+
     const newMap = new maplibregl.Map({
       container: mapContainer.current,
       style: theme === "dark" ? darkLayer : lightLayer,
-      zoom: 14,
-      center: [69.254643, 41.321151],
+      zoom: savedMapState.zoom,
+      center: savedMapState.center,
       pitch: 0,
-      bearing: 0,
       maxZoom: 20,
       minZoom: 10,
-
       canvasContextAttributes: { antialias: true },
     });
 
@@ -68,6 +75,18 @@ const MapLibreContainer = () => {
       console.log("Map loaded");
       setMap(newMap);
       setContextMap(newMap);
+    });
+
+    // Save map position and zoom when they change
+    newMap.on('moveend', () => {
+      const center = newMap.getCenter();
+      const zoom = newMap.getZoom();
+      const mapState = {
+        center: [center.lng, center.lat],
+        zoom
+      };
+      localStorage.setItem('mapState', JSON.stringify(mapState));
+      console.log("Saved map state:", mapState);
     });
 
     // Add navigation controls

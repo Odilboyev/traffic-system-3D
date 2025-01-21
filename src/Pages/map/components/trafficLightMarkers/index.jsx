@@ -44,8 +44,6 @@ const TrafficlightMarkers = ({
 
     // Add new markers
     trafficLights.forEach((light) => {
-      console.log("Creating marker for light:", light);
-
       // Create marker element
       const el = document.createElement("div");
       el.className = "traffic-light-marker";
@@ -73,8 +71,6 @@ const TrafficlightMarkers = ({
         parseFloat(light.longitude || light.lng),
         parseFloat(light.latitude || light.lat),
       ];
-
-      console.log("Marker coordinates:", coordinates);
 
       // Create and add marker
       const marker = new maplibregl.Marker({
