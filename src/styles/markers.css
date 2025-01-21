@@ -83,6 +83,9 @@
   z-index: 1;
   position: relative;
   transform-origin: center center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 50%;
 }
 
 .traffic-light-marker svg {
@@ -104,6 +107,12 @@
   z-index: 2;
 }
 
+.traffic-light-tooltip.light {
+  background: rgba(255, 255, 255, 0.9);
+  color: #1a1a1a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .traffic-light-active {
   border: 2px solid #4CAF50;
   box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
@@ -117,4 +126,15 @@
 
 .maplibregl-popup {
   z-index: 2;
+}
+
+.maplibregl-popup.dark .maplibregl-popup-content {
+  background: rgba(30, 41, 59, 0.95);
+  color: #fff;
+}
+
+.maplibregl-popup.light .maplibregl-popup-content {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

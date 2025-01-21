@@ -21,6 +21,7 @@ const TrafficlightMarkers = ({
   trafficSocket,
   setIsPaused,
   map,
+  theme,
 }) => {
   const isDraggable = useSelector((state) => state.map.isDraggable);
 
@@ -53,7 +54,7 @@ const TrafficlightMarkers = ({
 
       // Create icon element
       const icon = renderToString(
-        <div className="rounded-full flex items-center justify-center">
+        <div className={`rounded-full flex items-center justify-center`}>
           <NeonIcon
             icon={iconSelector({
               type: light.type,
@@ -62,11 +63,6 @@ const TrafficlightMarkers = ({
             })}
             status={light.status === 1 ? 0 : light.status === 2 ? 2 : 1}
             text={light.type === 100 && (light.countdown || "0")}
-            // className={`w-full h-full ${
-            //   currentSvetoforId === light.svetofor_id
-            //     ? "text-green-500"
-            //     : "text-gray-500"
-            // }`}
           />
         </div>
       );
@@ -85,7 +81,7 @@ const TrafficlightMarkers = ({
         element: el,
         draggable: isDraggable,
         anchor: "center",
-        rotation: light.rotate || 0,
+        // rotation: light.rotate || 0,
       })
         .setLngLat(coordinates)
         .addTo(map);
@@ -104,7 +100,7 @@ const TrafficlightMarkers = ({
         setIsPaused(false);
       });
     });
-  }, [trafficLights, map, currentSvetoforId, isDraggable]);
+  }, [trafficLights, map, currentSvetoforId, isDraggable, theme]);
 
   // Fetching function passed to custom hook
   const fetchTrafficLights = async (body) => {

@@ -3,19 +3,22 @@ import "./styles.css";
 
 import * as THREE from "three";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import Supercluster from "supercluster";
+import TrafficLightContainer from "../trafficLightMarkers/managementLights";
+import { darkLayer } from "./utils/darkLayer";
 import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
-import { useMapMarkers } from "../../hooks/useMapMarkers";
 import { useMapContext } from "../../context/MapContext";
-import TrafficLightContainer from "../trafficLightMarkers/managementLights";
+import { useMapMarkers } from "../../hooks/useMapMarkers";
+import {useTheme} from "../../../../customHooks/useTheme"
 
 const MapLibreContainer = () => {
   const mapContainer = useRef(null);
-  const { map, setMap } = useMapContext();
+  const { map: contextMap, setMap: setContextMap } = useMapContext();
+  const [map, setMap] = useState(null);
   const supercluster = useRef(null);
 
   const {
@@ -26,6 +29,8 @@ const MapLibreContainer = () => {
     updateMarkers: updateMarkerData,
     useClusteredMarkers,
   } = useMapMarkers();
+
+  const { theme } = useTheme();
 
   const isCamera = (type) => type === 1 || type === 5 || type === 6;
 
@@ -45,10 +50,10 @@ const MapLibreContainer = () => {
   useEffect(() => {
     if (map) return;
 
-    console.log('Initializing MapLibre map');
+    console.log("Initializing MapLibre map with theme:", theme);
     const newMap = new maplibregl.Map({
       container: mapContainer.current,
-      style: lightLayer,
+      style: theme === "dark" ? darkLayer : lightLayer,
       zoom: 14,
       center: [69.254643, 41.321151],
       pitch: 0,
@@ -59,9 +64,10 @@ const MapLibreContainer = () => {
       canvasContextAttributes: { antialias: true },
     });
 
-    newMap.on('load', () => {
-      console.log('Map loaded');
+    newMap.on("load", () => {
+      console.log("Map loaded");
       setMap(newMap);
+      setContextMap(newMap);
     });
 
     // Add navigation controls
@@ -416,16 +422,28 @@ const MapLibreContainer = () => {
     return () => {
       newMap.remove();
       setMap(null);
+      setContextMap(null);
     };
   }, []);
 
   useEffect(() => {
     if (!map) return;
-    console.log('Map instance updated:', map);
+    console.log("Map instance updated:", map);
   }, [map]);
 
+  useEffect(() => {
+    if (!map) return;
+
+    const currentStyle = theme === "dark" ? darkLayer : lightLayer;
+    map.setStyle(currentStyle);
+  }, [theme, map]);
+
   return (
-    <div ref={mapContainer} className="map-container">
+    <div
+      ref={mapContainer}
+      className="map-container"
+      style={{ background: theme === "dark" ? "#45516E" : "#ffffff" }}
+    >
       {map && <TrafficLightContainer />}
       <div
         style={{
