@@ -1,36 +1,38 @@
-import { useEffect, useRef, useState } from 'react';
-import maplibregl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import { useTheme } from '../../../../customHooks/useTheme';
-import baseLayers from '../../../../configurations/mapLayers';
+import "maplibre-gl/dist/maplibre-gl.css";
+
+import { useEffect, useRef, useState } from "react";
+
+import baseLayers from "../../../../configurations/mapLayers";
+import maplibregl from "maplibre-gl";
+import { useTheme } from "../../../../customHooks/useTheme";
 
 const MapCore = ({ children, onMapLoad }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const { currentLayer, show3DLayer } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
-  
+
   useEffect(() => {
     if (map.current) return;
-    
+
     const baseLayer = baseLayers.find((v) => v.name === currentLayer);
-    
+
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: {
         version: 8,
         sources: {
-          'raster-tiles': {
-            type: 'raster',
+          "raster-tiles": {
+            type: "raster",
             tiles: [baseLayer.url],
             tileSize: 256,
           },
         },
         layers: [
           {
-            id: 'base-layer',
-            type: 'raster',
-            source: 'raster-tiles',
+            id: "base-layer",
+            type: "raster",
+            source: "raster-tiles",
             minzoom: 0,
             maxzoom: 22,
           },
@@ -38,11 +40,15 @@ const MapCore = ({ children, onMapLoad }) => {
       },
       center: [69.2401, 41.2995], // Tashkent coordinates
       zoom: 12,
+      minZoom: 5,
+      maxZoom: 22,
       pitch: show3DLayer ? 45 : 0,
-      antialias: true
+      minPitch: 0,
+      maxPitch: 60,
+      antialias: true,
     });
 
-    map.current.on('load', () => {
+    map.current.on("load", () => {
       setMapLoaded(true);
       if (onMapLoad) onMapLoad(map.current);
     });
@@ -58,11 +64,11 @@ const MapCore = ({ children, onMapLoad }) => {
   // Handle layer changes
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
-    
+
     const baseLayer = baseLayers.find((v) => v.name === currentLayer);
     if (!baseLayer) return;
 
-    const source = map.current.getSource('raster-tiles');
+    const source = map.current.getSource("raster-tiles");
     if (source) {
       source.setTiles([baseLayer.url]);
     }
@@ -71,15 +77,15 @@ const MapCore = ({ children, onMapLoad }) => {
   // Handle 3D mode
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
-    
+
     map.current.easeTo({
       pitch: show3DLayer ? 45 : 0,
-      duration: 300
+      duration: 300,
     });
   }, [show3DLayer, mapLoaded]);
 
   return (
-    <div ref={mapContainer} style={{ width: '100%', height: '100%' }}>
+    <div ref={mapContainer} style={{ width: "100%", height: "100%" }}>
       {mapLoaded && children}
     </div>
   );

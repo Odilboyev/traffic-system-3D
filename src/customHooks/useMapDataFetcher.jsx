@@ -2,85 +2,88 @@ import { useEffect, useState } from "react";
 import { useMapContext } from "../Pages/map/context/MapContext";
 
 const useMapDataFetcher = ({
-  fetchData, // function to fetch data
-  onClearData, // function to clear data
-  onNewData, // function to handle new data
-  minZoom = 13, // Lowered minimum zoom level
-  fetchDistanceThreshold = 500, // Increased distance threshold for lower zoom
-  useDistanceThreshold = true, // New prop with default value true
+  fetchData,
+  onClearData,
+  onNewData,
+  minZoom = 19,
+  fetchDistanceThreshold = 100,
 }) => {
   const [lastSuccessfulLocation, setLastSuccessfulLocation] = useState(null);
   const { map } = useMapContext();
 
-  // Calculate distance between two points in meters
-  const calculateDistance = (point1, point2) => {
+  // Simple distance calculation (in meters)
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371e3; // Earth's radius in meters
-    const φ1 = (point1.lat * Math.PI) / 180;
-    const φ2 = (point2.lat * Math.PI) / 180;
-    const Δφ = ((point2.lat - point1.lat) * Math.PI) / 180;
-    const Δλ = ((point2.lng - point1.lng) * Math.PI) / 180;
+    const φ1 = (lat1 * Math.PI) / 180;
+    const φ2 = (lat2 * Math.PI) / 180;
+    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
     const a =
       Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
       Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
 
-  // Function to check distance and trigger fetch if conditions are met
   const handleMapEvents = () => {
     if (!map) return;
 
-    const center = map.getCenter();
     const zoom = map.getZoom();
+    if (zoom < minZoom) {
+      onClearData?.();
+      setLastSuccessfulLocation(null);
+      return;
+    }
+
+    const center = map.getCenter();
     const currentLocation = { lat: center.lat, lng: center.lng };
 
-    if (zoom >= minZoom) {
-      // Modified condition to check useDistanceThreshold prop
-      if (
-        !lastSuccessfulLocation ||
-        !useDistanceThreshold ||
-        calculateDistance(currentLocation, lastSuccessfulLocation) >
-          fetchDistanceThreshold
-      ) {
-        fetchData({
-          lat: center.lat,
-          lng: center.lng,
-          zoom,
-        });
-        setLastSuccessfulLocation(currentLocation);
-      }
-    } else {
-      // If zoom is lower than minZoom, clear the data and reset last location
-      onClearData();
-      if (lastSuccessfulLocation !== null) {
-        setLastSuccessfulLocation(null); // Only clear if it's not already null
+    // Skip if we haven't moved far enough
+    if (lastSuccessfulLocation) {
+      const distance = calculateDistance(
+        currentLocation.lat,
+        currentLocation.lng,
+        lastSuccessfulLocation.lat,
+        lastSuccessfulLocation.lng
+      );
+      
+      if (distance < fetchDistanceThreshold) {
+        return;
       }
     }
+
+    // Only fetch if we're either:
+    // 1. First time fetching (no last location)
+    // 2. Moved more than threshold distance
+    fetchData({
+      lat: currentLocation.lat,
+      lng: currentLocation.lng,
+      zoom,
+    }).then((response) => {
+      if (response?.data) {
+        onNewData?.(response.data);
+        setLastSuccessfulLocation(currentLocation);
+      }
+    });
   };
 
   useEffect(() => {
     if (!map) return;
 
-    // Initial trigger on mount
+    // Initial fetch
     handleMapEvents();
 
-    // Set up event listeners for map movement
-    map.on('moveend', handleMapEvents);
-    map.on('zoomend', handleMapEvents);
+    // Add event listener only for moveend
+    map.on("moveend", handleMapEvents);
 
-    // Cleanup event listeners
     return () => {
-      map.off('moveend', handleMapEvents);
-      map.off('zoomend', handleMapEvents);
+      map.off("moveend", handleMapEvents);
     };
   }, [map]);
 
-  return {
-    lastSuccessfulLocation,
-    setLastSuccessfulLocation,
-  };
+  return { lastSuccessfulLocation };
 };
 
 export default useMapDataFetcher;

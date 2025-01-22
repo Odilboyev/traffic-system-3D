@@ -35,12 +35,14 @@ const useMapMarkers = () => {
       console.log('Fetched marker data:', response);
       if (response?.data) {
         const formattedMarkers = response.data.map(marker => ({
-          ...marker,
-          id: marker.id || Math.random().toString(36).substr(2, 9),
-          lat: marker.lat || marker.latitude,
-          lng: marker.lng || marker.longitude,
-          type: marker.type || 'default',
-          status: marker.status || 'offline'
+          id: marker.id || Date.now() + Math.floor(Math.random() * 1000000),
+          lat: parseFloat(marker.lat || marker.latitude),
+          link_id: marker.link_id || 0,
+          lng: parseFloat(marker.lng || marker.longitude),
+          rotate: marker.rotate || 0,
+          svetofor_id: marker.svetofor_id?.toString() || "0",
+          type: marker.type || 2,
+          countdown: marker.countdown || 0
         }));
         console.log('Formatted markers:', formattedMarkers);
         dispatch(updateMarkers(formattedMarkers));
@@ -65,12 +67,14 @@ const useMapMarkers = () => {
     (data) => {
       if (data) {
         const formattedMarkers = data.map(marker => ({
-          ...marker,
-          id: marker.id || Math.random().toString(36).substr(2, 9),
-          lat: marker.lat || marker.latitude,
-          lng: marker.lng || marker.longitude,
-          type: marker.type || 'default',
-          status: marker.status || 'offline'
+          id: marker.id || Date.now() + Math.floor(Math.random() * 1000000),
+          lat: parseFloat(marker.lat || marker.latitude),
+          link_id: marker.link_id || 0,
+          lng: parseFloat(marker.lng || marker.longitude),
+          rotate: marker.rotate || 0,
+          svetofor_id: marker.svetofor_id?.toString() || "0",
+          type: marker.type || 2,
+          countdown: marker.countdown || 0
         }));
         dispatch(updateMarkers(formattedMarkers));
       }

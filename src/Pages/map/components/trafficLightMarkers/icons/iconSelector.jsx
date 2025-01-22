@@ -1,6 +1,7 @@
 import {
   TbArrowRampLeft,
   TbArrowRampRight,
+  TbArrowRotaryStraight,
   TbCornerUpLeft,
   TbCornerUpRight,
 } from "react-icons/tb";
@@ -14,7 +15,7 @@ const iconSelector = ({ type = 1, status = 0, style }) => {
   const IconComponent = (() => {
     switch (type) {
       case 1:
-        return MdStraight;
+        return TbArrowRotaryStraight;
       case 2:
         // return status === 1 ? IoIosWalk : IoMdMan;
         return PedestrianIcon;

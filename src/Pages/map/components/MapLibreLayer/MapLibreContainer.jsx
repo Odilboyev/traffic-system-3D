@@ -13,7 +13,7 @@ import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
 import { useMapContext } from "../../context/MapContext";
 import { useMapMarkers } from "../../hooks/useMapMarkers";
-import {useTheme} from "../../../../customHooks/useTheme"
+import { useTheme } from "../../../../customHooks/useTheme";
 
 const MapLibreContainer = () => {
   const mapContainer = useRef(null);
@@ -51,14 +51,12 @@ const MapLibreContainer = () => {
     if (map) return;
 
     console.log("Initializing MapLibre map with theme:", theme);
-    
-    // Get saved position from localStorage or use defaults
-    const savedMapState = JSON.parse(localStorage.getItem('mapState')) || {
-      center: [69.254643, 41.321151],
-      zoom: 14
-    };
 
-    console.log("Loading saved map state:", savedMapState);
+    // Get saved position from localStorage or use defaults
+    const savedMapState = JSON.parse(localStorage.getItem("mapState")) || {
+      center: [69.254643, 41.321151],
+      zoom: 14,
+    };
 
     const newMap = new maplibregl.Map({
       container: mapContainer.current,
@@ -67,7 +65,7 @@ const MapLibreContainer = () => {
       center: savedMapState.center,
       pitch: 0,
       maxZoom: 20,
-      minZoom: 10,
+      minZoom: 5,
       canvasContextAttributes: { antialias: true },
     });
 
@@ -78,15 +76,14 @@ const MapLibreContainer = () => {
     });
 
     // Save map position and zoom when they change
-    newMap.on('moveend', () => {
+    newMap.on("moveend", () => {
       const center = newMap.getCenter();
       const zoom = newMap.getZoom();
       const mapState = {
         center: [center.lng, center.lat],
-        zoom
+        zoom,
       };
-      localStorage.setItem('mapState', JSON.stringify(mapState));
-      console.log("Saved map state:", mapState);
+      localStorage.setItem("mapState", JSON.stringify(mapState));
     });
 
     // Add navigation controls
@@ -177,6 +174,7 @@ const MapLibreContainer = () => {
           });
           new maplibregl.Marker({
             element: el,
+            anchor: "center",
           })
             .setLngLat(coordinates)
             .addTo(newMap);
@@ -253,7 +251,7 @@ const MapLibreContainer = () => {
 
           new maplibregl.Marker({
             element: el,
-            subpixelPositioning: true,
+            anchor: "center",
           })
             .setLngLat(coordinates)
             .addTo(newMap);
