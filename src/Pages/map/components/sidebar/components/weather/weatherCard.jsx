@@ -30,7 +30,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
   const iconPath = "icons/wheather_icons";
 
   return (
-    <div className="w-full p-3 bg-gradient-to-br from-blue-400/40 to-black/20 backdrop-blur-sm">
+    <div className="w-full no-scrollbar p-3 bg-gradient-to-br from-blue-400/40 to-black/20 backdrop-blur-sm">
       {isSidebarOpen ? (
         <div className="flex items-start justify-between h-full">
           {/* Current Weather */}
@@ -47,13 +47,13 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                 <Typography className="text-2xl font-medium tracking-tight text-white/90">
                   {today.temp}°C
                 </Typography>
-                <Typography className="text-xs font-medium text-blue-gray-400">
+                <Typography className="text-xl font-medium text-blue-gray-400">
                   {new Date().toLocaleDateString("en-US", { weekday: "long" })}
                 </Typography>
               </div>
             </div>
 
-            <div className="flex gap-3 text-sm text-blue-gray-300">
+            <div className="flex gap-3 text-xl text-blue-gray-300">
               <div className="flex items-center gap-1.5">
                 <svg
                   className="w-4 h-4 text-blue-300"
@@ -69,7 +69,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                   />
                 </svg>
                 <span className="text-blue-gray-400">{today.wind}</span>
-                <span className="text-xs text-blue-gray-500">{t("m/s")}</span>
+                <span className="text-xl text-blue-gray-500">{t("m/s")}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <svg
@@ -86,7 +86,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                   />
                 </svg>
                 <span className="text-blue-gray-400">{today.humidity}</span>
-                <span className="text-xs text-blue-gray-500">%</span>
+                <span className="text-xl text-blue-gray-500">%</span>
               </div>
             </div>
           </div>
@@ -102,10 +102,10 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                   className="w-6 h-6"
                 />
                 <div>
-                  <div className="text-sm font-medium text-white/90">
+                  <div className="text-xl font-medium text-white/90">
                     {nextDays[0].temp_max}°C
                   </div>
-                  <div className="text-xs text-blue-gray-400">Day</div>
+                  <div className="text-sm text-blue-gray-400">Day</div>
                 </div>
               </div>
             </div>
@@ -119,10 +119,10 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                   className="w-6 h-6"
                 />
                 <div>
-                  <div className="text-sm font-medium text-white/90">
+                  <div className="text-xl font-medium text-white/90">
                     {nextDays[0].temp_min}°C
                   </div>
-                  <div className="text-xs text-blue-gray-400">Night</div>
+                  <div className="text-sm text-blue-gray-400">Night</div>
                 </div>
               </div>
             </div>
@@ -131,7 +131,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
       ) : (
         // Collapsed view - just temperature
 
-        <Typography className="text-sm font-bold text-center">
+        <Typography className="text-xl font-bold text-center">
           {today.temp}°C
         </Typography>
       )}
