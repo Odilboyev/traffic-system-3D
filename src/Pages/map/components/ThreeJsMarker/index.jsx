@@ -1,6 +1,8 @@
 import * as THREE from "three";
+
 import { Marker, useMap } from "@vis.gl/react-maplibre";
 import { useEffect, useRef } from "react";
+
 import maplibregl from "maplibre-gl";
 
 const ThreeJsMarker = ({ longitude, latitude, altitude = 0 }) => {
@@ -27,7 +29,7 @@ const ThreeJsMarker = ({ longitude, latitude, altitude = 0 }) => {
       rotateX: Math.PI / 2,
       rotateY: 0,
       rotateZ: 0,
-      scale: modelAsMercatorCoordinate.meterInMercatorCoordinateUnits()
+      scale: modelAsMercatorCoordinate.meterInMercatorCoordinateUnits(),
     };
 
     // Set up scene
@@ -41,8 +43,8 @@ const ThreeJsMarker = ({ longitude, latitude, altitude = 0 }) => {
     // Set up renderer with MapLibre GL JS canvas
     const renderer = new THREE.WebGLRenderer({
       canvas: map.current.getCanvas(),
-      context: map.current.getCanvas().getContext('webgl'),
-      antialias: true
+      context: map.current.getCanvas().getContext("webgl"),
+      antialias: true,
     });
     renderer.autoClear = false;
     rendererRef.current = renderer;
@@ -154,20 +156,20 @@ const ThreeJsMarker = ({ longitude, latitude, altitude = 0 }) => {
 
     // Add the custom layer to the map
     map.current.addLayer({
-      id: '3d-model',
-      type: 'custom',
-      renderingMode: '3d',
+      id: "3d-model",
+      type: "custom",
+      renderingMode: "3d",
       onAdd: () => {
         // Nothing to do here since we've already set up the scene
       },
       render: (gl, matrix) => {
         render();
-      }
+      },
     });
 
     return () => {
       if (map.current) {
-        map.current.removeLayer('3d-model');
+        map.current.removeLayer("3d-model");
       }
       scene.clear();
       renderer.dispose();

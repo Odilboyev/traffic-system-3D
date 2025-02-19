@@ -1,4 +1,4 @@
-import "./styles.css";
+// import "./styles.css";
 
 import { memo, useCallback, useEffect, useState } from "react";
 
@@ -6,10 +6,12 @@ import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
 // import MapLibreLayer from "./components/MapLibreLayer";
 import MapLibreContainer from "./components/MapLibreLayer/MapLibreContainer";
 import MapModals from "./components/MapModals/index.jsx";
+import MaplibreLayer from "./components/MapLibreLayer/reactBased.jsx";
 import NotificationBox from "../../components/NotificationBox/index.jsx";
 import PropTypes from "prop-types";
 import Sidebar from "./components/sidebar/index.jsx";
 import { ToastContainer } from "react-toastify";
+import TrafficMonitoringPanel from "../../components/SlidePanel/SlidePanelExample.jsx";
 import toaster from "../../tools/toastconfig.jsx";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 import { useTheme } from "../../customHooks/useTheme.jsx";
@@ -73,10 +75,19 @@ const MapComponent = memo(({ notifications, t }) => {
   return (
     <div className="map-page w-screen h-screen relative overflow-hidden">
       <div className="map-wrapper absolute inset-0">
-        {/* <MapLibreLayer
+        <TrafficMonitoringPanel />
+        {/* <MaplibreLayer
           markers={markers}
           onMarkerClick={handleMarkerClick}
           useClusteredMarkers={useClusteredMarkers}
+          threeDMarkers={[
+            {
+              longitude: 69.30783347820702,
+              latitude: 41.30512407773824,
+              altitude: 100, // optional
+            },
+            // ... more 3D markers
+          ]}
         /> */}
         <MapLibreContainer />
 
@@ -91,14 +102,14 @@ const MapComponent = memo(({ notifications, t }) => {
         /> */}
       </div>
 
-      <Sidebar
+      {/* <Sidebar
         isVisible={isSidebarVisible}
         setIsVisible={setIsSidebarVisible}
         activePanel={activeSidePanel}
         setActivePanel={setActiveSidePanel}
         reloadMarkers={getDataHandler}
         t={t}
-      />
+      /> */}
 
       <MapModals
         crossroadModal={crossroadModal}

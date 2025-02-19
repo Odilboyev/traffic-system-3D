@@ -102,21 +102,21 @@ const MapMarkers = ({ markers, useClusteredMarkers, onMarkerClick }) => {
     const [lng, lat] = point.geometry.coordinates;
     const { cluster, cluster_id, point_count } = point.properties;
 
-    if (cluster) {
-      return (
-        <div
-          key={`cluster-${cluster_id}`}
-          style={{
-            position: "absolute",
-            left: `${lng}px`,
-            top: `${lat}px`,
-            transform: `translate(-50%, -50%)`,
-          }}
-        >
-          {createClusterMarker(point_count)}
-        </div>
-      );
-    }
+    // if (cluster) {
+    //   return (
+    //     <div
+    //       key={`cluster-${cluster_id}`}
+    //       style={{
+    //         position: "absolute",
+    //         left: `${lng}px`,
+    //         top: `${lat}px`,
+    //         transform: `translate(-50%, -50%)`,
+    //       }}
+    //     >
+    //       {createClusterMarker(point_count)}
+    //     </div>
+    //   );
+    // }
 
     return (
       <div
@@ -142,7 +142,7 @@ export default function MapLibreLayer({
   const { show3DLayer } = useTheme();
 
   return (
-    <div style={{ width: "100%", height: "100%" }}>
+    <div style={{ width: "100vw", height: "100vh" }}>
       <Map
         initialViewState={{
           longitude: 69.30783347820702,

@@ -17,10 +17,6 @@
   cursor: pointer;
 }
 
-.maplibregl-popup {
-  max-width: 400px;
-}
-
 .maplibregl-popup-content {
   padding: 15px;
   border-radius: 8px;

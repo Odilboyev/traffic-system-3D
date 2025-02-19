@@ -21,26 +21,25 @@
 }
 
 .error-marker img {
-  filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8);
+  filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg)
+    saturate(600%) contrast(0.8);
 }
 
 .cluster-marker {
-  background: #fff;
-  border: 2px solid #3b82f6;
+  background: rgba(74, 144, 226, 0.7);
   border-radius: 50%;
-  color: #3b82f6;
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
   font-weight: bold;
-  font-size: 14px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  min-width: 32px;
-  min-height: 32px;
+  border: 2px solid #4a90e2;
 }
 
 .cluster-count {
-  padding: 4px;
+  color: white;
+  font-size: 14px;
 }
 
 .marker-popup {
@@ -48,5 +47,51 @@
   font-size: 14px;
   background: white;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.single-marker {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.marker-icon {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #4a90e2;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.marker-icon::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: #4a90e2;
+  border-radius: 50%;
+  z-index: 1;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
 }

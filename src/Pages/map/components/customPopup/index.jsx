@@ -46,14 +46,9 @@ const CameraDetails = memo(
           }?svetofor_id=${svetoforId}&token=${authToken}`
         );
 
-        socket.onopen = () => {
-          console.log(`WebSocket connected for svetofor_id: ${svetoforId}`);
-        };
+        socket.onopen = () => {};
 
-        socket.onclose = () => {
-          console.log(`WebSocket closed for svetofor_id: ${svetoforId}`);
-          setTrafficLightSocket(null);
-        };
+        socket.onclose = () => {};
 
         socket.onmessage = (event) => {
           let message = event.data;

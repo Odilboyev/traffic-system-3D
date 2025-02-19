@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import NeonIcon from "../../../../components/neonIcon";
 import { Typography } from "@material-tailwind/react";
 import { fixIncompleteJSON } from "./utils";
@@ -5,8 +7,8 @@ import { getNearbyTrafficLights } from "../../../../api/api.handlers";
 import iconSelector from "./icons/iconSelector";
 import maplibregl from "maplibre-gl";
 import { renderToString } from "react-dom/server";
-import { useEffect } from "react";
 import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
+import useTrafficLightsFetcher from "../../../../hooks/useTrafficLightsFetcher";
 import { useSelector } from "react-redux";
 
 const TrafficlightMarkers = ({
@@ -26,12 +28,17 @@ const TrafficlightMarkers = ({
   theme,
 }) => {
   const isDraggable = useSelector((state) => state.map.isDraggable);
+  const markersRef = useRef(null);
+  const { fetchTrafficLights } = useTrafficLightsFetcher(getNearbyTrafficLights);
 
   // Effect to manage markers
   useEffect(() => {
     if (!map || !trafficLights) return;
 
     console.log("Creating traffic light markers:", { trafficLights, map });
+
+    // Create a Map to store marker references
+    const markerRefs = new Map();
 
     // Remove existing markers
     const existingMarkers = document.getElementsByClassName(
@@ -45,6 +52,7 @@ const TrafficlightMarkers = ({
       const el = document.createElement("div");
       el.className =
         "traffic-light-marker rounded-full flex items-center justify-center";
+      el.setAttribute("data-light-id", v.id);
       el.style.width = "30px";
       el.style.height = "30px";
 
@@ -76,6 +84,9 @@ const TrafficlightMarkers = ({
       })
         .setLngLat([v.lng, v.lat])
         .addTo(map);
+
+      // Store marker reference
+      markerRefs.set(v.link_id, { marker, element: el, light: v });
 
       // Add click event
       el.addEventListener("click", () => {
@@ -121,7 +132,44 @@ const TrafficlightMarkers = ({
         });
       }
     });
-  }, [trafficLights, map, isDraggable, theme]);
+
+    // Store marker refs in a ref to access them in other effects
+    markersRef.current = markerRefs;
+
+    // Cleanup function
+    return () => {
+      markerRefs.forEach(({ marker }) => marker.remove());
+    };
+  }, [map, isDraggable]); // Only recreate markers when map or draggable state changes
+
+  // Effect to update marker visuals
+  useEffect(() => {
+    if (!markersRef.current || !trafficLights) return;
+
+    trafficLights.forEach((light) => {
+      const markerData = markersRef.current.get(light.link_id);
+      if (markerData) {
+        const { element } = markerData;
+        // Update only the visual state
+        const icon = renderToString(
+          <NeonIcon
+            isRounded={false}
+            icon={
+              light.type !== 100 &&
+              iconSelector({
+                type: light.type,
+                status: light.status,
+                style: { transform: `rotate(${light.rotate}deg)` },
+              })
+            }
+            status={light.status === 1 ? 0 : light.status === 2 ? 2 : 1}
+            text={light.type === 100 && (light.countdown || "0")}
+          />
+        );
+        element.innerHTML = icon;
+      }
+    });
+  }, [trafficLights, theme]);
 
   // Effect for socket connection and updates
   useEffect(() => {
@@ -134,8 +182,9 @@ const TrafficlightMarkers = ({
         const data = JSON.parse(message);
         if (data && data.channel) {
           const updatedLights = trafficLights.map((light) => {
-            const update = data.channel.find((v) => v.id === light.link_id);
+            const update = data.channel.find((v) => v.id === light.id);
             if (update) {
+              console.log("Updating light:", light.id, update); // Debug log
               return {
                 ...light,
                 status: update.type === 100 ? light.status : update.status,
@@ -158,65 +207,29 @@ const TrafficlightMarkers = ({
     };
   }, [trafficSocket, trafficLights, isPaused]);
 
-  // Fetching function passed to custom hook
-  const fetchTrafficLights = async (body) => {
-    try {
-      const response = await getNearbyTrafficLights(body);
-      console.log("Fetch response:", response);
-      console.log("Traffic lights data structure:", response.data?.[0]);
+  // Effect to handle map move events
+  useEffect(() => {
+    if (!map) return;
 
-      setVendor(Number(response.vendor_id) || response.vendor_id);
-      if (response.status === "error") {
-        console.error(response.message);
-        clearTrafficLights();
-        return;
-      }
+    const handleMapMove = () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      
+      fetchTrafficLights(center, zoom).then(response => {
+        if (response && response.data) {
+          setTrafficLights(response.data);
+        }
+      });
+    };
 
-      setTrafficLights(response.data);
+    map.on('moveend', handleMapMove);
+    // Initial fetch
+    handleMapMove();
 
-      if (currentSvetoforId !== response.svetofor_id) {
-        console.log("Setting new svetofor_id:", response.svetofor_id);
-        setCurrentSvetoforId(response.svetofor_id);
-      }
-
-      return { ...response, data: response.data };
-    } catch (error) {
-      console.error("Error fetching traffic lights:", error);
-      clearTrafficLights();
-    }
-  };
-
-  // Use the custom hook with adjusted settings
-  useMapDataFetcher({
-    use: true,
-    fetchData: fetchTrafficLights,
-    onClearData: () => {
-      // Only clear traffic lights if zoom is too low
-      const zoom = map?.getZoom();
-      if (zoom < 13) {
-        clearTrafficLights();
-      }
-    },
-    onNewData: (data) => {
-      if (data?.data) {
-        // Update traffic lights without affecting socket connection
-        setTrafficLights((prevLights) => {
-          const newLights = data.data;
-          // Preserve existing lights that are still in view
-          const existingLights = prevLights.filter((light) =>
-            newLights.some((newLight) => newLight.id === light.id)
-          );
-          // Add new lights that weren't there before
-          const brandNewLights = newLights.filter(
-            (newLight) => !prevLights.some((light) => light.id === newLight.id)
-          );
-          return [...existingLights, ...brandNewLights];
-        });
-      }
-    },
-    minZoom: 13,
-    fetchDistanceThreshold: 500, // Set to exactly 500 meters
-  });
+    return () => {
+      map.off('moveend', handleMapMove);
+    };
+  }, [map, fetchTrafficLights, setTrafficLights]);
 
   return null;
 };

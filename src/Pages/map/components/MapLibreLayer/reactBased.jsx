@@ -281,15 +281,14 @@ const MaplibreLayer = ({
         touchZoomRotate={true}
         keyboard={true}
       >
-        <ThreeJsMarkerRenderer
-          modelUrl="/models/traffic.gltf"
-          coordinates={[41.2995, 69.2401]} // [latitude, longitude]
-          altitude={0}
-          rotation={{ x: Math.PI / 2, y: 0, z: 0 }}
-          onClick={(intersection) =>
-            console.log("Model clicked:", intersection)
-          }
-          onLoaded={() => console.log("Model loaded")}
+        <ThreeJsMarker
+          longitude={69.30783347820702}
+          latitude={41.30512407773824}
+          altitude={100} // optional
+          onClick={() => {
+            // Handle click event
+            console.log("3D marker clicked");
+          }}
         />
         <FullscreenControl position="top-right" />
         <ScaleControl

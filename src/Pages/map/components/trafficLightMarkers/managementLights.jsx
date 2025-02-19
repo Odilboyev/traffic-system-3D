@@ -70,7 +70,7 @@ const TrafficLightContainer = ({ handleMarkerDragEnd }) => {
       try {
         const fixedData = fixIncompleteJSON(event.data);
         const data = JSON.parse(fixedData);
-        console.log("Received WebSocket message:", data);
+
         if (data.type === "phase") {
           setPhase(data.data);
         } else if (data.status && data.data) {
@@ -175,14 +175,14 @@ const TrafficLightContainer = ({ handleMarkerDragEnd }) => {
   const updateTrafficLights = (data) => {
     if (!data || isPaused) return;
 
-    setTrafficLights((prevLights) => {
-      return prevLights.map((light) => {
-        const updatedLight = data.find(
-          (d) => d.svetofor_id === light.svetofor_id
-        );
-        return updatedLight ? { ...light, ...updatedLight } : light;
-      });
-    });
+    // setTrafficLights((prevLights) => {
+    //   return prevLights.map((light) => {
+    //     const updatedLight = data.find(
+    //       (d) => d.link_id === light.link_id
+    //     );
+    //     return updatedLight ? { ...light, ...updatedLight } : light;
+    //   });
+    // });
   };
 
   const clearTrafficLights = () => {
@@ -194,7 +194,7 @@ const TrafficLightContainer = ({ handleMarkerDragEnd }) => {
 
   return (
     <>
-      <TrafficlightMarkers
+      {/* <TrafficlightMarkers
         trafficLights={trafficLights}
         setTrafficLights={setTrafficLights}
         setCurrentSvetoforId={setCurrentSvetoforId}
@@ -218,7 +218,7 @@ const TrafficLightContainer = ({ handleMarkerDragEnd }) => {
         isPaused={isPaused}
         setIsPaused={setIsPaused}
         map={map}
-      />
+      /> */}
       {map && phase?.length > 0 && <PhasesDisplay phases={phase} />}
     </>
   );
