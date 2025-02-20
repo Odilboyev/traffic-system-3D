@@ -516,26 +516,6 @@
   animation: pulse 2s infinite;
 }
 
-/* Add smooth scrollbar */
-.monitoring-panel::-webkit-scrollbar {
-  width: 6px;
-}
-
-.monitoring-panel::-webkit-scrollbar-track {
-  background: rgba(0, 255, 255, 0.05);
-  border-radius: 3px;
-}
-
-.monitoring-panel::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 255, 0.2);
-  border-radius: 3px;
-  transition: background 0.3s;
-}
-
-.monitoring-panel::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 255, 0.3);
-}
-
 /* Enhanced alert items */
 .alert-item {
   position: relative;

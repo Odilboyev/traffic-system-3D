@@ -4,7 +4,15 @@ import "swiper/css/effect-coverflow";
 import "swiper/css/navigation";
 
 import { EffectCoverflow, Navigation } from "swiper/modules";
-import { FaCarSide, FaTruck } from "react-icons/fa";
+import {
+  FaArrowAltCircleDown,
+  FaArrowAltCircleUp,
+  FaCarSide,
+  FaLongArrowAltDown,
+  FaLongArrowAltUp,
+  FaTruck,
+} from "react-icons/fa";
+import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
 import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -17,7 +25,7 @@ const TrafficMonitoringPanel = () => {
   const [isRightPanelOpen, setRightPanelOpen] = useState(true);
 
   const leftPanelContent = (
-    <div className="p-12 bg-gradient-to-r from-blue-900/70 to-blue-gray-900/0 h-full min-w-sm">
+    <div className="p-12 bg-gradient-to-r from-blue-gray-900/70 to-blue-gray-900/1 h-full max-h-full overflow-y-scroll min-w-sm scrollbar-hide">
       <h2 className="panel-title">Transportlarni xarakat statistikasi</h2>
 
       {/* Traffic Congestion Section */}
@@ -27,72 +35,83 @@ const TrafficMonitoringPanel = () => {
             10 та ўтказувчанлиги юқори чоррахалар
           </h3>
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3 text-base">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl font-semibold text-blue-400">#1</span>
-                <span className="text-lg text-white/90">
-                  01-123 (Чилонзор метро)
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-500/20 text-green-400 text-lg font-medium">
-                    <span>54 350</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-red-500/20 text-red-400 text-lg font-medium">
-                    <span>53 866</span>
-                  </div>
+            {[
+              {
+                name: "01-223 (Навоий ва Абай)",
+                volume: { today: 253350, lastWeek: 55350 },
+              },
+              {
+                name: "02-778 (Мирзо-Улуғбек)",
+                volume: { today: 32120, lastWeek: 43890 },
+              },
+              {
+                name: "02-334 (Юнусобод)",
+                volume: { today: 4780, lastWeek: 4120 },
+              },
+              {
+                name: "02-115 (Фарғона йўли)",
+                volume: { today: 4250, lastWeek: 3890 },
+              },
+              {
+                name: "01-445 (Яккасарой)",
+                volume: { today: 3890, lastWeek: 3670 },
+              },
+              {
+                name: "01-556 (Шайхонтохур)",
+                volume: { today: 3670, lastWeek: 3890 },
+              },
+              {
+                name: "01-222 (Навоий ва Абай)",
+                volume: { today: 3431, lastWeek: 2940 },
+              },
+              {
+                name: "03-445 (Чилонзор)",
+                volume: { today: 2980, lastWeek: 3150 },
+              },
+              {
+                name: "03-112 (Сергели)",
+                volume: { today: 2340, lastWeek: 2560 },
+              },
+              {
+                name: "01-229 (Навоий ва Абай)",
+                volume: { today: 120, lastWeek: 590 },
+              },
+            ].map((item, idx) => (
+              <div
+                className="flex items-center justify-between gap-3 text-base"
+                key={idx}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-semibold text-blue-400">
+                    #{idx + 1}
+                  </span>
+                  <span className="text-lg text-white/90">{item.name}</span>
                 </div>
-                <div className="">
-                  <svg
-                    className="w-6 h-6 text-red-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-red-500/20 text-red-400 text-lg font-medium">
+                      <span>{item.volume.lastWeek}</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-500/20 text-green-400 text-lg font-medium">
+                      <span>{item.volume.today}</span>
+                    </div>
+                  </div>
+                  <div
+                    className={`bg-gradient-to-r p-3 rounded-lg ${
+                      item.volume.today - item.volume.lastWeek > 0
+                        ? "from-green-500/20 to-green-500/0 text-green-400"
+                        : "from-red-500/20 to-red-500/0 text-red-400"
+                    }`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-3 text-base">
-              <div className="flex  items-center gap-3">
-                <span className="text-2xl font-semibold text-blue-400">#2</span>
-                <span className="text-lg text-white/90">
-                  01-223 (Навоий ва Абай)
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-500/20 text-green-400 text-lg font-medium">
-                    <span>53 350</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-red-500/20 text-red-400 text-lg font-medium">
-                    <span>54 866</span>
+                    {item.volume.today - item.volume.lastWeek > 0 ? (
+                      <FaArrowTrendUp />
+                    ) : (
+                      <FaArrowTrendDown />
+                    )}
                   </div>
                 </div>
-                <div className="">
-                  <svg
-                    className="w-6 h-6 text-green-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 10l7-7m0 0l7 7m-7-7v18"
-                    />
-                  </svg>
-                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -198,7 +217,7 @@ const TrafficMonitoringPanel = () => {
   );
 
   const rightPanelContent = (
-    <div className="p-12 bg-gradient-to-l from-blue-900/70 to-blue-gray-900/0 h-full">
+    <div className="p-12 bg-gradient-to-l from-blue-gray-900/70 to-blue-gray-900/10 h-full">
       <h2 className="panel-title">Avtomobil turlari</h2>
       <div className="chart-container">
         <div className="total-vehicles">

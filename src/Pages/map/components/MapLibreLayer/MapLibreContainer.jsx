@@ -99,13 +99,6 @@ const MapLibreContainer = () => {
     >
       {map && <TrafficLightContainer />}
       {map && markers && <PulsingMarkers map={map} markers={markers} />}
-      {/* {map && (
-        <ClusterLayer
-          map={map}
-          markers={markers}
-          superclusterRef={supercluster}
-        />
-      )} */}
       {/* {map && <ThreeDModelLayer map={map} />} */}
       <div style={{ width: "100vw", height: "100vh" }} />
     </div>

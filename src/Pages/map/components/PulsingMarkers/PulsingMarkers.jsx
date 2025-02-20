@@ -6,84 +6,142 @@ import Supercluster from "supercluster";
 import maplibregl from "maplibre-gl";
 
 const PulsingMarkers = ({ map, markers }) => {
-  const supercluster = useRef(new Supercluster({ radius: 100, maxZoom: 16 }));
   const markersRef = useRef([]);
+  const superclusterRef = useRef(null);
+
+  const createMarkerElement = (count = 1) => {
+    const el = document.createElement("div");
+    const container = document.createElement("div");
+    const innerChild = document.createElement("div");
+    const innerChildSecond = document.createElement("div");
+    const countElement = count > 1 ? document.createElement("div") : null;
+
+    container.className =
+      count > 1
+        ? "relative flex w-[2vw] h-[2vw] justify-center items-center"
+        : "relative flex w-[0.8vw] h-[0.8vw] justify-center items-center";
+
+    innerChild.className =
+      count > 1
+        ? "absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"
+        : "absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75";
+
+    innerChildSecond.className =
+      count > 1
+        ? "relative inline-flex w-[1.6vw] h-[1.6vw] rounded-full bg-blue-500 border-2 border-white flex items-center justify-center"
+        : "relative inline-flex w-[0.4vw] h-[0.4vw] rounded-full bg-green-500 border border-white";
+
+    if (count > 1) {
+      countElement.className = "text-white text-xs font-bold";
+      countElement.textContent = count;
+      innerChildSecond.appendChild(countElement);
+    }
+
+    container.appendChild(innerChildSecond);
+    container.appendChild(innerChild);
+    el.appendChild(container);
+    return el;
+  };
+
+  const updateMarkers = () => {
+    if (!map || !superclusterRef.current) return;
+
+    // Clean up existing markers
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
+
+    const bounds = map.getBounds();
+    const zoom = Math.floor(map.getZoom());
+
+    const clusters = superclusterRef.current.getClusters(
+      [
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth(),
+      ],
+      zoom
+    );
+
+    clusters.forEach((cluster) => {
+      const [lng, lat] = cluster.geometry.coordinates;
+      const el = createMarkerElement(
+        cluster.properties.cluster ? cluster.properties.point_count : 1
+      );
+
+      const marker = new maplibregl.Marker({
+        element: el,
+        anchor: "center",
+      })
+        .setLngLat([lng, lat])
+        .addTo(map);
+
+      markersRef.current.push(marker);
+    });
+  };
 
   useEffect(() => {
     if (!map || !markers) return;
 
     // Filter and prepare markers
     const type2Markers = markers.filter((marker) => marker.type === 2);
-    const points = type2Markers.map((marker) => ({
-      type: "Feature",
-      properties: { ...marker },
-      geometry: {
-        type: "Point",
-        coordinates: [parseFloat(marker.lng), parseFloat(marker.lat)],
-      },
-    }));
 
-    // Update supercluster with new points
-    supercluster.current.load(points);
+    // Initialize supercluster
+    superclusterRef.current = new Supercluster({
+      radius: 40,
+      maxZoom: 16,
+      minZoom: 0,
+    });
 
-    // Function to update markers based on viewport
-    const updateMarkers = () => {
-      // Remove all existing markers
-      markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = [];
+    // Add points to supercluster
+    const points = type2Markers
+      .map((marker) => {
+        const lng = parseFloat(marker.lng);
+        const lat = parseFloat(marker.lat);
 
-      const bounds = map.getBounds();
-      const bbox = [
-        bounds.getWest(),
-        bounds.getSouth(),
-        bounds.getEast(),
-        bounds.getNorth(),
-      ];
-      const zoom = Math.floor(map.getZoom());
-      const clusters = supercluster.current.getClusters(bbox, zoom);
-
-      clusters.forEach((cluster) => {
-        const [lng, lat] = cluster.geometry.coordinates;
-
-        const el = document.createElement("div");
-        el.className = "marker-container";
-
-        const markerEl = document.createElement("div");
-        markerEl.className = "pulsing-marker";
-        
-        if (cluster.properties.cluster) {
-          const count = cluster.properties.point_count;
-          markerEl.setAttribute('data-count', count);
-          markerEl.classList.add('cluster-marker');
+        if (isNaN(lng) || isNaN(lat)) {
+          console.warn(
+            `Invalid coordinates for marker ${marker.cid}: [${marker.lng}, ${marker.lat}]`
+          );
+          return null;
         }
-        
-        el.appendChild(markerEl);
 
-        const marker = new maplibregl.Marker({
-          element: el,
-          anchor: "center",
-          offset: [0, 0],
-        })
-          .setLngLat([lng, lat])
-          .addTo(map);
+        return {
+          type: "Feature",
+          properties: { ...marker },
+          geometry: {
+            type: "Point",
+            coordinates: [lng, lat],
+          },
+        };
+      })
+      .filter((point) => point !== null);
 
-        markersRef.current.push(marker);
-      });
-    };
+    superclusterRef.current.load(points);
 
-    // Update markers initially and on map events
+    // Initial render of markers
     updateMarkers();
+
+    // Add event listeners for map movement
     map.on("moveend", updateMarkers);
     map.on("zoomend", updateMarkers);
 
     return () => {
-      // Clean up all markers when component unmounts
-      markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = [];
       map.off("moveend", updateMarkers);
       map.off("zoomend", updateMarkers);
+      markersRef.current.forEach((marker) => marker.remove());
+      markersRef.current = [];
     };
   }, [map, markers]);
+  // }, [map, markers]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      markersRef.current.forEach((marker) => marker.remove());
+      markersRef.current = [];
+    };
+  }, []);
 
   return null;
 };
