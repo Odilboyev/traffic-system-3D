@@ -13,19 +13,43 @@ import {
   FaTruck,
 } from "react-icons/fa";
 import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import { PiVanFill } from "react-icons/pi";
 import SlidePanel from "./SlidePanel";
 import WeatherCard from "../../Pages/map/components/sidebar/components/weather/weatherCard";
 
-const TrafficMonitoringPanel = () => {
+const TrafficMonitoringPanel = ({ map }) => {
   const [isLeftPanelOpen, setLeftPanelOpen] = useState(true);
   const [isRightPanelOpen, setRightPanelOpen] = useState(true);
 
+  useEffect(() => {
+    if (!map) return;
+
+    const handleZoomEnd = () => {
+      const zoom = Math.floor(map.getZoom());
+      if (zoom === 11) {
+        setLeftPanelOpen(true);
+        setRightPanelOpen(true);
+      } else {
+        setLeftPanelOpen(false);
+        setRightPanelOpen(false);
+      }
+    };
+
+    map.on("zoom", handleZoomEnd);
+
+    // Initial check
+    handleZoomEnd();
+
+    return () => {
+      map.off("zoom", handleZoomEnd);
+    };
+  }, [map]);
+
   const leftPanelContent = (
-    <div className="p-12 bg-gradient-to-r from-blue-gray-900/70 to-blue-gray-900/1 h-full max-h-full overflow-y-scroll min-w-sm scrollbar-hide">
+    <div className="p-6 bg-gradient-to-r from-blue-gray-900/70 to-blue-gray-900/1 h-full max-h-full overflow-y-scroll min-w-sm scrollbar-hide">
       <h2 className="panel-title">Transportlarni xarakat statistikasi</h2>
 
       {/* Traffic Congestion Section */}

@@ -3,6 +3,7 @@ import "./styles.css";
 
 import { useEffect, useRef, useState } from "react";
 
+import MapControls from "./MapControls";
 // import ClusterLayer from "./ClusterLayer";
 import PulsingMarkers from "../PulsingMarkers/PulsingMarkers";
 import Supercluster from "supercluster";
@@ -18,7 +19,6 @@ const MapLibreContainer = () => {
   const mapContainer = useRef(null);
   const { map: contextMap, setMap: setContextMap } = useMapContext();
   const [map, setMap] = useState(null);
-  const supercluster = useRef(new Supercluster({ radius: 100, maxZoom: 16 }));
 
   const {
     markers,
@@ -66,17 +66,6 @@ const MapLibreContainer = () => {
       localStorage.setItem("mapState", JSON.stringify(mapState));
     });
 
-    newMap.addControl(new maplibregl.NavigationControl(), "top-right");
-    newMap.addControl(new maplibregl.FullscreenControl(), "top-right");
-    newMap.addControl(new maplibregl.ScaleControl(), "bottom-left");
-    newMap.addControl(
-      new maplibregl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-      }),
-      "top-right"
-    );
-
     getDataHandler();
 
     return () => {
@@ -99,6 +88,7 @@ const MapLibreContainer = () => {
     >
       {map && <TrafficLightContainer />}
       {map && markers && <PulsingMarkers map={map} markers={markers} />}
+      {/* {map && <MapControls map={map} />} */}
       {/* {map && <ThreeDModelLayer map={map} />} */}
       <div style={{ width: "100vw", height: "100vh" }} />
     </div>

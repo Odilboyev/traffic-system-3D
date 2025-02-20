@@ -2,21 +2,23 @@
 
 import { memo, useCallback, useEffect, useState } from "react";
 
-import DynamicMarkers from "./components/markers/DynamicMarkers.jsx";
-// import MapLibreLayer from "./components/MapLibreLayer";
+import FullscreenControl from "./controls/FullscreenControl/index.jsx";
+import GeolocateControl from "./controls/GeolocateControl/index.jsx";
 import MapLibreContainer from "./components/MapLibreLayer/MapLibreContainer";
 import MapModals from "./components/MapModals/index.jsx";
-import MaplibreLayer from "./components/MapLibreLayer/reactBased.jsx";
-import NotificationBox from "../../components/NotificationBox/index.jsx";
+import NavigationControl from "./controls/NavigationControl/index.jsx";
 import PropTypes from "prop-types";
-import Sidebar from "./components/sidebar/index.jsx";
+import ScaleControl from "./controls/ScaleControl/index.jsx";
 import { ToastContainer } from "react-toastify";
-import TrafficMonitoringPanel from "../../components/SlidePanel/SlidePanelExample.jsx";
+import TrafficMonitoringPanel from "./components/TrafficMonitoringPanel";
+import ZoomControl from "./controls/ZoomControl";
 import toaster from "../../tools/toastconfig.jsx";
+import { useMapContext } from "./context/MapContext.jsx";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 import { useTheme } from "../../customHooks/useTheme.jsx";
 
 const MapComponent = memo(({ notifications, t }) => {
+  const { map } = useMapContext();
   const {
     markers,
     setMarkers,
@@ -75,41 +77,10 @@ const MapComponent = memo(({ notifications, t }) => {
   return (
     <div className="map-page w-screen h-screen relative overflow-hidden">
       <div className="map-wrapper absolute inset-0">
-        <TrafficMonitoringPanel />
-        {/* <MaplibreLayer
-          markers={markers}
-          onMarkerClick={handleMarkerClick}
-          useClusteredMarkers={useClusteredMarkers}
-          threeDMarkers={[
-            {
-              longitude: 69.30783347820702,
-              latitude: 41.30512407773824,
-              altitude: 100, // optional
-            },
-            // ... more 3D markers
-          ]}
-        /> */}
+        <TrafficMonitoringPanel map={map} />
+
         <MapLibreContainer />
-
-        {/* <DynamicMarkers
-          useDynamicFetching={true}
-          filter={{}}
-          handleMonitorCrossroad={handleMonitorCrossroadOpen}
-          handleBoxModalOpen={handleBoxModalOpen}
-          handleLightsModalOpen={handleLightsModalOpen}
-          handleMarkerDragEnd={handleMarkerDragEnd}
-          t={t}
-        /> */}
       </div>
-
-      {/* <Sidebar
-        isVisible={isSidebarVisible}
-        setIsVisible={setIsSidebarVisible}
-        activePanel={activeSidePanel}
-        setActivePanel={setActiveSidePanel}
-        reloadMarkers={getDataHandler}
-        t={t}
-      /> */}
 
       <MapModals
         crossroadModal={crossroadModal}
@@ -131,6 +102,18 @@ const MapComponent = memo(({ notifications, t }) => {
 
       {/* <NotificationBox notifications={notifications} /> */}
       <ToastContainer {...toaster} />
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center justify-between gap-6 bg-blue-gray-900/80 px-6 py-3 rounded-2xl backdrop-blur-md shadow-lg border border-white/10 hover:border-white/20 transition-colors">
+        <ScaleControl map={map} />
+
+        <div className="h-full w-2 bg-gray-100"></div>
+        <ZoomControl map={map} />
+        <div className="h-full w-2 bg-gray-100"></div>
+
+        <NavigationControl map={map} />
+        <div className="h-full w-2 bg-gray-100"></div>
+
+        <FullscreenControl map={map} />
+      </div>
     </div>
   );
 });

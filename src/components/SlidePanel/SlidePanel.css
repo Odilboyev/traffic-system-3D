@@ -1,9 +1,13 @@
 .slide-panel {
   position: fixed;
   background: transparent;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.5s ease-in-out;
   z-index: 1000;
   border: none;
+}
+
+.slide-panel-top {
+  z-index: 1001;
 }
 
 .slide-panel-content {
@@ -51,9 +55,10 @@
 .slide-panel-left,
 .slide-panel-right {
   width: 300px;
+  top: 64px !important; /* Height of the top panel */
 }
 
 .slide-panel-top,
 .slide-panel-bottom {
-  height: 300px;
+  height: 64px;
 }

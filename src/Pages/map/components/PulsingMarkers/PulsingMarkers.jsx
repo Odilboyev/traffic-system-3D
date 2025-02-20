@@ -17,23 +17,17 @@ const PulsingMarkers = ({ map, markers }) => {
     const countElement = count > 1 ? document.createElement("div") : null;
 
     container.className =
-      count > 1
-        ? "relative flex w-[2vw] h-[2vw] justify-center items-center"
-        : "relative flex w-[0.8vw] h-[0.8vw] justify-center items-center";
+      "relative flex w-[0.8vw] h-[0.8vw] justify-center items-center";
 
     innerChild.className =
-      count > 1
-        ? "absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"
-        : "absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75";
+      "absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75";
 
     innerChildSecond.className =
-      count > 1
-        ? "relative inline-flex w-[1.6vw] h-[1.6vw] rounded-full bg-blue-500 border-2 border-white flex items-center justify-center"
-        : "relative inline-flex w-[0.4vw] h-[0.4vw] rounded-full bg-green-500 border border-white";
+      "relative inline-flex w-[0.4vw] h-[0.4vw] rounded-full bg-green-500 border border-white";
 
     if (count > 1) {
       countElement.className = "text-white text-xs font-bold";
-      countElement.textContent = count;
+      // countElement.textContent = count;
       innerChildSecond.appendChild(countElement);
     }
 
@@ -133,7 +127,6 @@ const PulsingMarkers = ({ map, markers }) => {
       markersRef.current = [];
     };
   }, [map, markers]);
-  // }, [map, markers]);
 
   // Cleanup on unmount
   useEffect(() => {

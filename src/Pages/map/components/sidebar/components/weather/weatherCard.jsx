@@ -53,7 +53,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
               </div>
             </div>
 
-            <div className="flex gap-3 text-xl text-blue-gray-300">
+            <div className="flex  flex-col gap-3 text-xl text-blue-gray-300">
               <div className="flex items-center gap-1.5">
                 <svg
                   className="w-4 h-4 text-blue-300"

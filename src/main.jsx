@@ -2,6 +2,9 @@ import "./index.css";
 import "../tailwind.css";
 import "react-toastify/dist/ReactToastify.css";
 import "maplibre-gl/dist/maplibre-gl.css";
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import "swiper/css/navigation";
 
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 
