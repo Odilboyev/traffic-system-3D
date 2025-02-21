@@ -101,10 +101,8 @@ const TrafficMonitoringPanel = ({ map }) => {
 
   const leftPanelContent = (
     <div className="p-4 bg-gradient-to-r from-blue-gray-900/70 to-blue-gray-900/1 h-full max-h-full overflow-y-auto min-w-sm scrollbar-hide">
-      <h2 className="panel-title">Transportlarni xarakat statistikasi</h2>
-
       {/* Traffic Congestion Section */}
-      <div className="mt-6 space-y-6">
+      <div className="space-y-6">
         <div className="bg-black/30 rounded-xl p-6 backdrop-blur-sm border border-white/10">
           <h3 className="text-lg font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
             10 та ўтказувчанлиги юқори чоррахалар
@@ -318,27 +316,27 @@ const TrafficMonitoringPanel = ({ map }) => {
   );
 
   const rightPanelContent = (
-    <div className="p-4 flex flex-col justify-evenly items-end bg-gradient-to-l from-blue-gray-900/70 to-blue-gray-900/10 h-full overflow-y-auto relative">
+    <div className="p-4 flex gap-2 scrollbar-hide flex-col justify-evenly items-end bg-gradient-to-l from-blue-gray-900/70 to-blue-gray-900/10 h-full overflow-y-auto relative">
       <div className="absolute inset-0 bg-gradient-to-l from-blue-500/5 to-transparent"></div>
+      {/* Devices Status Panel */}
+      <div className=" w-[30vw]">
+        <DevicesStatusPanel cardsInfoData={cardsInfoData} />
+      </div>{" "}
       <div className="flex gap-3 items-center">
-        <div className="mt-4 min-w-[15vw]">
+        <div className="min-w-[15vw]">
           <SpeedStatsWidget
             minSpeed={speedStats.min}
             avgSpeed={speedStats.avg}
             maxSpeed={speedStats.max}
           />
-        </div>
-        {/* Devices Status Panel */}
-        <div className="mt-4 w-[30vw]">
-          <DevicesStatusPanel cardsInfoData={cardsInfoData} />
+        </div>{" "}
+        {/* Weather Card */}
+        <div className="rounded-lg w-[15vw] overflow-hidden border border-blue-gray-800/50">
+          <WeatherCard t={(key) => key} isSidebarOpen={true} />
         </div>
       </div>{" "}
-      {/* Weather Card */}
-      <div className="mt-4 rounded-lg w-[15vw] overflow-hidden border border-blue-gray-800/50">
-        <WeatherCard t={(key) => key} isSidebarOpen={true} />
-      </div>
       {/* Traffic Volume Chart */}
-      <div className="mt-8 min-w-[30vw] bg-black/30 text-white rounded-xl p-6 backdrop-blur-sm border border-teal-400/30 shadow-[0_0_15px_rgba(45,212,191,0.3)] relative z-10 hover:shadow-[0_0_25px_rgba(45,212,191,0.4)] transition-all duration-500">
+      <div className=" min-w-[30vw] bg-black/30 text-white rounded-xl p-6 backdrop-blur-sm border border-teal-400/30 shadow-[0_0_15px_rgba(45,212,191,0.3)] relative z-10 hover:shadow-[0_0_25px_rgba(45,212,191,0.4)] transition-all duration-500">
         <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 via-transparent to-teal-500/5 rounded-xl"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-teal-500/5 to-transparent rounded-xl"></div>
         <h3 className="text-lg font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
