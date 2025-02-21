@@ -5,7 +5,9 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  ComposedChart,
   LabelList,
+  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -17,16 +19,25 @@ import { FaCarSide, FaTruck } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
+import DevicesStatusPanel from "../DevicesStatusPanel";
 import FullscreenControl from "../../controls/FullscreenControl";
 import GeolocateControl from "../../controls/GeolocateControl";
 import NavigationControl from "../../controls/NavigationControl";
 import { PiVanFill } from "react-icons/pi";
 import ScaleControl from "../../controls/ScaleControl";
 import SlidePanel from "../../../../components/SlidePanel/SlidePanel";
+import SpeedStatsWidget from "../SpeedStatsWidget";
 import WeatherCard from "../sidebar/components/weather/weatherCard";
 import ZoomControl from "../../controls/ZoomControl";
+import { getInfoForCards } from "../../../../api/api.handlers";
 
 const TrafficMonitoringPanel = ({ map }) => {
+  const [cardsInfoData, setCardsInfoData] = useState([]);
+  const [speedStats, setSpeedStats] = useState({
+    min: 25,
+    avg: 45,
+    max: 65,
+  });
   const [isLeftPanelOpen, setLeftPanelOpen] = useState(true);
   const [isRightPanelOpen, setRightPanelOpen] = useState(true);
 
@@ -51,6 +62,18 @@ const TrafficMonitoringPanel = ({ map }) => {
     { time: "17:00", volume: 108604 },
     { time: "18:00", volume: 114592 },
   ];
+
+  useEffect(() => {
+    const fetchCardsInfoData = async () => {
+      try {
+        const data = await getInfoForCards();
+        setCardsInfoData(data);
+      } catch (error) {
+        console.error("Error fetching cards info data:", error);
+      }
+    };
+    fetchCardsInfoData();
+  }, []);
 
   useEffect(() => {
     if (!map) return;
@@ -260,128 +283,88 @@ const TrafficMonitoringPanel = ({ map }) => {
           </div>
         </div>
       </div>
+
+      {/* Traffic Volume Chart */}
+      <div className="flex gap-1.5 mt-4">
+        <div className="stat-card flex-1 min-w-[110px] p-3">
+          <div className="flex items-center flex-col justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <FaCarSide className="text-teal-400" size={20} />
+              <div className="text-teal-400 font-bold">Yengil</div>
+            </div>
+            <div className="text-3xl font-semibold text-teal-300">9.5M</div>
+          </div>
+        </div>
+        <div className="stat-card flex-1 min-w-[110px] p-3">
+          <div className="flex items-center flex-col justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <PiVanFill className="text-teal-400" size={20} />
+              <div className="text-teal-400 font-bold">O'rta</div>
+            </div>
+            <div className="text-3xl font-semibold text-teal-300">60.9K</div>
+          </div>
+        </div>
+        <div className="stat-card flex-1 min-w-[110px] p-3">
+          <div className="flex items-center flex-col justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <FaTruck className="text-teal-400" size={20} />
+              <div className="text-teal-400 font-bold">Og'ir</div>
+            </div>
+            <div className="text-3xl font-semibold text-teal-300">10.5K</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   const rightPanelContent = (
     <div className="p-4 flex flex-col justify-evenly items-end bg-gradient-to-l from-blue-gray-900/70 to-blue-gray-900/10 h-full overflow-y-auto relative">
       <div className="absolute inset-0 bg-gradient-to-l from-blue-500/5 to-transparent"></div>
+      <div className="flex gap-3 items-center">
+        <div className="mt-4 min-w-[15vw]">
+          <SpeedStatsWidget
+            minSpeed={speedStats.min}
+            avgSpeed={speedStats.avg}
+            maxSpeed={speedStats.max}
+          />
+        </div>
+        {/* Devices Status Panel */}
+        <div className="mt-4 w-[30vw]">
+          <DevicesStatusPanel cardsInfoData={cardsInfoData} />
+        </div>
+      </div>{" "}
       {/* Weather Card */}
-
-      <div className="mt-8 w-[20vw] bg-black/30 rounded-xl p-6 backdrop-blur-sm border border-blue-400/30 shadow-[0_0_15px_rgba(96,165,250,0.3)] relative z-10 hover:shadow-[0_0_25px_rgba(96,165,250,0.4)] transition-all duration-500">
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 via-transparent to-teal-500/5 rounded-xl"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-teal-500/5 to-transparent rounded-xl"></div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-teal-200 drop-shadow-[0_0_8px_rgba(45,212,191,0.6)]">
-            Avtomobil turlari
-          </h3>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-teal-500/20 rounded-lg border border-teal-400/30 shadow-[0_0_15px_rgba(45,212,191,0.3)] hover:shadow-[0_0_20px_rgba(45,212,191,0.5)] transition-all duration-300">
-            <span className="text-sm text-teal-200">Jami:</span>
-            <span className="text-teal-300 font-semibold drop-shadow-[0_0_8px_rgba(45,212,191,0.8)]">
-              10.5M
-            </span>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 bg-black/20 rounded-lg p-3 border border-teal-400/20 shadow-[0_0_10px_rgba(45,212,191,0.2)] relative overflow-hidden group hover:border-teal-400/40 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/5 to-transparent group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-            <div className="p-2 bg-teal-500/20 rounded-lg text-teal-300 shadow-[0_0_10px_rgba(45,212,191,0.3)] relative z-10">
-              <FaCarSide size={20} />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm text-teal-200 group-hover:text-teal-100 transition-colors duration-300">
-                  Yengil avtomobil
-                </span>
-                <span className="text-sm font-medium text-teal-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.7)]">
-                  9.5M
-                </span>
-              </div>
-              <div className="h-1.5 bg-black/20 rounded-full overflow-hidden shadow-[0_0_10px_rgba(45,212,191,0.2)]">
-                <div
-                  className="h-full bg-gradient-to-r from-teal-400/80 via-teal-300/90 to-teal-400/80 rounded-full shadow-[0_0_15px_rgba(45,212,191,0.5)]"
-                  style={{ width: "90%" }}
-                ></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 bg-black/20 rounded-lg p-3 border border-teal-400/20 shadow-[0_0_10px_rgba(45,212,191,0.2)] relative overflow-hidden group hover:border-teal-400/40 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/5 to-transparent group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-            <div className="p-2 bg-teal-500/20 rounded-lg text-teal-300 shadow-[0_0_10px_rgba(45,212,191,0.3)] relative z-10">
-              <PiVanFill size={20} />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm text-teal-200 group-hover:text-teal-100 transition-colors duration-300">
-                  O'rta vaznli
-                </span>
-                <span className="text-sm font-medium text-teal-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.7)]">
-                  60.9K
-                </span>
-              </div>
-              <div className="h-1.5 bg-black/20 rounded-full overflow-hidden shadow-[0_0_10px_rgba(45,212,191,0.2)]">
-                <div
-                  className="h-full bg-gradient-to-r from-teal-400/80 via-teal-300/90 to-teal-400/80 rounded-full shadow-[0_0_15px_rgba(45,212,191,0.5)]"
-                  style={{ width: "15%" }}
-                ></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 bg-black/20 rounded-lg p-3 border border-teal-400/20 shadow-[0_0_10px_rgba(45,212,191,0.2)] relative overflow-hidden group hover:border-teal-400/40 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/5 to-transparent group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-            <div className="p-2 bg-teal-500/20 rounded-lg text-teal-300 shadow-[0_0_10px_rgba(45,212,191,0.3)] relative z-10">
-              <FaTruck size={20} />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm text-teal-200 group-hover:text-teal-100 transition-colors duration-300">
-                  Og'ir vaznli
-                </span>
-                <span className="text-sm font-medium text-teal-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.7)]">
-                  10.5K
-                </span>
-              </div>
-              <div className="h-1.5 bg-black/20 rounded-full overflow-hidden shadow-[0_0_10px_rgba(45,212,191,0.2)]">
-                <div
-                  className="h-full bg-gradient-to-r from-teal-400/80 via-teal-300/90 to-teal-400/80 rounded-full shadow-[0_0_15px_rgba(45,212,191,0.5)]"
-                  style={{ width: "5%" }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="mt-4 rounded-lg w-[15vw]  overflow-hidden border border-blue-gray-800/50">
+      <div className="mt-4 rounded-lg w-[15vw] overflow-hidden border border-blue-gray-800/50">
         <WeatherCard t={(key) => key} isSidebarOpen={true} />
       </div>
-
       {/* Traffic Volume Chart */}
       <div className="mt-8 min-w-[30vw] bg-black/30 text-white rounded-xl p-6 backdrop-blur-sm border border-teal-400/30 shadow-[0_0_15px_rgba(45,212,191,0.3)] relative z-10 hover:shadow-[0_0_25px_rgba(45,212,191,0.4)] transition-all duration-500">
         <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 via-transparent to-teal-500/5 rounded-xl"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-teal-500/5 to-transparent rounded-xl"></div>
         <h3 className="text-lg font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
-          Транспорт воситаларини кун давомида ўтиш статистикаси
+          Trafik hajmi
         </h3>
-        <div className="w-full h-[320px]">
+        <div className="w-full h-[30vh] ">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={trafficData}
-              margin={{ top: 30, right: 0, left: -20, bottom: 0 }}
+              margin={{ top: 30, right: 30, left: 0, bottom: 0 }}
+              layout="vertical"
             >
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="rgba(45,212,191,0.2)"
               />
-              <XAxis
+              <YAxis
                 dataKey="time"
+                type="category"
                 stroke="#2dd4bf"
                 tick={{ fill: "#5eead4", fontSize: 12 }}
               />
-              <YAxis
+              <XAxis
+                type="number"
                 stroke="#2dd4bf"
+                reversed={true}
                 tick={{ fill: "#5eead4", fontSize: 12 }}
                 tickFormatter={(value) => {
                   if (value >= 1000000) {
@@ -402,11 +385,12 @@ const TrafficMonitoringPanel = ({ map }) => {
                   boxShadow: "0 0 15px rgba(96,165,250,0.2)",
                 }}
               />
-              <Bar dataKey="volume" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="volume" radius={[0, 4, 4, 0]}>
                 <LabelList
                   dataKey="volume"
-                  position="top"
+                  position="insideLeft"
                   fill="#f0fdfa"
+                  offset={0}
                   formatter={(value) => {
                     if (value >= 1000000) {
                       return (value / 1000000).toFixed(1) + "M";
@@ -417,6 +401,8 @@ const TrafficMonitoringPanel = ({ map }) => {
                   }}
                   style={{
                     fontSize: "12px",
+                    paddingLeft: 0,
+                    marginLeft: 0,
                     fontWeight: "600",
                     textShadow:
                       "0 0 8px rgba(0,0,0,0.8), 0 0 12px rgba(45,212,191,0.9)",
@@ -454,7 +440,7 @@ const TrafficMonitoringPanel = ({ map }) => {
           <span className="nav-text">Tashkent</span>
         </div>
       </div>
-      <div className="nav-item">
+      <div className="nav-item w-1/3">
         <Swiper
           effect={"coverflow"}
           grabCursor={true}
@@ -469,7 +455,7 @@ const TrafficMonitoringPanel = ({ map }) => {
           }}
           navigation={true}
           modules={[EffectCoverflow, Navigation]}
-          className="nav-swiper"
+          className="nav-swiper w-full"
         >
           <SwiperSlide>
             <div className="nav-item">
@@ -487,6 +473,9 @@ const TrafficMonitoringPanel = ({ map }) => {
             </div>
           </SwiperSlide>
         </Swiper>
+      </div>
+      <div className="nav-item">
+        <span className="nav-text">Tashkent</span>
       </div>
     </div>
   );
