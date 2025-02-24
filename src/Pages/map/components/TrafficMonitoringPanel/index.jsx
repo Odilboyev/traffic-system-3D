@@ -405,7 +405,6 @@ const TrafficMonitoringPanel = ({ map }) => {
                     textShadow:
                       "0 0 8px rgba(0,0,0,0.8), 0 0 12px rgba(45,212,191,0.9)",
                   }}
-                  offset={10}
                 />
                 {trafficData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill="url(#barGradient)" />
