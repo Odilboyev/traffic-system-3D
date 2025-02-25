@@ -41,28 +41,6 @@ const TrafficMonitoringPanel = ({ map }) => {
   const [isLeftPanelOpen, setLeftPanelOpen] = useState(true);
   const [isRightPanelOpen, setRightPanelOpen] = useState(true);
 
-  const trafficData = [
-    { time: "00:00", volume: 10584 },
-    { time: "01:00", volume: 8043 },
-    { time: "02:00", volume: 8013 },
-    { time: "03:00", volume: 7569 },
-    { time: "04:00", volume: 8504 },
-    { time: "05:00", volume: 12065 },
-    { time: "06:00", volume: 23045 },
-    { time: "07:00", volume: 35904 },
-    { time: "08:00", volume: 120250 },
-    { time: "09:00", volume: 135585 },
-    { time: "10:00", volume: 150445 },
-    { time: "11:00", volume: 110365 },
-    { time: "12:00", volume: 115246 },
-    { time: "13:00", volume: 116874 },
-    { time: "14:00", volume: 114765 },
-    { time: "15:00", volume: 110654 },
-    { time: "16:00", volume: 108646 },
-    { time: "17:00", volume: 108604 },
-    { time: "18:00", volume: 114592 },
-  ];
-
   useEffect(() => {
     const fetchCardsInfoData = async () => {
       try {
@@ -80,7 +58,7 @@ const TrafficMonitoringPanel = ({ map }) => {
 
     const handleZoomEnd = () => {
       const zoom = Math.floor(map.getZoom());
-      if (zoom === 12) {
+      if (zoom === 10) {
         setLeftPanelOpen(true);
         setRightPanelOpen(true);
       } else {
@@ -100,72 +78,31 @@ const TrafficMonitoringPanel = ({ map }) => {
   }, [map]);
 
   const leftPanelContent = (
-    <div className="p-4 bg-gradient-to-r from-blue-gray-900/70 to-blue-gray-900/1 h-full max-h-full overflow-y-auto min-w-sm scrollbar-hide">
+    <div className="p-4 bg-gradient-to-r from-blue-gray-900/70 to-blue-gray-900/1 h-full max-h-full overflow-y-auto max-w-[40vw] scrollbar-hide space-y-4">
       {/* Traffic Congestion Section */}
-      <div className="space-y-6">
-        <div className="bg-black/30 rounded-xl p-6 backdrop-blur-sm border border-white/10">
-          <h3 className="text-lg font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
+      <div className="space-y-4">
+        <div className="bg-black/30  w-[25vw] rounded-xl p-3 backdrop-blur-sm border border-white/10">
+          <h3 className="text-md font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
             10 та ўтказувчанлиги юқори чоррахалар
           </h3>
-          <div className="space-y-2">
-            {[
-              {
-                name: "01-223 (Навоий ва Абай)",
-                volume: { today: 253350, lastWeek: 55350 },
-              },
-              {
-                name: "02-778 (Мирзо-Улуғбек)",
-                volume: { today: 32120, lastWeek: 43890 },
-              },
-              {
-                name: "02-334 (Юнусобод)",
-                volume: { today: 4780, lastWeek: 4120 },
-              },
-              {
-                name: "02-115 (Фарғона йўли)",
-                volume: { today: 4250, lastWeek: 3890 },
-              },
-              {
-                name: "01-445 (Яккасарой)",
-                volume: { today: 3890, lastWeek: 3670 },
-              },
-              {
-                name: "01-556 (Шайхонтохур)",
-                volume: { today: 3670, lastWeek: 3890 },
-              },
-              {
-                name: "01-222 (Навоий ва Абай)",
-                volume: { today: 3431, lastWeek: 2940 },
-              },
-              {
-                name: "03-445 (Чилонзор)",
-                volume: { today: 2980, lastWeek: 3150 },
-              },
-              {
-                name: "03-112 (Сергели)",
-                volume: { today: 2340, lastWeek: 2560 },
-              },
-              {
-                name: "01-229 (Навоий ва Абай)",
-                volume: { today: 120, lastWeek: 590 },
-              },
-            ].map((item, idx) => (
+          <div className="space-y-2 max-h-[25vh] overflow-y-scroll scrollbar-hide">
+            {data.crossroadsRanking.map((item, idx) => (
               <div
-                className="flex items-center justify-between gap-3 text-base"
+                className="flex items-center justify-between gap-3 text-sm"
                 key={idx}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-semibold text-blue-400">
-                    #{idx + 1}
+                <div className="flex mr-5 items-center gap-3">
+                  <span className="text-sm font-semibold text-blue-400">
+                    {idx + 1}.
                   </span>
-                  <span className="text-lg text-white/90">{item.name}</span>
+                  <span className="text-sm text-white/90">{item.name}</span>
                 </div>
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex  items-center text-right  justify-end gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-red-500/20 text-red-400 text-lg font-medium">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-red-500/20 text-red-400 text-sm font-medium">
                       <span>{item.volume.lastWeek}</span>
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-500/20 text-green-400 text-lg font-medium">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-500/20 text-green-400 text-sm font-medium">
                       <span>{item.volume.today}</span>
                     </div>
                   </div>
@@ -189,12 +126,12 @@ const TrafficMonitoringPanel = ({ map }) => {
         </div>
 
         {/* Traffic Rating Section */}
-        <div className="bg-black/30 rounded-xl p-6 backdrop-blur-sm border border-white/10">
-          <h3 className="text-lg font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
+        <div className="bg-black/30 w-[15vw] rounded-xl p-3 backdrop-blur-sm border border-white/10">
+          <h3 className="text-md font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
             5 та тирбантлиги юқори чоррахалар
           </h3>
-          <div className="grid grid-cols-5 gap-4">
-            {[9.1, 9, 8.2, 8, 7].map((rating, idx) => (
+          <div className="grid grid-cols-3 grid-rows-2  gap-y-4 gap-x-0">
+            {[9.1, 9, 8.2, 8, 7, 5.4].map((rating, idx) => (
               <div className="flex flex-col items-center" key={idx}>
                 <div className="relative w-20 h-20">
                   <svg className="w-full h-full" viewBox="0 0 36 36">
@@ -210,7 +147,7 @@ const TrafficMonitoringPanel = ({ map }) => {
                           ? "#f9731622"
                           : "#eab30822"
                       }
-                      strokeWidth="3"
+                      strokeWidth="2"
                       strokeLinecap="round"
                     />
                     <path
@@ -225,14 +162,14 @@ const TrafficMonitoringPanel = ({ map }) => {
                           ? "#f97316"
                           : "#eab308"
                       }
-                      strokeWidth="3"
+                      strokeWidth="2"
                       strokeLinecap="round"
                       strokeDasharray={`${rating * 10}, 100`}
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div
-                      className={`text-3xl font-bold ${
+                      className={`text-xl font-bold ${
                         rating > 8.5
                           ? "text-red-400"
                           : rating > 7.5
@@ -256,59 +193,59 @@ const TrafficMonitoringPanel = ({ map }) => {
 
       {/* Transport Stats */}
       <div className="flex gap-1.5 mt-4">
-        <div className="stat-card flex-1 min-w-[110px] p-3">
+        <div className="stat-card flex-1 min-w-[4vw] p-3">
           <div className="flex items-center flex-col justify-between gap-2">
             <div className="flex items-center gap-1.5">
               <div className="text-green-600 font-bold daily">Kunlik</div>
             </div>
-            <div className="text-3xl font-semibold">10.5M</div>
+            <div className="text-xl font-semibold">10.5M</div>
           </div>
         </div>
-        <div className="stat-card flex-1 min-w-[110px] p-3">
+        <div className="stat-card flex-1 min-w-[4vw] p-3">
           <div className="flex items-center flex-col justify-between gap-2">
             <div className="flex items-center gap-1.5">
               <div className="text-yellow-600 font-bold weekly">Haftalik</div>
             </div>
-            <div className="text-3xl font-semibold">80.5M</div>
+            <div className="text-xl font-semibold">80.5M</div>
           </div>
         </div>
-        <div className="stat-card flex-1 min-w-[110px] p-3">
+        <div className="stat-card flex-1 min-w-[4vw] p-3">
           <div className="flex items-center flex-col justify-between gap-2">
             <div className="flex items-center gap-1.5">
-              <div className="text-brown-600 font-bold monthly">Oylik</div>
+              <div className="text-red-600 font-bold monthly">Oylik</div>
             </div>
-            <div className="text-3xl font-semibold">100M</div>
+            <div className="text-xl font-semibold">100M</div>
           </div>
         </div>
       </div>
 
       {/* Traffic Volume Chart */}
       <div className="flex gap-1.5 mt-4">
-        <div className="stat-card flex-1 min-w-[110px] p-3">
+        <div className="stat-card flex-1 min-w-[4vw] p-3">
           <div className="flex items-center flex-col justify-between gap-2">
-            <div className="flex items-center gap-1.5">
-              <FaCarSide className="text-teal-400" size={20} />
-              <div className="text-teal-400 font-bold">Yengil</div>
+            <div className="flex text-green-600 items-center gap-1.5">
+              <FaCarSide className="" size={20} />
+              <div className=" font-bold">Yengil</div>
             </div>
-            <div className="text-3xl font-semibold text-teal-300">9.5M</div>
+            <div className="text-xl font-semibold">9.5M</div>
           </div>
         </div>
-        <div className="stat-card flex-1 min-w-[110px] p-3">
+        <div className="stat-card flex-1 min-w-[4vw] p-3">
           <div className="flex items-center flex-col justify-between gap-2">
-            <div className="flex items-center gap-1.5">
-              <PiVanFill className="text-teal-400" size={20} />
-              <div className="text-teal-400 font-bold">O'rta</div>
+            <div className="flex text-yellow-600 items-center gap-1.5">
+              <PiVanFill className="" size={20} />
+              <div className=" font-bold">O'rta</div>
             </div>
-            <div className="text-3xl font-semibold text-teal-300">60.9K</div>
+            <div className="text-xl font-semibold">60.9K</div>
           </div>
         </div>
-        <div className="stat-card flex-1 min-w-[110px] p-3">
+        <div className="stat-card flex-1 min-w-[4vw] p-3">
           <div className="flex items-center flex-col justify-between gap-2">
-            <div className="flex items-center gap-1.5">
-              <FaTruck className="text-teal-400" size={20} />
-              <div className="text-teal-400 font-bold">Og'ir</div>
+            <div className="flex text-red-600 items-center gap-1.5">
+              <FaTruck className="" size={20} />
+              <div className=" font-bold">Og'ir</div>
             </div>
-            <div className="text-3xl font-semibold text-teal-300">10.5K</div>
+            <div className="text-xl font-semibold">10.5K</div>
           </div>
         </div>
       </div>
@@ -316,36 +253,18 @@ const TrafficMonitoringPanel = ({ map }) => {
   );
 
   const rightPanelContent = (
-    <div className="p-4 flex gap-2 scrollbar-hide flex-col justify-evenly items-end bg-gradient-to-l from-blue-gray-900/70 to-blue-gray-900/10 h-full overflow-y-auto relative">
-      <div className="absolute inset-0 bg-gradient-to-l from-blue-500/5 to-transparent"></div>
-      {/* Devices Status Panel */}
-      <div className=" w-[30vw]">
-        <DevicesStatusPanel cardsInfoData={cardsInfoData} />
-      </div>{" "}
-      <div className="flex gap-3 items-center">
-        <div className="min-w-[15vw]">
-          <SpeedStatsWidget
-            minSpeed={speedStats.min}
-            avgSpeed={speedStats.avg}
-            maxSpeed={speedStats.max}
-          />
-        </div>{" "}
-        {/* Weather Card */}
-        <div className="rounded-lg w-[15vw] overflow-hidden border border-blue-gray-800/50">
-          <WeatherCard t={(key) => key} isSidebarOpen={true} />
-        </div>
-      </div>{" "}
+    <div className="p-4 bg-gradient-to-l from-blue-gray-900/70 to-blue-gray-900/1 h-screen max-h-screen overflow-y-auto max-w-[40vw] scrollbar-hide space-y-4">
+      <DevicesStatusPanel cardsInfoData={cardsInfoData} />
+
       {/* Traffic Volume Chart */}
-      <div className=" min-w-[30vw] bg-black/30 text-white rounded-xl p-6 backdrop-blur-sm border border-teal-400/30 shadow-[0_0_15px_rgba(45,212,191,0.3)] relative z-10 hover:shadow-[0_0_25px_rgba(45,212,191,0.4)] transition-all duration-500">
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 via-transparent to-teal-500/5 rounded-xl"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-teal-500/5 to-transparent rounded-xl"></div>
+      <div className="max-w-[25vw] mt-auto ml-auto bg-black/50 backdrop-blur-sm text-white p-3 rounded-xl ">
         <h3 className="text-lg font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
           Trafik hajmi
         </h3>
-        <div className="w-full h-[30vh] ">
+        <div className=" h-[30vh] ">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={trafficData}
+              data={data.trafficData}
               margin={{ top: 30, right: 30, left: 0, bottom: 0 }}
               layout="vertical"
             >
@@ -406,7 +325,7 @@ const TrafficMonitoringPanel = ({ map }) => {
                       "0 0 8px rgba(0,0,0,0.8), 0 0 12px rgba(45,212,191,0.9)",
                   }}
                 />
-                {trafficData.map((entry, index) => (
+                {data.trafficData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill="url(#barGradient)" />
                 ))}
               </Bar>
@@ -421,23 +340,34 @@ const TrafficMonitoringPanel = ({ map }) => {
           </ResponsiveContainer>
         </div>
       </div>
+      {/* Speed Stats */}
+      <div className="flex-1 max-w-[30vw] ml-auto bg-black/30 rounded-xl  backdrop-blur-sm border border-white/10">
+        <SpeedStatsWidget
+          minSpeed={speedStats.min}
+          avgSpeed={speedStats.avg}
+          maxSpeed={speedStats.max}
+        />
+      </div>
     </div>
   );
 
   const topPanelContent = (
-    <div className="w-full flex justify-between items-center mx-auto bg-blue-gray-900/80 backdrop-blur-md px-4 h-16">
-      <div className="flex gap-3">
-        <div className="nav-item">
-          <span className="nav-text">Tashkent</span>
+    <div className="w-full flex justify-between items-center mx-auto bg-blue-gray-900/80 backdrop-blur-md px-6 h-16">
+      {/* Left Navigation */}
+      <div className="flex gap-4">
+        <div className="nav-item hover:bg-blue-400/10 transition-colors">
+          <span className="nav-text font-medium">Dashboard</span>
         </div>
-        <div className="nav-item">
-          <span className="nav-text">Tashkent</span>
+        <div className="nav-item hover:bg-blue-400/10 transition-colors">
+          <span className="nav-text font-medium">Analytics</span>
         </div>
-        <div className="nav-item">
-          <span className="nav-text">Tashkent</span>
+        <div className="nav-item hover:bg-blue-400/10 transition-colors">
+          <span className="nav-text font-medium">Reports</span>
         </div>
       </div>
-      <div className="nav-item w-1/3">
+
+      {/* Center Navigation */}
+      <div className="nav-item w-1/3 px-4">
         <Swiper
           effect={"coverflow"}
           grabCursor={true}
@@ -455,24 +385,26 @@ const TrafficMonitoringPanel = ({ map }) => {
           className="nav-swiper w-full"
         >
           <SwiperSlide>
-            <div className="nav-item">
-              <span className="nav-text">Transport Tizimi</span>
+            <div className="nav-item bg-blue-400/10 hover:bg-blue-400/20 transition-colors">
+              <span className="nav-text font-semibold">Transport Tizimi</span>
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="nav-item">
-              <span className="nav-text">Monitoring</span>
+            <div className="nav-item bg-blue-400/10 hover:bg-blue-400/20 transition-colors">
+              <span className="nav-text font-semibold">Monitoring</span>
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="nav-item">
-              <span className="nav-text">Ob-havo</span>
+            <div className="nav-item bg-blue-400/10 hover:bg-blue-400/20 transition-colors">
+              <span className="nav-text font-semibold">Ob-havo</span>
             </div>
           </SwiperSlide>
         </Swiper>
       </div>
-      <div className="nav-item">
-        <span className="nav-text">Tashkent</span>
+
+      {/* City Selector */}
+      <div className="nav-item bg-blue-400/10 hover:bg-blue-400/20 transition-colors">
+        <span className="nav-text font-semibold">Tashkent</span>
       </div>
     </div>
   );
@@ -502,3 +434,69 @@ const TrafficMonitoringPanel = ({ map }) => {
 };
 
 export default TrafficMonitoringPanel;
+
+const data = {
+  crossroadsRanking: [
+    {
+      name: "01-223 (Навоий ва Абай)",
+      volume: { today: 253350, lastWeek: 55350 },
+    },
+    {
+      name: "02-778 (Мирзо-Улуғбек)",
+      volume: { today: 32120, lastWeek: 43890 },
+    },
+    {
+      name: "02-334 (Юнусобод)",
+      volume: { today: 4780, lastWeek: 4120 },
+    },
+    {
+      name: "02-115 (Фарғона йўли)",
+      volume: { today: 4250, lastWeek: 3890 },
+    },
+    {
+      name: "01-445 (Яккасарой)",
+      volume: { today: 3890, lastWeek: 3670 },
+    },
+    {
+      name: "01-556 (Шайхонтохур)",
+      volume: { today: 3670, lastWeek: 3890 },
+    },
+    {
+      name: "01-222 (Навоий ва Абай)",
+      volume: { today: 3431, lastWeek: 2940 },
+    },
+    {
+      name: "03-445 (Чилонзор)",
+      volume: { today: 2980, lastWeek: 3150 },
+    },
+    {
+      name: "03-112 (Сергели)",
+      volume: { today: 2340, lastWeek: 2560 },
+    },
+    {
+      name: "01-229 (Навоий ва Абай)",
+      volume: { today: 120, lastWeek: 590 },
+    },
+  ],
+  trafficData: [
+    { time: "00:00", volume: 10584 },
+    { time: "01:00", volume: 8043 },
+    { time: "02:00", volume: 8013 },
+    { time: "03:00", volume: 7569 },
+    { time: "04:00", volume: 8504 },
+    { time: "05:00", volume: 12065 },
+    { time: "06:00", volume: 23045 },
+    { time: "07:00", volume: 35904 },
+    { time: "08:00", volume: 120250 },
+    { time: "09:00", volume: 135585 },
+    { time: "10:00", volume: 150445 },
+    { time: "11:00", volume: 110365 },
+    { time: "12:00", volume: 115246 },
+    { time: "13:00", volume: 116874 },
+    { time: "14:00", volume: 114765 },
+    { time: "15:00", volume: 110654 },
+    { time: "16:00", volume: 108646 },
+    { time: "17:00", volume: 108604 },
+    { time: "18:00", volume: 114592 },
+  ],
+};

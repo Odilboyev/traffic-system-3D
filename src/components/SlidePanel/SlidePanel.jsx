@@ -23,13 +23,13 @@ const SlidePanel = ({ side = "right", content, isOpen, onHandleOpen }) => {
       }}
     >
       <div className="slide-panel-content">{content}</div>
-      <button
+      {/* <button
         className={`slide-panel-close slide-panel-close-${side}`}
         onClick={() => onHandleOpen(false)}
         aria-label="Close panel"
       >
         ×
-      </button>
+      </button> */}
     </div>
   );
 };

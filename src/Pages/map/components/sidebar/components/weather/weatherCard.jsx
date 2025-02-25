@@ -56,7 +56,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
   const iconPath = "icons/wheather_icons";
 
   return (
-    <div className="w-full no-scrollbar p-4 bg-gradient-to-br from-cyan-950/90 to-black/90 backdrop-blur-lg font-mono border border-cyan-500/20 rounded-xl shadow-[0_0_30px_rgba(34,211,238,0.15)] relative overflow-hidden">
+    <div className="w-full no-scrollbar p-2 bg-gradient-to-br from-cyan-950/90 to-black/90 backdrop-blur-lg font-mono border border-cyan-500/20 rounded-xl shadow-[0_0_30px_rgba(34,211,238,0.15)] relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(34,211,238,0.1),transparent_70%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.1),transparent_50%)]" />
       {isSidebarOpen ? (
@@ -66,7 +66,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
             <div className="text-4xl font-bold tracking-[0.2em] text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] bg-gradient-to-b from-cyan-300 to-cyan-500 text-transparent bg-clip-text">
               {formatTime(currentTime)}
             </div>
-            <div className="text-lg tracking-[0.15em] text-cyan-400/60 mt-1">
+            <div className="text-lg font-medium tracking-[0.15em] text-cyan-400/60 mt-1">
               {formatDate(currentTime)}
             </div>
           </div>
@@ -82,7 +82,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                 />
               </div>
               <div>
-                <div className="text-3xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">
+                <div className="text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">
                   {today.temp}°C
                 </div>
                 <div className="text-lg font-medium text-cyan-400/80 tracking-wide">
@@ -127,7 +127,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                       className="w-8 h-8 drop-shadow-[0_0_5px_rgba(34,211,238,0.3)]"
                     />
                   </div>
-                  <div className="text-2xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500">
+                  <div className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500">
                     {nextDays[0].temp_max}°C
                   </div>
                 </div>
@@ -151,7 +151,7 @@ const WeatherCard = ({ t, isSidebarOpen }) => {
                       className="w-8 h-8 drop-shadow-[0_0_5px_rgba(34,211,238,0.3)]"
                     />
                   </div>
-                  <div className="text-2xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500">
+                  <div className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500">
                     {nextDays[0].temp_min}°C
                   </div>
                 </div>
