@@ -254,10 +254,12 @@ const TrafficMonitoringPanel = ({ map }) => {
 
   const rightPanelContent = (
     <div className="p-4 bg-gradient-to-l from-blue-gray-900/70 to-blue-gray-900/1 h-screen max-h-screen overflow-y-auto max-w-[40vw] scrollbar-hide space-y-4">
-      <DevicesStatusPanel cardsInfoData={cardsInfoData} />
+      <div className=" ml-auto">
+        <DevicesStatusPanel cardsInfoData={cardsInfoData} />
+      </div>
 
-      {/* Traffic Volume Chart */}
-      <div className="max-w-[25vw] mt-auto ml-auto bg-black/50 backdrop-blur-sm text-white p-3 rounded-xl ">
+      {/* Hourly Traffic Volume Chart */}
+      <div className="max-w-[20vw] mt-auto ml-auto bg-black/50 backdrop-blur-sm text-white p-3 rounded-xl ">
         <h3 className="text-lg font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
           Trafik hajmi
         </h3>
@@ -321,19 +323,68 @@ const TrafficMonitoringPanel = ({ map }) => {
                     paddingLeft: 0,
                     marginLeft: 0,
                     fontWeight: "600",
-                    textShadow:
-                      "0 0 8px rgba(0,0,0,0.8), 0 0 12px rgba(45,212,191,0.9)",
+                    textShadow: "0 0 8px rgba(0,0,0,0.8)",
                   }}
                 />
-                {data.trafficData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill="url(#barGradient)" />
-                ))}
+                {(() => {
+                  const maxVolume = Math.max(
+                    ...data.trafficData.map((d) => d.volume)
+                  );
+                  return data.trafficData.map((entry, index) => {
+                    const volume = entry.volume;
+                    const percentage = (volume / maxVolume) * 100;
+                    let gradientId;
+
+                    if (percentage >= 80) {
+                      gradientId = "highTrafficGradient";
+                    } else if (percentage >= 75) {
+                      gradientId = "mediumTrafficGradient";
+                    } else {
+                      gradientId = "lowTrafficGradient";
+                    }
+
+                    return (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={`url(#${gradientId})`}
+                      />
+                    );
+                  });
+                })()}
               </Bar>
               <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#14b8a6" stopOpacity={1} />
-                  <stop offset="50%" stopColor="#0d9488" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#0f766e" stopOpacity={0.8} />
+                <linearGradient
+                  id="highTrafficGradient"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="0"
+                >
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={1} />
+                  <stop offset="50%" stopColor="#dc2626" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#b91c1c" stopOpacity={0.8} />
+                </linearGradient>
+                <linearGradient
+                  id="mediumTrafficGradient"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="0"
+                >
+                  <stop offset="0%" stopColor="#ffbf00" stopOpacity={1} />
+                  <stop offset="50%" stopColor="#ce9a00" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#b87700" stopOpacity={0.8} />
+                </linearGradient>
+                <linearGradient
+                  id="lowTrafficGradient"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="0"
+                >
+                  <stop offset="0%" stopColor="#00ff5e" stopOpacity={1} />
+                  <stop offset="50%" stopColor="#16a34a" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#15803d" stopOpacity={0.8} />
                 </linearGradient>
               </defs>
             </BarChart>
@@ -341,7 +392,7 @@ const TrafficMonitoringPanel = ({ map }) => {
         </div>
       </div>
       {/* Speed Stats */}
-      <div className="flex-1 max-w-[30vw] ml-auto bg-black/30 rounded-xl  backdrop-blur-sm border border-white/10">
+      <div className="flex-1 max-w-[15vw] ml-auto bg-black/30 rounded-xl  backdrop-blur-sm border border-white/10">
         <SpeedStatsWidget
           minSpeed={speedStats.min}
           avgSpeed={speedStats.avg}
@@ -498,5 +549,10 @@ const data = {
     { time: "16:00", volume: 108646 },
     { time: "17:00", volume: 108604 },
     { time: "18:00", volume: 114592 },
+    { time: "19:00", volume: 11455 },
+    { time: "20:00", volume: 1154 },
+    { time: "21:00", volume: 253 },
+    { time: "22:00", volume: 23 },
+    { time: "23:00", volume: 45 },
   ],
 };

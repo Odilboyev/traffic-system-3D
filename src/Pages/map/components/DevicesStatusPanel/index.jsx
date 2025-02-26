@@ -1,61 +1,66 @@
 import { FaTrafficLight, FaVideo } from "react-icons/fa";
 
+import { BiSolidCctv } from "react-icons/bi";
 import { IoSpeedometer } from "react-icons/io5";
 import { MdSensors } from "react-icons/md";
 import React from "react";
+import { TbDeviceCctvFilled } from "react-icons/tb";
 import { useTranslation } from "react-i18next";
 
 const DevicesStatusPanel = ({ cardsInfoData }) => {
   const { t } = useTranslation();
 
   const deviceTypes = [
-    { key: "camera", icon: FaVideo },
-    { key: "traffic_light", icon: FaTrafficLight },
-    { key: "speed_radar", icon: IoSpeedometer },
-    { key: "sensor", icon: MdSensors },
+    { key: 1, icon: FaVideo, name: "cameras_traffic" },
+    { key: 5, icon: TbDeviceCctvFilled, name: "cameras_view" },
+    { key: 6, icon: BiSolidCctv, name: "cameras_pdd" },
+    { key: 4, icon: FaTrafficLight, name: "svetofors" },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-4 " style={{ direction: "rtl" }}>
-      <div className="contents w-full" style={{ direction: "ltr" }}>
-        {cardsInfoData?.map((device, index) => {
+    <div className="flex rounded-lg">
+      {cardsInfoData
+        ?.filter((d) => d.type !== 3)
+        .map((device, index) => {
           const total = device.count_all;
           const onlineCount =
             device.data.find((item) => item.status === 0)?.count || 0;
           const offlineCount = total - onlineCount;
           const Icon =
-            deviceTypes.find((d) => d.key === device.type_name.toLowerCase())
-              ?.icon || MdSensors;
+            deviceTypes.find((d) => d.key === device.type)?.icon || MdSensors;
 
           return (
             <div
               key={index}
-              className="flex items-center justify-between p-4 border border-blue-gray-800/50 rounded-lg backdrop-blur-sm bg-black/40 hover:bg-blue-gray-900/70 transition-all duration-300"
+              className="border border-blue-gray-800/50 pb-12 relative backdrop-blur-sm bg-black/40"
             >
-              <div className="flex font-semibold items-center gap-3">
+              <div className="flex p-4  items-center">
                 <div className="p-2 rounded-lg bg-teal-500/10">
                   <Icon className="text-teal-300 text-2xl" />
                 </div>
-                <div className="text-sm text-white/90 ml-2">
-                  <div className="font-bold">{total}</div>
-                  <div className="text-teal-200/70">{t(device.type_name)}</div>
+                <div className="ml-3">
+                  <div className="text-lg font-bold text-white/90">{total}</div>
+                  <div className="text-sm text-teal-200/70">
+                    {t(device.type_name)}
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-6 text-sm">
-                <div className="h-full w-px bg-blue-gray-800/50"></div>
-                <div className="text-center">
-                  <div className="font-bold text-green-400">{onlineCount}</div>
-                  <div className="text-green-400/70">{t("Online")}</div>
+
+              <div className="flex justify-around absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-r from-green-500/20 to-red-500/20">
+                <div>
+                  <div className="text-base font-bold text-green-400">
+                    {onlineCount}
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="font-bold text-red-400">{offlineCount}</div>
-                  <div className="text-red-400/70">{t("Offline")}</div>
+                <div>
+                  <div className="text-base font-bold text-red-400">
+                    {offlineCount}
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
-      </div>
     </div>
   );
 };
