@@ -45,7 +45,7 @@ const NavigationControl = ({ map }) => {
 
   return (
     <div className="flex items-center gap-4">
-      <div className="flex flex-col items-center gap-1.5">
+      {/* <div className="flex flex-col items-center gap-1.5">
         <button
           onClick={() => adjustPitch(10)}
           className="p-1.5 text-white/80 hover:text-blue-400 hover:bg-white/10 rounded-lg transition-all"
@@ -60,7 +60,7 @@ const NavigationControl = ({ map }) => {
         >
           <FaArrowDown className="text-sm" />
         </button>
-      </div>
+      </div> */}
       <div className="flex items-center gap-2">
         <button
           onClick={resetNorth}

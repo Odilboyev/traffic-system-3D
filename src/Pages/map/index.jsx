@@ -2,16 +2,12 @@
 
 import { memo, useCallback, useEffect, useState } from "react";
 
-import FullscreenControl from "./controls/FullscreenControl/index.jsx";
-import GeolocateControl from "./controls/GeolocateControl/index.jsx";
 import MapLibreContainer from "./components/MapLibreLayer/MapLibreContainer";
 import MapModals from "./components/MapModals/index.jsx";
-import NavigationControl from "./controls/NavigationControl/index.jsx";
 import PropTypes from "prop-types";
-import ScaleControl from "./controls/ScaleControl/index.jsx";
 import { ToastContainer } from "react-toastify";
 import TrafficMonitoringPanel from "./components/TrafficMonitoringPanel";
-import ZoomControl from "./controls/ZoomControl";
+import MapControlsPanel from "./components/MapControlsPanel";
 import toaster from "../../tools/toastconfig.jsx";
 import { useMapContext } from "./context/MapContext.jsx";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
@@ -102,18 +98,7 @@ const MapComponent = memo(({ notifications, t }) => {
 
       {/* <NotificationBox notifications={notifications} /> */}
       <ToastContainer {...toaster} />
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center justify-between gap-6 bg-blue-gray-900/80 px-6 py-3 rounded-2xl backdrop-blur-md shadow-lg border border-white/10 hover:border-white/20 transition-colors">
-        <ScaleControl map={map} />
-
-        <div className="h-full w-2 bg-gray-100"></div>
-        <ZoomControl map={map} />
-        <div className="h-full w-2 bg-gray-100"></div>
-
-        <NavigationControl map={map} />
-        <div className="h-full w-2 bg-gray-100"></div>
-
-        <FullscreenControl map={map} />
-      </div>
+      <MapControlsPanel map={map} />
     </div>
   );
 });
