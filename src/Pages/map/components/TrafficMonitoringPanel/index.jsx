@@ -1,4 +1,8 @@
 import "./styles.trafficMonitoring.css";
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import "swiper/css/navigation";
 
 import {
   Bar,
@@ -30,6 +34,7 @@ import SpeedStatsWidget from "../SpeedStatsWidget";
 import WeatherCard from "../sidebar/components/weather/weatherCard";
 import ZoomControl from "../../controls/ZoomControl";
 import { getInfoForCards } from "../../../../api/api.handlers";
+import { useZoomPanel } from "../../context/ZoomPanelContext";
 
 const TrafficMonitoringPanel = ({ map }) => {
   const [cardsInfoData, setCardsInfoData] = useState([]);
@@ -38,8 +43,8 @@ const TrafficMonitoringPanel = ({ map }) => {
     avg: 45,
     max: 65,
   });
-  const [isLeftPanelOpen, setLeftPanelOpen] = useState(true);
-  const [isRightPanelOpen, setRightPanelOpen] = useState(true);
+  const conditionMet = useZoomPanel();
+
   const [panelHeights, setPanelHeights] = useState({
     speed: 0,
     devices: 0,
@@ -106,7 +111,7 @@ const TrafficMonitoringPanel = ({ map }) => {
     updateHeights();
     window.addEventListener("resize", updateHeights);
     return () => window.removeEventListener("resize", updateHeights);
-  }, [isRightPanelOpen]);
+  }, [conditionMet]);
 
   // device stats
   useEffect(() => {
@@ -121,40 +126,19 @@ const TrafficMonitoringPanel = ({ map }) => {
     fetchCardsInfoData();
   }, []);
 
-  useEffect(() => {
-    if (!map) return;
-
-    const handleZoomEnd = () => {
-      const zoom = Math.floor(map.getZoom());
-      if (zoom === 11) {
-        setLeftPanelOpen(true);
-        setRightPanelOpen(true);
-      } else {
-        setLeftPanelOpen(false);
-        setRightPanelOpen(false);
-      }
-    };
-
-    map.on("zoom", handleZoomEnd);
-
-    // Initial check
-    handleZoomEnd();
-
-    return () => {
-      map.off("zoom", handleZoomEnd);
-    };
-  }, [map]);
-
   const gradientClass =
     "from-blue-gray-900/90 via-blue-gray-900/80 via-blue-gray-900/80 via-blue-gray-900/80 via-blue-gray-900/70 via-blue-gray-900/60 via-blue-gray-900/50 via-blue-gray-900/40 via-blue-gray-900/30 via-blue-gray-900/30 via-blue-gray-900/40 to-blue-gray-900/10 to-blue-gray-900/0";
   const TransportStatsCard = (
-    <div
-      ref={transportStatsRef}
-      className={`p-3 bg-gradient-to-r ${gradientClass}`}
-    >
-      <h3 className="text-md font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
-        Транспорт оқими статистикаси
-      </h3>
+    <div ref={transportStatsRef} className={`p-3 `}>
+      <div className="relative mb-4 flex items-center gap-2">
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+        <h3 className="text-sm uppercase tracking-[0.2em] font-medium text-teal-200 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)] flex items-center gap-2">
+          <span className="text-teal-500/50">|</span>
+          Транспорт оқими статистикаси
+          <span className="text-teal-500/50">|</span>
+        </h3>
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+      </div>
       <div className="flex gap-2">
         <div className=" flex-1 min-w-[4vw] p-3  hover:border-teal-500/30 hover:bg-teal-500/30 backdrop-blur-mdtransition-colors">
           <div className="flex items-center flex-col justify-between gap-2">
@@ -184,13 +168,16 @@ const TrafficMonitoringPanel = ({ map }) => {
     </div>
   );
   const TrafficVolumeStatsCard = (
-    <div
-      ref={trafficVolumeStatsRef}
-      className={` p-3 bg-gradient-to-r ${gradientClass}`}
-    >
-      <h3 className="text-md font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
-        Транспорт турлари бўйича тақсимот
-      </h3>
+    <div ref={trafficVolumeStatsRef} className={` p-3 `}>
+      <div className="relative mb-4 flex items-center gap-2">
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+        <h3 className="text-sm uppercase tracking-[0.2em] font-medium text-teal-200 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)] flex items-center gap-2">
+          <span className="text-teal-500/50">|</span>
+          Транспорт турлари бўйича тақсимот
+          <span className="text-teal-500/50">|</span>
+        </h3>
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+      </div>
       <div className="flex gap-2">
         <div className=" flex-1 min-w-[4vw] p-3  hover:border-teal-500/30 hover:bg-teal-500/30 backdrop-blur-mdtransition-colors">
           <div className="flex items-center flex-col justify-between gap-2">
@@ -407,59 +394,95 @@ const TrafficMonitoringPanel = ({ map }) => {
   );
 
   const topPanelContent = (
-    <div className="w-full flex justify-between items-center mx-auto bg-blue-gray-900/80 backdrop-blur-md px-6 h-16">
-      {/* Left Navigation */}
-      <div className="flex gap-4">
-        <div className="nav-item hover:bg-blue-400/10 transition-colors">
-          <span className="nav-text font-medium">Dashboard</span>
-        </div>
-        <div className="nav-item hover:bg-blue-400/10 transition-colors">
-          <span className="nav-text font-medium">Analytics</span>
-        </div>
-        <div className="nav-item hover:bg-blue-400/10 transition-colors">
-          <span className="nav-text font-medium">Reports</span>
-        </div>
-      </div>
+    <div className="relative w-full h-14 backdrop-blur-sm">
+      {/* Main container with modern glassmorphism */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-900/80 via-blue-900/60 to-blue-900/40 backdrop-filter backdrop-blur-md">
+        {/* Enhanced top glow effect */}
+        <div className="absolute -top-[1px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent shadow-[0_0_20px_0_rgba(34,211,238,0.6)]" />
 
-      {/* Center Navigation */}
-      <div className="nav-item w-1/3 px-4">
-        <Swiper
-          effect={"coverflow"}
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView={3}
-          coverflowEffect={{
-            rotate: 0,
-            stretch: 0,
-            depth: 100,
-            modifier: 2.5,
-            slideShadows: false,
-          }}
-          navigation={true}
-          modules={[EffectCoverflow, Navigation]}
-          className="nav-swiper w-full"
-        >
-          <SwiperSlide>
-            <div className="nav-item bg-blue-400/10 hover:bg-blue-400/20 transition-colors">
-              <span className="nav-text font-semibold">Transport Tizimi</span>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="nav-item bg-blue-400/10 hover:bg-blue-400/20 transition-colors">
-              <span className="nav-text font-semibold">Monitoring</span>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="nav-item bg-blue-400/10 hover:bg-blue-400/20 transition-colors">
-              <span className="nav-text font-semibold">Ob-havo</span>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-      </div>
+        {/* Content container with improved spacing */}
+        <div className="h-full flex items-center justify-between px-8">
+          {/* Left Navigation with enhanced hover effects */}
+          <div className="flex items-center gap-8">
+            {["Dashboard", "Analytics", "Reports"].map((item, index) => (
+              <div key={index} className="group relative cursor-pointer">
+                {/* Modernized hover indicator */}
+                <div className="absolute -top-[1px] left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-400/0 via-cyan-400/0 to-cyan-400/0 group-hover:via-cyan-400/70 transition-all duration-500 ease-in-out" />
+                <div className="flex items-center gap-3 py-1.5 px-2 rounded-md transition-all duration-300 group-hover:bg-cyan-400/10">
+                  <div className="h-3 w-[1px] bg-gradient-to-b from-transparent via-cyan-400/50 to-transparent group-hover:via-cyan-400/80 transition-all duration-300" />
+                  <span className="text-[12px] uppercase tracking-[0.2em] font-medium text-cyan-100/70 group-hover:text-cyan-100 transition-all duration-300">
+                    {item}
+                  </span>
+                </div>
+                {/* Bottom glow on hover */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/0 to-transparent group-hover:via-cyan-400/30 transition-all duration-500" />
+              </div>
+            ))}
+          </div>
 
-      {/* City Selector */}
-      <div className="nav-item bg-blue-400/10 hover:bg-blue-400/20 transition-colors">
-        <span className="nav-text font-semibold">Tashkent</span>
+          {/* Center Navigation with enhanced decorative elements */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-0.5 flex flex-col items-center">
+            {/* Modernized top decorative elements */}
+            <div className="flex gap-2 mb-1">
+              <div className="w-[70px] h-[1px] bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent" />
+              <div className="w-[2px] h-[3px] bg-cyan-400/70 rounded-full shadow-[0_0_8px_0_rgba(34,211,238,0.6)]" />
+              <div className="w-[70px] h-[1px] bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent" />
+            </div>
+
+            {/* Enhanced Swiper container */}
+            <div className="relative w-[50vw] bg-gradient-to-r from-transparent via-blue-900/80 to-transparent rounded-md overflow-hidden">
+              <Swiper
+                effect={"coverflow"}
+                grabCursor={true}
+                centeredSlides={true}
+                slidesPerView={3}
+                coverflowEffect={{
+                  rotate: 15,
+                  stretch: 0,
+                  depth: 100,
+                  modifier: 1.5,
+                  slideShadows: true,
+                }}
+                speed={600}
+                initialSlide={1}
+                navigation={true}
+                modules={[EffectCoverflow, Navigation]}
+                className="nav-swiper"
+              >
+                {["Transport Tizimi", "Monitoring", "Ob-havo"].map(
+                  (item, index) => (
+                    <SwiperSlide key={index}>
+                      <div className="group text-center relative py-2 px-6 cursor-pointer">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/5 to-transparent via-cyan-400/15 transition-all duration-500" />
+                        <span className="text-[12px] uppercase tracking-[0.2em] font-semibold text-cyan-100/80 group-hover:text-cyan-100 transition-all duration-300">
+                          {item}
+                        </span>
+                        {/* Active indicator */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/3 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/0 to-transparent via-cyan-400/70 transition-all duration-500" />
+                      </div>
+                    </SwiperSlide>
+                  )
+                )}
+              </Swiper>
+            </div>
+          </div>
+
+          {/* Enhanced City Selector */}
+          <div className="group relative py-2 px-6 cursor-pointer">
+            <div className="absolute inset-0 rounded-md bg-gradient-to-r from-cyan-400/5 to-transparent group-hover:from-cyan-400/15 transition-all duration-300" />
+            <div className="flex items-center gap-3">
+              <span className="text-[12px] uppercase tracking-[0.2em] font-medium text-cyan-100/80 group-hover:text-cyan-100 transition-all duration-300">
+                Tashkent
+              </span>
+              <div className="h-3 w-[1px] bg-gradient-to-b from-transparent via-cyan-400/50 to-transparent group-hover:via-cyan-400/80 transition-all duration-300" />
+            </div>
+            {/* Hover glow effect */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/0 to-transparent group-hover:via-cyan-400/30 transition-all duration-500" />
+          </div>
+        </div>
+
+        {/* Enhanced bottom line with gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent" />
       </div>
     </div>
   );
@@ -615,11 +638,17 @@ const TrafficMonitoringPanel = ({ map }) => {
   const HourlyTrafficChartContent = (
     <div
       ref={hourlyTrafficRef}
-      className={`w-[23vw] mt-auto pl-16 ml-auto bg-gradient-to-l ${gradientClass} text-white p-3`}
+      className={`w-[23vw] mt-auto pl-16 ml-auto  text-white p-3`}
     >
-      <h3 className="text-lg font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
-        Trafik hajmi
-      </h3>
+      <div className="relative mb-4 flex items-center gap-2">
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+        <h3 className="text-sm uppercase tracking-[0.2em] font-medium text-teal-200 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)] flex items-center gap-2">
+          <span className="text-teal-500/50">|</span>
+          Trafik hajmi
+          <span className="text-teal-500/50">|</span>
+        </h3>
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+      </div>
       <div className=" h-[30vh] ">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -747,10 +776,7 @@ const TrafficMonitoringPanel = ({ map }) => {
     </div>
   );
   const SpeedChartContent = (
-    <div
-      ref={speedRef}
-      className={`flex-1 overflow-hidden max-w-[15vw] ml-auto bg-gradient-to-l ${gradientClass}`}
-    >
+    <div ref={speedRef} className={`flex-1 overflow-hidden max-w-[15vw] `}>
       <SpeedStatsWidget
         minSpeed={speedStats.min}
         avgSpeed={speedStats.avg}
@@ -765,63 +791,74 @@ const TrafficMonitoringPanel = ({ map }) => {
   );
   // left side
   const TopCrossroadsContent = (
-    <div
-      className={`space-y-4 bg-gradient-to-r ${gradientClass}`}
-      ref={crossroadsRef}
-    >
-      <div className=" w-[25vw] p-3 ">
-        <h3 className="text-md font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
-          10 та ўтказувчанлиги юқори чоррахалар
-        </h3>
-        <div className="space-y-2 max-h-[25vh] overflow-y-scroll scrollbar-hide">
-          {data.crossroadsRanking.map((item, idx) => (
-            <div
-              className="flex items-center justify-between gap-3 text-sm"
-              key={idx}
-            >
-              <div className="flex mr-5 items-center gap-3">
-                <span className="text-sm font-semibold text-blue-400">
-                  {idx + 1}.
-                </span>
-                <span className="text-sm text-white/90">{item.name}</span>
-              </div>
-              <div className="flex  items-center text-right  justify-end gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-red-500/70 text-red-200 text-sm font-medium">
-                    <span>{item.volume.lastWeek}</span>
+    <div className={`relative `} ref={crossroadsRef}>
+      <div className="w-[25vw] p-4">
+        <div className="relative mb-4 flex items-center gap-2">
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+          <h3 className="text-sm uppercase tracking-[0.2em] font-medium text-teal-200 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)] flex items-center gap-2">
+            <span className="text-teal-500/50">|</span>
+            10 та ўтказувчанлиги юқори чоррахалар
+            <span className="text-teal-500/50">|</span>
+          </h3>
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+        </div>
+        <div className="relative">
+          <div className="space-y-2 max-h-[25vh] overflow-y-scroll scrollbar-hide">
+            {data.crossroadsRanking.map((item, idx) => (
+              <div
+                className="flex items-center justify-between gap-3 text-sm p-2 hover:bg-white/5 transition-colors rounded-lg group"
+                key={idx}
+              >
+                <div className="flex mr-5 items-center gap-3">
+                  <span className="text-sm font-semibold text-teal-300 group-hover:text-teal-200 transition-colors">
+                    {idx + 1}.
+                  </span>
+                  <span className="text-sm text-white/80 group-hover:text-white/100 transition-colors">
+                    {item.name}
+                  </span>
+                </div>
+                <div className="flex items-center text-right justify-end gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-500/20 to-red-500/40 text-red-200 text-sm font-medium border border-red-500/20 group-hover:from-red-500/30 group-hover:to-red-500/50 transition-all">
+                      <span>{item.volume.lastWeek}</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-500/20 to-green-500/40 text-green-200 text-sm font-medium border border-green-500/20 group-hover:from-green-500/30 group-hover:to-green-500/50 transition-all">
+                      <span>{item.volume.today}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-500/70 text-green-200 text-sm font-medium">
-                    <span>{item.volume.today}</span>
+                  <div
+                    className={`p-2.5 rounded-lg transition-all ${
+                      item.volume.today - item.volume.lastWeek > 0
+                        ? "bg-gradient-to-r from-green-500/20 to-green-500/40 text-green-300 border border-green-500/20 group-hover:from-green-500/30 group-hover:to-green-500/50"
+                        : "bg-gradient-to-r from-red-500/20 to-red-500/40 text-red-300 border border-red-500/20 group-hover:from-red-500/30 group-hover:to-red-500/50"
+                    }`}
+                  >
+                    {item.volume.today - item.volume.lastWeek > 0 ? (
+                      <FaArrowTrendUp size={14} />
+                    ) : (
+                      <FaArrowTrendDown size={14} />
+                    )}
                   </div>
                 </div>
-                <div
-                  className={`bg-gradient-to-l p-3 rounded-lg ${
-                    item.volume.today - item.volume.lastWeek > 0
-                      ? "from-green-500/70 to-green-500/50 text-green-400"
-                      : "from-red-500/70 to-red-500/50 text-red-400"
-                  }`}
-                >
-                  {item.volume.today - item.volume.lastWeek > 0 ? (
-                    <FaArrowTrendUp />
-                  ) : (
-                    <FaArrowTrendDown />
-                  )}
-                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-blue-gray-900/80 to-transparent pointer-events-none"></div>
         </div>
       </div>
     </div>
   );
   const TrafficRatingContent = (
-    <div
-      ref={trafficRatingRef}
-      className={`w-[15vw]  p-3 bg-gradient-to-r ${gradientClass}`}
-    >
-      <h3 className="text-md font-medium text-teal-200 mb-4 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]">
-        5 та тирбантлиги юқори чоррахалар
-      </h3>
+    <div ref={trafficRatingRef} className={`w-[15vw]  p-3 `}>
+      <div className="relative mb-4 flex items-center gap-2">
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+        <h3 className="text-sm uppercase tracking-[0.2em] font-medium text-teal-200 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)] flex items-center gap-2">
+          <span className="text-teal-500/50">|</span>5 та тирбантлиги юқори
+          чоррахалар
+          <span className="text-teal-500/50">|</span>
+        </h3>
+        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
+      </div>
       <div className="grid grid-cols-3 grid-rows-2  gap-y-4 gap-x-0">
         {[9.1, 9, 8.2, 8, 7, 5.4].map((rating, idx) => (
           <div className="flex flex-col items-center" key={idx}>
@@ -837,7 +874,7 @@ const TrafficMonitoringPanel = ({ map }) => {
                       ? "#ef444422"
                       : rating > 7.5
                       ? "#f9731622"
-                      : "#eab30822"
+                      : "#aeea0821"
                   }
                   strokeWidth="2"
                   strokeLinecap="round"
@@ -852,7 +889,7 @@ const TrafficMonitoringPanel = ({ map }) => {
                       ? "#ef4444"
                       : rating > 7.5
                       ? "#f97316"
-                      : "#eab308"
+                      : "#b2ea08"
                   }
                   strokeWidth="2"
                   strokeLinecap="round"
@@ -888,48 +925,45 @@ const TrafficMonitoringPanel = ({ map }) => {
       {/* <SlidePanel
       
         side="left"
-        isOpen={isLeftPanelOpen}
-        onHandleOpen={setLeftPanelOpen}
+        isOpen={conditionMet}
+        
         content={leftPanelContent}
       /> */}
 
       <SlidePanel
         side="left"
-        isOpen={isLeftPanelOpen}
+        isOpen={conditionMet}
         positionGap={{
           from: "top",
           value: `calc(64px + 16px)`,
         }}
-        onHandleOpen={setLeftPanelOpen}
         content={TopCrossroadsContent}
       />
       <SlidePanel
         side="left"
-        isOpen={isLeftPanelOpen}
+        isOpen={conditionMet}
         positionGap={{
           from: "top",
           value: `calc(64px + ${panelHeights.crossroads}px + 16px + 16px)`,
         }}
-        onHandleOpen={setLeftPanelOpen}
         content={TrafficRatingContent}
       />
       <div className="flex gap-4">
         <SlidePanel
           side="left"
-          isOpen={isLeftPanelOpen}
+          isOpen={conditionMet}
           positionGap={{
             from: "top",
             value: `calc(64px + ${
               panelHeights.crossroads + panelHeights.trafficRating + 16 + 16
             }px)`,
           }}
-          onHandleOpen={setLeftPanelOpen}
           content={TrafficVolumeStatsCard}
         />
 
         <SlidePanel
           side="left"
-          isOpen={isLeftPanelOpen}
+          isOpen={conditionMet}
           positionGap={{
             from: "top",
             value: `calc(64px + ${
@@ -941,35 +975,27 @@ const TrafficMonitoringPanel = ({ map }) => {
               16
             }px)`,
           }}
-          onHandleOpen={setLeftPanelOpen}
           content={TransportStatsCard}
         />
       </div>
 
       {/* <SlidePanel
         side="right"
-        isOpen={isRightPanelOpen}
-        onHandleOpen={setRightPanelOpen}
+        isOpen={conditionMet}
+        
         content={rightPanelContent}
       /> */}
-      <SlidePanel
-        side="top"
-        isOpen={true}
-        onHandleOpen={setRightPanelOpen}
-        content={topPanelContent}
-      />
+      <SlidePanel side="top" isOpen={true} content={topPanelContent} />
       {/* right side widgets */}
 
       <SlidePanel
         side="bottom"
-        isOpen={isRightPanelOpen}
-        onHandleOpen={setRightPanelOpen}
+        isOpen={conditionMet}
         content={DevicesStatusPanelWrapper}
       />
       <SlidePanel
         side="right"
-        isOpen={isRightPanelOpen}
-        onHandleOpen={setRightPanelOpen}
+        isOpen={conditionMet}
         positionGap={{
           from: "top",
           value: `calc(64px + ${panelHeights.devices + 16 + 16}px)`,
@@ -978,8 +1004,7 @@ const TrafficMonitoringPanel = ({ map }) => {
       />
       <SlidePanel
         side="right"
-        isOpen={isRightPanelOpen}
-        onHandleOpen={setRightPanelOpen}
+        isOpen={conditionMet}
         positionGap={{
           from: "top",
           value: `calc(64px + ${

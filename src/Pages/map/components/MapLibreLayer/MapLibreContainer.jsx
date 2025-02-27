@@ -14,11 +14,13 @@ import maplibregl from "maplibre-gl";
 import { useMapContext } from "../../context/MapContext";
 import { useMapMarkers } from "../../hooks/useMapMarkers";
 import { useTheme } from "../../../../customHooks/useTheme";
+import { useZoomPanel } from "../../context/ZoomPanelContext";
 
 const MapLibreContainer = () => {
   const mapContainer = useRef(null);
   const { map: contextMap, setMap: setContextMap } = useMapContext();
   const [map, setMap] = useState(null);
+  const overlayRef = useRef(null);
 
   const {
     markers,
@@ -30,7 +32,7 @@ const MapLibreContainer = () => {
   } = useMapMarkers();
 
   const { theme } = useTheme();
-
+  const conditionMet = useZoomPanel();
   useEffect(() => {
     if (map) return;
 
@@ -81,16 +83,31 @@ const MapLibreContainer = () => {
   }, [theme, map]);
 
   return (
-    <div
-      ref={mapContainer}
-      className="map-container"
-      style={{ background: theme === "dark" ? "#45516E" : "#ffffff" }}
-    >
-      {map && <TrafficLightContainer />}
-      {map && markers && <PulsingMarkers map={map} markers={markers} />}
-      {/* {map && <MapControls map={map} />} */}
-      {/* {map && <ThreeDModelLayer map={map} />} */}
-      <div style={{ width: "100vw", height: "100vh" }} />
+    <div className="relative" style={{ width: "100vw", height: "100vh" }}>
+      <div
+        ref={mapContainer}
+        className="map-container w-full h-full"
+        style={{ background: theme === "dark" ? "#45516E" : "#ffffff" }}
+      >
+        {map && <TrafficLightContainer />}
+        {map && markers && <PulsingMarkers map={map} markers={markers} />}
+        {/* {map && <MapControls map={map} />} */}
+        {/* {map && <ThreeDModelLayer map={map} />} */}
+      </div>
+
+      {/* Gradient Overlay */}
+      {conditionMet && (
+        <div ref={overlayRef} className="absolute inset-0 pointer-events-none">
+          {/* Top gradient */}
+          <div className="absolute top-0 left-0 right-0 h-[30vh] bg-gradient-to-b from-black/90 to-transparent" />
+          {/* Bottom gradient */}
+          <div className="absolute bottom-0 left-0 right-0 h-[30vh] bg-gradient-to-t from-black/90 to-transparent" />
+          {/* Left gradient */}
+          <div className="absolute top-0 left-0 bottom-0 w-[30vw] bg-gradient-to-r from-black/90 to-transparent" />
+          {/* Right gradient */}
+          <div className="absolute top-0 right-0 bottom-0 w-[30vw] bg-gradient-to-l from-black/90 to-transparent" />
+        </div>
+      )}
     </div>
   );
 };
