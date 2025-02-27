@@ -18,7 +18,7 @@ const DevicesStatusPanel = ({ cardsInfoData }) => {
   ];
 
   return (
-    <div className="flex rounded-lg">
+    <div className="flex rounded-lg justify-between w-full max-w-full">
       {cardsInfoData
         ?.filter((d) => d.type !== 3)
         .map((device, index) => {

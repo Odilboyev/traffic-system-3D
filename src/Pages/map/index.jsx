@@ -2,12 +2,12 @@
 
 import { memo, useCallback, useEffect, useState } from "react";
 
+import MapControlsPanel from "./components/MapControlsPanel";
 import MapLibreContainer from "./components/MapLibreLayer/MapLibreContainer";
 import MapModals from "./components/MapModals/index.jsx";
 import PropTypes from "prop-types";
 import { ToastContainer } from "react-toastify";
 import TrafficMonitoringPanel from "./components/TrafficMonitoringPanel";
-import MapControlsPanel from "./components/MapControlsPanel";
 import toaster from "../../tools/toastconfig.jsx";
 import { useMapContext } from "./context/MapContext.jsx";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
@@ -72,6 +72,8 @@ const MapComponent = memo(({ notifications, t }) => {
 
   return (
     <div className="map-page w-screen h-screen relative overflow-hidden">
+      <MapControlsPanel map={map} />
+
       <div className="map-wrapper absolute inset-0">
         <TrafficMonitoringPanel map={map} />
 
@@ -98,7 +100,6 @@ const MapComponent = memo(({ notifications, t }) => {
 
       {/* <NotificationBox notifications={notifications} /> */}
       <ToastContainer {...toaster} />
-      <MapControlsPanel map={map} />
     </div>
   );
 });

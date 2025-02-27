@@ -1,35 +1,49 @@
 import "./SlidePanel.css";
 
-import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
-const SlidePanel = ({ side = "right", content, isOpen, onHandleOpen }) => {
+import PropTypes from "prop-types";
+
+const SlidePanel = ({
+  side = "right",
+  content,
+  isOpen,
+  positionGap = {},
+  onHandleOpen,
+}) => {
   const positionStyles = {
-    top: { top: isOpen ? "0" : "-100%", left: 0, right: 0 },
-    bottom: { bottom: isOpen ? "0" : "-100%", left: 0, right: 0 },
-    left: { left: isOpen ? "0" : "-100%", top: "64px", bottom: 0 },
-    right: { right: isOpen ? "0" : "-100%", top: "64px", bottom: 0 },
+    top: {
+      top: isOpen ? "0" : "-100%",
+      left: "50%",
+      transform: "translateX(-50%)",
+      margin: "0 auto",
+      width: "fit-content",
+      // maxWidth: "90vw",
+    },
+    bottom: {
+      bottom: isOpen ? "16px" : "-100%",
+      left: "50%",
+      transform: "translateX(-50%)",
+      margin: "0 auto",
+      width: "fit-content",
+    },
+    left: { left: isOpen ? "16px" : "-100%" },
+    right: { right: isOpen ? "16px" : "-100%" },
   };
 
   const isVertical = side === "top" || side === "bottom";
 
   return (
     <div
-      className={`slide-panel slide-panel-${side} scrollbar-hide`}
+      className={`slide-panel  slide-panel-${side} scrollbar-hide`}
       style={{
         ...positionStyles[side],
         width: isVertical ? "100%" : "auto",
-        height: isVertical ? "auto" : "calc(100vh - 64px)",
+        height: "fit-content",
+        [positionGap.from]: positionGap.value,
       }}
     >
       <div className="slide-panel-content">{content}</div>
-      {/* <button
-        className={`slide-panel-close slide-panel-close-${side}`}
-        onClick={() => onHandleOpen(false)}
-        aria-label="Close panel"
-      >
-        ×
-      </button> */}
     </div>
   );
 };
@@ -39,6 +53,10 @@ SlidePanel.propTypes = {
   content: PropTypes.node.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onHandleOpen: PropTypes.func.isRequired,
+  positionGap: PropTypes.shape({
+    from: PropTypes.string,
+    value: PropTypes.string,
+  }),
 };
 
 export default SlidePanel;

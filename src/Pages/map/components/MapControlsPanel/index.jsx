@@ -7,14 +7,22 @@ import ScaleControl from "../../controls/ScaleControl";
 import ZoomControl from "../../controls/ZoomControl";
 
 const MapControlsPanel = ({ map }) => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState(
+    JSON.parse(localStorage.getItem("mapControlPosition")) || { x: 0, y: 0 }
+  );
   const nodeRef = useRef(null);
 
   return (
     <Draggable
       nodeRef={nodeRef}
       position={position}
-      onStop={(e, data) => setPosition({ x: data.x, y: data.y })}
+      onStop={(e, data) => {
+        setPosition({ x: data.x, y: data.y });
+        localStorage.setItem(
+          "mapControlPosition",
+          JSON.stringify({ x: data.x, y: data.y })
+        );
+      }}
       bounds="parent"
       handle=".drag-handle"
     >
@@ -40,7 +48,7 @@ const MapControlsPanel = ({ map }) => {
         <div className="p-2">
           <div className="flex items-center gap-2">
             {/* <ScaleControl map={map} /> */}
-            <div className="h-6 w-px bg-gray-100/30"></div>
+
             <ZoomControl map={map} />
             <div className="h-6 w-px bg-gray-100/30"></div>
             <NavigationControl map={map} />
