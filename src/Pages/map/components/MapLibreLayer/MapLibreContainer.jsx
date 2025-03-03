@@ -20,6 +20,7 @@ const MapLibreContainer = () => {
   const mapContainer = useRef(null);
   const { map: contextMap, setMap: setContextMap } = useMapContext();
   const [map, setMap] = useState(null);
+  const [currentZoom, setCurrentZoom] = useState(14);
   const overlayRef = useRef(null);
 
   const {
@@ -64,6 +65,7 @@ const MapLibreContainer = () => {
     newMap.on("moveend", () => {
       const center = newMap.getCenter();
       const zoom = newMap.getZoom();
+      setCurrentZoom(zoom);
       const mapState = { center: [center.lng, center.lat], zoom };
       localStorage.setItem("mapState", JSON.stringify(mapState));
     });
@@ -89,7 +91,7 @@ const MapLibreContainer = () => {
         className="map-container w-full h-full"
         style={{ background: theme === "dark" ? "#45516E" : "#ffffff" }}
       >
-        {map && <TrafficLightContainer />}
+        {map && currentZoom == 20 && <TrafficLightContainer />}
         {map && markers && <PulsingMarkers map={map} markers={markers} />}
         {/* {map && <MapControls map={map} />} */}
         {/* {map && <ThreeDModelLayer map={map} />} */}

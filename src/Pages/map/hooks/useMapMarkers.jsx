@@ -24,17 +24,10 @@ const useMapMarkers = () => {
   const getDataHandler = useCallback(async () => {
     dispatch(updateLoadingState(true));
     try {
-      const response = await getAllMarkers({
-        bounds: {
-          north: 41.4,  // Default bounds for Tashkent
-          south: 41.2,
-          east: 69.4,
-          west: 69.1
-        }
-      });
-      console.log('Fetched marker data:', response);
+      const response = await getAllMarkers();
+      console.log("Fetched marker data:", response);
       if (response?.data) {
-        const formattedMarkers = response.data.map(marker => ({
+        const formattedMarkers = response.data.map((marker) => ({
           id: marker.id || Date.now() + Math.floor(Math.random() * 1000000),
           lat: parseFloat(marker.lat || marker.latitude),
           link_id: marker.link_id || 0,
@@ -42,13 +35,13 @@ const useMapMarkers = () => {
           rotate: marker.rotate || 0,
           svetofor_id: marker.svetofor_id?.toString() || "0",
           type: marker.type || 2,
-          countdown: marker.countdown || 0
+          countdown: marker.countdown || 0,
         }));
-        console.log('Formatted markers:', formattedMarkers);
+        console.log("Formatted markers:", formattedMarkers);
         dispatch(updateMarkers(formattedMarkers));
       }
     } catch (error) {
-      console.error('Error fetching markers:', error);
+      console.error("Error fetching markers:", error);
       if (error.code === "ERR_NETWORK") {
         dispatch(updateErrorMessage("You are offline. Please try again"));
       } else {
@@ -66,7 +59,7 @@ const useMapMarkers = () => {
   const setMarkers = useCallback(
     (data) => {
       if (data) {
-        const formattedMarkers = data.map(marker => ({
+        const formattedMarkers = data.map((marker) => ({
           id: marker.id || Date.now() + Math.floor(Math.random() * 1000000),
           lat: parseFloat(marker.lat || marker.latitude),
           link_id: marker.link_id || 0,
@@ -74,7 +67,7 @@ const useMapMarkers = () => {
           rotate: marker.rotate || 0,
           svetofor_id: marker.svetofor_id?.toString() || "0",
           type: marker.type || 2,
-          countdown: marker.countdown || 0
+          countdown: marker.countdown || 0,
         }));
         dispatch(updateMarkers(formattedMarkers));
       }
