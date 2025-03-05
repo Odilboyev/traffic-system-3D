@@ -85,6 +85,8 @@ const modifyPTZCamera = async (data) =>
   putData(import.meta.env.VITE_OVERVIEW_CAMERA + "/ptz_control", data);
 const modifySvetofor = async (data, id) =>
   postData(import.meta.env.VITE_TRAFFIC_LIGHTS_UPDATE + "/" + id, data);
+const getFuelStations = async () => getData(import.meta.env.VITE_FUEL_STATIONS);
+
 const getTrafficStatsData = async (id, params) =>
   getDataWithParams(import.meta.env.VITE_TRAFFIC_STATS + "/" + id, params);
 const getTrafficJamLines = async () =>
@@ -194,6 +196,7 @@ const subscribeToCurrentAlarms = (onDataReceived) => {
 
 // Export functions
 export {
+  getFuelStations,
   addUser,
   deleteUser,
   fetchDataForManagement,

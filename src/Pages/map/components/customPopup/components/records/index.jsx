@@ -1,49 +1,62 @@
 import "./records.style.css";
 
+import { ReduxProvider } from "../../../../../../redux/ReduxProvider";
 import { memo } from "react";
-import { useSelector } from "react-redux";
+import { useMapMarkers } from "../../../../hooks/useMapMarkers";
 
-const Records = memo(
-  function Records({ videos, name }) {
-    const { isHighQuality } = useSelector((state) => state.map.isHighQuality);
-
-    return (
-      <div
-        className="bg-gray-900/60 backdrop-blur-md text-white  rounded-t-lg"
-        style={{
-          minWidth: "14vw",
-          minHeight: "8vw",
-          overflow: "hidden",
-        }}
-      >
-        <p className="!my-1 pl-2 py-2">{name}</p>
-        <div className="flex flex-col w-full">
-          {videos?.map((video, index) => {
-            const updatedLink = video.mselink.replace(
-              /.$/,
-              isHighQuality ? "1" : "0"
-            );
-            return (
-              <div key={index} className="aspect-w-16 aspect-h-9 w-full h-auto">
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full"
-                  src={updatedLink}
-                  allowFullScreen
-                  style={{ border: "none" }}
-                ></iframe>
-              </div>
-            );
-          })}
-        </div>
+const RecordsContent = ({ videos, name, isLoading }) => {
+  const { isHighQuality } = useMapMarkers();
+  console.log(videos, "the videos");
+  return (
+    <div
+      className="bg-black text-white"
+      style={{
+        width: "100%",
+        maxWidth: "100%",
+        overflow: "hidden",
+        boxSizing: "border-box",
+      }}
+    >
+      <div className="flex flex-col w-full">
+        {videos?.map((video, index) => {
+          const updatedLink = video.mselink.replace(
+            /.$/,
+            isHighQuality ? "1" : "0"
+          );
+          return (
+            <div
+              key={index}
+              style={{
+                width: "100%",
+                height: "180px",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <iframe
+                src={updatedLink}
+                allowFullScreen
+                style={{
+                  border: "none",
+                  width: "100%",
+                  height: "100%",
+                  maxWidth: "100%",
+                  objectFit: "cover",
+                }}
+              ></iframe>
+            </div>
+          );
+        })}
       </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    // Only re-render if videos or name changes
-    return (
-      prevProps.videos === nextProps.videos && prevProps.name === nextProps.name
-    );
-  }
+    </div>
+  );
+};
+
+// Wrap the component with ReduxProvider to ensure it has access to the Redux store
+const Records = (props) => (
+  <ReduxProvider>
+    <RecordsContent {...props} />
+  </ReduxProvider>
 );
 
-export default Records;
+export default memo(Records);

@@ -51,6 +51,7 @@ const TrafficlightMarkers = ({
       const icon = renderToString(
         <NeonIcon
           isRounded={false}
+          removeShadows
           icon={
             v.type !== 100 &&
             iconSelector({

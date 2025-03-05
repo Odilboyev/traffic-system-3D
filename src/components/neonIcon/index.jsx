@@ -22,6 +22,7 @@ const NeonIcon = ({
   isRounded,
   text,
   status,
+  removeShadows,
   className,
 }) => {
   const statusClass = statusStyles[status] || statusStyles[0];
@@ -29,7 +30,11 @@ const NeonIcon = ({
     neonTextShadowStyles[status] || neonTextShadowStyles[0];
 
   // Determine the classes for the container
-  let containerClasses = `flex items-center justify-center shadow-sm  text-green-300 rounded-full drop-shadow-neon`;
+  let containerClasses = `flex items-center justify-center ${
+    !removeShadows
+      ? "shadow-sm text-green-300 rounded-full drop-shadow-neon"
+      : ""
+  }`;
   if (isRounded && Icon) {
     // If `isRounded` is true and `Icon` exists, add ring and background color
     containerClasses += ` rounded-full ring-1 ${statusClass}`;

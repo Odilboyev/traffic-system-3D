@@ -3,16 +3,21 @@ import "./styles.css";
 
 import { useEffect, useRef, useState } from "react";
 
+import FuelStationMarkers from "../fuelStationMarkers";
 import MapControls from "./MapControls";
 // import ClusterLayer from "./ClusterLayer";
 import PulsingMarkers from "../PulsingMarkers/PulsingMarkers";
 import Supercluster from "supercluster";
 import TrafficLightContainer from "../trafficLightMarkers/managementLights";
+import WeatherMarkers from "../weatherMarkers/WeatherMarkers";
 import { darkLayer } from "./utils/darkLayer";
+import { getMarkerData } from "../../../../api/api.handlers";
 import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
 import { useMapContext } from "../../context/MapContext";
 import { useMapMarkers } from "../../hooks/useMapMarkers";
+import { useModule } from "../../context/ModuleContext";
+import useModuleMarkers from "../../hooks/useModuleMarkers";
 import { useTheme } from "../../../../customHooks/useTheme";
 import { useZoomPanel } from "../../context/ZoomPanelContext";
 
@@ -32,8 +37,13 @@ const MapLibreContainer = () => {
     useClusteredMarkers,
   } = useMapMarkers();
 
+  const { activeModule } = useModule();
+  const { updateModuleMarkers, activeModuleType } = useModuleMarkers();
+  console.log(activeModule, "the active module");
+  console.log("---------------");
   const { theme } = useTheme();
   const conditionMet = useZoomPanel();
+
   useEffect(() => {
     if (map) return;
 
@@ -84,6 +94,12 @@ const MapLibreContainer = () => {
     map.setStyle(theme === "dark" ? darkLayer : lightLayer);
   }, [theme, map]);
 
+  // Update markers when active module changes
+  useEffect(() => {
+    if (!activeModule) return;
+    updateModuleMarkers(activeModule);
+  }, [activeModule, updateModuleMarkers]);
+
   return (
     <div className="relative" style={{ width: "100vw", height: "100vh" }}>
       <div
@@ -91,8 +107,24 @@ const MapLibreContainer = () => {
         className="map-container w-full h-full"
         style={{ background: theme === "dark" ? "#45516E" : "#ffffff" }}
       >
-        {map && currentZoom == 20 && <TrafficLightContainer />}
-        {map && markers && <PulsingMarkers map={map} markers={markers} />}
+        {/* Render different markers based on active module */}
+        {map && activeModuleType === "monitoring" && (
+          <>
+            {currentZoom == 20 && <TrafficLightContainer />}
+            {markers && (
+              <>
+                {console.log("Passing markers to PulsingMarkers:", markers)}
+                <PulsingMarkers map={map} markers={markers} />
+              </>
+            )}
+          </>
+        )}
+        {map && activeModuleType === "fuel" && (
+          <FuelStationMarkers map={map} markers={markers} />
+        )}
+        {map && activeModuleType === "weather" && (
+          <WeatherMarkers map={map} markers={markers} />
+        )}
         {/* {map && <MapControls map={map} />} */}
         {/* {map && <ThreeDModelLayer map={map} />} */}
       </div>

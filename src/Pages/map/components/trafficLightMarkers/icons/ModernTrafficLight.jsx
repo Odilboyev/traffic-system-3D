@@ -36,26 +36,34 @@ const ModernTrafficLight = ({ type, status, countdown, rotate }) => {
   const textColor = "white";
 
   return (
-    <div
-      className="relative w-full h-full rounded-xl overflow-hidden flex flex-col items-center justify-center"
-      style={{
-        backgroundColor: bgColor,
-        transform: `rotate(${rotate}deg)`,
-        minWidth: "30px",
-        minHeight: "60px",
-      }}
-    >
-      {/* {status === 2 && (
-        <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+    <div className="flex flex-col items-center">
+      <div
+        className="relative w-full h-full rounded-xl border-4 border-gray-900 overflow-hidden flex flex-col items-center justify-center"
+        style={{
+          backgroundColor: bgColor,
+          transform: `rotate(${rotate}deg)`,
+          minWidth: "35px",
+          minHeight: "65px",
+        }}
+      >
+        {/* {status === 2 && (
+        <div className="">
           <span className="text-white text-xl">×</span>
         </div>
       )} */}
-      <div className="text-xl font-bold" style={{ color: textColor }}>
-        {countdown || "0"}
+        <div className="text-xl font-bold" style={{ color: textColor }}>
+          {countdown || "0"}
+        </div>
+        <div className="mt-1">
+          <IconComponent className="text-white w-6 h-6" />
+        </div>
       </div>
-      <div className="mt-1">
-        <IconComponent className="text-white w-6 h-6" />
-      </div>
+      <div
+        className="w-2 h-8 bg-gray-900 border-l border-l-gray-600 border-r border-r-gray-600 border-b border-b-gray-900 rounded-b-md"
+        style={{
+          transform: `rotate(${rotate}deg)`,
+        }}
+      />
     </div>
   );
 };

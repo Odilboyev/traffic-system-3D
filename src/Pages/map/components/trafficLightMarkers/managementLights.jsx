@@ -80,7 +80,7 @@ const TrafficLightContainer = ({ handleMarkerDragEnd }) => {
           const fixedData = fixIncompleteJSON(event.data);
           const data = JSON.parse(fixedData);
           // Handle traffic light status updates
-          console.log(data, "data");
+
           updateTrafficLights(data);
         } catch (error) {
           console.error("Error parsing socket data:", error);
@@ -192,7 +192,6 @@ const TrafficLightContainer = ({ handleMarkerDragEnd }) => {
       closeGlobalSocket();
     }
   }, [currentSvetoforId, vendor, isPaused]);
-  console.log(trafficLights, "trafficLights");
   return (
     <>
       <TrafficlightMarkers

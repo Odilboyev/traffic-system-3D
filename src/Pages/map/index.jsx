@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import { ToastContainer } from "react-toastify";
 import TrafficMonitoringPanel from "./components/TrafficMonitoringPanel";
 import { ZoomPanelProvider } from "./context/ZoomPanelContext";
+import { ModuleProvider } from "./context/ModuleContext";
 import toaster from "../../tools/toastconfig.jsx";
 import { useMapContext } from "./context/MapContext.jsx";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
@@ -75,7 +76,8 @@ const MapComponent = memo(({ notifications, t }) => {
 
   return (
     <div className="map-page w-screen h-screen relative overflow-hidden">
-      <ZoomPanelProvider map={map} condition={conditionToShowShadowOverlay}>
+      <ModuleProvider>
+        <ZoomPanelProvider map={map} condition={conditionToShowShadowOverlay}>
         <MapControlsPanel map={map} />
 
         <div className="map-wrapper absolute inset-0">
@@ -108,6 +110,7 @@ const MapComponent = memo(({ notifications, t }) => {
         {/* <NotificationBox notifications={notifications} /> */}
         <ToastContainer {...toaster} />
       </ZoomPanelProvider>
+      </ModuleProvider>
     </div>
   );
 });

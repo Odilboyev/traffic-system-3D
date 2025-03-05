@@ -1,0 +1,74 @@
+.fuel-station-marker {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.2s ease;
+  z-index: 1;
+}
+
+.fuel-station-marker:hover {
+  transform: scale(1.1);
+  z-index: 2;
+}
+
+.marker-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.marker-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  z-index: 1;
+}
+
+.marker-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #333;
+  transition: color 0.2s ease;
+}
+
+.cluster-marker {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #016bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cluster-count {
+  color: #016bff;
+  font-weight: bold;
+  font-size: 16px;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.cluster-marker:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}

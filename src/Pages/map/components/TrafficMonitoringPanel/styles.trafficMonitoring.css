@@ -79,6 +79,24 @@
 .nav-swiper {
   padding: 10px 30px !important;
   overflow: visible !important;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.swiper-loading {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.swiper-loaded {
+  opacity: 1;
+  visibility: visible;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .nav-swiper .swiper-slide {

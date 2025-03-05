@@ -5,3 +5,41 @@
 .custom-popup-no-tip .leaflet-popup-tip {
   display: none; /* Completely removes the tip */
 }
+
+/* Styles for MapLibre custom popups */
+/* .maplibre-custom-popup {
+  z-index: 1000;
+  transition: transform 0.2s ease-out;
+  max-width: 260px !important;
+  width: 260px !important;
+}
+
+.maplibregl-popup {
+  max-width: 260px !important;
+  width: 260px !important;
+} */
+
+/* .maplibre-custom-popup .mapboxgl-popup-content,
+.maplibregl-popup-content {
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 260px !important;
+  width: 260px !important;
+} */
+
+.popup-container {
+  position: relative;
+  max-width: 280px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.popup-drag-handle {
+  cursor: move;
+  user-select: none;
+  width: 100%;
+  box-sizing: border-box;
+}

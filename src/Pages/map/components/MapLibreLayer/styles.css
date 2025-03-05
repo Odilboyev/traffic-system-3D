@@ -50,6 +50,42 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.marker {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.marker:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.marker svg {
+  width: 20px;
+  height: 20px;
+  color: #4a90e2;
+}
+
+.maplibregl-popup {
+  max-width: 200px;
+}
+
+/* .maplibregl-popup-content {
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  line-height: 1.4;
+} */
+
 .single-marker {
   position: relative;
   width: 20px;

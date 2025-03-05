@@ -40,41 +40,41 @@ const DynamicMarkers = ({
   } = useMapMarkers();
   const lastFetchRef = useRef(Date.now());
 
-  // Fetch markers data
-  const fetchMarkers = async (bounds) => {
-    if (Date.now() - lastFetchRef.current < 1000) {
-      return; // Throttle requests to once per second
-    }
-    lastFetchRef.current = Date.now();
+  // // Fetch markers data
+  // const fetchMarkers = async (bounds) => {
+  //   if (Date.now() - lastFetchRef.current < 1000) {
+  //     return; // Throttle requests to once per second
+  //   }
+  //   lastFetchRef.current = Date.now();
 
-    try {
-      const response = await getAllMarkers({
-        ...filter,
-        bounds: {
-          north: bounds.getNorth(),
-          south: bounds.getSouth(),
-          east: bounds.getEast(),
-          west: bounds.getWest(),
-        },
-      });
+  //   try {
+  //     const response = await getAllMarkers({
+  //       ...filter,
+  //       bounds: {
+  //         north: bounds.getNorth(),
+  //         south: bounds.getSouth(),
+  //         east: bounds.getEast(),
+  //         west: bounds.getWest(),
+  //       },
+  //     });
 
-      if (response?.data) {
-        const newMarkers = response.data.map((marker) => ({
-          ...marker,
-          lat: marker.lat || marker.latitude,
-          lng: marker.lng || marker.longitude,
-        }));
+  //     if (response?.data) {
+  //       const newMarkers = response.data.map((marker) => ({
+  //         ...marker,
+  //         lat: marker.lat || marker.latitude,
+  //         lng: marker.lng || marker.longitude,
+  //       }));
 
-        if (updateMarkers) {
-          updateMarkers(newMarkers);
-        } else {
-          setMarkers(newMarkers);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching markers:", error);
-    }
-  };
+  //       if (updateMarkers) {
+  //         updateMarkers(newMarkers);
+  //       } else {
+  //         setMarkers(newMarkers);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching markers:", error);
+  //   }
+  // };
 
   // Use the map data fetcher hook for dynamic fetching
   // useMapDataFetcher({

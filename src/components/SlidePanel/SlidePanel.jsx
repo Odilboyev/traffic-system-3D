@@ -27,8 +27,14 @@ const SlidePanel = ({
       margin: "0 auto",
       width: "fit-content",
     },
-    left: { left: isOpen ? "16px" : "-100%" },
-    right: { right: isOpen ? "16px" : "-100%" },
+    left: {
+      left: isOpen ? "16px" : "-100%",
+      top: "10%",
+    },
+    right: {
+      right: isOpen ? "16px" : "-100%",
+      top: "10%",
+    },
   };
 
   const isVertical = side === "top" || side === "bottom";
@@ -52,7 +58,7 @@ SlidePanel.propTypes = {
   side: PropTypes.oneOf(["top", "bottom", "left", "right"]),
   content: PropTypes.node.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onHandleOpen: PropTypes.func.isRequired,
+  onHandleOpen: PropTypes.func,
   positionGap: PropTypes.shape({
     from: PropTypes.string,
     value: PropTypes.string,

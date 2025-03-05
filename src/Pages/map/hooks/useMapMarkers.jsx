@@ -1,3 +1,4 @@
+import { getAllMarkers, getMarkerData } from "../../../api/api.handlers";
 import {
   updateErrorMessage,
   updateLoadingState,
@@ -6,8 +7,6 @@ import {
 } from "../../../redux/slices/mapslice";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-import { getAllMarkers } from "../../../api/api.handlers";
 
 const useMapMarkers = () => {
   const dispatch = useDispatch();
@@ -19,26 +18,17 @@ const useMapMarkers = () => {
   const useClusteredMarkers = useSelector(
     (state) => state.map.useClusteredMarkers
   );
+  const isHighQuality = useSelector((state) => state.map.isHighQuality);
 
   // Action to fetch data
   const getDataHandler = useCallback(async () => {
     dispatch(updateLoadingState(true));
     try {
-      const response = await getAllMarkers();
+      const response = await getMarkerData();
       console.log("Fetched marker data:", response);
       if (response?.data) {
-        const formattedMarkers = response.data.map((marker) => ({
-          id: marker.id || Date.now() + Math.floor(Math.random() * 1000000),
-          lat: parseFloat(marker.lat || marker.latitude),
-          link_id: marker.link_id || 0,
-          lng: parseFloat(marker.lng || marker.longitude),
-          rotate: marker.rotate || 0,
-          svetofor_id: marker.svetofor_id?.toString() || "0",
-          type: marker.type || 2,
-          countdown: marker.countdown || 0,
-        }));
-        console.log("Formatted markers:", formattedMarkers);
-        dispatch(updateMarkers(formattedMarkers));
+        console.log("Formatted markers:", response.data);
+        dispatch(updateMarkers(response.data));
       }
     } catch (error) {
       console.error("Error fetching markers:", error);
@@ -59,17 +49,7 @@ const useMapMarkers = () => {
   const setMarkers = useCallback(
     (data) => {
       if (data) {
-        const formattedMarkers = data.map((marker) => ({
-          id: marker.id || Date.now() + Math.floor(Math.random() * 1000000),
-          lat: parseFloat(marker.lat || marker.latitude),
-          link_id: marker.link_id || 0,
-          lng: parseFloat(marker.lng || marker.longitude),
-          rotate: marker.rotate || 0,
-          svetofor_id: marker.svetofor_id?.toString() || "0",
-          type: marker.type || 2,
-          countdown: marker.countdown || 0,
-        }));
-        dispatch(updateMarkers(formattedMarkers));
+        dispatch(updateMarkers(data));
       }
     },
     [dispatch]
@@ -86,6 +66,7 @@ const useMapMarkers = () => {
     markers,
     areMarkersLoading,
     errorMessage,
+    isHighQuality,
     getDataHandler,
     clearMarkers,
     setMarkers,
