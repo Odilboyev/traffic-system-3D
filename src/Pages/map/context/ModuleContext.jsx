@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 // Create the context with default values
 const ModuleContext = createContext({
@@ -8,11 +8,22 @@ const ModuleContext = createContext({
 
 // Create a provider component
 export const ModuleProvider = ({ children }) => {
-  const [activeModule, setActiveModule] = useState({
-    id: "monitoring",
-    name: "Monitoring",
-    markerType: "monitoring",
+  // Initialize state from localStorage or use default
+  const [activeModule, setActiveModule] = useState(() => {
+    const savedModule = localStorage.getItem('activeModule');
+    return savedModule 
+      ? JSON.parse(savedModule) 
+      : {
+          id: "monitoring",
+          name: "Monitoring",
+          markerType: "monitoring",
+        };
   });
+  
+  // Save to localStorage when activeModule changes
+  useEffect(() => {
+    localStorage.setItem('activeModule', JSON.stringify(activeModule));
+  }, [activeModule]);
 
   return (
     <ModuleContext.Provider value={{ activeModule, setActiveModule }}>

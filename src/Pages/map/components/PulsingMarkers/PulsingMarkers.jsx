@@ -77,8 +77,6 @@ const PulsingMarkers = ({ map, markers }) => {
       return [...filtered, updatedMarker];
     });
 
-    // Log the updated marker for debugging
-    console.log("Updated marker with data:", updatedMarker);
   };
 
   const createMarkerElement = (marker, count = 1) => {
@@ -201,12 +199,7 @@ const PulsingMarkers = ({ map, markers }) => {
           coordinates: [lng, lat], // Store original coordinates array for reference
         };
 
-        console.log(
-          "Adding marker with coordinates:",
-          markerWithCoords.cid,
-          lng,
-          lat
-        );
+       
 
         // Add to visible markers only if it doesn't already exist
         // This is crucial to prevent infinite loops
@@ -392,7 +385,6 @@ const PulsingMarkers = ({ map, markers }) => {
   useEffect(() => {
     if (!map || !markers) return;
 
-    console.log("PulsingMarkers received markers:", markers);
 
     // Clear existing markers and popups to prevent duplicates
     markersRef.current.forEach((marker) => marker.remove());
@@ -412,7 +404,6 @@ const PulsingMarkers = ({ map, markers }) => {
         marker.type === 5 ||
         marker.type === 6
     );
-    console.log("Filtered markers:", filteredMarkers);
 
     // Initialize supercluster
     superclusterRef.current = new Supercluster({
@@ -504,11 +495,7 @@ const PulsingMarkers = ({ map, markers }) => {
             let coordinates = [0, 0];
             if (markerElement) {
               coordinates = markerElement.getLngLat().toArray();
-              console.log(
-                "Found marker element coordinates:",
-                marker.cid,
-                coordinates
-              );
+             
             }
 
             const markerWithCorrectCoords = {
@@ -516,8 +503,6 @@ const PulsingMarkers = ({ map, markers }) => {
               lng: coordinates[0].toString(),
               lat: coordinates[1].toString(),
             };
-
-            console.log("Rendering popup for marker:", markerWithCorrectCoords);
 
             return (
               <MapLibreCameraDetails

@@ -71,8 +71,6 @@ const FuelStationMarkers = ({ map }) => {
   }, []);
 
   useEffect(() => {
-    console.log(filter, "filter");
-    console.log(stations, "stations");
     if (!map || !stations.length) return;
 
     // Clean up existing markers

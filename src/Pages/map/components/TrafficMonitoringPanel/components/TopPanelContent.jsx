@@ -13,7 +13,6 @@ import { useModule } from "../../../context/ModuleContext";
 const TopPanelContent = () => {
   const [swiperInstance, setSwiperInstance] = useState(null);
   const [swiperLoaded, setSwiperLoaded] = useState(false);
-  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const { activeModule, setActiveModule } = useModule();
 
   // Module definitions
@@ -22,6 +21,15 @@ const TopPanelContent = () => {
     { id: "fuel", name: "Yoqilg'i stansiyalari", markerType: "fuel" },
     { id: "weather", name: "Ob-havo", markerType: "weather" },
   ];
+  
+  // Find the index of the active module from localStorage or default to monitoring
+  const findInitialSlideIndex = () => {
+    const monitoringIndex = modules.findIndex(module => module.id === activeModule.id);
+    return monitoringIndex >= 0 ? monitoringIndex : 0;
+  };
+  
+  const initialSlideIndex = findInitialSlideIndex();
+  const [activeSlideIndex, setActiveSlideIndex] = useState(initialSlideIndex);
 
   // Ensure swiper is updated when component is fully mounted
   useEffect(() => {
@@ -91,7 +99,7 @@ const TopPanelContent = () => {
                   slideShadows: true,
                 }}
                 speed={600}
-                initialSlide={1}
+                initialSlide={initialSlideIndex}
                 navigation={true}
                 modules={[EffectCoverflow, Navigation]}
                 className={`nav-swiper ${

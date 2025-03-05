@@ -23,7 +23,6 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   map,
 }) {
   const popupRef = useRef(null);
-  console.log(marker, "the marker");
   const dispatch = useDispatch();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPopupDraggable] = useState(true); // Always keep popup draggable
@@ -66,32 +65,66 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   // Manage WebSocket connection based on marker type
   useEffect(() => {
     const connectTrafficLightSocket = (svetoforId) => {
-      if (trafficLightSocket) return trafficLightSocket;
+      // Prevent multiple connections for the same svetofor_id
+      if (trafficLightSocket) {
+        return trafficLightSocket;
+      }
+
+      const vendor = marker.vendor_id ?? marker.vendor ?? 1; // Try both vendor_id and vendor, fallback to 1
+
+      const wsBaseUrl =
+        Number(vendor) === 1
+          ? import.meta.env.VITE_TRAFFICLIGHT_SOCKET
+          : import.meta.env.VITE_TRAFFICLIGHT_SOCKET.replace(
+              "/websocket/",
+              "/websocketfama/"
+            );
 
       const socket = new WebSocket(
-        `${
-          import.meta.env.VITE_TRAFFICLIGHT_SOCKET
-        }?svetofor_id=${svetoforId}&token=${authToken}`
+        `${wsBaseUrl}?svetofor_id=${svetoforId}&token=${authToken}`
       );
 
       socket.onopen = () => {
-        console.log("Traffic light socket connected");
-      };
-
-      socket.onmessage = (event) => {
-        try {
-          const fixedData = fixIncompleteJSON(event.data);
-          const data = JSON.parse(fixedData);
-          trafficLightSecondsRef.current = data;
-          dispatch(updateTrafficLightSeconds(data));
-        } catch (error) {
-          console.error("Error parsing socket data:", error);
-        }
+        console.log(`WebSocket connected for svetofor_id: ${svetoforId}`);
       };
 
       socket.onclose = () => {
-        console.log("Traffic light socket closed");
+        console.log(`WebSocket closed for svetofor_id: ${svetoforId}`);
         setTrafficLightSocket(null);
+      };
+
+      socket.onmessage = (event) => {
+        let message = event.data;
+        message = fixIncompleteJSON(message);
+        try {
+          const data = JSON.parse(message);
+          if (data?.channel) {
+            const channelSeconds = data.channel.reduce((acc, channel) => {
+              acc[channel.id] = {
+                countdown: channel.countdown,
+                status: channel.status,
+              };
+              return acc;
+            }, {});
+
+            // Update ref immediately
+            trafficLightSecondsRef.current = channelSeconds;
+
+            // Dispatch action to update Redux store
+            dispatch(
+              updateTrafficLightSeconds({
+                camera_id: marker.link_id,
+                countdown: channelSeconds[marker.link_id].countdown,
+                status: channelSeconds[marker.link_id].status,
+              })
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Error parsing traffic light WebSocket message:",
+            error
+          );
+        }
       };
 
       setTrafficLightSocket(socket);
@@ -135,87 +168,91 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
           console.log("Popup closed for marker:", marker.cid);
         }}
       >
-        <div className="popup-drag-handle flex justify-between items-center bg-gray-800/80 backdrop-blur-md rounded-t-lg ">
-          <div className="text-white font-medium text-center w-full">
-            {marker.cname || marker.id || marker.cid}
-          </div>
-          <button
-            className="text-white hover:text-gray-300 focus:outline-none absolute right-2"
-            onClick={() => {
-              // Close the popup
-              popupRef.current.remove();
-            }}
-          >
-            ×
-          </button>
-        </div>
-
-        {!isCollapsed && (
-          <div className="flex flex-col ">
-            {marker.url && (
+        {marker.statuserror > 0 ? (
+          "This camera is offline"
+        ) : (
+          <>
+            <div className="popup-drag-handle flex justify-between items-center bg-gray-800/80 backdrop-blur-md rounded-t-lg ">
+              <div className="text-white font-medium text-center w-full">
+                {marker.cname || marker.id || marker.cid}
+              </div>
               <button
-                onClick={handleOpenLink}
-                className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
+                className="text-white hover:text-gray-300 focus:outline-none absolute right-2"
+                onClick={() => {
+                  // Close the popup
+                  popupRef.current.remove();
+                }}
               >
-                <FiExternalLink />
-                <span>{t("open_in_new_tab")}</span>
+                ×
               </button>
-            )}
-            {isPTZ && (
-              <button
-                onClick={openModal}
-                className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
-              >
-                <FaVideo />
-                <span>{t("ptz_control")}</span>
-              </button>
-            )}
-            <div
-              style={{
-                width: "100%",
-                maxWidth: "15vw",
-                overflow: "hidden",
-              }}
-            >
-              <Records
-                videos={marker.cameraData.streams}
-                name={marker.cname || marker.id || marker.cid}
-                isLoading={isLoading}
-              />
             </div>
-            <div className="flex items-center justify-between bg-gray-800/30 backdrop-blur-md p-2">
-              <div className="flex items-center gap-2">
-                <button className="text-white p-1">
-                  <FaVideo />
-                </button>
-                <button
-                  className="text-white p-1"
-                  onClick={() => setPTZOpen(true)}
-                >
-                  <FaPlus />
-                </button>
-                <button
-                  className="text-white p-1"
-                  onClick={() => {
-                    window.open(
-                      `${window.location.origin}/camera/${marker.cid}`,
-                      "_blank"
-                    );
+
+            {!isCollapsed && (
+              <div className="flex flex-col ">
+                {marker.url && (
+                  <button
+                    onClick={handleOpenLink}
+                    className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
+                  >
+                    <FiExternalLink />
+                    <span>{t("open_in_new_tab")}</span>
+                  </button>
+                )}
+                {isPTZ && (
+                  <button
+                    onClick={openModal}
+                    className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
+                  >
+                    <FaVideo />
+                    <span>{t("ptz_control")}</span>
+                  </button>
+                )}
+                <div
+                  style={{
+                    width: "100%",
+                    maxWidth: "15vw",
+                    overflow: "hidden",
                   }}
                 >
-                  <FiExternalLink />
-                </button>
+                  <Records
+                    videos={marker.cameraData.streams}
+                    name={marker.cname || marker.id || marker.cid}
+                    isLoading={isLoading}
+                  />
+                </div>
+                <div className="flex items-center justify-between bg-gray-800/30 backdrop-blur-md p-2">
+                  <div className="w-1/3 flex items-center gap-2">
+                    <button className="text-white p-1">
+                      <FaVideo />
+                    </button>
+                    <button
+                      className="text-white p-1"
+                      onClick={() => setPTZOpen(true)}
+                    >
+                      <FaPlus />
+                    </button>
+                    <button
+                      className="text-white p-1"
+                      onClick={() => {
+                        window.open(
+                          `${window.location.origin}/camera/${marker.cid}`,
+                          "_blank"
+                        );
+                      }}
+                    >
+                      <FiExternalLink />
+                    </button>
+                  </div>
+                  <div className="w-1/3">
+                    <TrafficLightCounter
+                      // trafficLightSeconds={trafficLightSecondsRef.current}
+                      channelId={marker.link_id}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="bg-red-500 text-white px-3 py-1 rounded text-xl font-bold">
-                {trafficLightSecondsRef.current || "34"}
-              </div>
-            </div>
-            {false && (
-              <TrafficLightCounter
-                trafficLightSeconds={trafficLightSecondsRef.current}
-              />
             )}
-          </div>
+          </>
         )}
       </MapLibrePopup>
 

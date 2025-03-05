@@ -39,15 +39,13 @@ const MapLibreContainer = () => {
 
   const { activeModule } = useModule();
   const { updateModuleMarkers, activeModuleType } = useModuleMarkers();
-  console.log(activeModule, "the active module");
-  console.log("---------------");
+
   const { theme } = useTheme();
   const conditionMet = useZoomPanel();
 
   useEffect(() => {
     if (map) return;
 
-    console.log("Initializing MapLibre map with theme:", theme);
     const savedMapState = JSON.parse(localStorage.getItem("mapState")) || {
       center: [69.254643, 41.321151],
       zoom: 14,
