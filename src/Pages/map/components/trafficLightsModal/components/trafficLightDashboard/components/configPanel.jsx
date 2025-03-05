@@ -3,7 +3,8 @@ import { ToastContainer, toast } from "react-toastify";
 import CustomSelect from "../../../../../../../components/customSelect";
 import { FaSpinner } from "react-icons/fa6";
 import PropTypes from "prop-types";
-import Slider from "react-smooth-range-input";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import { iconOptions } from "../utils";
 import { modifySvetofor } from "../../../../../../../api/api.handlers";
@@ -258,12 +259,9 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
               id={`lanesLeft-${direction}`}
               min={1}
               max={5}
-              hasTickMarks={false}
-              barHeight={10}
+              step={1}
               style={{ maxWidth: "10vw" }}
               className="max-w-full"
-              shouldAnimateNumber={false}
-              step={1}
               value={config[direction].lanesLeft.length}
               onChange={(value) =>
                 updateLaneCount(direction, "lanesLeft", value)
@@ -286,9 +284,6 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
               min={1}
               max={5}
               step={1}
-              hasTickMarks={false}
-              barHeight={10}
-              shouldAnimateNumber={false}
               value={config[direction].lanesRight.length}
               onChange={(value) =>
                 updateLaneCount(direction, "lanesRight", value)

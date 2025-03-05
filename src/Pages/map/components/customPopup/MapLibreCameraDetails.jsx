@@ -169,7 +169,10 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
         }}
       >
         {marker.statuserror > 0 ? (
-          "This camera is offline"
+          <div className="backdrop-blur-md bg-red-800/80 p-2 rounded-lg">
+            {" "}
+            This camera is offline
+          </div>
         ) : (
           <>
             <div className="popup-drag-handle flex justify-between items-center bg-gray-800/80 backdrop-blur-md rounded-t-lg ">

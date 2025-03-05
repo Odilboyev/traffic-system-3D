@@ -1,10 +1,27 @@
-# React + Vite
+# Traffic System 3D
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based traffic monitoring system with 3D visualization using MapLibre.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# big-monitoring
-# big-monitoring
+```bash
+npm install
+npm run dev
+```
+
+## Deployment
+
+This project is configured for deployment on Vercel.
+
+### Deployment Notes
+
+- The project uses `rc-slider` for range input sliders, which is compatible with React 18.
+- A `vercel.json` file is included to configure the build process.
+- If you encounter dependency conflicts during deployment, you may need to use the `--legacy-peer-deps` flag during installation.
+
+## Tech Stack
+
+- React 18
+- Vite
+- MapLibre GL
+- Tailwind CSS
