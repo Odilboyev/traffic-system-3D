@@ -6,9 +6,12 @@ import MapLibreCameraDetails from "../../components/customPopup/MapLibreCameraDe
 import Supercluster from "supercluster";
 import { getCameraDetails } from "../../../../api/api.handlers";
 import maplibregl from "maplibre-gl";
+import { useMapMarkers } from "../../hooks/useMapMarkers";
 import { useTranslation } from "react-i18next";
 
-const PulsingMarkers = ({ map, markers }) => {
+const PulsingMarkers = ({ map }) => {
+  const { markers } = useMapMarkers();
+
   const markersRef = useRef([]);
   const superclusterRef = useRef(null);
   const [selectedMarkers, setSelectedMarkers] = useState([]);
@@ -72,11 +75,24 @@ const PulsingMarkers = ({ map, markers }) => {
 
     // Update the selected markers list
     setSelectedMarkers((prev) => {
-      // Remove any existing marker with the same ID
-      const filtered = prev.filter((m) => m.cid !== marker.cid);
-      return [...filtered, updatedMarker];
-    });
+      // Check if the marker already exists in the array
+      const markerExists = prev.some(
+        (m) => m.cid === marker.cid && m.type === marker.type
+      );
 
+      if (markerExists) {
+        // If it exists, update it in place
+        return prev.map((m) => {
+          if (m.cid === marker.cid && m.type === marker.type) {
+            return updatedMarker;
+          }
+          return m;
+        });
+      } else {
+        // If it doesn't exist, add it to the array
+        return [...prev, updatedMarker];
+      }
+    });
   };
 
   const createMarkerElement = (marker, count = 1) => {
@@ -129,7 +145,17 @@ const PulsingMarkers = ({ map, markers }) => {
     // Add click event listener
     el.addEventListener("click", () => {
       if (isCamera(marker.type)) {
-        setSelectedMarkers([marker]); // Update to use the correct state setter
+        // Add the marker to the existing selectedMarkers array instead of replacing it
+        setSelectedMarkers((prev) => {
+          // Check if this marker is already in the array
+          const markerExists = prev.some((m) => m.cid === marker.cid);
+          if (markerExists) {
+            // If it exists, don't add it again
+            return prev;
+          }
+          // Add the new marker to the array
+          return [...prev, marker];
+        });
         fetchCameraDetails(marker);
       }
     });
@@ -198,8 +224,6 @@ const PulsingMarkers = ({ map, markers }) => {
           lat: lat.toString(),
           coordinates: [lng, lat], // Store original coordinates array for reference
         };
-
-       
 
         // Add to visible markers only if it doesn't already exist
         // This is crucial to prevent infinite loops
@@ -306,10 +330,10 @@ const PulsingMarkers = ({ map, markers }) => {
         if (centerDistance < requiredDistance) {
           // Calculate direction vector
           const angle = Math.atan2(dy, dx);
-          
+
           // Calculate how much to move
           const moveDistance = requiredDistance - centerDistance + 10; // Add extra pixels to ensure gap
-          
+
           // Move current marker away from previous marker
           const newX = markerPoint.x + Math.cos(angle) * moveDistance;
           const newY = markerPoint.y + Math.sin(angle) * moveDistance;
@@ -342,18 +366,18 @@ const PulsingMarkers = ({ map, markers }) => {
     });
 
     // Additional pass to ensure all popups are within the viewport
-    const finalMarkers = optimizedMarkers.map(marker => {
+    const finalMarkers = optimizedMarkers.map((marker) => {
       const point = map.project([
         parseFloat(marker.lng),
         parseFloat(marker.lat),
       ]);
-      
+
       // Check if the point is too close to the edge of the viewport
       const padding = 150; // Larger padding to account for popup size
       let needsAdjustment = false;
       let newX = point.x;
       let newY = point.y;
-      
+
       if (point.x < padding) {
         newX = padding;
         needsAdjustment = true;
@@ -361,7 +385,7 @@ const PulsingMarkers = ({ map, markers }) => {
         newX = viewportWidth - padding;
         needsAdjustment = true;
       }
-      
+
       if (point.y < padding) {
         newY = padding;
         needsAdjustment = true;
@@ -369,13 +393,13 @@ const PulsingMarkers = ({ map, markers }) => {
         newY = viewportHeight - padding;
         needsAdjustment = true;
       }
-      
+
       if (needsAdjustment) {
         const newLngLat = map.unproject([newX, newY]);
         marker.lng = newLngLat.lng.toString();
         marker.lat = newLngLat.lat.toString();
       }
-      
+
       return marker;
     });
 
@@ -384,7 +408,6 @@ const PulsingMarkers = ({ map, markers }) => {
 
   useEffect(() => {
     if (!map || !markers) return;
-
 
     // Clear existing markers and popups to prevent duplicates
     markersRef.current.forEach((marker) => marker.remove());
@@ -474,6 +497,19 @@ const PulsingMarkers = ({ map, markers }) => {
     };
   }, []);
 
+  // Function to handle closing a popup
+  const handleClosePopup = (markerId) => {
+    // Remove the marker from selectedMarkers to close its popup
+    setSelectedMarkers((prev) =>
+      prev.filter((marker) => marker.cid !== markerId)
+    );
+
+    // Optionally, also remove from visibleMarkers if you want to completely hide it
+    // setVisibleMarkers(prev => prev.filter(marker => marker.cid !== markerId));
+
+    console.log(`Closed popup for marker: ${markerId}`);
+  };
+
   return (
     <>
       {map &&
@@ -495,7 +531,6 @@ const PulsingMarkers = ({ map, markers }) => {
             let coordinates = [0, 0];
             if (markerElement) {
               coordinates = markerElement.getLngLat().toArray();
-             
             }
 
             const markerWithCorrectCoords = {
@@ -513,6 +548,7 @@ const PulsingMarkers = ({ map, markers }) => {
                 cameraData={marker.cameraData}
                 isPTZ={marker.type === 5}
                 map={map}
+                onClose={handleClosePopup}
               />
             );
           }

@@ -1,6 +1,7 @@
 import {
-  clearSelectedStation,
+  clearSelectedStation as clearSelectedStationAction,
   selectStation,
+  toggleHeatmap,
   updateErrorMessage,
   updateFilter,
   updateLoadingState,
@@ -41,9 +42,11 @@ const useFuelStations = () => {
   const selectedStation = useSelector(
     (state) => state.fuelStations.selectedStation
   );
+  const showHeatmap = useSelector((state) => state.fuelStations.showHeatmap);
 
   // Action to fetch fuel stations data
   const fetchStations = useCallback(async () => {
+    console.log("Fetching fuel stations...");
     dispatch(updateLoadingState(true));
     try {
       const response = await getFuelStations();
@@ -124,19 +127,42 @@ const useFuelStations = () => {
 
   // Clear selected station
   const clearSelectedStation = useCallback(() => {
-    dispatch(clearSelectedStation());
+    dispatch(clearSelectedStationAction());
   }, [dispatch]);
 
   // Get filtered stations based on current filter settings
   const getFilteredStations = useCallback(() => {
-    if (!stations || !stations.length) return [];
+    try {
+      // Safely check if stations is a valid array
+      if (!Array.isArray(stations) || stations.length === 0) {
+        return [];
+      }
 
-    return stations.filter((station) => {
-      // If station has no type, default to "petrol"
-      const stationType = station.type || "petrol";
-      return filter[stationType] === true;
-    });
+      return stations.filter((station) => {
+        // Skip invalid stations
+        if (!station || typeof station !== "object") {
+          return false;
+        }
+        // If station has no type, default to "petrol"
+        const stationType = station.type || "petrol";
+        // Check if this type should be shown based on filter
+        return (
+          filter && typeof filter === "object" && filter[stationType] === true
+        );
+      });
+    } catch (error) {
+      console.error("Error in getFilteredStations:", error);
+      return [];
+    }
   }, [stations, filter]);
+
+  // Set heatmap visibility
+  const setShowHeatmap = useCallback(
+    (value) => {
+      dispatch(toggleHeatmap(value));
+    },
+    [dispatch]
+  );
 
   return {
     stations,
@@ -147,6 +173,7 @@ const useFuelStations = () => {
     useClusteredView,
     visibleRadius,
     selectedStation,
+    showHeatmap,
     fetchStations,
     clearStations,
     setStations,
@@ -158,6 +185,7 @@ const useFuelStations = () => {
     clearSelectedStation,
     getFilteredStations,
     zoomThreshold,
+    setShowHeatmap,
   };
 };
 

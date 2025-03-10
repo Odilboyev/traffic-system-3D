@@ -1,0 +1,49 @@
+.region-filter-container {
+  user-select: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.region-filter-container:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.region-filter-container.dragging {
+  opacity: 0.9;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.drag-handle {
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.drag-handle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Animation for the filter when it's being dragged */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.region-filter-container.dragging {
+  animation: pulse 1.5s infinite;
+}

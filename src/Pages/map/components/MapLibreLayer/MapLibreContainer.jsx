@@ -3,10 +3,15 @@ import "./styles.css";
 
 import { useEffect, useRef, useState } from "react";
 
+import ActiveModuleComponents from "../ActiveModuleComponents";
+import FuelStationHeatmap from "../fuelStationMarkers/FuelStationHeatmap";
 import FuelStationMarkers from "../fuelStationMarkers";
-import MapControls from "./MapControls";
+import HeatmapControl from "../controls/heatmapControl";
+// import MapControls from "./MapControls";
+import MapControlsPanel from "../MapControlsPanel";
 // import ClusterLayer from "./ClusterLayer";
 import PulsingMarkers from "../PulsingMarkers/PulsingMarkers";
+import RegionDistrictFilter from "../RegionDistrictFilter";
 import Supercluster from "supercluster";
 import TrafficLightContainer from "../trafficLightMarkers/managementLights";
 import WeatherMarkers from "../weatherMarkers/WeatherMarkers";
@@ -14,9 +19,10 @@ import { darkLayer } from "./utils/darkLayer";
 import { getMarkerData } from "../../../../api/api.handlers";
 import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
+import { useFuelStations } from "../../hooks/useFuelStations";
 import { useMapContext } from "../../context/MapContext";
 import { useMapMarkers } from "../../hooks/useMapMarkers";
-import { useModule } from "../../context/ModuleContext";
+import { useModuleContext } from "../../context/ModuleContext";
 import useModuleMarkers from "../../hooks/useModuleMarkers";
 import { useTheme } from "../../../../customHooks/useTheme";
 import { useZoomPanel } from "../../context/ZoomPanelContext";
@@ -27,6 +33,7 @@ const MapLibreContainer = () => {
   const [map, setMap] = useState(null);
   const [currentZoom, setCurrentZoom] = useState(14);
   const overlayRef = useRef(null);
+  const { showHeatmap, setShowHeatmap } = useFuelStations();
 
   const {
     markers,
@@ -37,7 +44,7 @@ const MapLibreContainer = () => {
     useClusteredMarkers,
   } = useMapMarkers();
 
-  const { activeModule } = useModule();
+  const { activeModule } = useModuleContext();
   const { updateModuleMarkers, activeModuleType } = useModuleMarkers();
 
   const { theme } = useTheme();
@@ -46,10 +53,31 @@ const MapLibreContainer = () => {
   useEffect(() => {
     if (map) return;
 
-    const savedMapState = JSON.parse(localStorage.getItem("mapState")) || {
+    // Safely parse mapState from localStorage with fallback
+    let savedMapState = {
       center: [69.254643, 41.321151],
       zoom: 14,
     };
+
+    try {
+      const storedMapState = localStorage.getItem("mapState");
+      if (storedMapState && storedMapState !== "undefined") {
+        const parsedState = JSON.parse(storedMapState);
+        // Validate the parsed state
+        if (
+          parsedState &&
+          Array.isArray(parsedState.center) &&
+          parsedState.center.length === 2 &&
+          typeof parsedState.zoom === "number"
+        ) {
+          savedMapState = parsedState;
+        }
+      }
+    } catch (error) {
+      console.warn("Error parsing mapState from localStorage:", error);
+      // Remove invalid mapState from localStorage
+      localStorage.removeItem("mapState");
+    }
 
     const newMap = new maplibregl.Map({
       container: mapContainer.current,
@@ -74,8 +102,12 @@ const MapLibreContainer = () => {
       const center = newMap.getCenter();
       const zoom = newMap.getZoom();
       setCurrentZoom(zoom);
-      const mapState = { center: [center.lng, center.lat], zoom };
-      localStorage.setItem("mapState", JSON.stringify(mapState));
+      try {
+        const mapState = { center: [center.lng, center.lat], zoom };
+        localStorage.setItem("mapState", JSON.stringify(mapState));
+      } catch (error) {
+        console.warn("Error saving mapState to localStorage:", error);
+      }
     });
 
     getDataHandler();
@@ -92,6 +124,14 @@ const MapLibreContainer = () => {
     map.setStyle(theme === "dark" ? darkLayer : lightLayer);
   }, [theme, map]);
 
+  // Fetch markers when activeModuleType changes to 'monitoring'
+  useEffect(() => {
+    if (!map || activeModuleType !== "its") return;
+
+    console.log("Fetching monitoring markers due to module switch");
+    getDataHandler();
+  }, [map, activeModuleType, getDataHandler]);
+
   // Update markers when active module changes
   useEffect(() => {
     if (!activeModule) return;
@@ -104,28 +144,15 @@ const MapLibreContainer = () => {
         ref={mapContainer}
         className="map-container w-full h-full"
         style={{ background: theme === "dark" ? "#45516E" : "#ffffff" }}
-      >
-        {/* Render different markers based on active module */}
-        {map && activeModuleType === "monitoring" && (
-          <>
-            {currentZoom == 20 && <TrafficLightContainer />}
-            {markers && (
-              <>
-                {console.log("Passing markers to PulsingMarkers:", markers)}
-                <PulsingMarkers map={map} markers={markers} />
-              </>
-            )}
-          </>
-        )}
-        {map && activeModuleType === "fuel" && (
-          <FuelStationMarkers map={map} markers={markers} />
-        )}
-        {map && activeModuleType === "weather" && (
-          <WeatherMarkers map={map} markers={markers} />
-        )}
-        {/* {map && <MapControls map={map} />} */}
-        {/* {map && <ThreeDModelLayer map={map} />} */}
-      </div>
+      ></div>
+
+      {/* Active Module Components */}
+      {map && (
+        <>
+          <ActiveModuleComponents map={map} />
+          <MapControlsPanel map={map} />
+        </>
+      )}
 
       {/* Gradient Overlay */}
       {conditionMet && (

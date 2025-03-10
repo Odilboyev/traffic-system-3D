@@ -8,26 +8,21 @@ import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import the module context
-import { useModule } from "../../../context/ModuleContext";
+import { useModuleContext } from "../../../context/ModuleContext";
 
 const TopPanelContent = () => {
   const [swiperInstance, setSwiperInstance] = useState(null);
   const [swiperLoaded, setSwiperLoaded] = useState(false);
-  const { activeModule, setActiveModule } = useModule();
+  const { activeModule, setActiveModule, modules } = useModuleContext();
 
-  // Module definitions
-  const modules = [
-    { id: "monitoring", name: "Monitoring", markerType: "monitoring" },
-    { id: "fuel", name: "Yoqilg'i stansiyalari", markerType: "fuel" },
-    { id: "weather", name: "Ob-havo", markerType: "weather" },
-  ];
-  
   // Find the index of the active module from localStorage or default to monitoring
   const findInitialSlideIndex = () => {
-    const monitoringIndex = modules.findIndex(module => module.id === activeModule.id);
+    const monitoringIndex = modules.findIndex(
+      (module) => module.id === activeModule.id
+    );
     return monitoringIndex >= 0 ? monitoringIndex : 0;
   };
-  
+
   const initialSlideIndex = findInitialSlideIndex();
   const [activeSlideIndex, setActiveSlideIndex] = useState(initialSlideIndex);
 
@@ -59,9 +54,9 @@ const TopPanelContent = () => {
         <div className="h-full flex items-center justify-between px-8">
           {/* Left Navigation with enhanced hover effects */}
           <div className="flex items-center gap-8">
-            {["Dashboard", "Analytics", "Reports"].map((item, index) => (
+            {/* {["Dashboard", "Analytics", "Reports"].map((item, index) => (
               <div key={index} className="group relative cursor-pointer">
-                {/* Modernized hover indicator */}
+ 
                 <div className="absolute -top-[1px] left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-400/0 via-cyan-400/0 to-cyan-400/0 group-hover:via-cyan-400/70 transition-all duration-500 ease-in-out" />
                 <div className="flex items-center gap-3 py-1.5 px-2 rounded-md transition-all duration-300 group-hover:bg-cyan-400/10">
                   <div className="h-3 w-[1px] bg-gradient-to-b from-transparent via-cyan-400/50 to-transparent group-hover:via-cyan-400/80 transition-all duration-300" />
@@ -69,10 +64,10 @@ const TopPanelContent = () => {
                     {item}
                   </span>
                 </div>
-                {/* Bottom glow on hover */}
+               
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/0 to-transparent group-hover:via-cyan-400/30 transition-all duration-500" />
               </div>
-            ))}
+            ))} */}
           </div>
 
           {/* Center Navigation with enhanced decorative elements */}

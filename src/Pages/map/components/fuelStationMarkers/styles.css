@@ -47,6 +47,90 @@
   transition: color 0.2s ease;
 }
 
+/* Fuel Station Popup Styles */
+.fuel-station-popup {
+  padding: 0;
+  max-width: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.fuel-station-popup .maplibregl-popup-content {
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fuel-station-popup .popup-header {
+  background-color: #3b82f6;
+  color: white;
+  padding: 12px 16px;
+  position: relative;
+}
+
+.fuel-station-popup .popup-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.fuel-station-popup .popup-body {
+  padding: 16px;
+  background-color: white;
+}
+
+.fuel-station-popup .popup-section {
+  margin-bottom: 12px;
+}
+
+.fuel-station-popup .popup-section:last-child {
+  margin-bottom: 0;
+}
+
+.fuel-station-popup .popup-section-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.fuel-station-popup .popup-section-content {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.fuel-station-popup .fuel-prices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fuel-station-popup .fuel-price-tag {
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fuel-station-popup .fuel-price-tag.petrol {
+  color: #ef4444;
+  background-color: #fee2e2;
+}
+
+.fuel-station-popup .fuel-price-tag.gas {
+  color: #3b82f6;
+  background-color: #dbeafe;
+}
+
+.fuel-station-popup .fuel-price-tag.electro {
+  color: #10b981;
+  background-color: #d1fae5;
+}
+
 .cluster-marker {
   width: 50px;
   height: 50px;

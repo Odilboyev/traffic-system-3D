@@ -1,30 +1,26 @@
 // import "./styles.css";
 
+import { ModuleProvider, useModuleContext } from "./context/ModuleContext";
 import { memo, useCallback, useEffect, useState } from "react";
 
-import MapControlsPanel from "./components/MapControlsPanel";
+import ActiveModuleComponents from "./components/ActiveModuleComponents";
+// Import Fines components
+import { FinesProvider } from "./context/FinesContext";
+import MapControlsPanel from "./components/MapControlsPanel/index.jsx";
 import MapLibreContainer from "./components/MapLibreLayer/MapLibreContainer";
 import MapModals from "./components/MapModals/index.jsx";
+// Import ActiveModuleComponents for module-specific rendering
 import PropTypes from "prop-types";
 import { ToastContainer } from "react-toastify";
-import TrafficMonitoringPanel from "./components/TrafficMonitoringPanel";
+import TopPanel from "./components/TrafficMonitoringPanel/components/TopPanel.jsx";
 import { ZoomPanelProvider } from "./context/ZoomPanelContext";
-import { ModuleProvider } from "./context/ModuleContext";
 import toaster from "../../tools/toastconfig.jsx";
 import { useMapContext } from "./context/MapContext.jsx";
 import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
-import { useTheme } from "../../customHooks/useTheme.jsx";
 
-const MapComponent = memo(({ notifications, t }) => {
+const MapComponent = memo(({ t }) => {
   const { map } = useMapContext();
-  const {
-    markers,
-    setMarkers,
-    getDataHandler,
-    clearMarkers,
-    updateMarkers,
-    useClusteredMarkers,
-  } = useMapMarkers();
+  const { markers, getDataHandler } = useMapMarkers();
 
   const [crossroadModal, setCrossroadModal] = useState({
     isOpen: false,
@@ -41,12 +37,10 @@ const MapComponent = memo(({ notifications, t }) => {
   const [isBoxLoading] = useState(false);
   const [isLightsLoading] = useState(false);
   const [changedMarker, setChangedMarker] = useState(null);
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-  const [activeSidePanel, setActiveSidePanel] = useState(null);
+  // const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  // const [activeSidePanel, setActiveSidePanel] = useState(null);
 
-  const { show3DLayer } = useTheme();
-
-  const conditionToShowShadowOverlay = 11;
+  // const { show3DLayer } = useTheme();
 
   // Fetch markers on mount
   useEffect(() => {
@@ -58,58 +52,54 @@ const MapComponent = memo(({ notifications, t }) => {
     console.log("Current markers:", markers);
   }, [markers]);
 
-  const handleMarkerClick = useCallback((marker) => {
-    switch (marker.type) {
-      case "crossroad":
-        setCrossroadModal({ isOpen: true, marker });
-        break;
-      case "device":
-        setDeviceModal({ isOpen: true, marker });
-        break;
-      case "trafficLights":
-        setTrafficLightsModal({ isOpen: true, marker });
-        break;
-      default:
-        console.warn("Unknown marker type:", marker.type);
-    }
-  }, []);
+  // const handleMarkerClick = useCallback((marker) => {
+  //   switch (marker.type) {
+  //     case "crossroad":
+  //       setCrossroadModal({ isOpen: true, marker });
+  //       break;
+  //     case "device":
+  //       setDeviceModal({ isOpen: true, marker });
+  //       break;
+  //     case "trafficLights":
+  //       setTrafficLightsModal({ isOpen: true, marker });
+  //       break;
+  //     default:
+  //       console.warn("Unknown marker type:", marker.type);
+  //   }
+  // }, []);
 
   return (
     <div className="map-page w-screen h-screen relative overflow-hidden">
       <ModuleProvider>
-        <ZoomPanelProvider map={map} condition={conditionToShowShadowOverlay}>
         <MapControlsPanel map={map} />
 
-        <div className="map-wrapper absolute inset-0">
-          <TrafficMonitoringPanel
-            map={map}
-            conditionToShowShadowOverlay={conditionToShowShadowOverlay}
-          />
-
-          <MapLibreContainer />
-        </div>
-
-        <MapModals
-          crossroadModal={crossroadModal}
-          deviceModal={deviceModal}
-          trafficLightsModal={trafficLightsModal}
-          onClose={{
-            handleCloseCrossroadModal: () =>
-              setCrossroadModal({ isOpen: false, marker: null }),
-            handleCloseDeviceModal: () =>
-              setDeviceModal({ isOpen: false, marker: null }),
-            handleCloseTrafficLightsModal: () =>
-              setTrafficLightsModal({ isOpen: false, marker: null }),
-          }}
-          isBoxLoading={isBoxLoading}
-          isLightsLoading={isLightsLoading}
-          changedMarker={changedMarker}
-          t={t}
-        />
-
-        {/* <NotificationBox notifications={notifications} /> */}
-        <ToastContainer {...toaster} />
-      </ZoomPanelProvider>
+        <FinesProvider>
+          <ZoomPanelProvider map={map} condition={11}>
+            <TopPanel />
+            <div className="map-wrapper">
+              <MapLibreContainer />
+              {/* All module-specific components are managed by ActiveModuleComponents inside MapLibreContainer */}
+            </div>
+            <MapModals
+              crossroadModal={crossroadModal}
+              deviceModal={deviceModal}
+              trafficLightsModal={trafficLightsModal}
+              onClose={{
+                handleCloseCrossroadModal: () =>
+                  setCrossroadModal({ isOpen: false, marker: null }),
+                handleCloseDeviceModal: () =>
+                  setDeviceModal({ isOpen: false, marker: null }),
+                handleCloseTrafficLightsModal: () =>
+                  setTrafficLightsModal({ isOpen: false, marker: null }),
+              }}
+              isBoxLoading={isBoxLoading}
+              isLightsLoading={isLightsLoading}
+              changedMarker={changedMarker}
+              t={t}
+            />
+            <ToastContainer {...toaster} />
+          </ZoomPanelProvider>
+        </FinesProvider>
       </ModuleProvider>
     </div>
   );

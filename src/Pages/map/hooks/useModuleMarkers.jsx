@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useMapMarkers } from "./useMapMarkers";
-import { useModule } from "../context/ModuleContext";
+import { useModuleContext } from "../context/ModuleContext";
 
 const weatherMarkers = [
   {
@@ -52,7 +52,7 @@ const weatherMarkers = [
 const useModuleMarkers = () => {
   const { markers, setMarkers, clearMarkers } = useMapMarkers();
   const [activeModuleType, setActiveModuleType] = useState("monitoring");
-  const { activeModule } = useModule();
+  const { activeModule } = useModuleContext();
 
   // Function to load markers based on module type
   const loadMarkersByModuleType = useCallback(
@@ -100,13 +100,15 @@ const useModuleMarkers = () => {
       const moduleType = module.id || "monitoring";
       setActiveModuleType(moduleType);
 
-      // Only load module-specific markers if not 'monitoring'
-      // For 'monitoring', we'll use the API data fetched in MapLibreContainer
-      if (moduleType !== "monitoring") {
-        // Clear existing markers
-        clearMarkers();
+      // Clear existing markers for any module change
+      clearMarkers();
 
-        // Load new markers
+      if (moduleType === "monitoring") {
+        // For monitoring module, we need to fetch the data again
+        // This will trigger the API call in MapLibreContainer
+        console.log("Switching to monitoring module, markers cleared");
+      } else {
+        // Load new markers for other modules
         loadMarkersByModuleType(moduleType);
       }
     },

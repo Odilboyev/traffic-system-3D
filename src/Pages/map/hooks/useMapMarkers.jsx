@@ -2,7 +2,9 @@ import { getAllMarkers, getMarkerData } from "../../../api/api.handlers";
 import {
   updateErrorMessage,
   updateLoadingState,
+  updateMap,
   updateMarkers,
+  updateNotifications,
   updateUseClusteredMarkers,
 } from "../../../redux/slices/mapslice";
 import { useCallback, useEffect } from "react";
@@ -12,6 +14,7 @@ const useMapMarkers = () => {
   const dispatch = useDispatch();
 
   // Access state from Redux
+  const map = useSelector((state) => state.map.map);
   const markers = useSelector((state) => state.map.markers);
   const areMarkersLoading = useSelector((state) => state.map.areMarkersLoading);
   const errorMessage = useSelector((state) => state.map.errorMessage);
@@ -19,7 +22,7 @@ const useMapMarkers = () => {
     (state) => state.map.useClusteredMarkers
   );
   const isHighQuality = useSelector((state) => state.map.isHighQuality);
-
+  const notifications = useSelector((state) => state.map.notifications);
   // Action to fetch data
   const getDataHandler = useCallback(async () => {
     dispatch(updateLoadingState(true));
@@ -61,17 +64,32 @@ const useMapMarkers = () => {
     },
     [dispatch]
   );
+  const setNotifications = useCallback(
+    (value) => {
+      dispatch(updateNotifications(value));
+    },
+    [dispatch]
+  );
+  const setMap = useCallback(
+    (map) => {
+      dispatch(updateMap(map));
+    },
+    [dispatch]
+  );
 
   return {
     markers,
     areMarkersLoading,
     errorMessage,
     isHighQuality,
+    notifications,
+    map,
     getDataHandler,
     clearMarkers,
     setMarkers,
     useClusteredMarkers,
     setUseClusteredMarkers,
+    setNotifications,
   };
 };
 

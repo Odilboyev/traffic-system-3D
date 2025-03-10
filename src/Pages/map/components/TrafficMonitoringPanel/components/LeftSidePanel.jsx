@@ -1,22 +1,21 @@
+import FuelStationsModule from "./modules/FuelStationsModule";
 import React from "react";
 import SlidePanel from "../../../../../components/SlidePanel/SlidePanel";
 import TopCrossroadsContent from "./TopCrossroadsContent";
 import TrafficRatingContent from "./TrafficRatingContent";
 import TrafficVolumeStatsCard from "./TrafficVolumeStatsCard";
-import TransportStatsCard from "./TransportStatsCard";
-import { useModule } from "../../../context/ModuleContext";
-
 // Import module-specific components
 import TransportModule from "./modules/TransportModule";
-import FuelStationsModule from "./modules/FuelStationsModule";
+import TransportStatsCard from "./TransportStatsCard";
 import WeatherModule from "./modules/WeatherModule";
+import { useModuleContext } from "../../../context/ModuleContext";
 
 const LeftSidePanel = () => {
-  const { activeModule } = useModule();
+  const { activeModule } = useModuleContext();
   // Render different content based on active module
   const renderModuleContent = () => {
     switch (activeModule?.id) {
-      case 'transport':
+      case "transport":
         return (
           <>
             {/* Top Crossroads Panel */}
@@ -35,9 +34,9 @@ const LeftSidePanel = () => {
             <TransportModule />
           </>
         );
-      case 'fuel':
+      case "fuel":
         return <FuelStationsModule />;
-      case 'weather':
+      case "weather":
         return <WeatherModule />;
       default:
         return (
@@ -50,7 +49,22 @@ const LeftSidePanel = () => {
 
   return (
     <div className="left-side-panels h-full max-h-full overflow-y-auto max-w-[30vw] scrollbar-hide space-y-4">
-      {renderModuleContent()}
+      <>
+        {/* Top Crossroads Panel */}
+        <TopCrossroadsContent />
+
+        {/* Traffic Rating Panel */}
+        <TrafficRatingContent />
+
+        <div className="w-3/4">
+          {/* Traffic Volume Stats Panel */}
+          <TrafficVolumeStatsCard />
+
+          {/* Transport Stats Panel */}
+          <TransportStatsCard />
+        </div>
+        <TransportModule />
+      </>
     </div>
   );
 };

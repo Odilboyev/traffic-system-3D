@@ -5,6 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // mapSlice.js
 const getInitialState = () => {
   const defaultState = {
+    map: null,
     markers: [],
     areMarkersLoading: false,
     errorMessage: null,
@@ -33,6 +34,7 @@ const getInitialState = () => {
       weather: true,
       time: true,
     },
+    notifications: [],
   };
 
   migrateLocalStorage(defaultState);
@@ -76,6 +78,12 @@ export const mapSlice = createSlice({
     updateIsHighQuality: (state, action) => {
       state.isHighQuality = action.payload;
     },
+    updateNotifications: (state, action) => {
+      state.notifications = action.payload;
+    },
+    updateMap: (state, action) => {
+      state.map = action.payload;
+    },
     // updateLanguage: (state, action) => {
     //   state.language = action.payload;
     // },
@@ -92,6 +100,8 @@ export const {
   updateWidgets,
   updateIsDraggable,
   updateIsHighQuality,
+  updateNotifications,
+  updateMap,
   // updateLanguage,
 } = mapSlice.actions;
 

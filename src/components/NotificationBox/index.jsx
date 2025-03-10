@@ -1,20 +1,35 @@
 import "./notificationBox.style.css";
 
 import { BiBell, BiError } from "react-icons/bi";
-import { IoCheckmarkCircle, IoWarning } from "react-icons/io5";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
-import Control from "../customControl";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { IconButton } from "@material-tailwind/react";
+import { IoCheckmarkCircle } from "react-icons/io5";
 import { TbDeviceComputerCamera } from "react-icons/tb";
 import { ThemeContext } from "../../context/themeContext";
+import dangerSound from "../../assets/audio/danger.mp3";
+import positiveSound from "../../assets/audio/positive.mp3";
+import { subscribeToCurrentAlarms } from "../../api/api.handlers.js";
 import { t } from "i18next";
-import { useMap } from "react-leaflet";
+import { useMapMarkers } from "../../Pages/map/hooks/useMapMarkers";
 
 const getStatusStyle = (statuserror, type_name, theme) => {
   const isLight = theme === "light";
   switch (statuserror) {
+    case 0:
+      return {
+        border: isLight ? "border-l-green-500" : "border-l-green-500/50",
+        bg: isLight ? "bg-green-50" : "bg-green-500/10",
+        text: isLight ? "text-green-600" : "text-green-400",
+        statusBg: isLight ? "bg-green-100" : "bg-green-500/20",
+        icon: (
+          <IoCheckmarkCircle
+            className={isLight ? "text-green-600" : "text-green-400 text-lg"}
+          />
+        ),
+        hoverBg: isLight ? "hover:bg-green-50" : "hover:bg-green-500/10",
+        hoverBorder: "hover:border-l-green-500",
+      };
     case 1:
     case 2:
       return {
@@ -30,20 +45,7 @@ const getStatusStyle = (statuserror, type_name, theme) => {
         hoverBg: isLight ? "hover:bg-red-50" : "hover:bg-red-500/10",
         hoverBorder: "hover:border-l-red-500",
       };
-    case 0:
-      return {
-        border: isLight ? "border-l-teal-500" : "border-l-teal-500/50",
-        bg: isLight ? "bg-teal-50" : "bg-teal-500/10",
-        text: isLight ? "text-teal-600" : "text-teal-400",
-        statusBg: isLight ? "bg-teal-100" : "bg-teal-500/20",
-        icon: (
-          <IoCheckmarkCircle
-            className={isLight ? "text-teal-600" : "text-teal-400 text-lg"}
-          />
-        ),
-        hoverBg: isLight ? "hover:bg-teal-50" : "hover:bg-teal-500/10",
-        hoverBorder: "hover:border-l-teal-500",
-      };
+
     default:
       return {
         border: isLight ? "border-l-sky-500" : "border-l-sky-500/50",
@@ -61,11 +63,89 @@ const getStatusStyle = (statuserror, type_name, theme) => {
   }
 };
 
-const NotificationBox = ({ notifications, map }) => {
+const NotificationBox = () => {
   const scrollRef = useRef(null);
+  const { map } = useMapMarkers();
   const [animatingItems, setAnimatingItems] = useState(new Set());
   const { theme } = useContext(ThemeContext);
+  // const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
+  const notificationQueueRef = useRef([]);
+  const processingRef = useRef(false);
+
+  const processNotificationQueue = useCallback(() => {
+    if (processingRef.current) return;
+
+    processingRef.current = true;
+    const queue = notificationQueueRef.current;
+    notificationQueueRef.current = [];
+
+    // Deduplicate notifications
+    const uniqueNotifications = Array.from(
+      new Map(
+        queue.map((item) => [`${item.data.cid}-${item.data.type}`, item])
+      ).values()
+    );
+
+    // Process notifications
+    if (uniqueNotifications.length > 0) {
+      const latestNotification =
+        uniqueNotifications[uniqueNotifications.length - 1];
+
+      // setChangedMarkers(
+      //   uniqueNotifications.map((notification) => notification.data)
+      // );
+
+      // Add new notifications to the list
+      setNotifications((prev) => [...prev, ...uniqueNotifications]);
+      // Play sound based on the latest notification
+      const sound = new Audio();
+      sound.volume = 0.1;
+      if (latestNotification.data.statuserror === 1) {
+        sound.src = dangerSound;
+      } else if (latestNotification.data.statuserror === 0) {
+        sound.src = positiveSound;
+      } else if (latestNotification.data.statuserror === 2) {
+        sound.src = dangerSound;
+      }
+      sound.play();
+    }
+
+    processingRef.current = false;
+
+    // Check if more notifications arrived during processing
+    if (notificationQueueRef.current.length > 0) {
+      processNotificationQueue();
+    }
+  }, []);
+
+  useEffect(() => {
+    const processQueueInterval = setInterval(() => {
+      if (notificationQueueRef.current.length > 0) {
+        processNotificationQueue();
+      }
+    }, 1000); // Process queue every 1000ms
+
+    return () => clearInterval(processQueueInterval);
+  }, [processNotificationQueue]);
+
+  useEffect(() => {
+    if (!isSubscribed) {
+      subscribeToCurrentAlarms((data) => {
+        // Prevent duplicate processing of the same data
+        if (
+          !notificationQueueRef.current.some(
+            (item) => item.data.eventdate === data.data.eventdate
+          )
+        ) {
+          notificationQueueRef.current.push(data);
+          setIsSubscribed(true);
+        }
+      });
+    }
+  }, [isSubscribed]);
   useEffect(() => {
     // Add animation class to new notifications
     if (notifications.length > 0) {
@@ -110,7 +190,7 @@ const NotificationBox = ({ notifications, map }) => {
       </div>
       <div
         ref={scrollRef}
-        className={`overflow-y-auto max-h-[250px] scrollbar-thin backdrop-blur-md ${
+        className={`overflow-y-auto max-h-[250px] scrollbar-hide backdrop-blur-md ${
           theme === "light" ? "bg-white/50" : ""
         }`}
       >

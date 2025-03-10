@@ -19,13 +19,22 @@ const getInitialState = () => {
       { name: "electro", type: "electro" },
     ],
     useClusteredView: true,
+    showHeatmap: false,
     visibleRadius: 150, // in meters
     selectedStation: null,
-    zoomThreshold: 16,
+    zoomThreshold: 13,
   };
 
-  migrateLocalStorage(defaultState);
+  // Create a prefixed state object for migration
+  const prefixedState = {};
+  Object.entries(defaultState).forEach(([key, value]) => {
+    prefixedState[`fuelStations_${key}`] = value;
+  });
 
+  // Migrate localStorage with prefixed keys
+  migrateLocalStorage(prefixedState);
+
+  // Return state with values from localStorage or defaults
   return Object.fromEntries(
     Object.entries(defaultState).map(([key, defaultValue]) => [
       key,
@@ -64,6 +73,9 @@ export const fuelStationsSlice = createSlice({
     clearSelectedStation: (state) => {
       state.selectedStation = null;
     },
+    toggleHeatmap: (state, action) => {
+      state.showHeatmap = action.payload;
+    },
   },
 });
 
@@ -76,6 +88,7 @@ export const {
   updateVisibleRadius,
   selectStation,
   clearSelectedStation,
+  toggleHeatmap,
 } = fuelStationsSlice.actions;
 
 export default fuelStationsSlice.reducer;

@@ -1,0 +1,257 @@
+/* Road Sign Marker Styles */
+.road-sign-marker-container {
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  transition: transform 0.2s ease;
+}
+
+.road-sign-marker-container:hover {
+  transform: scale(1.1);
+}
+
+.road-sign-marker {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.road-sign-marker-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #f8fafc;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid #e2e8f0;
+  overflow: hidden;
+  position: relative;
+}
+
+.road-sign-marker-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.road-sign-marker-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: bold;
+  color: #0f172a;
+}
+
+/* Road Sign Popup Styles */
+.road-sign-popup {
+  max-width: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.road-sign-popup .maplibregl-popup-content {
+  padding: 0;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.road-sign-popup .maplibregl-popup-tip {
+  border-top-color: rgba(15, 23, 42, 0.9);
+}
+
+.road-sign-popup-content {
+  color: white;
+  padding: 0;
+}
+
+.road-sign-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.road-sign-popup-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.road-sign-popup-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.road-sign-popup-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.road-sign-icon-placeholder {
+  width: 24px;
+  height: 24px;
+  background-color: #0f172a;
+  border-radius: 50%;
+}
+
+.road-sign-popup-speed-limit {
+  background-color: #ef4444;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.road-sign-popup-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.road-sign-popup-close:hover {
+  color: white;
+}
+
+.road-sign-popup-body {
+  padding: 16px;
+}
+
+.road-sign-popup-description {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.road-sign-popup-info-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+
+.road-sign-popup-info-text {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.road-sign-popup-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.road-sign-popup-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.road-sign-popup-info-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+}
+
+.road-sign-popup-info-value {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.road-sign-popup-footer {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.road-sign-popup-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  align-self: flex-start;
+}
+
+.road-sign-popup-status[data-status="active"] {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.road-sign-popup-status[data-status="maintenance"] {
+  background-color: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+}
+
+.road-sign-popup-status[data-status="planned"] {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.road-sign-popup-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.road-sign-popup-action-button {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+}
+
+.road-sign-popup-action-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.road-sign-popup-report-button {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.road-sign-popup-report-button:hover {
+  background-color: rgba(239, 68, 68, 0.3);
+}

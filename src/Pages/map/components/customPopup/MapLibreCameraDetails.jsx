@@ -21,11 +21,13 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   cameraData,
   isPTZ,
   map,
+  onClose, // Add onClose prop
 }) {
   const popupRef = useRef(null);
   const dispatch = useDispatch();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPopupDraggable] = useState(true); // Always keep popup draggable
+  const [PTZModalOpen, setPTZModalOpen] = useState(false);
   // Always show popup when the component is rendered
   const [showPopup] = useState(true);
 
@@ -114,8 +116,8 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
             dispatch(
               updateTrafficLightSeconds({
                 camera_id: marker.link_id,
-                countdown: channelSeconds[marker.link_id].countdown,
-                status: channelSeconds[marker.link_id].status,
+                countdown: channelSeconds[marker.link_id]?.countdown,
+                status: channelSeconds[marker.link_id]?.status,
               })
             );
           }
@@ -147,7 +149,9 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   // as this is now handled by the PulsingMarkers component
 
   const handleOpenLink = () => {
-    window.open(marker.url, "_blank");
+    const { ip, http_port } = marker.cameraData;
+    const url = `http://${ip}:${http_port}`;
+    window.open(url, "_blank");
   };
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -163,6 +167,7 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
         coordinates={[parseFloat(marker.lng || 0), parseFloat(marker.lat || 0)]}
         isDraggable={isPopupDraggable}
         offset={[0, -30]}
+        markerId={marker.cid} // Pass the marker ID
         onClose={() => {
           // When a popup is closed, update the visible markers list
           console.log("Popup closed for marker:", marker.cid);
@@ -170,7 +175,6 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
       >
         {marker.statuserror > 0 ? (
           <div className="backdrop-blur-md bg-red-800/80 p-2 rounded-lg">
-            {" "}
             This camera is offline
           </div>
         ) : (
@@ -182,8 +186,10 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
               <button
                 className="text-white hover:text-gray-300 focus:outline-none absolute right-2"
                 onClick={() => {
-                  // Close the popup
-                  popupRef.current.remove();
+                  // Call the onClose prop to handle popup removal
+                  if (typeof onClose === "function") {
+                    onClose(marker.cid);
+                  }
                 }}
               >
                 ×
@@ -230,28 +236,22 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
                     </button>
                     <button
                       className="text-white p-1"
-                      onClick={() => setPTZOpen(true)}
+                      onClick={() => setPTZModalOpen(true)}
                     >
                       <FaPlus />
                     </button>
-                    <button
-                      className="text-white p-1"
-                      onClick={() => {
-                        window.open(
-                          `${window.location.origin}/camera/${marker.cid}`,
-                          "_blank"
-                        );
-                      }}
-                    >
+                    <button className="text-white p-1" onClick={handleOpenLink}>
                       <FiExternalLink />
                     </button>
                   </div>
-                  <div className="w-1/3">
-                    <TrafficLightCounter
-                      // trafficLightSeconds={trafficLightSecondsRef.current}
-                      channelId={marker.link_id}
-                    />
-                  </div>
+                  {marker.link_id && (
+                    <div className="w-1/3">
+                      <TrafficLightCounter
+                        // trafficLightSeconds={trafficLightSecondsRef.current}
+                        channelId={marker.link_id}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )}

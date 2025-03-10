@@ -1,0 +1,199 @@
+.fine-marker {
+  width: 24px;
+  height: 24px;
+  background-color: #f87171;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.fine-marker.selected {
+  background-color: #3b82f6;
+  transform: scale(1.2);
+  z-index: 10;
+}
+
+.fine-marker:hover {
+  transform: scale(1.1);
+}
+
+.fine-marker.selected:hover {
+  transform: scale(1.3);
+}
+
+.fine-marker-pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(248, 113, 113, 0.4);
+  z-index: -1;
+}
+
+.fine-marker.pulse .fine-marker-pulse {
+  animation: marker-pulse 1.5s infinite;
+}
+
+@keyframes marker-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Popup styles */
+.fine-popup {
+  max-width: 300px;
+}
+
+.fine-popup .maplibregl-popup-content {
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.fine-popup-content {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.fine-popup-header {
+  background-color: #1e293b;
+  color: white;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fine-popup-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.fine-popup-type {
+  background-color: #f87171;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.fine-popup-image {
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+}
+
+.fine-popup-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fine-popup-details {
+  padding: 12px;
+  background-color: white;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.fine-popup-details > div {
+  margin-bottom: 8px;
+}
+
+.fine-popup-details > div:last-child {
+  margin-bottom: 0;
+}
+
+.fine-popup-amount {
+  color: #f87171;
+}
+
+.fine-popup-time {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.fine-popup-speed {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.fine-popup-location {
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.fine-popup-gallery {
+  margin-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 12px;
+}
+
+.fine-popup-thumbnails {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.fine-popup-thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.fine-popup-thumbnail:hover {
+  border-color: #3b82f6;
+  transform: scale(1.05);
+}
+
+.fine-popup-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Flying image animation */
+.flying-fine-image {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  z-index: 9999; /* Ensure it's above everything */
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.5);
+  transition: all 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+  object-fit: cover;
+  transform-origin: center;
+  animation: pulse-scale 1s infinite alternate;
+}
+
+@keyframes pulse-scale {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}

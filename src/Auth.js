@@ -3,6 +3,7 @@ let token = localStorage.getItem("big_monitoring_token");
 class Auth {
   constructor() {
     this.authenticated = token ? true : false;
+    this.token = token;
     // this.authenticated = true;
   }
 

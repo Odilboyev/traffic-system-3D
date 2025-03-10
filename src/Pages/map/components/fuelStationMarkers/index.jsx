@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import EnergyIcon from "../../../../assets/icons/energy.svg";
+import FuelStationPopup from "./FuelStationPopup";
 import GasIcon from "../../../../assets/icons/gas.svg";
 import PetrolIcon from "../../../../assets/icons/petrol.svg";
 import ReactDOM from "react-dom/client";
@@ -47,6 +48,8 @@ const MarkerComponent = ({ type }) => {
 const FuelStationMarkers = ({ map }) => {
   const markersRef = useRef({});
   const sourceAdded = useRef(false);
+  const popupRef = useRef(null);
+  const [activeStation, setActiveStation] = useState(null);
   const {
     stations,
     fetchStations,
@@ -152,6 +155,11 @@ const FuelStationMarkers = ({ map }) => {
             })
               .setLngLat([station.lng, station.lat])
               .addTo(map);
+
+            // Add click event to marker
+            divContainer.addEventListener("click", () => {
+              handleMarkerClick(station);
+            });
 
             markersRef.current[station.id] = marker;
           }
@@ -277,8 +285,12 @@ const FuelStationMarkers = ({ map }) => {
 
       if (features.length > 0) {
         const props = features[0].properties;
-        console.log("Clicked fuel station:", props);
-        // You can add additional actions here, like showing a popup
+        const stationId = parseInt(props.id);
+        const station = stations.find((s) => s.id === stationId);
+
+        if (station) {
+          handleMarkerClick(station);
+        }
       }
     });
 
@@ -353,6 +365,47 @@ const FuelStationMarkers = ({ map }) => {
       if (map.getSource("fuel-stations")) map.removeSource("fuel-stations");
     };
   }, [map, stations, filter, useClusteredView, getFilteredStations]);
+
+  // Function to handle marker clicks
+  const handleMarkerClick = (station) => {
+    // Close existing popup if any
+    if (popupRef.current) {
+      popupRef.current.remove();
+      popupRef.current = null;
+    }
+
+    // Set the active station
+    setActiveStation(station);
+    setSelectedStation(station);
+
+    // Create popup element
+    const popupEl = document.createElement("div");
+    ReactDOM.createRoot(popupEl).render(<FuelStationPopup station={station} />);
+
+    // Create and add the popup
+    const popup = new maplibregl.Popup({
+      closeButton: true,
+      closeOnClick: false,
+      maxWidth: "300px",
+      className: "fuel-station-popup",
+    })
+      .setLngLat([station.lng, station.lat])
+      .setDOMContent(popupEl)
+      .addTo(map);
+
+    // Store reference to popup
+    popupRef.current = popup;
+
+    // Add event listener for popup close
+    popup.on("close", () => {
+      setActiveStation(null);
+      // Call clearSelectedStation only if it exists and is a function
+      if (typeof clearSelectedStation === "function") {
+        clearSelectedStation();
+      }
+      popupRef.current = null;
+    });
+  };
 
   return null;
 };

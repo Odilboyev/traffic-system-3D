@@ -33,6 +33,7 @@ const MapLibrePopup = ({
   onClose,
   offset = [0, 0],
   className = "",
+  markerId = "", // Add markerId prop
 }) => {
   const popupRef = useRef(null);
   const containerRef = useRef(null);
@@ -47,9 +48,7 @@ const MapLibrePopup = ({
       containerRef.current.className = ` ${className}`;
       ReactDOM.createRoot(containerRef.current).render(
         <ReduxProvider>
-          <div className="popup-wrapper">
-            {children}
-          </div>
+          <div className="popup-wrapper">{children}</div>
         </ReduxProvider>
       );
     }
@@ -60,13 +59,24 @@ const MapLibrePopup = ({
         closeButton: false,
         closeOnClick: false,
         offset,
-        className: `maplibre-custom-popup ${isDraggable ? 'draggable-popup' : ''}`,
-        draggable: isDraggable
+        className: `maplibre-custom-popup ${
+          isDraggable ? "draggable-popup" : ""
+        }`,
+        draggable: isDraggable,
       })
-
         .setLngLat(coordinates)
         .setDOMContent(containerRef.current)
         .addTo(map);
+
+      // Add the marker ID as a data attribute to the popup element
+      setTimeout(() => {
+        if (popupRef.current && markerId) {
+          const popupElement = popupRef.current.getElement();
+          if (popupElement) {
+            popupElement.setAttribute("data-marker-id", markerId);
+          }
+        }
+      }, 0);
 
       // Register the popup in the global registry
       popupRegistry.register(popupRef.current, coordinates);
@@ -94,38 +104,38 @@ const MapLibrePopup = ({
       if (isDraggable && popupRef.current) {
         // Get the popup element
         const popupElement = popupRef.current.getElement();
-        
+
         if (popupElement && !popupElement._hasMouseUpListener) {
           popupElement._hasMouseUpListener = true;
-          
+
           // Add mousedown event to start dragging
           popupElement.addEventListener("mousedown", (e) => {
             // Only initiate drag if clicking on the drag handle
-            if (e.target.closest('.popup-drag-handle')) {
+            if (e.target.closest(".popup-drag-handle")) {
               popupElement._isDragging = true;
               popupElement._dragStartX = e.clientX;
               popupElement._dragStartY = e.clientY;
               popupElement._initialLngLat = popupRef.current.getLngLat();
             }
           });
-          
+
           // Add mousemove event to handle dragging
           document.addEventListener("mousemove", (e) => {
             if (popupElement._isDragging && popupRef.current) {
               // Calculate pixel movement
               const dx = e.clientX - popupElement._dragStartX;
               const dy = e.clientY - popupElement._dragStartY;
-              
+
               // Convert pixel movement to geographic coordinates
               const initialPoint = map.project(popupElement._initialLngLat);
               const newPoint = [initialPoint.x + dx, initialPoint.y + dy];
               const newLngLat = map.unproject(newPoint);
-              
+
               // Update popup position
               popupRef.current.setLngLat(newLngLat);
             }
           });
-          
+
           // Add mouseup event to end dragging
           document.addEventListener("mouseup", () => {
             if (popupElement._isDragging && popupRef.current) {

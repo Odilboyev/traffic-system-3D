@@ -1,0 +1,285 @@
+/* Fuel Station Marker Styles */
+.fuel-station-marker-container {
+  cursor: pointer;
+  width: 40px;
+  height: 50px;
+  transition: transform 0.2s ease;
+}
+
+.fuel-station-marker-container:hover {
+  transform: scale(1.1);
+}
+
+.fuel-station-marker {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.fuel-station-marker-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: white;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid;
+  overflow: hidden;
+}
+
+.fuel-station-marker-icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.fuel-station-marker-label {
+  margin-top: 4px;
+  font-size: 9px;
+  font-weight: bold;
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+/* Fuel Station Popup Styles */
+.fuel-station-popup {
+  max-width: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.fuel-station-popup .maplibregl-popup-content {
+  padding: 0;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fuel-station-popup .maplibregl-popup-tip {
+  border-top-color: rgba(15, 23, 42, 0.9);
+}
+
+.fuel-station-popup-content {
+  color: white;
+  padding: 0;
+}
+
+.fuel-station-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid;
+}
+
+.fuel-station-popup-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fuel-station-popup-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.fuel-station-popup-brand {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.fuel-station-popup-logo {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fuel-station-popup-logo img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.fuel-station-popup-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.fuel-station-popup-close:hover {
+  color: white;
+}
+
+.fuel-station-popup-body {
+  padding: 16px;
+}
+
+.fuel-station-popup-section {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fuel-station-popup-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.fuel-station-popup-section-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.fuel-station-popup-fuel-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.fuel-station-popup-fuel-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fuel-station-popup-fuel-item.fuel-unavailable {
+  opacity: 0.5;
+}
+
+.fuel-station-popup-fuel-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.fuel-station-popup-fuel-price {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fuel-station-popup-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.fuel-station-popup-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.fuel-station-popup-info-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.fuel-station-popup-info-text {
+  flex: 1;
+}
+
+.fuel-station-popup-info-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+}
+
+.fuel-station-popup-info-value {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.fuel-station-popup-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fuel-station-popup-rating-value {
+  color: #f59e0b;
+  font-weight: bold;
+}
+
+.fuel-station-popup-rating-count {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.fuel-station-popup-services {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+}
+
+.fuel-station-popup-phone {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.fuel-station-popup-phone:hover {
+  text-decoration: underline;
+}
+
+.fuel-station-popup-footer {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.fuel-station-popup-action-button {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+}
+
+.fuel-station-popup-directions-button {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.fuel-station-popup-directions-button:hover {
+  background-color: #2563eb;
+}
