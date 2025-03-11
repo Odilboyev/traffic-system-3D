@@ -56,8 +56,8 @@ const SlidePanel = ({
 
 SlidePanel.propTypes = {
   side: PropTypes.oneOf(["top", "bottom", "left", "right"]),
-  content: PropTypes.node.isRequired,
-  isOpen: PropTypes.bool.isRequired,
+  content: PropTypes.node,
+  isOpen: PropTypes.bool,
   onHandleOpen: PropTypes.func,
   positionGap: PropTypes.shape({
     from: PropTypes.string,

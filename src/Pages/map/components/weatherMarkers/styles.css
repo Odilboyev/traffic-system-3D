@@ -1,7 +1,6 @@
 /* Weather Marker Styles */
 .weather-marker-container {
   cursor: pointer;
-  transition: transform 0.2s ease;
 }
 
 .weather-marker-container:hover {

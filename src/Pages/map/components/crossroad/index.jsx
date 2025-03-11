@@ -212,8 +212,8 @@ const CrossroadModal = ({ isOpen, onClose, marker }) => {
 };
 
 CrossroadModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool,
+  onClose: PropTypes.func,
   marker: PropTypes.object,
 };
 

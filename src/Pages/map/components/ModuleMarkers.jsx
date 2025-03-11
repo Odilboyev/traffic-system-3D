@@ -27,7 +27,7 @@ const ModuleMarkers = ({ map }) => {
       return <RoadSignsMarkers map={map} />;
     case "fuel_stations":
       return <FuelStationMarkers map={map} />;
-    case "monitoring":
+    case "its":
       return <MonitoringMarkers map={map} />;
     default:
       return null;

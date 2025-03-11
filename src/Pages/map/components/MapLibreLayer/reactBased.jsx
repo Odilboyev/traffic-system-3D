@@ -314,13 +314,13 @@ const MaplibreLayer = ({
 };
 
 ThemeToggle.propTypes = {
-  isDark: PropTypes.bool.isRequired,
-  onToggle: PropTypes.func.isRequired,
+  isDark: PropTypes.bool,
+  onToggle: PropTypes.func,
 };
 
 LayerControl.propTypes = {
-  layers: PropTypes.object.isRequired,
-  toggleLayer: PropTypes.func.isRequired,
+  layers: PropTypes.object,
+  toggleLayer: PropTypes.func,
 };
 
 MaplibreLayer.propTypes = {

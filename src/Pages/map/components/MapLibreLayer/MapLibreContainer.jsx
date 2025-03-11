@@ -149,8 +149,7 @@ const MapLibreContainer = () => {
       {/* Active Module Components */}
       {map && (
         <>
-          <ActiveModuleComponents map={map} />
-          <MapControlsPanel map={map} />
+          <ActiveModuleComponents map={map} currentZoom={currentZoom} />
         </>
       )}
 

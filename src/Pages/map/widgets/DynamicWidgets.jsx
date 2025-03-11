@@ -1,7 +1,7 @@
-import PropTypes from "prop-types";
 import Control from "../../../components/customControl";
 import CrossroadWidget from "./crossroadData";
 import InfoWidget from "./infoWidget";
+import PropTypes from "prop-types";
 import UserInfoWidget from "./userInfo";
 import WeatherWidget from "./weather";
 const DynamicWidgets = ({ widgets, t }) => {
@@ -33,7 +33,7 @@ const DynamicWidgets = ({ widgets, t }) => {
 };
 
 DynamicWidgets.propTypes = {
-  widgets: PropTypes.object.isRequired,
+  widgets: PropTypes.object,
   t: PropTypes.func,
 };
 

@@ -107,7 +107,7 @@ const MapComponent = memo(({ t }) => {
 
 MapComponent.propTypes = {
   notifications: PropTypes.array,
-  t: PropTypes.func.isRequired,
+  t: PropTypes.func,
 };
 
 export default MapComponent;

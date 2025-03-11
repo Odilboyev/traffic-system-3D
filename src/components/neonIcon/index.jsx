@@ -73,7 +73,7 @@ NeonIcon.propTypes = {
   icon: PropTypes.node, // Changed to node to accommodate div components
   text: PropTypes.any,
   iconStyle: PropTypes.object,
-  status: PropTypes.oneOf([0, 1, 2, 3, 4]).isRequired,
+  status: PropTypes.oneOf([0, 1, 2, 3, 4]),
   isRounded: PropTypes.bool, // Ensure this prop is defined
 };
 

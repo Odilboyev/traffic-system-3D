@@ -1,5 +1,4 @@
 import { Marker, Popup } from "maplibre-gl";
-import React, { useEffect, useState } from "react";
 import {
   WiCloudy,
   WiDaySunny,
@@ -7,6 +6,7 @@ import {
   WiSnow,
   WiStrongWind,
 } from "react-icons/wi";
+import { useEffect, useState } from "react";
 
 import { FaExclamationTriangle } from "react-icons/fa";
 import ReactDOM from "react-dom/client";
@@ -18,7 +18,7 @@ const WeatherMarkers = ({ map, markers }) => {
   // Create weather station marker element
   const createWeatherStationElement = (marker) => {
     const el = document.createElement("div");
-    el.className = "weather-station-marker";
+    el.className = "weather-sation-marker";
     el.style.width = "40px";
     el.style.height = "40px";
     el.style.borderRadius = "50%";

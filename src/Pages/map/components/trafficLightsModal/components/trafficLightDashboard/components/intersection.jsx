@@ -244,9 +244,9 @@ Intersection.propTypes = {
     south: PropTypes.object,
     east: PropTypes.object,
     west: PropTypes.object,
-  }).isRequired,
-  trafficLights: PropTypes.object.isRequired,
-  crosswalks: PropTypes.object.isRequired,
+  }),
+  trafficLights: PropTypes.object,
+  crosswalks: PropTypes.object,
 };
 
 export default Intersection;

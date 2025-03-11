@@ -37,8 +37,8 @@ InputField.propTypes = {
   label: PropTypes.string,
   inputType: PropTypes.string,
   type: PropTypes.string,
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 export default InputField;

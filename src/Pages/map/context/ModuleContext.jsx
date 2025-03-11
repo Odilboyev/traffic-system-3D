@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 // Create the context with default values
 const ModuleContext = createContext({
-  activeModule: { id: "monitoring", name: "Monitoring" },
+  activeModule: { id: "its", name: "ITS" },
   setActiveModule: () => {},
   modules: [],
 });
@@ -25,8 +25,8 @@ export const ModuleProvider = ({ children }) => {
     return savedModule
       ? JSON.parse(savedModule)
       : {
-          id: "monitoring",
-          name: "Monitoring",
+          id: "its",
+          name: "ITS",
         };
   });
 

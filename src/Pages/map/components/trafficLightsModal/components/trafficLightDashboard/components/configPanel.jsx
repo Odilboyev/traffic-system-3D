@@ -1,10 +1,11 @@
+import "rc-slider/assets/index.css";
+
 import { ToastContainer, toast } from "react-toastify";
 
 import CustomSelect from "../../../../../../../components/customSelect";
 import { FaSpinner } from "react-icons/fa6";
 import PropTypes from "prop-types";
 import Slider from "rc-slider";
-import "rc-slider/assets/index.css";
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import { iconOptions } from "../utils";
 import { modifySvetofor } from "../../../../../../../api/api.handlers";
@@ -33,8 +34,8 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
         ...prevConfig[direction],
         [`cross_walk${side}`]: {
           ...prevConfig[direction][`cross_walk${side}`],
-          exists: value
-        }
+          exists: value,
+        },
       },
     }));
     console.log({
@@ -43,10 +44,10 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
         ...config[direction],
         [`cross_walk${side}`]: {
           ...config[direction][`cross_walk${side}`],
-          exists: value
-        }
+          exists: value,
+        },
       },
-    })
+    });
   };
 
   // Generates lane icons based on lane count for the right side
@@ -300,7 +301,9 @@ const ConfigPanel = ({ config, setConfig, id, handleCLose }) => {
                   <label className="capitalize">{t(side)}</label>
                   <input
                     type="checkbox"
-                    checked={config[direction]?.[`cross_walk${side}`]?.exists ?? false}
+                    checked={
+                      config[direction]?.[`cross_walk${side}`]?.exists ?? false
+                    }
                     onChange={(e) =>
                       handleCrosswalkChange(direction, side, e.target.checked)
                     }
@@ -472,8 +475,8 @@ ConfigPanel.propTypes = {
         channel_id: PropTypes.number,
       }),
     }),
-  }).isRequired,
-  setConfig: PropTypes.func.isRequired,
+  }),
+  setConfig: PropTypes.func,
 };
 
 export default ConfigPanel;

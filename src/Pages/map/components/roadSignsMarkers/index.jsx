@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import ReactDOM from "react-dom/client";
-import maplibregl from "maplibre-gl";
 import "./styles.css";
+
+import { useEffect, useRef, useState } from "react";
+
+import ReactDOM from "react-dom/client";
 import RoadSignPopup from "./RoadSignPopup";
+import maplibregl from "maplibre-gl";
 import { useRoadSigns } from "../../hooks/useRoadSigns";
 
 // Placeholder SVG icons for road signs (in a real app, you would use actual images)
@@ -15,16 +17,19 @@ const roadSignIcons = {
   no_overtaking: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 8l6 8"/><path d="M15 8l-6 8"/></svg>`,
   pedestrian_crossing: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M12 11v8"/><path d="M8 15h8"/></svg>`,
   traffic_light: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>`,
-  no_u_turn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h4v8"/><path d="M7 9a4 4 0 0 1 4-4h6"/><path d="M17 5l-4 4 4 4"/></svg>`
+  no_u_turn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h4v8"/><path d="M7 9a4 4 0 0 1 4-4h6"/><path d="M17 5l-4 4 4 4"/></svg>`,
 };
 
 const RoadSignMarkerComponent = ({ roadSign }) => {
   let iconHtml = roadSignIcons[roadSign.type] || roadSignIcons.stop;
   let label = roadSign.type === "speed_limit" ? `${roadSign.value}` : "";
-  
+
   return (
     <div className="road-sign-marker">
-      <div className="road-sign-marker-icon" dangerouslySetInnerHTML={{ __html: iconHtml }}></div>
+      <div
+        className="road-sign-marker-icon"
+        dangerouslySetInnerHTML={{ __html: iconHtml }}
+      ></div>
       {label && <div className="road-sign-marker-label">{label}</div>}
     </div>
   );
@@ -43,7 +48,7 @@ const RoadSignsMarkers = ({ map }) => {
     getFilteredRoadSigns,
     roadSignTypes,
     isLoading,
-    error
+    error,
   } = useRoadSigns();
 
   useEffect(() => {
@@ -72,8 +77,8 @@ const RoadSignsMarkers = ({ map }) => {
 
       // Create a custom HTML element for the marker
       const markerElement = document.createElement("div");
-      markerElement.className = "road-sign-marker-container";
-      
+      markerElement.className = "mrker-container";
+
       // Create a React root and render the marker component
       const root = ReactDOM.createRoot(markerElement);
       root.render(<RoadSignMarkerComponent roadSign={roadSign} />);
@@ -97,18 +102,18 @@ const RoadSignsMarkers = ({ map }) => {
         // Create popup element
         const popupElement = document.createElement("div");
         const popupRoot = ReactDOM.createRoot(popupElement);
-        
+
         // Render popup content
         popupRoot.render(
-          <RoadSignPopup 
-            roadSign={roadSign} 
+          <RoadSignPopup
+            roadSign={roadSign}
             roadSignType={roadSignTypes[roadSign.type]}
             onClose={() => {
               if (popupRef.current) {
                 popupRef.current.remove();
                 popupRef.current = null;
               }
-            }} 
+            }}
           />
         );
 

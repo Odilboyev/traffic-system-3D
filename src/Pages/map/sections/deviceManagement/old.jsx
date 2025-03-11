@@ -1,9 +1,5 @@
 import { CogIcon, PlusIcon } from "@heroicons/react/16/solid";
 import { IconButton, List, ListItem } from "@material-tailwind/react";
-import { t } from "i18next";
-import PropTypes from "prop-types";
-import { memo, useCallback, useState } from "react";
-import { toast } from "react-toastify";
 import {
   addUser,
   deleteUser,
@@ -13,9 +9,14 @@ import {
   recoverUser,
   updateUser,
 } from "../../../../api/api.handlers";
+import { memo, useCallback, useState } from "react";
+
+import ModalTable from "../../components/modalTable";
+import PropTypes from "prop-types";
 import SidePanel from "../../../../components/sidePanel";
 import { modalToastConfig } from "../../../../tools/toastconfig";
-import ModalTable from "../../components/modalTable";
+import { t } from "i18next";
+import { toast } from "react-toastify";
 import { useMapMarkers } from "../../hooks/useMapMarkers";
 
 const DeviceManagement = ({ activeSidePanel, setActiveSidePanel }) => {
@@ -340,7 +341,7 @@ const DeviceManagement = ({ activeSidePanel, setActiveSidePanel }) => {
 };
 
 DeviceManagement.propTypes = {
-  refreshHandler: PropTypes.func.isRequired,
+  refreshHandler: PropTypes.func,
 };
 
 export default memo(DeviceManagement);

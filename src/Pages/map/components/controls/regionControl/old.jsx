@@ -1,11 +1,12 @@
+import { getDistricts, getRegions } from "../../../../../api/api.handlers";
+import { useEffect, useState } from "react";
+
+import Control from "../../../../../components/customControl";
+import { FaLocationDot } from "react-icons/fa6";
 import { IconButton } from "@material-tailwind/react";
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
-import { FaLocationDot } from "react-icons/fa6";
-import { useMap } from "react-leaflet";
-import { getDistricts, getRegions } from "../../../../../api/api.handlers";
-import Control from "../../../../../components/customControl";
 import SidePanel from "../../../../../components/sidePanel";
+import { useMap } from "react-leaflet";
 
 const RegionControl = ({ activeSidePanel, setActiveSidePanel, t }) => {
   const [regions, setRegions] = useState([]);
@@ -139,7 +140,7 @@ const RegionControl = ({ activeSidePanel, setActiveSidePanel, t }) => {
 
 RegionControl.propTypes = {
   activeSidePanel: PropTypes.any,
-  setActiveSidePanel: PropTypes.func.isRequired,
+  setActiveSidePanel: PropTypes.func,
 };
 
 export default RegionControl;

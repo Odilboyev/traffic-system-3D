@@ -18,6 +18,7 @@ import TrafficLightContainer from "./trafficLightMarkers/managementLights";
 import TransportMarkers from "./transportMarkers";
 import WeatherMarkers from "./weatherMarkers";
 import WeatherModule from "./TrafficMonitoringPanel/components/modules/WeatherModule";
+import { useEffect } from "react";
 import { useModuleContext } from "../context/ModuleContext";
 import { useState } from "react";
 import { useZoomPanel } from "../context/ZoomPanelContext";
@@ -30,7 +31,12 @@ const ActiveModuleComponents = ({ map }) => {
   const { activeModule } = useModuleContext();
   const conditionMet = useZoomPanel();
   const [showHeatmap, setShowHeatmap] = useState(true);
-  const currentZoom = useZoomPanel();
+  const [currentZoom, setCurrentZoom] = useState(13);
+  console.log(currentZoom, "zom");
+  useEffect(() => {
+    setCurrentZoom(JSON.parse(localStorage.getItem("mapState")).zoom);
+  }, [localStorage.getItem("mapState")]);
+
   if (!map) return null;
 
   // Render both markers and panels based on the active module
@@ -38,7 +44,7 @@ const ActiveModuleComponents = ({ map }) => {
     case "its":
       return (
         <>
-          {currentZoom == 20 && <TrafficLightContainer />}
+          {currentZoom >= 20 && <TrafficLightContainer />}
 
           <PulsingMarkers map={map} />
 

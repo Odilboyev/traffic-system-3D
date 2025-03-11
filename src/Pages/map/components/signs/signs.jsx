@@ -1,12 +1,14 @@
-import { t } from "i18next";
-import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
-import { FaXmark } from "react-icons/fa6";
-import { useMap } from "react-leaflet";
-import { getNearbySigns } from "../../../../api/api.handlers";
-import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
-import CustomMarker from "./customMarker";
 import "./Signs.css";
+
+import { useEffect, useState } from "react";
+
+import CustomMarker from "./customMarker";
+import { FaXmark } from "react-icons/fa6";
+import PropTypes from "prop-types";
+import { getNearbySigns } from "../../../../api/api.handlers";
+import { t } from "i18next";
+import { useMap } from "react-leaflet";
+import useMapDataFetcher from "../../../../customHooks/useMapDataFetcher";
 
 const Signs = ({
   signs, // signs state
@@ -129,8 +131,8 @@ const Signs = ({
 };
 
 Signs.propTypes = {
-  signs: PropTypes.array.isRequired,
-  setSigns: PropTypes.func.isRequired,
+  signs: PropTypes.array,
+  setSigns: PropTypes.func,
   clearSigns: PropTypes.func,
 };
 

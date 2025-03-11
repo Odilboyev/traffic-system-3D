@@ -1,21 +1,21 @@
 import PropTypes from "prop-types";
 
 export const MarkerPropTypes = {
-  cid: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  position: PropTypes.arrayOf(PropTypes.number).isRequired,
+  cid: PropTypes.string,
+  type: PropTypes.string,
+  position: PropTypes.arrayOf(PropTypes.number),
 };
 
 export const ModalPropTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool,
+  onClose: PropTypes.func,
 };
 
 export const MapControlsPropTypes = {
-  theme: PropTypes.string.isRequired,
-  toggleTheme: PropTypes.func.isRequired,
+  theme: PropTypes.string,
+  toggleTheme: PropTypes.func,
   activeSidePanel: PropTypes.string,
-  setActiveSidePanel: PropTypes.func.isRequired,
-  filter: PropTypes.object.isRequired,
-  setFilter: PropTypes.func.isRequired,
+  setActiveSidePanel: PropTypes.func,
+  filter: PropTypes.object,
+  setFilter: PropTypes.func,
 };

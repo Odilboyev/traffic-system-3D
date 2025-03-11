@@ -167,8 +167,8 @@ const CustomMarker = memo(
 );
 
 CustomMarker.propTypes = {
-  marker: PropTypes.object.isRequired,
-  L: PropTypes.object.isRequired,
+  marker: PropTypes.object,
+  L: PropTypes.object,
   isDraggable: PropTypes.bool,
   handleMonitorCrossroad: PropTypes.func,
   handleBoxModalOpen: PropTypes.func,

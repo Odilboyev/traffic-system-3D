@@ -1,6 +1,7 @@
 import { IconButton, Typography } from "@material-tailwind/react";
-import PropTypes from "prop-types";
+
 import { IoMdClose } from "react-icons/io";
+import PropTypes from "prop-types";
 
 const SidePanel = ({
   title,
@@ -46,9 +47,9 @@ const SidePanel = ({
 
 SidePanel.propTypes = {
   title: PropTypes.string,
-  isOpen: PropTypes.bool.isRequired,
-  content: PropTypes.node.isRequired,
-  setIsOpen: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool,
+  content: PropTypes.node,
+  setIsOpen: PropTypes.func,
   wrapperClass: PropTypes.string,
   sndWrapperClass: PropTypes.string,
   padding: PropTypes.string,
