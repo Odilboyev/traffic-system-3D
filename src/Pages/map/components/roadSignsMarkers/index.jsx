@@ -23,14 +23,15 @@ const roadSignIcons = {
 const RoadSignMarkerComponent = ({ roadSign }) => {
   let iconHtml = roadSignIcons[roadSign.type] || roadSignIcons.stop;
   let label = roadSign.type === "speed_limit" ? `${roadSign.value}` : "";
-
+  console.log(roadSign, "roadSign");
   return (
     <div className="road-sign-marker">
-      <div
+      <img
         className="road-sign-marker-icon"
-        dangerouslySetInnerHTML={{ __html: iconHtml }}
-      ></div>
-      {label && <div className="road-sign-marker-label">{label}</div>}
+        src={`/icons/signs/${roadSign.sings_data[0].roadsign_image_url}`}
+        // alt={roadSign.location_id}
+      />
+      {/* {label && <div className="road-sign-marker-label">{label}</div>} */}
     </div>
   );
 };
@@ -52,9 +53,13 @@ const RoadSignsMarkers = ({ map }) => {
   } = useRoadSigns();
 
   useEffect(() => {
+    map.on("moveend", () => {
+      const center = map.getCenter();
+      const zoom = Math.round(map.getZoom());
+      zoom > 17 &&
+        fetchRoadSignsData({ lat: center.lat, lng: center.lng, zoom });
+    });
     // Fetch road signs data when component mounts
-    fetchRoadSignsData();
-
     // Clean up when component unmounts
     return () => {
       clearRoadSignsData();
@@ -67,13 +72,11 @@ const RoadSignsMarkers = ({ map }) => {
     // Clean up existing markers
     Object.values(markersRef.current).forEach((marker) => marker.remove());
     markersRef.current = {};
-
-    // Get filtered road signs
-    const filteredRoadSigns = getFilteredRoadSigns();
-
+    console.log(roadSignsData, "roadSignsData");
     // Add new markers
-    filteredRoadSigns.forEach((roadSign) => {
-      if (!roadSign.location.lat || !roadSign.location.lng) return;
+    roadSignsData.forEach((roadSign) => {
+      console.log(roadSign, "roadSign");
+      if (!roadSign.lat || !roadSign.lng) return;
 
       // Create a custom HTML element for the marker
       const markerElement = document.createElement("div");
@@ -88,7 +91,7 @@ const RoadSignsMarkers = ({ map }) => {
         element: markerElement,
         anchor: "center",
       })
-        .setLngLat([roadSign.location.lng, roadSign.location.lat])
+        .setLngLat([roadSign.lng, roadSign.lat])
         .addTo(map);
 
       // Add click event to show popup
@@ -125,7 +128,7 @@ const RoadSignsMarkers = ({ map }) => {
           offset: [0, -10],
           className: "road-sign-popup",
         })
-          .setLngLat([roadSign.location.lng, roadSign.location.lat])
+          .setLngLat([roadSign.lng, roadSign.lat])
           .setDOMContent(popupElement)
           .addTo(map);
 

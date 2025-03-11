@@ -4,19 +4,7 @@ import "./styles.css";
 import { useEffect, useRef, useState } from "react";
 
 import ActiveModuleComponents from "../ActiveModuleComponents";
-import FuelStationHeatmap from "../fuelStationMarkers/FuelStationHeatmap";
-import FuelStationMarkers from "../fuelStationMarkers";
-import HeatmapControl from "../controls/heatmapControl";
-// import MapControls from "./MapControls";
-import MapControlsPanel from "../MapControlsPanel";
-// import ClusterLayer from "./ClusterLayer";
-import PulsingMarkers from "../PulsingMarkers/PulsingMarkers";
-import RegionDistrictFilter from "../RegionDistrictFilter";
-import Supercluster from "supercluster";
-import TrafficLightContainer from "../trafficLightMarkers/managementLights";
-import WeatherMarkers from "../weatherMarkers/WeatherMarkers";
 import { darkLayer } from "./utils/darkLayer";
-import { getMarkerData } from "../../../../api/api.handlers";
 import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
 import { useFuelStations } from "../../hooks/useFuelStations";
@@ -88,7 +76,6 @@ const MapLibreContainer = () => {
       maxPitch: 70,
       maxZoom: 20,
       minZoom: 5,
-      // ...existing code...
       canvasContextAttributes: { antialias: true },
     });
 
