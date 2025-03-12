@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getNearbySigns } from "../../../api/api.handlers";
 
@@ -177,6 +177,7 @@ export const useRoadSigns = () => {
   const [error, setError] = useState(null);
   const [selectedRoadSign, setSelectedRoadSign] = useState(null);
   const [lastSuccessFullLocation, setLastSuccessFullLocation] = useState(null);
+  const lastLocationRef = useRef(null);
 
   const [filters, setFilters] = useState({
     types: {
@@ -197,29 +198,66 @@ export const useRoadSigns = () => {
     },
   });
 
-  // Fetch road signs data
-  const fetchRoadSignsData = useCallback(async (body) => {
-    setIsLoading(true);
-    setError(null);
-    // console.log("Fetching road signs data with body:", body);
-    //  const latDiff = Math.abs(mapCenter.lat - fine.location[1]);
-    //  const lngDiff = Math.abs(mapCenter.lng - fine.location[0]);
+  // Move toRadians function outside to prevent recreation on each call
+  const toRadians = (degrees) => (Number(degrees) * Math.PI) / 180;
 
-    //  // Consider "near" if within ~1km (rough approximation)
-    //  console.log("difference ", latDiff < 0.01 && lngDiff < 0.01)
-    try {
-      // In a real app, this would be an API call
-      // For now, we'll use the mock data with a delay to simulate network request
-      const res = await getNearbySigns(body);
-      setRoadSignsData(res.data);
-      setLastSuccessFullLocation([body.lat, body.lng]);
-      setIsLoading(false);
-    } catch (err) {
-      console.error("Error fetching road signs data:", err);
-      setError("Failed to fetch road signs data");
-      setIsLoading(false);
+  // Fetch road signs data
+  const fetchRoadSignsData = useCallback(
+    async (body) => {
+      setIsLoading(true);
+      setError(null);
+
+      const newLocation = { lat: body.lat, lng: body.lng };
+
+      // Use the ref instead of state for immediate access
+      if (lastLocationRef.current) {
+        const lat1 = toRadians(newLocation.lat);
+        const lat2 = toRadians(lastLocationRef.current.lat);
+        const lng1 = toRadians(newLocation.lng);
+        const lng2 = toRadians(lastLocationRef.current.lng);
+
+        // Haversine formula
+        const R = 6371000; // Earth's radius in meters
+        const dLat = lat2 - lat1;
+        const dLng = lng2 - lng1;
+
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1) *
+            Math.cos(lat2) *
+            Math.sin(dLng / 2) *
+            Math.sin(dLng / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c;
+
+        if (distance < 100) {
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      try {
+        const res = await getNearbySigns(body);
+        setRoadSignsData(res.data);
+        // Update both state and ref
+        setLastSuccessFullLocation(newLocation);
+        lastLocationRef.current = newLocation;
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching road signs data:", err);
+        setError("Failed to fetch road signs data");
+        setIsLoading(false);
+      }
+    },
+    [toRadians] // Remove lastSuccessFullLocation from dependencies
+  );
+
+  useEffect(() => {
+    if (lastSuccessFullLocation) {
+      lastLocationRef.current = lastSuccessFullLocation;
     }
-  }, []);
+  }, [lastSuccessFullLocation]);
 
   // Clear road signs data
   const clearRoadSignsData = useCallback(() => {

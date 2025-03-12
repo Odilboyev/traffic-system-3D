@@ -23,7 +23,7 @@ const roadSignIcons = {
 const RoadSignMarkerComponent = ({ roadSign }) => {
   let iconHtml = roadSignIcons[roadSign.type] || roadSignIcons.stop;
   let label = roadSign.type === "speed_limit" ? `${roadSign.value}` : "";
-  console.log(roadSign, "roadSign");
+
   return (
     <div className="road-sign-marker">
       <img
@@ -56,7 +56,7 @@ const RoadSignsMarkers = ({ map }) => {
     map.on("moveend", () => {
       const center = map.getCenter();
       const zoom = Math.round(map.getZoom());
-      zoom > 17 &&
+      zoom >= 17 &&
         fetchRoadSignsData({ lat: center.lat, lng: center.lng, zoom });
     });
     // Fetch road signs data when component mounts
@@ -72,10 +72,8 @@ const RoadSignsMarkers = ({ map }) => {
     // Clean up existing markers
     Object.values(markersRef.current).forEach((marker) => marker.remove());
     markersRef.current = {};
-    console.log(roadSignsData, "roadSignsData");
     // Add new markers
     roadSignsData.forEach((roadSign) => {
-      console.log(roadSign, "roadSign");
       if (!roadSign.lat || !roadSign.lng) return;
 
       // Create a custom HTML element for the marker
