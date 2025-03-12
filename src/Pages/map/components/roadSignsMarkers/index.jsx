@@ -67,13 +67,19 @@ const RoadSignsMarkers = ({ map }) => {
   }, []);
 
   useEffect(() => {
-    if (!map || !roadSignsData.length) return;
+    if (!map || !roadSignsData.length) {
+      // Clean up existing markers when data is empty
+      Object.values(markersRef.current)?.forEach((marker) => marker.remove());
+      markersRef.current = {};
+      return;
+    }
 
     // Clean up existing markers
-    Object.values(markersRef.current).forEach((marker) => marker.remove());
+    Object.values(markersRef.current)?.forEach((marker) => marker.remove());
     markersRef.current = {};
+
     // Add new markers
-    roadSignsData.forEach((roadSign) => {
+    roadSignsData.forEach((roadSign, index) => {
       if (!roadSign.lat || !roadSign.lng) return;
 
       // Create a custom HTML element for the marker
@@ -136,14 +142,16 @@ const RoadSignsMarkers = ({ map }) => {
       });
 
       // Store marker reference for cleanup
-      markersRef.current[roadSign.id] = marker;
+      markersRef.current[index] = marker;
     });
 
     // Cleanup function
     return () => {
-      Object.values(markersRef.current).forEach((marker) => marker.remove());
+      Object.values(markersRef.current)?.forEach((marker) => marker.remove());
+      markersRef.current = {};
       if (popupRef.current) {
         popupRef.current.remove();
+        popupRef.current = null;
       }
     };
   }, [map, roadSignsData, getFilteredRoadSigns, selectRoadSign, roadSignTypes]);
