@@ -25,21 +25,27 @@ const RoadSignMarkerComponent = ({ roadSign }) => {
   let label = roadSign.type === "speed_limit" ? `${roadSign.value}` : "";
 
   return (
-    <div className="road-sign-marker">
-      <img
-        className="road-sign-marker-icon"
-        src={`/icons/signs/${roadSign.sings_data[0].roadsign_image_url}`}
-        // alt={roadSign.location_id}
-      />
+    <div className="road-sign-marker flex flex-col items-center gap-1 bg-white p-1  rounded-full shadow-md">
+      {roadSign.sings_data.map((sign, index) => (
+        <img
+          key={index}
+          className="road-sign-marker-icon shadow-sm"
+          src={`/icons/signs/${sign.roadsign_image_url}`}
+          // alt={roadSign.location_id}
+        />
+      ))}
       {/* {label && <div className="road-sign-marker-label">{label}</div>} */}
     </div>
   );
 };
 
 const RoadSignsMarkers = ({ map }) => {
+  const zoom = Math.round(map.getZoom());
+
   const markersRef = useRef({});
   const popupRef = useRef(null);
   const [activeRoadSign, setActiveRoadSign] = useState(null);
+
   const {
     roadSignsData,
     fetchRoadSignsData,
@@ -51,11 +57,9 @@ const RoadSignsMarkers = ({ map }) => {
     isLoading,
     error,
   } = useRoadSigns();
-
   useEffect(() => {
     map.on("moveend", () => {
       const center = map.getCenter();
-      const zoom = Math.round(map.getZoom());
       zoom >= 17 &&
         fetchRoadSignsData({ lat: center.lat, lng: center.lng, zoom });
     });
@@ -67,7 +71,7 @@ const RoadSignsMarkers = ({ map }) => {
   }, []);
 
   useEffect(() => {
-    if (!map || !roadSignsData.length) {
+    if (!map || !roadSignsData.length || zoom < 17) {
       // Clean up existing markers when data is empty
       Object.values(markersRef.current)?.forEach((marker) => marker.remove());
       markersRef.current = {};
@@ -93,7 +97,7 @@ const RoadSignsMarkers = ({ map }) => {
       // Create the marker and add it to the map
       const marker = new maplibregl.Marker({
         element: markerElement,
-        anchor: "center",
+        anchor: "bottom",
       })
         .setLngLat([roadSign.lng, roadSign.lat])
         .addTo(map);

@@ -4,8 +4,8 @@ import "swiper/css/effect-coverflow";
 import "swiper/css/navigation";
 
 import { EffectCoverflow, Navigation } from "swiper/modules";
-import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useEffect, useState } from "react";
 
 // Import the module context
 import { useModuleContext } from "../../../context/ModuleContext";

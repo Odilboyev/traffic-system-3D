@@ -1,12 +1,16 @@
 import * as THREE from "three";
 
+import { useCallback, useEffect, useState } from "react";
+
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import PropTypes from "prop-types";
 import maplibregl from "maplibre-gl";
-import { useEffect } from "react";
 
 const ThreeDModelLayer = ({ map }) => {
-  useEffect(() => {
-    if (!map) return;
+  const [modelLoaded, setModelLoaded] = useState(false);
+
+  const addCustomLayer = useCallback(() => {
+    if (!map || modelLoaded) return;
 
     const modelOrigin = [69.254643, 41.321151];
     const modelAltitude = 0;
@@ -22,7 +26,7 @@ const ThreeDModelLayer = ({ map }) => {
       rotateX: modelRotate[0],
       rotateY: modelRotate[1],
       rotateZ: modelRotate[2],
-      scale: modelAsMercatorCoordinate.meterInMercatorCoordinateUnits() * 20,
+      scale: modelAsMercatorCoordinate.meterInMercatorCoordinateUnits() * 5,
     };
 
     const customLayer = {
@@ -69,10 +73,13 @@ const ThreeDModelLayer = ({ map }) => {
               -(center.z + size.z / 2)
             );
             this.scene.add(gltf.scene);
+            setModelLoaded(true);
+            this.map.triggerRepaint();
           },
           undefined,
           (error) => {
             console.error("Error loading GLTF model:", error);
+            setModelLoaded(false);
           }
         );
       },
@@ -104,19 +111,46 @@ const ThreeDModelLayer = ({ map }) => {
       },
     };
 
+    // Remove existing layer if it exists
+    if (map.getLayer("3d-model")) {
+      map.removeLayer("3d-model");
+    }
+
     map.addLayer(customLayer);
+  }, [map, modelLoaded]);
+
+  useEffect(() => {
+    if (!map) return;
+
+    // Attempt to add layer immediately and on map idle
+    addCustomLayer();
+    map.on("render", addCustomLayer);
 
     return () => {
-      if (map.getLayer("3d-model")) {
-        map.removeLayer("3d-model");
-        if (map.getSource("3d-model")) {
-          map.removeSource("3d-model");
+      if (map) {
+        map.off("idle", addCustomLayer);
+        if (map.getLayer("3d-model")) {
+          map.removeLayer("3d-model");
         }
       }
     };
-  }, [map]);
+  }, [map, addCustomLayer]);
 
   return null;
+};
+
+ThreeDModelLayer.propTypes = {
+  map: PropTypes.shape({
+    getCanvas: PropTypes.func.isRequired,
+    addLayer: PropTypes.func.isRequired,
+    getLayer: PropTypes.func.isRequired,
+    removeLayer: PropTypes.func.isRequired,
+    getSource: PropTypes.func.isRequired,
+    removeSource: PropTypes.func.isRequired,
+    triggerRepaint: PropTypes.func.isRequired,
+    on: PropTypes.func.isRequired,
+    off: PropTypes.func.isRequired,
+  }),
 };
 
 export default ThreeDModelLayer;

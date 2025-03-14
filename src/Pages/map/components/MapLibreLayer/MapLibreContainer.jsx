@@ -4,6 +4,7 @@ import "./styles.css";
 import { useEffect, useRef, useState } from "react";
 
 import ActiveModuleComponents from "../ActiveModuleComponents";
+import ThreeDModelLayer from "./ThreeDModelLayer";
 import { darkLayer } from "./utils/darkLayer";
 import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
@@ -137,6 +138,7 @@ const MapLibreContainer = () => {
       {map && (
         <>
           <ActiveModuleComponents map={map} currentZoom={currentZoom} />
+          {/* <ThreeDModelLayer map={map} /> */}
         </>
       )}
 
