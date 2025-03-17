@@ -1,0 +1,25 @@
+.flying-image {
+  position: fixed;
+  width: 50px; /* Adjust as needed */
+  height: 50px; /* Adjust as needed */
+  object-fit: cover;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 9999;
+  left: var(--start-x);
+  top: var(--start-y);
+  animation: fly-to-panel 1.4s ease-in-out forwards;
+}
+
+@keyframes fly-to-panel {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}

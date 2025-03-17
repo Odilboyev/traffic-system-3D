@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import "./styles.finesPanel.css";
+
+import { useEffect, useRef, useState } from "react";
 
 import { useFines } from "../../context/FinesContext";
 import { useMapContext } from "../../context/MapContext";
@@ -52,6 +54,7 @@ const FinesPanel = () => {
   const [animatingFineId, setAnimatingFineId] = useState(null);
   const [mapCenter, setMapCenter] = useState(null);
   const panelRef = useRef(null);
+  const [flyingImage, setFlyingImage] = useState(null);
 
   // Add fines-panel class to the panel for targeting in CSS
   useEffect(() => {
@@ -89,92 +92,150 @@ const FinesPanel = () => {
     return latDiff < 0.01 && lngDiff < 0.01;
   };
 
+  // Add this function to calculate screen coordinates from map coordinates
+  const getScreenPosition = (location) => {
+    if (!map || !location) return null;
+    const point = map.project(location);
+    return {
+      x: point.x,
+      y: point.y,
+    };
+  };
+
   // Handle new fines coming in
   useEffect(() => {
     if (fines.length > 0) {
-      const latestFine = fines[fines.length - 1];
-      setAnimatingFineId(latestFine.id);
+      const latestFine = fines[0];
+      console.log(fines, "fines");
+      // Get the fine's location on screen
+      const screenPos = getScreenPosition([
+        latestFine.location[0],
+        latestFine.location[1],
+      ]);
 
-      // Clear the animation state after animation completes
-      const timer = setTimeout(() => {
-        setAnimatingFineId(null);
-      }, 2000); // Match this with CSS animation duration
+      if (screenPos && panelRef.current) {
+        // Get the panel's position
+        const panelRect = panelRef.current.getBoundingClientRect();
 
-      return () => clearTimeout(timer);
+        // Find the position where the fine will be added in the list
+        const fineElements = panelRef.current.querySelectorAll(".fine-item");
+        const targetElement = fineElements[fineElements.length - 1];
+
+        if (targetElement) {
+          const targetRect = targetElement.getBoundingClientRect();
+
+          // Set up the flying image animation
+          setFlyingImage({
+            id: latestFine.id,
+            src: latestFine.imagePath,
+            startX: screenPos.x,
+            startY: screenPos.y,
+            endX: targetRect.left,
+            endY: targetRect.top,
+          });
+
+          // Remove flying image after animation completes
+          setTimeout(() => {
+            setFlyingImage(null);
+          }, 1400);
+        }
+      }
     }
-  }, [fines.length]);
+  }, [fines.length, map]);
+
+  // Add this function for testing
 
   if (!showFinesPanel) return null;
 
   return (
-    <div className="absolute mt-[90px] right-5 top-0 w-[30vw] max-h-[calc(90vh)] bg-[rgba(24,28,41,0.10)] rounded-lg shadow-lg overflow-y-auto flex flex-col z-[100] backdrop-blur-md transition-all duration-300">
-      <div className="p-4 bg-black/20 flex flex-col gap-2 border-b border-white/10">
-        <div className="flex justify-between items-center">
-          <h2 className="text-white text-lg font-semibold m-0">
-            Traffic Violations
-          </h2>
-          <span className="bg-white/20 text-white px-2 py-1 rounded-full text-xs">
-            {fines.length} total
-          </span>
-        </div>
-        <ConnectionStatus status={socketStatus} />
-      </div>
-
-      {/* Display up to 8 fines in a 2x4 grid layout */}
-      <div className="flex-1 overflow-y-auto p-2 grid grid-cols-2 gap-4">
-        {fines.map((fine) => (
-          <div
-            key={fine.id}
-            className={`relative bg-white/10 rounded-md overflow-hidden cursor-pointer transition-all duration-200 h-60 group ${
-              selectedFine?.id === fine.id && isNearMapCenter(fine)
-                ? "ring-2 ring-blue-500"
-                : ""
-            } ${animatingFineId === fine.id ? "animate-pulse-gold" : ""}`}
-            onClick={() => flyToFine(fine)}
-          >
-            <div className="w-full h-full overflow-hidden">
-              <img
-                src={fine.imagePath}
-                alt="Traffic violation"
-                className="w-full h-full object-cover transition-transform duration-300 "
-              />
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-black/30 p-3 opacity-20 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-1">
-              {fine.crossroad && (
-                <div
-                  className="font-semibold text-white text-sm mt-0.5"
-                  title={fine.crossroad}
-                >
-                  {fine.crossroad.length > 30
-                    ? `${fine.crossroad.substring(0, 30)}...`
-                    : fine.crossroad}
-                </div>
-              )}
-              {/* <div className="text-white font-semibold capitalize text-sm">
-                {fine.type}
-              </div> */}
-              <div className="flex justify-between items-center text-white/80 text-xs">
-                <span className="font-semibold bg-white/15 px-1.5 py-0.5 rounded">
-                  {fine.vehicleInfo.plate}
-                </span>
-                {fine.speed && parseInt(fine.speed) > 0 && (
-                  <span className="text-red-400 font-semibold">
-                    {fine.speed} km/h
-                  </span>
-                )}
-              </div>
-
-              {/* <div className="text-red-400 font-semibold text-sm mt-1">
-                ${fine.amount}
-              </div> */}
-              <div className="text-white/60 text-xs mt-0.5">
-                {new Date(fine.timestamp).toLocaleTimeString()}
-              </div>
-            </div>
+    <>
+      {flyingImage && (
+        <img
+          src={flyingImage.src}
+          className="flying-image"
+          style={{
+            "--start-x": `${flyingImage.startX}px`,
+            "--start-y": `${flyingImage.startY}px`,
+            "--end-x": `${flyingImage.endX}px`,
+            "--end-y": `${flyingImage.endY}px`,
+          }}
+          alt=""
+        />
+      )}
+      <div
+        ref={panelRef}
+        className="absolute mt-[90px] right-5 top-0 w-[30vw] max-h-[calc(90vh)] bg-[rgba(24,28,41,0.10)] rounded-lg shadow-lg overflow-y-auto flex flex-col z-[100] backdrop-blur-md transition-all duration-300"
+      >
+        <div className="p-4 bg-black/20 flex flex-col gap-2 border-b border-white/10">
+          <div className="flex justify-between items-center">
+            <h2 className="text-white text-lg font-semibold m-0">
+              Traffic Violations
+            </h2>
+            <span className="bg-white/20 text-white px-2 py-1 rounded-full text-xs">
+              {fines.length} total
+            </span>
           </div>
-        ))}
+          <ConnectionStatus status={socketStatus} />
+        </div>
+
+        {/* Display up to 8 fines in a 2x4 grid layout */}
+        <div className="flex-1 overflow-y-auto p-2 grid grid-cols-2 gap-4">
+          {fines.map((fine) => (
+            <div
+              key={fine.id}
+              className={`relative fine-item bg-white/10 rounded-md overflow-hidden cursor-pointer transition-all duration-200 h-60 group ${
+                selectedFine?.id === fine.id && isNearMapCenter(fine)
+                  ? "ring-2 ring-blue-500"
+                  : ""
+              } ${animatingFineId === fine.id ? "animate-pulse-gold" : ""}`}
+              onClick={() => flyToFine(fine)}
+            >
+              <div className="w-full h-full overflow-hidden">
+                <img
+                  src={fine.imagePath}
+                  alt="Traffic violation"
+                  className="w-full h-full object-cover transition-transform duration-300 "
+                />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-black/30 p-3 opacity-20 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-1">
+                {fine.crossroad && (
+                  <div
+                    className="font-semibold text-white text-sm mt-0.5"
+                    title={fine.crossroad}
+                  >
+                    {fine.crossroad.length > 30
+                      ? `${fine.crossroad.substring(0, 30)}...`
+                      : fine.crossroad}
+                  </div>
+                )}
+                {/* <div className="text-white font-semibold capitalize text-sm">
+                  {fine.type}
+                </div> */}
+                <div className="w-full flex justify-between">
+                  <div className="flex justify-between items-center text-white/80 text-xs">
+                    <span className="font-semibold bg-white/15 px-1.5 py-0.5 rounded">
+                      {fine.vehicleInfo.plate}
+                    </span>
+                    {fine.speed && parseInt(fine.speed) > 0 && (
+                      <span className="text-red-400 font-semibold">
+                        {fine.speed} km/h
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* <div className="text-red-400 font-semibold text-sm mt-1">
+                  ${fine.amount}
+                </div> */}
+                <div className="text-white/60 text-xs mt-0.5">
+                  {new Date(fine.timestamp).toLocaleTimeString()}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

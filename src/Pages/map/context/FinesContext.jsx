@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useCallback,
   useContext,
@@ -122,7 +122,9 @@ export const FinesProvider = ({ children }) => {
 
           // Add new fines at the top of the list and limit to 8
           setFines((prevFines) => {
-            const updatedFines = [newFine, ...prevFines];
+            const updatedFines = [newFine, ...prevFines].sort(
+              (a, b) => b.timestamp - a.timestamp
+            );
             // If we have more than 8 fines, remove the oldest one
             return updatedFines.slice(0, 8);
           });
@@ -189,6 +191,7 @@ export const FinesProvider = ({ children }) => {
       value={{
         fines,
         showFinesPanel,
+        setFines,
         selectedFine,
         socketStatus,
         flyToFine,

@@ -1,25 +1,18 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import * as Threebox from "threebox-plugin";
-
 import {
   FullscreenControl,
   GeolocateControl,
   Map,
-  Marker,
   NavigationControl,
-  Popup,
   ScaleControl,
 } from "@vis.gl/react-maplibre";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import ProjectMarker from "../ProjectMarker";
 import PropTypes from "prop-types";
 import ThreeJsMarker from "../ThreeJsMarker";
-import ThreeJsMarkerRenderer from "../ThreeJsMarker/ThreeJsMarkerRenderer";
 import { darkLayer } from "./utils/darkLayer";
 import { lightLayer } from "./utils/lightLayer";
-import maplibregl from "maplibre-gl";
 
 // Map styles for light and dark modes
 const MAP_STYLES = {
