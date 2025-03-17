@@ -4,7 +4,6 @@ import "./styles.css";
 import { useEffect, useRef, useState } from "react";
 
 import ActiveModuleComponents from "../ActiveModuleComponents";
-import ThreeDModelLayer from "./ThreeDModelLayer";
 import { darkLayer } from "./utils/darkLayer";
 import { lightLayer } from "./utils/lightLayer";
 import maplibregl from "maplibre-gl";
@@ -50,7 +49,7 @@ const MapLibreContainer = () => {
 
     try {
       const storedMapState = localStorage.getItem("mapState");
-      if (storedMapState && storedMapState !== "undefined") {
+      if (storedMapState && storedMapState !== undefined) {
         const parsedState = JSON.parse(storedMapState);
         // Validate the parsed state
         if (

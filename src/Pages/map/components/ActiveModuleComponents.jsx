@@ -7,8 +7,6 @@ import FuelStationMarkers from "./fuelStationMarkers";
 import FuelStationsModule from "./TrafficMonitoringPanel/components/modules/FuelStationsModule";
 import HeatmapControl from "./controls/heatmapControl";
 import ITSModule from "./TrafficMonitoringPanel/components/modules/ITSModule";
-import MapControlsPanel from "./MapControlsPanel";
-import MonitoringMarkers from "./monitoringMarkers";
 import NotificationBox from "../../../components/NotificationBox";
 import PulsingMarkers from "./PulsingMarkers/PulsingMarkers";
 import RegionDistrictFilter from "./RegionDistrictFilter";
@@ -34,7 +32,11 @@ const ActiveModuleComponents = ({ map }) => {
   const [currentZoom, setCurrentZoom] = useState(13);
   console.log(currentZoom, "zom");
   useEffect(() => {
-    setCurrentZoom(JSON.parse(localStorage.getItem("mapState")).zoom);
+    setCurrentZoom(
+      JSON.parse(localStorage.getItem("mapState"))
+        ? JSON.parse(localStorage.getItem("mapState")).zoom
+        : 13
+    );
   }, [localStorage.getItem("mapState")]);
 
   if (!map) return null;
