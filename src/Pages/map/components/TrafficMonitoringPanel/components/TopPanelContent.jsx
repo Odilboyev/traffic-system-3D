@@ -81,13 +81,15 @@ const TopPanelContent = () => {
   }, [activeSlideIndex, setActiveModule]);
 
   return (
-    <div className="relative w-full h-14 ">
+    <div className="relative mx-auto h-14 w-[90%]">
       {/* Main container with modern glassmorphism */}
-
-      {/* Content container with improved spacing */}
-      <div className="h-full flex items-center justify-between px-3">
+      <div className="h-full flex items-center justify-between relative">
         {/* BLOCK 1: Location, Date, Time with neon green style */}
-        <div className="h-full px-3 flex items-center gap-5 bg-gradient-to-b from-black/90 via-black/80 to-black/70 backdrop-blur-sm">
+        <div className="h-full flex items-center gap-5 bg-gradient-to-b from-black/90 via-black/80 to-black/70 backdrop-blur-sm relative border-t border-b border-l border-green-400/30 pl-3 pr-12">
+          {/* Triangle shape for left edge */}
+          <div className="absolute left-0 top-0 h-full w-8 ">
+            <div className="absolute top-0 -left-full border-t border-green-400/30 border-b border-green-400/30 w-16 h-full bg-gradient-to-b from-black/90 via-black/80 to-black/70 origin-top-left skew-x-20 translate-x-8"></div>
+          </div>
           {/* Location */}
           <div className="group relative cursor-pointer flex items-center gap-2">
             <div className="text-green-400 text-sm">
@@ -99,7 +101,7 @@ const TopPanelContent = () => {
           </div>
 
           {/* Date */}
-          <div className="group relative cursor-pointer flex items-center gap-2 ">
+          <div className="group relative cursor-pointer flex items-center gap-2">
             <div className="text-green-400 text-sm">
               <FaCalendarAlt size={14} className="inline mr-1" />
               <span className="font-medium uppercase tracking-wider">
@@ -117,12 +119,22 @@ const TopPanelContent = () => {
               </span>
             </div>
           </div>
+
+          {/* Triangle shape for right edge */}
+          <div className="absolute right-0 top-0 h-full w-8 ">
+            <div className="absolute top-0 -right-full border-t border-green-400/30 border-b border-green-400/30 w-16 h-full bg-gradient-to-b from-black/90 via-black/80 to-black/70 origin-top-left skew-x-20  translate-x-8"></div>
+          </div>
         </div>
 
         {/* BLOCK 2: Center Navigation Swiper */}
-        <div className="h-full px-3 w-2/5 justify-center absolute left-1/2 bg-gradient-to-b from-black/90 via-black/80 to-black/70 backdrop-blur-sm -translate-x-1/2 flex flex-col items-center">
+        <div className="h-full w-[40%] absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center bg-gradient-to-b from-black/90 via-black/80 to-black/70 backdrop-blur-sm border-t border-b border-green-400/30 relative">
+          {/* Left triangle */}
+          <div className="absolute left-0 top-0 h-full w-8 ">
+            <div className="absolute top-0 -left-full border-t border-green-400/30 border-b border-green-400/30 w-16 h-full bg-gradient-to-b from-black/90 via-black/80 to-black/70 origin-top-right skew-x-20 -translate-x-8"></div>
+          </div>
+
           {/* Enhanced Swiper container */}
-          <div className="relative w-full">
+          <div className="relative w-full px-8">
             <Swiper
               effect={"coverflow"}
               grabCursor={true}
@@ -157,7 +169,7 @@ const TopPanelContent = () => {
               {modules.map((module, index) => (
                 <SwiperSlide key={index}>
                   <div
-                    className={`group text-center relative py-2 px-6 cursor-pointer ${
+                    className={`group text-center flex flex-col justify-center items-center relative py-2 px-6 cursor-pointer ${
                       index === activeSlideIndex ? "active-slide" : ""
                     }`}
                   >
@@ -179,10 +191,20 @@ const TopPanelContent = () => {
               ))}
             </Swiper>
           </div>
+
+          {/* Right triangle */}
+          <div className="absolute right-0 top-0 h-full w-8 ">
+            <div className="absolute top-0 -right-full border-t border-green-400/30 border-b border-green-400/30 w-16 h-full bg-gradient-to-b from-black/90 via-black/80 to-black/70 origin-top-left -skew-x-20 translate-x-8"></div>
+          </div>
         </div>
 
         {/* BLOCK 3: Control buttons */}
-        <div className="h-full px-3 flex bg-gradient-to-b from-black/90 via-black/80 to-black/70 backdrop-blur-sm items-center gap-4">
+        <div className="h-full flex items-center gap-4 bg-gradient-to-b from-black/90 via-black/80 to-black/70 backdrop-blur-sm border-t border-b border-r border-green-400/30 pl-12 pr-3 ml-auto relative">
+          {/* Left triangle shape */}
+          <div className="absolute left-0 top-0 h-full w-8 ">
+            <div className="absolute top-0 -left-full border-t border-green-400/30 border-b border-green-400/30 w-16 h-full bg-gradient-to-b from-black/90 via-black/80 to-black/70 origin-top-right -skew-x-20 -translate-x-8"></div>
+          </div>
+
           {/* Search button */}
           <div className="group relative cursor-pointer py-1 px-2 bg-black/40 rounded border border-green-400/20 hover:border-green-400/50 transition-all duration-300">
             <div className="flex items-center gap-2">
@@ -202,8 +224,23 @@ const TopPanelContent = () => {
               </span>
             </div>
           </div>
+          {/* Left triangle shape */}
+          <div className="absolute right-0 top-0 h-full w-8 -z-10">
+            <div className="absolute top-0 -right-full border-t border-green-400/30 border-b border-green-400/30 w-16 h-full bg-gradient-to-b from-black/90 via-black/80 to-black/70 origin-top-right -skew-x-20 -translate-x-8"></div>
+          </div>
         </div>
       </div>
+
+      {/* Add any additional styles needed for the Swiper */}
+      <style jsx>{`
+        /* You can add any custom styles here if needed */
+        .skew-x-20 {
+          transform: skewX(20deg);
+        }
+        .-skew-x-20 {
+          transform: skewX(-20deg);
+        }
+      `}</style>
     </div>
   );
 };
