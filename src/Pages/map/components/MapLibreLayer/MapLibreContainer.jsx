@@ -137,7 +137,6 @@ const MapLibreContainer = () => {
       {map && (
         <>
           <ActiveModuleComponents map={map} currentZoom={currentZoom} />
-          {/* <ThreeDModelLayer map={map} /> */}
         </>
       )}
 

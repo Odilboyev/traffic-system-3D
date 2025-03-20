@@ -1,13 +1,54 @@
 import * as THREE from 'three';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 
 const CameraMarker3D = ({ rotation = 0 }) => {
   const containerRef = useRef();
   const sceneRef = useRef();
   const cameraRef = useRef();
   const rendererRef = useRef();
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Memoize geometries and materials to prevent unnecessary recreations
+  const { cameraGeometry, cameraMaterial, fovGeometry, fovMaterial } = useMemo(() => ({
+    cameraGeometry: new THREE.ConeGeometry(0.8, 2, 8),
+    cameraMaterial: new THREE.MeshBasicMaterial({
+      color: 0x00ff00,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.8
+    }),
+    fovGeometry: new THREE.ConeGeometry(2, 4, 8),
+    fovMaterial: new THREE.MeshBasicMaterial({
+      color: 0x00ff00,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.3
+    })
+  }), []);
 
   useEffect(() => {
+    // Intersection Observer to manage visibility and rendering
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
     // Set up scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
@@ -28,23 +69,9 @@ const CameraMarker3D = ({ rotation = 0 }) => {
     }
 
     // Create camera model
-    const cameraGeometry = new THREE.ConeGeometry(0.8, 2, 8);
-    const cameraMaterial = new THREE.MeshBasicMaterial({
-      color: 0x00ff00,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.8
-    });
     const cameraMesh = new THREE.Mesh(cameraGeometry, cameraMaterial);
     
     // Add field of view visualization
-    const fovGeometry = new THREE.ConeGeometry(2, 4, 8);
-    const fovMaterial = new THREE.MeshBasicMaterial({
-      color: 0x00ff00,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.3
-    });
     const fovMesh = new THREE.Mesh(fovGeometry, fovMaterial);
     fovMesh.position.z = -2;
     
@@ -64,20 +91,24 @@ const CameraMarker3D = ({ rotation = 0 }) => {
     scene.add(ambientLight);
 
     // Animation loop
+    let animationFrameId;
     const animate = () => {
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
       renderer.render(scene, camera);
     };
     animate();
 
     // Cleanup
     return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };
-  }, [rotation]);
+  }, [rotation, isVisible, cameraGeometry, cameraMaterial, fovGeometry, fovMaterial]);
 
   return (
     <div 
@@ -85,7 +116,8 @@ const CameraMarker3D = ({ rotation = 0 }) => {
       style={{ 
         width: '40px', 
         height: '40px',
-        position: 'relative'
+        position: 'relative',
+        visibility: isVisible ? 'visible' : 'hidden'
       }} 
     />
   );

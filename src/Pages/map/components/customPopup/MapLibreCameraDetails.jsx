@@ -4,15 +4,13 @@ import { FaMinus, FaPlus, FaVideo } from "react-icons/fa6";
 import { memo, useEffect, useRef, useState } from "react";
 
 import { FiExternalLink } from "react-icons/fi";
-import { IconButton } from "@material-tailwind/react";
 import MapLibrePopup from "./components/customPopup/MapLibrePopup";
 import PTZCameraModal from "./components/ptzModal";
 import Records from "./components/records";
 import TrafficLightCounter from "./components/TrafficLightCounter";
-import { authToken } from "../../../../api/api.config";
-import { fixIncompleteJSON } from "../../components/trafficLightMarkers/utils";
 import { updateTrafficLightSeconds } from "../../../../redux/slices/trafficLightSecondsSlice";
 import { useDispatch } from "react-redux";
+import WebSocketManager from "../../../../utils/WebSocketManager";
 
 const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   marker = {},
@@ -26,10 +24,7 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   const popupRef = useRef(null);
   const dispatch = useDispatch();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isPopupDraggable] = useState(true); // Always keep popup draggable
   const [PTZModalOpen, setPTZModalOpen] = useState(false);
-  // Always show popup when the component is rendered
-  const [showPopup] = useState(true);
 
   const handleCollapseToggle = () => {
     setIsCollapsed((prev) => !prev);
@@ -37,22 +32,16 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
 
   // Store the latest traffic light seconds in a ref
   const trafficLightSecondsRef = useRef(null);
-  const [trafficLightSocket, setTrafficLightSocket] = useState(null);
 
   // Close popup when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      // Check if click is outside the popup
-      const popups = document.querySelectorAll(".camera-popup");
-      let clickedOutside = true;
+      // More efficient event handling
+      if (!popupRef.current) return;
 
-      popups.forEach((popup) => {
-        if (popup.contains(e.target)) {
-          clickedOutside = false;
-        }
-      });
-
-      if (clickedOutside && !isCollapsed) {
+      const isClickOutside = !popupRef.current.contains(e.target);
+      
+      if (isClickOutside && !isCollapsed) {
         setIsCollapsed(true);
       }
     };
@@ -66,40 +55,10 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
 
   // Manage WebSocket connection based on marker type
   useEffect(() => {
-    const connectTrafficLightSocket = (svetoforId) => {
-      // Prevent multiple connections for the same svetofor_id
-      if (trafficLightSocket) {
-        return trafficLightSocket;
-      }
-
-      const vendor = marker.vendor_id ?? marker.vendor ?? 1; // Try both vendor_id and vendor, fallback to 1
-
-      const wsBaseUrl =
-        Number(vendor) === 1
-          ? import.meta.env.VITE_TRAFFICLIGHT_SOCKET
-          : import.meta.env.VITE_TRAFFICLIGHT_SOCKET.replace(
-              "/websocket/",
-              "/websocketfama/"
-            );
-
-      const socket = new WebSocket(
-        `${wsBaseUrl}?svetofor_id=${svetoforId}&token=${authToken}`
-      );
-
-      socket.onopen = () => {
-        console.log(`WebSocket connected for svetofor_id: ${svetoforId}`);
-      };
-
-      socket.onclose = () => {
-        console.log(`WebSocket closed for svetofor_id: ${svetoforId}`);
-        setTrafficLightSocket(null);
-      };
-
-      socket.onmessage = (event) => {
-        let message = event.data;
-        message = fixIncompleteJSON(message);
+    // Only connect for traffic light markers
+    if (marker.type === 1 && marker.svetofor_id) {
+      const handleTrafficLightMessage = (data) => {
         try {
-          const data = JSON.parse(message);
           if (data?.channel) {
             const channelSeconds = data.channel.reduce((acc, channel) => {
               acc[channel.id] = {
@@ -123,30 +82,29 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
           }
         } catch (error) {
           console.error(
-            "Error parsing traffic light WebSocket message:",
+            "Error processing traffic light WebSocket message:",
             error
           );
         }
       };
 
-      setTrafficLightSocket(socket);
-      return socket;
-    };
+      // Connect using WebSocketManager
+      WebSocketManager.connect(
+        marker.svetofor_id, 
+        marker.vendor_id ?? marker.vendor ?? 1, 
+        handleTrafficLightMessage
+      );
 
-    if (marker.type === 1 && marker.svetofor_id) {
-      const socket = connectTrafficLightSocket(marker.svetofor_id);
+      // Cleanup function
       return () => {
-        if (socket) {
-          socket.close();
-          setTrafficLightSocket(null);
-        }
+        WebSocketManager.disconnect(
+          marker.svetofor_id, 
+          marker.vendor_id ?? marker.vendor ?? 1, 
+          handleTrafficLightMessage
+        );
       };
     }
-  }, [marker.svetofor_id, marker.type, dispatch]);
-
-  // Auto-open popup at zoom level 20
-  // We no longer need to control popup visibility based on zoom
-  // as this is now handled by the PulsingMarkers component
+  }, [marker.svetofor_id, marker.type, marker.link_id, marker.vendor_id, marker.vendor, dispatch]);
 
   const handleOpenLink = () => {
     const { ip, http_port } = marker.cameraData;
@@ -158,14 +116,12 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
 
-  if (!showPopup) return null;
-
   return (
     <>
       <MapLibrePopup
         map={map}
         coordinates={[parseFloat(marker.lng || 0), parseFloat(marker.lat || 0)]}
-        isDraggable={isPopupDraggable}
+        isDraggable={true}
         offset={[0, -30]}
         markerId={marker.cid} // Pass the marker ID
         onClose={() => {
@@ -247,7 +203,6 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
                   {marker.link_id && (
                     <div className="w-1/3">
                       <TrafficLightCounter
-                        // trafficLightSeconds={trafficLightSecondsRef.current}
                         channelId={marker.link_id}
                       />
                     </div>
