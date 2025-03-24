@@ -91,6 +91,8 @@ const getTrafficStatsData = async (id, params) =>
   getDataWithParams(import.meta.env.VITE_TRAFFIC_STATS + "/" + id, params);
 const getTrafficJamLines = async () =>
   getData(import.meta.env.VITE_TRAFFICJAM_LINES);
+const getFineStats = async () => getData(import.meta.env.VITE_FINE_STATS);
+
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
   let endpoint;
@@ -225,6 +227,7 @@ export {
   getWeatherData,
   getTrafficStatsData,
   getTrafficJamLines,
+  getFineStats,
   listUsers,
   markerHandler,
   recoverUser,

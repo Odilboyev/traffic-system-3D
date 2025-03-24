@@ -54,7 +54,7 @@ const ActiveModuleComponents = ({ map }) => {
           {/* <MonitoringMarkers map={map} /> */}
           {/* ITS panels */}
           <ITSModule map={map} />
-          <NotificationBox />
+          {/* <NotificationBox /> */}
         </>
       );
     case "fuel":

@@ -43,7 +43,7 @@ const ZoomControl = ({ map }) => {
     <div className=" flex items-center gap-4 bg-blue-gray-900/70 px-4 py-2 rounded-full backdrop-blur-sm">
       <button
         onClick={handleZoomOut}
-        className="p-2 text-white hover:text-blue-400 transition-colors"
+        className="p-2 text-white rounded-full  transition-colors"
       >
         <FaMinus />
       </button>
@@ -52,7 +52,7 @@ const ZoomControl = ({ map }) => {
       </div>
       <button
         onClick={handleZoomIn}
-        className="p-2 text-white hover:text-blue-400 transition-colors"
+        className="p-2 text-white rounded-full  transition-colors"
       >
         <FaPlus />
       </button>

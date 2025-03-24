@@ -5,7 +5,7 @@ import { crossroadsRanking } from "../data";
 const TopCrossroadsContent = ({ forwardedRef }) => {
   return (
     <div className="relative" ref={forwardedRef}>
-      <div className="w-[25vw] p-4">
+      <div className="w-[25vw] p-4 ">
         <div className="relative mb-4 flex items-center gap-2">
           <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
           <h3 className="text-sm uppercase tracking-[0.2em] font-medium text-teal-200 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)] flex items-center gap-2">
@@ -56,7 +56,7 @@ const TopCrossroadsContent = ({ forwardedRef }) => {
               </div>
             ))}
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-blue-gray-900/80 to-transparent pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-12 rounded-b-lg bg-gradient-to-t from-black/80 to-transparent pointer-events-none"></div>
         </div>
       </div>
     </div>

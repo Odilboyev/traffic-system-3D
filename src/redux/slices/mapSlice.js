@@ -6,6 +6,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const getInitialState = () => {
   const defaultState = {
     map: null,
+    currentZoom: localStorage.getItem("currentZoom") || 12,
     markers: [],
     areMarkersLoading: false,
     errorMessage: null,
