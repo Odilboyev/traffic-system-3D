@@ -166,7 +166,7 @@ const FinesPanel = () => {
         ref={panelRef}
         className="absolute mt-[90px] right-5 top-0 w-[30vw] max-h-[calc(90vh)] bg-[rgba(24,28,41,0.10)] rounded-lg shadow-lg overflow-y-auto flex flex-col z-[100] backdrop-blur-md transition-all duration-300"
       >
-        <div className="p-4 bg-black/20 flex flex-col gap-2 border-b border-white/10">
+        {/* <div className="p-4 bg-black/20 flex flex-col gap-2 border-b border-white/10">
           <div className="flex justify-between items-center">
             <h2 className="text-white text-lg font-semibold m-0">
               Traffic Violations
@@ -176,10 +176,10 @@ const FinesPanel = () => {
             </span>
           </div>
           <ConnectionStatus status={socketStatus} />
-        </div>
+        </div> */}
 
         {/* Display up to 8 fines in a 2x4 grid layout */}
-        <div className="flex-1 overflow-y-auto p-2 grid grid-cols-2 gap-4">
+        <div className="flex-1 overflow-y-auto p-2 grid grid-cols-3 gap-4">
           {fines.map((fine) => (
             <div
               key={fine.id}

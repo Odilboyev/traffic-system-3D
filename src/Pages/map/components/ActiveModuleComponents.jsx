@@ -2,12 +2,12 @@
 import FineMarkers from "./FineMarkers";
 // Panels
 import FinesPanel from "./FinesPanel";
+import FinesStats from "./fines/FinesStats";
 import FuelStationHeatmap from "./fuelStationMarkers/FuelStationHeatmap";
 import FuelStationMarkers from "./fuelStationMarkers";
 import FuelStationsModule from "./TrafficMonitoringPanel/components/modules/FuelStationsModule";
 import HeatmapControl from "./controls/heatmapControl";
 import ITSModule from "./TrafficMonitoringPanel/components/modules/ITSModule";
-import NotificationBox from "../../../components/NotificationBox";
 import PulsingMarkers from "./PulsingMarkers/PulsingMarkers";
 import RegionDistrictFilter from "./RegionDistrictFilter";
 // Panels
@@ -77,8 +77,9 @@ const ActiveModuleComponents = ({ map }) => {
         <>
           {/* Fines module markers */}
           <FineMarkers map={map} />
-          {/* Fines module panel */}
+          {/* Fines module panels */}
           <FinesPanel />
+          <FinesStats />
         </>
       );
 

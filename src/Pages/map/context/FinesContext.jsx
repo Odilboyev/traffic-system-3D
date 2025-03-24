@@ -19,14 +19,6 @@ export const FinesProvider = ({ children }) => {
   const [socketStatus, setSocketStatus] = useState("disconnected"); // 'connecting', 'connected', 'error', 'disconnected'
   const { map } = useMapContext();
 
-  // Limit the number of fines to 8
-  useEffect(() => {
-    if (fines.length > 8) {
-      // Keep only the 8 most recent fines (which are at the top of the list)
-      setFines((prevFines) => prevFines.slice(0, 8));
-    }
-  }, [fines]);
-
   // WebSocket connection for real-time fines
   useEffect(() => {
     if (!map) return;
@@ -120,13 +112,13 @@ export const FinesProvider = ({ children }) => {
                 : "/src/assets/images/sampleFine.png",
           };
 
-          // Add new fines at the top of the list and limit to 8
+          // Replace a random fine in the list
           setFines((prevFines) => {
-            const updatedFines = [newFine, ...prevFines].sort(
-              (a, b) => b.timestamp - a.timestamp
-            );
-            // If we have more than 8 fines, remove the oldest one
-            return updatedFines.slice(0, 8);
+            if (prevFines.length === 0) return [newFine];
+            const randomIndex = Math.floor(Math.random() * prevFines.length);
+            const updatedFines = [...prevFines];
+            updatedFines[randomIndex] = newFine;
+            return updatedFines;
           });
         } catch (error) {
           console.error("Error processing WebSocket message:", error);
