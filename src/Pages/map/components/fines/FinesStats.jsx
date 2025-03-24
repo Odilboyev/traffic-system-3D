@@ -35,7 +35,7 @@ const FinesStats = () => {
   if (!stats) return null;
 
   return (
-    <div className="absolute left-4 top-[12%] w-[25vw] z-50 backdrop-blur-[2px]">
+    <div className="absolute left-4 top-[12%] w-[25vw] z-50 backdrop-blur-[2px] bg-gradient-to-r from-black/20 to-black/0">
       {/* Today's Total Violations */}
       <div className="mb-8">
         <div className="relative mb-4 flex items-center gap-2">

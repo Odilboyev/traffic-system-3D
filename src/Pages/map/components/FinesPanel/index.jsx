@@ -2,6 +2,7 @@ import "./styles.finesPanel.css";
 
 import { useEffect, useRef, useState } from "react";
 
+import { getRegions } from "../../../../api/api.handlers";
 import { useFines } from "../../context/FinesContext";
 import { useMapContext } from "../../context/MapContext";
 
@@ -55,6 +56,7 @@ const FinesPanel = () => {
   const [mapCenter, setMapCenter] = useState(null);
   const panelRef = useRef(null);
   const [flyingImage, setFlyingImage] = useState(null);
+  const [regions, setRegions] = useState({});
 
   // Add fines-panel class to the panel for targeting in CSS
   useEffect(() => {
@@ -79,6 +81,20 @@ const FinesPanel = () => {
       map.off("move", updateMapCenter);
     };
   }, [map]);
+
+  // Fetch regions data
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const regionsData = await getRegions();
+        setRegions(regionsData);
+        console.log(regionsData);
+      } catch (error) {
+        console.error("Error fetching regions:", error);
+      }
+    };
+    fetchRegions();
+  }, []);
 
   // Helper function to check if a fine is near the current map center
   const isNearMapCenter = (fine) => {
@@ -179,11 +195,11 @@ const FinesPanel = () => {
         </div> */}
 
         {/* Display up to 8 fines in a 2x4 grid layout */}
-        <div className="flex-1 overflow-y-auto p-2 grid grid-cols-3 gap-4">
+        <div className="flex-1 overflow-y-auto p-2 grid grid-cols-3 gap-4 scrollbar-hide">
           {fines.map((fine) => (
             <div
               key={fine.id}
-              className={`relative fine-item bg-white/10 rounded-md overflow-hidden cursor-pointer transition-all duration-200 h-60 group ${
+              className={`relative fine-item bg-white/10 rounded-md overflow-hidden cursor-pointer transition-all duration-200 h-40 group ${
                 selectedFine?.id === fine.id && isNearMapCenter(fine)
                   ? "ring-2 ring-blue-500"
                   : ""
@@ -197,25 +213,31 @@ const FinesPanel = () => {
                   className="w-full h-full object-cover transition-transform duration-300 "
                 />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-black/30 p-3 opacity-20 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-1">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-black/30 p-2 opacity-10 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-1">
                 {fine.crossroad && (
                   <div
                     className="font-semibold text-white text-sm mt-0.5"
-                    title={fine.crossroad}
+                    title={fine.crossroad?.name}
                   >
-                    {fine.crossroad.length > 30
-                      ? `${fine.crossroad.substring(0, 30)}...`
-                      : fine.crossroad}
+                    {fine.crossroad.name?.length > 30
+                      ? `${fine.crossroad?.name.substring(0, 30)}...`
+                      : fine.crossroad?.name}
                   </div>
                 )}
                 {/* <div className="text-white font-semibold capitalize text-sm">
                   {fine.type}
                 </div> */}
-                <div className="w-full flex justify-between">
+                <div className="w-full flex flex-col gap-1.5">
+                  {fine.crossroad &&
+                    regions?.find((v) => v.id == fine.crossroad.region_id) && (
+                      <div className="text-[10px] text-blue-400 font-medium flex items-center gap-1">
+                        {
+                          regions?.find((v) => v.id == fine.crossroad.region_id)
+                            .name
+                        }
+                      </div>
+                    )}
                   <div className="flex justify-between items-center text-white/80 text-xs">
-                    <span className="font-semibold bg-white/15 px-1.5 py-0.5 rounded">
-                      {fine.vehicleInfo.plate}
-                    </span>
                     {fine.speed && parseInt(fine.speed) > 0 && (
                       <span className="text-red-400 font-semibold">
                         {fine.speed} km/h

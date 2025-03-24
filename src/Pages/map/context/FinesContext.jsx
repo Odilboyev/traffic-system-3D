@@ -100,9 +100,7 @@ export const FinesProvider = ({ children }) => {
               model: "Unknown",
               color: "Unknown",
             },
-            crossroad: data.crossroad
-              ? data.crossroad.name
-              : "Unknown Location",
+            crossroad: data.crossroad || { name: "Unkown" },
             speed: data.speed || "0",
             photos: data.photos || [],
             // Use the first photo if available, otherwise use sample image
@@ -112,13 +110,17 @@ export const FinesProvider = ({ children }) => {
                 : "/src/assets/images/sampleFine.png",
           };
 
-          // Replace a random fine in the list
           setFines((prevFines) => {
-            if (prevFines.length === 0) return [newFine];
-            const randomIndex = Math.floor(Math.random() * prevFines.length);
-            const updatedFines = [...prevFines];
-            updatedFines[randomIndex] = newFine;
-            return updatedFines;
+            if (prevFines.length >= 15) {
+              // Replace a random fine when we have 15 or more
+              const randomIndex = Math.floor(Math.random() * prevFines.length);
+              const updatedFines = [...prevFines];
+              updatedFines[randomIndex] = newFine;
+              return updatedFines;
+            } else {
+              // Add new fine if we have less than 15
+              return [...prevFines, newFine];
+            }
           });
         } catch (error) {
           console.error("Error processing WebSocket message:", error);
