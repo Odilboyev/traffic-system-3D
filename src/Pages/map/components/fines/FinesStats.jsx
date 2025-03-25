@@ -37,7 +37,7 @@ const FinesStats = () => {
   return (
     <div className="absolute left-4 top-[12%] w-[25vw] z-50 backdrop-blur-[2px] bg-gradient-to-r from-black/20 to-black/0">
       {/* Today's Total Violations */}
-      <div className="mb-8">
+      <div className="my-4">
         <div className="relative mb-4 flex items-center gap-2">
           <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
           <h3 className="text-sm uppercase tracking-[0.2em] font-medium text-teal-200 relative z-10 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)] flex items-center gap-2">
@@ -112,9 +112,14 @@ const FinesStats = () => {
                 <span className="text-sm font-semibold text-teal-300 group-hover:text-teal-200 transition-colors min-w-[24px]">
                   {idx + 1}.
                 </span>
-                <span className="text-sm text-white/80 group-hover:text-white/100 transition-colors">
-                  {location.crossroad_name}
-                </span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-white/80 group-hover:text-white/100 transition-colors">
+                    {location.crossroad_name}
+                  </span>
+                  <span className="text-xs text-teal-300 group-hover:text-white transition-colors">
+                    {location.crossroad_region_name}
+                  </span>
+                </div>
               </div>
               <span className="text-teal-300 group-hover:text-teal-200 transition-colors font-medium bg-black/30 px-3 py-1 rounded-full">
                 {location.count.toLocaleString()}
