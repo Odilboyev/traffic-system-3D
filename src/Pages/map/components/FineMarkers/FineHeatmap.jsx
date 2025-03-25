@@ -2,15 +2,13 @@ import "./styles.css";
 
 import { useEffect, useRef, useState } from "react";
 
-import { IoClose } from "react-icons/io5";
 import { MdOutlineGavel } from "react-icons/md";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom/client";
 import { getFineMarkers } from "../../../../api/api.handlers";
 import maplibregl from "maplibre-gl";
-import { useFines } from "../../context/FinesContext";
 
-const FinePopup = ({ data, onClose }) => {
+const FinePopup = ({ data }) => {
   const { name, count, violations } = data;
 
   return (
@@ -55,15 +53,11 @@ FinePopup.propTypes = {
       })
     ).isRequired,
   }).isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 const FineHeatmap = ({ map }) => {
-  const { fines } = useFines();
-  const [sourceAdded, setSourceAdded] = useState(false);
   const popupRef = useRef(null);
   const [fineMarkers, setFineMarkers] = useState([]);
-  const [areMarkersPlaced, setAreMarkersPlaced] = useState(false);
 
   // Fetch fine markers
   useEffect(() => {
@@ -116,28 +110,31 @@ const FineHeatmap = ({ map }) => {
   useEffect(() => {
     if (!map) return;
     console.log("fines are loaded");
-    // Add fine markers source
-    map.addSource("fine-markers", {
-      type: "geojson",
-      data: {
-        type: "FeatureCollection",
-        features: [],
-      },
-    });
 
-    // Add fine markers layer
-    map.addLayer({
-      id: "fine-markers-pulse",
-      type: "circle",
-      source: "fine-markers",
-      paint: {
-        "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 5, 15, 10],
-        "circle-color": "#ff4444",
-        "circle-opacity": ["get", "pulse"],
-        "circle-stroke-width": 2,
-        "circle-stroke-color": "#ff4444",
-      },
-    });
+    // Add fine markers source
+    if (!map.getSource('fine-markers')) {
+      map.addSource("fine-markers", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
+      });
+
+      // Add fine markers layer
+      map.addLayer({
+        id: "fine-markers-pulse",
+        type: "circle",
+        source: "fine-markers",
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 5, 15, 10],
+          "circle-color": "#ff4444",
+          "circle-opacity": ["get", "pulse"],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#ff4444",
+        },
+      });
+    }
 
     if (!Array.isArray(fineMarkers) || fineMarkers.length === 0) {
       console.error("fineMarkers is not an array or is empty:", fineMarkers);
@@ -204,7 +201,7 @@ const FineHeatmap = ({ map }) => {
         />
       );
 
-      // Create new popup
+      // Create and set new popup
       try {
         popupRef.current = new maplibregl.Popup({ className: "fine-popup" })
           .setLngLat(coordinates)
@@ -215,33 +212,30 @@ const FineHeatmap = ({ map }) => {
       }
     };
 
-    // Set up click handler
-    try {
-      map.off("click", "fine-markers-pulse");
-      map.on("click", "fine-markers-pulse", handleMarkerClick);
-      setAreMarkersPlaced(true);
-    } catch (error) {
-      console.error("Error setting up click handler:", error);
-    }
+    // Add click event listener
+    map.on("click", "fine-markers-pulse", handleMarkerClick);
 
-    // Return cleanup function that combines all cleanups
+    // Cleanup function
     return () => {
-      // // Cleanup animation
-      // if (animationFrameId) {
-      //   cancelAnimationFrame(animationFrameId);
-      // }
-      // // Cleanup event listeners
-      // try {
-      //   if (map) {
-      //     map.off("mouseenter", "fine-markers-pulse");
-      //     map.off("mouseleave", "fine-markers-pulse");
-      //     map.off("click", "fine-markers-pulse");
-      //   }
-      // } catch (error) {
-      //   console.error("Error cleaning up event listeners:", error);
-      // }
+      // Remove event listener
+      map.off("click", "fine-markers-pulse", handleMarkerClick);
+
+      // Remove popup if it exists
+      if (popupRef.current) {
+        popupRef.current.remove();
+        popupRef.current = null;
+      }
+
+      // Remove layer and source if they exist
+      if (map.getLayer("fine-markers-pulse")) {
+        map.removeLayer("fine-markers-pulse");
+      }
+      if (map.getSource("fine-markers")) {
+        map.removeSource("fine-markers");
+      }
     };
   }, [map, fineMarkers]);
+
   return null;
 };
 
@@ -251,10 +245,11 @@ FineHeatmap.propTypes = {
     addLayer: PropTypes.func,
     removeLayer: PropTypes.func,
     removeSource: PropTypes.func,
+    getLayer: PropTypes.func,
     getSource: PropTypes.func,
-    isStyleLoaded: PropTypes.func,
     on: PropTypes.func,
     off: PropTypes.func,
+    isStyleLoaded: PropTypes.func,
     getCanvas: PropTypes.func,
     getZoom: PropTypes.func,
     setPaintProperty: PropTypes.func,
