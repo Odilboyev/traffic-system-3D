@@ -15,13 +15,13 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Import the module context
 import { useModuleContext } from "../../../context/ModuleContext";
 
 const TopPanelContent = () => {
-  const [swiperInstance, setSwiperInstance] = useState(null);
+  const swiperRef = useRef(null);
   const [swiperLoaded, setSwiperLoaded] = useState(false);
   const { activeModule, setActiveModule, modules } = useModuleContext();
 
@@ -62,18 +62,18 @@ const TopPanelContent = () => {
     });
   };
 
-  // Ensure swiper is updated when component is fully mounted
-  useEffect(() => {
-    if (swiperInstance) {
-      // Force update after a short delay to ensure DOM is fully rendered
-      const timer = setTimeout(() => {
-        swiperInstance.update();
-        setSwiperLoaded(true);
-      }, 300);
+  // // Ensure swiper is updated when component is fully mounted
+  // useEffect(() => {
+  //   if (swiperInstance) {
+  //     // Force update after a short delay to ensure DOM is fully rendered
+  //     const timer = setTimeout(() => {
+  //       swiperInstance.update();
+  //       setSwiperLoaded(true);
+  //     }, 300);
 
-      return () => clearTimeout(timer);
-    }
-  }, [swiperInstance]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [swiperInstance]);
 
   // Update active module when slide changes
   useEffect(() => {
@@ -160,10 +160,10 @@ const TopPanelContent = () => {
                 modules={[EffectCoverflow, Navigation]}
                 className={`nav-swiper `}
                 onSwiper={(swiper) => {
-                  setSwiperInstance(swiper);
+                  swiperRef.current = swiper;
                   // Force update after mounting
                   setTimeout(() => {
-                    swiper.update();
+                    swiperRef.current.update();
                     setSwiperLoaded(true);
                   }, 100);
                 }}

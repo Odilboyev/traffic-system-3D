@@ -1,14 +1,13 @@
 // import "./styles.css";
 
-import { ModuleProvider, useModuleContext } from "./context/ModuleContext";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
-import ActiveModuleComponents from "./components/ActiveModuleComponents";
 // Import Fines components
 import { FinesProvider } from "./context/FinesContext";
 import MapControlsPanel from "./components/MapControlsPanel/index.jsx";
 import MapLibreContainer from "./components/MapLibreLayer/MapLibreContainer";
 import MapModals from "./components/MapModals/index.jsx";
+import { ModuleProvider } from "./context/ModuleContext";
 // Import ActiveModuleComponents for module-specific rendering
 import PropTypes from "prop-types";
 import { ToastContainer } from "react-toastify";
@@ -46,11 +45,6 @@ const MapComponent = memo(({ t }) => {
   useEffect(() => {
     getDataHandler();
   }, [getDataHandler]);
-
-  // Debug markers data
-  useEffect(() => {
-    console.log("Current markers:", markers);
-  }, [markers]);
 
   // const handleMarkerClick = useCallback((marker) => {
   //   switch (marker.type) {

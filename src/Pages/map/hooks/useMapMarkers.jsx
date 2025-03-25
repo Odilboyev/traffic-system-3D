@@ -28,9 +28,8 @@ const useMapMarkers = () => {
     dispatch(updateLoadingState(true));
     try {
       const response = await getMarkerData();
-      console.log("Fetched marker data:", response);
+
       if (response?.data) {
-        console.log("Formatted markers:", response.data);
         dispatch(updateMarkers(response.data));
       }
     } catch (error) {

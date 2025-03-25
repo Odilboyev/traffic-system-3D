@@ -91,6 +91,7 @@ export const FinesProvider = ({ children }) => {
 
           // Create fine object from WebSocket data
           const newFine = {
+            ...data,
             id: Date.now().toString(),
             location: location,
             timestamp: data.created_at || new Date().toISOString(),
@@ -100,7 +101,7 @@ export const FinesProvider = ({ children }) => {
               model: "Unknown",
               color: "Unknown",
             },
-            crossroad: data.crossroad || { name: "Unkown" },
+            crossroad: data.crossroad || { name: "Unknown" },
             speed: data.speed || "0",
             photos: data.photos || [],
             // Use the first photo if available, otherwise use sample image

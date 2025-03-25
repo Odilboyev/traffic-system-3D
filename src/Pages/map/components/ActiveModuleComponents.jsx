@@ -30,7 +30,6 @@ const ActiveModuleComponents = ({ map }) => {
   const conditionMet = useZoomPanel();
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [currentZoom, setCurrentZoom] = useState(13);
-  console.log(currentZoom, "zom");
   useEffect(() => {
     setCurrentZoom(
       JSON.parse(localStorage.getItem("mapState"))
