@@ -221,15 +221,38 @@ const PulsingMarkers = ({ map }) => {
           coordinates: [lng, lat], // Store original coordinates array for reference
         };
 
-        // Add to visible markers only if it doesn't already exist
-        // This is crucial to prevent infinite loops
+        // Collect all potential visible markers first, then apply limit
         setVisibleMarkers((prev) => {
-          if (!prev.some((m) => m.cid === markerWithCoords.cid)) {
-            // Only fetch camera details if this is a new marker
-            fetchCameraDetails(markerWithCoords);
-            return [...prev, markerWithCoords];
+          if (prev.some((m) => m.cid === markerWithCoords.cid)) {
+            return prev;
           }
-          return prev;
+          
+          // Add the new marker
+          const newMarkers = [...prev, markerWithCoords];
+          
+          // Sort by distance to center and limit
+          const center = map.getCenter();
+          const sorted = newMarkers.sort((a, b) => {
+            const distA = Math.sqrt(
+              Math.pow(parseFloat(a.lat) - center.lat, 2) +
+              Math.pow(parseFloat(a.lng) - center.lng, 2)
+            );
+            const distB = Math.sqrt(
+              Math.pow(parseFloat(b.lat) - center.lat, 2) +
+              Math.pow(parseFloat(b.lng) - center.lng, 2)
+            );
+            return distA - distB;
+          });
+
+          // Keep only the closest markers up to maxPopups
+          const limited = sorted.slice(0, 5);
+          
+          // Fetch details only if the marker made it into the limited set
+          if (limited.some(m => m.cid === markerWithCoords.cid)) {
+            fetchCameraDetails(markerWithCoords);
+          }
+          
+          return limited;
         });
       }
     });
@@ -246,33 +269,20 @@ const PulsingMarkers = ({ map }) => {
       setSelectedMarkers([]);
       setVisibleMarkers([]);
     } else {
-      // Only update markers if we don't already have visible markers
-      // This prevents infinite loops of marker creation
-      if (visibleMarkers.length === 0) {
-        updateMarkers();
-      }
-
-      // Limit the number of visible popups to avoid cluttering the screen
-      // Only call this if we have markers to limit
-      if (visibleMarkers.length > 0) {
-        limitVisiblePopups();
-      }
+      // Always enforce the popup limit when zoom level is appropriate
+      limitVisiblePopups();
     }
   };
 
-  // Function to limit the number of visible popups and ensure they're properly spaced
+  // Function to limit the number of visible popups
   const limitVisiblePopups = () => {
     if (!map || visibleMarkers.length === 0) return;
-
-    const bounds = map.getBounds();
-    const center = map.getCenter();
-    const viewportWidth = map.getContainer().offsetWidth;
-    const viewportHeight = map.getContainer().offsetHeight;
 
     // Maximum number of popups to show at once
     const maxPopups = 5;
 
     // Sort markers by distance to center of the screen
+    const center = map.getCenter();
     const sortedMarkers = [...visibleMarkers].sort((a, b) => {
       const distA = Math.sqrt(
         Math.pow(parseFloat(a.lat) - center.lat, 2) +
@@ -287,119 +297,14 @@ const PulsingMarkers = ({ map }) => {
 
     // Keep only the closest markers up to maxPopups
     const limitedMarkers = sortedMarkers.slice(0, maxPopups);
-
-    // Estimate popup dimensions - these will be used to calculate required spacing
-    // Actual dimensions will vary, but we need an estimate for initial positioning
-    const estimatedPopupWidth = 280; // Average popup width in pixels
-    const estimatedPopupHeight = 200; // Average popup height in pixels
-    const minGap = 20; // Minimum gap between popups in pixels
-
-    // Calculate optimal positions for these markers to avoid overlap
-    const optimizedMarkers = limitedMarkers.map((marker, index) => {
-      // For the first marker, keep its original position
-      if (index === 0) return marker;
-
-      // For subsequent markers, ensure they're not too close to previous markers
-      const markerPoint = map.project([
-        parseFloat(marker.lng),
-        parseFloat(marker.lat),
-      ]);
-
-      // Check distance to all previous markers
-      for (let i = 0; i < index; i++) {
-        const prevMarker = optimizedMarkers[i];
-        const prevPoint = map.project([
-          parseFloat(prevMarker.lng),
-          parseFloat(prevMarker.lat),
-        ]);
-
-        // Calculate center-to-center distance
-        const dx = markerPoint.x - prevPoint.x;
-        const dy = markerPoint.y - prevPoint.y;
-        const centerDistance = Math.sqrt(dx * dx + dy * dy);
-
-        // Calculate required distance based on estimated popup dimensions plus the minimum gap
-        // This ensures popups don't overlap and have at least a small gap between them
-        const requiredDistance = estimatedPopupWidth + minGap;
-
-        // If markers are too close (would cause popups to overlap or be too close), adjust position
-        if (centerDistance < requiredDistance) {
-          // Calculate direction vector
-          const angle = Math.atan2(dy, dx);
-
-          // Calculate how much to move
-          const moveDistance = requiredDistance - centerDistance + 10; // Add extra pixels to ensure gap
-
-          // Move current marker away from previous marker
-          const newX = markerPoint.x + Math.cos(angle) * moveDistance;
-          const newY = markerPoint.y + Math.sin(angle) * moveDistance;
-
-          // Ensure the new position is within viewport bounds with some padding
-          const padding = 100; // Increased padding to keep popups more visible
-          const boundedX = Math.max(
-            padding,
-            Math.min(newX, viewportWidth - padding)
-          );
-          const boundedY = Math.max(
-            padding,
-            Math.min(newY, viewportHeight - padding)
-          );
-
-          // Convert back to geographic coordinates
-          const newLngLat = map.unproject([boundedX, boundedY]);
-
-          // Update marker coordinates
-          marker.lng = newLngLat.lng.toString();
-          marker.lat = newLngLat.lat.toString();
-
-          // Update the marker point for subsequent distance calculations
-          markerPoint.x = boundedX;
-          markerPoint.y = boundedY;
-        }
-      }
-
-      return marker;
+    
+    // Update both visible markers and selected markers to enforce the limit
+    setVisibleMarkers(limitedMarkers);
+    setSelectedMarkers(prev => {
+      // Only keep selected markers that are in the limited set
+      const limitedIds = new Set(limitedMarkers.map(m => m.cid));
+      return prev.filter(m => limitedIds.has(m.cid));
     });
-
-    // Additional pass to ensure all popups are within the viewport
-    const finalMarkers = optimizedMarkers.map((marker) => {
-      const point = map.project([
-        parseFloat(marker.lng),
-        parseFloat(marker.lat),
-      ]);
-
-      // Check if the point is too close to the edge of the viewport
-      const padding = 150; // Larger padding to account for popup size
-      let needsAdjustment = false;
-      let newX = point.x;
-      let newY = point.y;
-
-      if (point.x < padding) {
-        newX = padding;
-        needsAdjustment = true;
-      } else if (point.x > viewportWidth - padding) {
-        newX = viewportWidth - padding;
-        needsAdjustment = true;
-      }
-
-      if (point.y < padding) {
-        newY = padding;
-        needsAdjustment = true;
-      } else if (point.y > viewportHeight - padding) {
-        newY = viewportHeight - padding;
-        needsAdjustment = true;
-      }
-
-      if (needsAdjustment) {
-        const newLngLat = map.unproject([newX, newY]);
-        marker.lng = newLngLat.lng.toString();
-        marker.lat = newLngLat.lat.toString();
-      }
-
-      return marker;
-    });
-
-    setVisibleMarkers(finalMarkers);
   };
 
   useEffect(() => {
