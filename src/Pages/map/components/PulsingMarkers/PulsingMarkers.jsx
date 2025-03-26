@@ -1,6 +1,6 @@
 import "./styles.css";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import MapLibreCameraDetails from "../../components/customPopup/MapLibreCameraDetails";
 import Supercluster from "supercluster";
@@ -23,19 +23,15 @@ const PulsingMarkers = ({ map }) => {
 
   const isCamera = (type) => type === 1 || type === 5 || type === 6;
 
-  const cameraType = (type) => {
-    switch (type) {
-      case 1:
-        return "cameratraffic";
-      case 5:
-        return "cameraview";
-      case 6:
-        return "camerapdd";
-      default:
-        return "";
-    }
-  };
-
+  const cameraType = useCallback(
+    (type) =>
+      ({
+        1: "cameratraffic",
+        5: "cameraview",
+        6: "camerapdd",
+      }[type] || ""),
+    []
+  );
   const fetchCameraDetails = async (marker) => {
     if (!marker || !isCamera(marker.type)) return;
 
@@ -503,11 +499,6 @@ const PulsingMarkers = ({ map }) => {
     setSelectedMarkers((prev) =>
       prev.filter((marker) => marker.cid !== markerId)
     );
-
-    // Optionally, also remove from visibleMarkers if you want to completely hide it
-    // setVisibleMarkers(prev => prev.filter(marker => marker.cid !== markerId));
-
-    console.log(`Closed popup for marker: ${markerId}`);
   };
 
   return (
@@ -523,20 +514,10 @@ const PulsingMarkers = ({ map }) => {
               (m) => m.cid === marker.cid
             );
 
-            // Get coordinates from the map for this marker
-            const markerElement = markersRef.current.find(
-              (m) => m.cid === marker.cid
-            );
-
-            let coordinates = [0, 0];
-            if (markerElement) {
-              coordinates = markerElement.getLngLat().toArray();
-            }
-
             const markerWithCorrectCoords = {
               ...marker,
-              lng: coordinates[0].toString(),
-              lat: coordinates[1].toString(),
+              lng: marker.popup_lng?.toString() || marker.lng,
+              lat: marker.popup_lat?.toString() || marker.lat,
             };
 
             return (
@@ -559,5 +540,3 @@ const PulsingMarkers = ({ map }) => {
 };
 
 export default PulsingMarkers;
-
-
