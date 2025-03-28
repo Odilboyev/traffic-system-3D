@@ -1,5 +1,6 @@
 // Markers
 import FineMarkers from "./FineMarkers";
+import ParkingMarkers from "./parkingMarkers";
 // Panels
 import FinesPanel from "./FinesPanel";
 import FinesStats from "./fines/FinesStats";
@@ -16,10 +17,10 @@ import TrafficLightContainer from "./trafficLightMarkers/managementLights";
 import TransportMarkers from "./transportMarkers";
 import WeatherMarkers from "./weatherMarkers";
 import WeatherModule from "./TrafficMonitoringPanel/components/modules/WeatherModule";
-import { useEffect } from "react";
+import ParkingLotsModule from "./TrafficMonitoringPanel/components/modules/ParkingLotsModule";
+import { useEffect, useState } from "react";
 import { useModuleContext } from "../context/ModuleContext";
-import { useState } from "react";
-import { useZoomPanel } from "../context/ZoomPanelContext";
+import PropTypes from 'prop-types';
 
 /**
  * Component that renders module-specific components based on the active module
@@ -27,16 +28,14 @@ import { useZoomPanel } from "../context/ZoomPanelContext";
  */
 const ActiveModuleComponents = ({ map }) => {
   const { activeModule } = useModuleContext();
-  const conditionMet = useZoomPanel();
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [currentZoom, setCurrentZoom] = useState(13);
+  
   useEffect(() => {
-    setCurrentZoom(
-      JSON.parse(localStorage.getItem("mapState"))
-        ? JSON.parse(localStorage.getItem("mapState")).zoom
-        : 13
-    );
-  }, [localStorage.getItem("mapState")]);
+    const mapState = localStorage.getItem("mapState");
+    const zoom = mapState ? JSON.parse(mapState).zoom : 13;
+    setCurrentZoom(zoom);
+  }, []);
 
   if (!map) return null;
 
@@ -108,9 +107,30 @@ const ActiveModuleComponents = ({ map }) => {
         </>
       );
 
+    case "parking":
+      return (
+        <>
+          {/* Parking markers */}
+          <ParkingMarkers map={map} />
+          {/* Parking panel */}
+          <ParkingLotsModule />
+        </>
+      );
+
     default:
       return null;
   }
+};
+
+ActiveModuleComponents.propTypes = {
+  map: PropTypes.shape({
+    addSource: PropTypes.func,
+    addLayer: PropTypes.func,
+    getLayer: PropTypes.func,
+    removeLayer: PropTypes.func,
+    getSource: PropTypes.func,
+    removeSource: PropTypes.func
+  })
 };
 
 export default ActiveModuleComponents;

@@ -1,5 +1,5 @@
-import React from 'react';
-import DevicesStatusPanel from '../../DevicesStatusPanel';
+import DevicesStatusPanel from "../../DevicesStatusPanel";
+import React from "react";
 
 const DevicesStatusPanelWrapper = ({ forwardedRef, cardsInfoData }) => {
   return (

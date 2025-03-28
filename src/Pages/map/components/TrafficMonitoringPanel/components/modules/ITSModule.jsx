@@ -28,17 +28,19 @@ const ITSModule = ({ map }) => {
       <SlidePanel
         side="bottom"
         isOpen={conditionMet}
-        content={<BottomPanel cardsInfoData={cardsInfoData} />}
+        content={
+          <BottomPanel isOpen={conditionMet} cardsInfoData={cardsInfoData} />
+        }
       />
       <SlidePanel
         side="left"
         isOpen={conditionMet}
-        content={<LeftSidePanel />}
+        content={<LeftSidePanel isOpen={conditionMet} />}
       />
       <SlidePanel
         side="right"
         isOpen={conditionMet}
-        content={<RightSidePanel />}
+        content={<RightSidePanel isOpen={conditionMet} />}
       />
     </div>
   );

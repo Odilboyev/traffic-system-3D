@@ -17,6 +17,7 @@ export const ModuleProvider = ({ children }) => {
     { id: "public_transport", name: "Jamoat transporti" },
     { id: "road_signs", name: "Road signs" },
     { id: "weather", name: "Ob-havo" },
+    { id: "parking", name: "Parking Lots" },
   ];
 
   // Initialize state from localStorage or use default

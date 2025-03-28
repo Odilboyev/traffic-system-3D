@@ -1,8 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 
-const TrafficRatingContent = ({ forwardedRef }) => {
+import CountUp from "react-countup";
+import PropTypes from "prop-types";
+
+const TrafficRatingContent = ({ forwardedRef, isOpen }) => {
+  const [triggerCount, setTriggerCount] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  const CIRCLE_RADIUS = 15.91549430918954;
+  const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS;
+
+  useEffect(() => {
+    if (isOpen) {
+      setTriggerCount((prev) => prev + 1);
+      setProgress(0);
+      const timer = setTimeout(() => setProgress(1), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
   const ratings = [9.1, 9, 8.2, 8, 7, 5.4];
-  
+
   return (
     <div ref={forwardedRef} className="w-[15vw] p-3">
       <div className="relative mb-4 flex items-center gap-2">
@@ -32,7 +49,6 @@ const TrafficRatingContent = ({ forwardedRef }) => {
                       : "#aeea0821"
                   }
                   strokeWidth="2"
-                  strokeLinecap="round"
                 />
                 <path
                   d="M18 2.0845
@@ -61,7 +77,13 @@ const TrafficRatingContent = ({ forwardedRef }) => {
                       : "text-yellow-400"
                   }`}
                 >
-                  {rating}
+                  <CountUp
+                    key={`rating-${triggerCount}-${idx}`}
+                    end={rating}
+                    duration={3}
+                    decimals={1}
+                    start={0}
+                  />
                 </div>
               </div>
             </div>
@@ -74,6 +96,18 @@ const TrafficRatingContent = ({ forwardedRef }) => {
       </div>
     </div>
   );
+};
+
+TrafficRatingContent.propTypes = {
+  forwardedRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  ]),
+  isOpen: PropTypes.bool,
+};
+
+TrafficRatingContent.defaultProps = {
+  isOpen: false,
 };
 
 export default TrafficRatingContent;
