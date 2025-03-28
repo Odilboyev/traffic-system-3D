@@ -133,12 +133,8 @@ const TopPanelContent = () => {
             <div className="absolute right-0 top-0 bottom-0 w-[35%] bg-gradient-to-l from-black via-slate-900/95 to-transparent pointer-events-none z-10"></div>
             <div className="absolute inset-0 bg-gradient-to-b from-sky-500/5 via-transparent to-transparent pointer-events-none opacity-50"></div>
             <div className="relative w-full px-8 flex items-center justify-center min-h-[3rem]">
-              <button className="swiper-button-prev ">
-                <FaMapMarkerAlt className="text-sky-400/70 text-sm group-hover:text-sky-400 -rotate-90 transition-all duration-300 relative z-10 translate-y-px" />
-              </button>
-              <button className="swiper-button-next ">
-                <FaMapMarkerAlt className="text-sky-400/70 text-sm group-hover:text-sky-400 rotate-90 transition-all duration-300 relative z-10 translate-y-px" />
-              </button>
+              <button className="swiper-button-prev "></button>
+              <button className="swiper-button-next "></button>
               <Swiper
                 effect={"coverflow"}
                 grabCursor={true}
