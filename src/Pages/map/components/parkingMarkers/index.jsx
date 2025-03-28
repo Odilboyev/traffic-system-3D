@@ -402,6 +402,12 @@ const ParkingMarkers = ({ map }) => {
         map.removeLayer("parking-areas-fill");
       if (map.getLayer("parking-areas-outline"))
         map.removeLayer("parking-areas-outline");
+      if (map.getLayer("hover")) map.removeLayer("hover");
+      if (map.getLayer("parking-lines-label-bg"))
+        map.removeLayer("parking-lines-label-bg");
+      if (map.getLayer("parking-lines-labels"))
+        map.removeLayer("parking-lines-labels");
+
       if (map.getLayer("parking-lines-line"))
         map.removeLayer("parking-lines-line");
       if (map.getSource("parking-areas")) map.removeSource("parking-areas");

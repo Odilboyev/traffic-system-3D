@@ -8,9 +8,9 @@ import MapLibrePopup from "./components/customPopup/MapLibrePopup";
 import PTZCameraModal from "./components/ptzModal";
 import Records from "./components/records";
 import TrafficLightCounter from "./components/TrafficLightCounter";
+import WebSocketManager from "../../../../utils/WebSocketManager";
 import { updateTrafficLightSeconds } from "../../../../redux/slices/trafficLightSecondsSlice";
 import { useDispatch } from "react-redux";
-import WebSocketManager from "../../../../utils/WebSocketManager";
 
 const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   marker = {},
@@ -40,7 +40,7 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
       if (!popupRef.current) return;
 
       const isClickOutside = !popupRef.current.contains(e.target);
-      
+
       if (isClickOutside && !isCollapsed) {
         setIsCollapsed(true);
       }
@@ -90,16 +90,16 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
 
       // Connect using WebSocketManager
       WebSocketManager.connect(
-        marker.svetofor_id, 
-        marker.vendor_id ?? marker.vendor ?? 1, 
+        marker.svetofor_id,
+        marker.vendor_id ?? marker.vendor ?? 1,
         handleTrafficLightMessage
       );
 
       // Cleanup function
       return () => {
         WebSocketManager.disconnect(
-          marker.svetofor_id, 
-          marker.vendor_id ?? marker.vendor ?? 1, 
+          marker.svetofor_id,
+          marker.vendor_id ?? marker.vendor ?? 1,
           handleTrafficLightMessage
         );
       };
@@ -202,9 +202,7 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
                   </div>
                   {marker.link_id && (
                     <div className="w-1/3">
-                      <TrafficLightCounter
-                        channelId={marker.link_id}
-                      />
+                      <TrafficLightCounter channelId={marker.link_id} />
                     </div>
                   )}
                 </div>

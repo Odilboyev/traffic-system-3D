@@ -49,8 +49,14 @@ const ConnectionStatus = ({ status }) => {
 };
 
 const FinesPanel = () => {
-  const { fines, showFinesPanel, flyToFine, selectedFine, socketStatus } =
-    useFines();
+  const {
+    fines,
+    showFinesPanel,
+    fetchFinesData,
+    flyToFine,
+    selectedFine,
+    socketStatus,
+  } = useFines();
   const { map } = useMapContext();
   const [animatingFineId, setAnimatingFineId] = useState(null);
   const [mapCenter, setMapCenter] = useState(null);
@@ -63,6 +69,9 @@ const FinesPanel = () => {
       panelRef.current.classList.add("fines-panel");
     }
   }, []);
+  useEffect(() => {
+    fetchFinesData();
+  }, [fetchFinesData]);
 
   // Track map center changes
   useEffect(() => {
@@ -81,68 +90,70 @@ const FinesPanel = () => {
     };
   }, [map]);
 
-  // Helper function to check if a fine is near the current map center
-  const isNearMapCenter = (fine) => {
-    if (!mapCenter || !fine) return false;
+  // // Helper function to check if a fine is near the current map center
+  // const isNearMapCenter = (fine) => {
+  //   if (!mapCenter || !fine) return false;
 
-    // Calculate distance between points (simple approximation)
-    const latDiff = Math.abs(mapCenter.lat - fine.location[1]);
-    const lngDiff = Math.abs(mapCenter.lng - fine.location[0]);
+  //   // Calculate distance between points (simple approximation)
+  //   const latDiff = Math.abs(mapCenter.lat - fine.location[1]);
+  //   const lngDiff = Math.abs(mapCenter.lng - fine.location[0]);
 
-    // Consider "near" if within ~1km (rough approximation)
-    return latDiff < 0.01 && lngDiff < 0.01;
-  };
+  //   // Consider "near" if within ~1km (rough approximation)
+  //   return latDiff < 0.01 && lngDiff < 0.01;
+  // };
 
-  // Add this function to calculate screen coordinates from map coordinates
-  const getScreenPosition = (location) => {
-    if (!map || !location) return null;
-    const point = map.project(location);
-    return {
-      x: point.x,
-      y: point.y,
-    };
-  };
+  // // Add this function to calculate screen coordinates from map coordinates
+  // const getScreenPosition = (location) => {
+  //   if (!map || !location) return null;
+  //   console.log(location, "location in getScreenpositiuons");
+  //   const point = map.project(location);
+  //   return {
+  //     x: point.x,
+  //     y: point.y,
+  //   };
+  // };
 
-  // Handle new fines coming in
-  useEffect(() => {
-    if (fines.length > 0) {
-      const latestFine = fines[0];
+  // // Handle new fines coming in
+  // useEffect(() => {
+  //   console.log(fines, "fines in panel");
+  //   if (fines?.length > 0) {
+  //     const latestFine = fines[0];
 
-      // Get the fine's location on screen
-      const screenPos = getScreenPosition([
-        latestFine.location[0],
-        latestFine.location[1],
-      ]);
+  //     // Get the fine's location on screen
+  //     const screenPos = getScreenPosition([
+  //       latestFine.location[0],
+  //       latestFine.location[1],
+  //     ]);
 
-      if (screenPos && panelRef.current) {
-        // Get the panel's position
-        const panelRect = panelRef.current.getBoundingClientRect();
+  //     if (screenPos && panelRef.current) {
+  //       // Get the panel's position
+  //       const panelRect = panelRef.current.getBoundingClientRect();
 
-        // Find the position where the fine will be added in the list
-        const fineElements = panelRef.current.querySelectorAll(".fine-item");
-        const targetElement = fineElements[fineElements.length - 1];
+  //       // Find the position where the fine will be added in the list
+  //       const fineElements = panelRef.current.querySelectorAll(".fine-item");
+  //       const targetElement = fineElements[fineElements.length - 1];
 
-        if (targetElement) {
-          const targetRect = targetElement.getBoundingClientRect();
+  //       if (targetElement) {
+  //         const targetRect = targetElement.getBoundingClientRect();
 
-          // Set up the flying image animation
-          setFlyingImage({
-            id: latestFine.id,
-            src: latestFine.imagePath,
-            startX: screenPos.x,
-            startY: screenPos.y,
-            endX: targetRect.left,
-            endY: targetRect.top,
-          });
+  //         // Set up the flying image animation
+  //         setFlyingImage({
+  //           id: latestFine.id,
+  //           src: latestFine.imagePath,
+  //           startX: screenPos.x,
+  //           startY: screenPos.y,
+  //           endX: targetRect.left,
+  //           endY: targetRect.top,
+  //         });
 
-          // Remove flying image after animation completes
-          setTimeout(() => {
-            setFlyingImage(null);
-          }, 1400);
-        }
-      }
-    }
-  }, [fines.length, map]);
+  //         // Remove flying image after animation completes
+  //         setTimeout(() => {
+  //           setFlyingImage(null);
+  //         }, 1400);
+  //       }
+  //     }
+  //   }
+  // }, [fines, map]);
 
   // Add this function for testing
 
@@ -181,14 +192,12 @@ const FinesPanel = () => {
 
         {/* Display up to 8 fines in a 2x4 grid layout */}
         <div className="flex-1 overflow-y-auto p-2 grid grid-cols-3 gap-2 scrollbar-hide">
-          {fines.map((fine) => (
+          {fines?.map((fine) => (
             <div
               key={fine.id}
-              className={`relative fine-item bg-white/10 rounded-md overflow-hidden cursor-pointer transition-all duration-200 h-40 group ${
-                selectedFine?.id === fine.id && isNearMapCenter(fine)
-                  ? "ring-2 ring-blue-500"
-                  : ""
-              } ${animatingFineId === fine.id ? "animate-pulse-gold" : ""}`}
+              className={`relative fine-item bg-white/10 rounded-md overflow-hidden cursor-pointer transition-all duration-200 h-40 group  ${
+                animatingFineId === fine.id ? "animate-pulse-gold" : ""
+              }`}
               onClick={() => flyToFine(fine)}
             >
               {" "}
@@ -202,7 +211,7 @@ const FinesPanel = () => {
               )}
               <div className="w-full h-full overflow-hidden">
                 <img
-                  src={fine.imagePath}
+                  src={fine?.photo_link}
                   alt="Traffic violation"
                   className="w-full h-full object-cover transition-transform duration-300 "
                 />
@@ -249,7 +258,7 @@ const FinesPanel = () => {
                   ${fine.amount}
                 </div> */}
                 <div className="text-white/60 text-xs">
-                  {new Date(fine.timestamp).toLocaleTimeString()}
+                  {new Date(fine.created_at).toLocaleTimeString()}
                 </div>
               </div>
             </div>

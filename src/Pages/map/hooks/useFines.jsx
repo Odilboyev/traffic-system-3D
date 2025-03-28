@@ -1,12 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import { getFineLastData } from "../../../api/api.handlers";
 
 // Mock fines data - in a real app, this would come from an API
 const mockFinesData = [
   {
     id: 1,
     location: {
-      lat: 41.3010,
-      lng: 69.2400
+      lat: 41.301,
+      lng: 69.24,
     },
     timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 minutes ago
     type: "speeding",
@@ -17,24 +19,24 @@ const mockFinesData = [
       type: "car",
       color: "white",
       make: "Chevrolet",
-      model: "Nexia"
+      model: "Nexia",
     },
     fine: 250000,
     status: "pending",
     camera: {
       id: "CAM-001",
-      type: "speed"
+      type: "speed",
     },
     images: [
       "https://example.com/fine1-image1.jpg",
-      "https://example.com/fine1-image2.jpg"
-    ]
+      "https://example.com/fine1-image2.jpg",
+    ],
   },
   {
     id: 2,
     location: {
-      lat: 41.2950,
-      lng: 69.2450
+      lat: 41.295,
+      lng: 69.245,
     },
     timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
     type: "red_light",
@@ -43,24 +45,24 @@ const mockFinesData = [
       type: "car",
       color: "black",
       make: "Toyota",
-      model: "Camry"
+      model: "Camry",
     },
     fine: 300000,
     status: "pending",
     camera: {
       id: "CAM-002",
-      type: "traffic_light"
+      type: "traffic_light",
     },
     images: [
       "https://example.com/fine2-image1.jpg",
-      "https://example.com/fine2-image2.jpg"
-    ]
+      "https://example.com/fine2-image2.jpg",
+    ],
   },
   {
     id: 3,
     location: {
-      lat: 41.3050,
-      lng: 69.2350
+      lat: 41.305,
+      lng: 69.235,
     },
     timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 minutes ago
     type: "no_seatbelt",
@@ -69,23 +71,21 @@ const mockFinesData = [
       type: "car",
       color: "silver",
       make: "Hyundai",
-      model: "Sonata"
+      model: "Sonata",
     },
     fine: 150000,
     status: "pending",
     camera: {
       id: "CAM-003",
-      type: "surveillance"
+      type: "surveillance",
     },
-    images: [
-      "https://example.com/fine3-image1.jpg"
-    ]
+    images: ["https://example.com/fine3-image1.jpg"],
   },
   {
     id: 4,
     location: {
-      lat: 41.2900,
-      lng: 69.2500
+      lat: 41.29,
+      lng: 69.25,
     },
     timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
     type: "wrong_lane",
@@ -94,24 +94,24 @@ const mockFinesData = [
       type: "truck",
       color: "blue",
       make: "Isuzu",
-      model: "NPR"
+      model: "NPR",
     },
     fine: 200000,
     status: "pending",
     camera: {
       id: "CAM-004",
-      type: "surveillance"
+      type: "surveillance",
     },
     images: [
       "https://example.com/fine4-image1.jpg",
-      "https://example.com/fine4-image2.jpg"
-    ]
+      "https://example.com/fine4-image2.jpg",
+    ],
   },
   {
     id: 5,
     location: {
-      lat: 41.3100,
-      lng: 69.2550
+      lat: 41.31,
+      lng: 69.255,
     },
     timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(), // 1.5 hours ago
     type: "parking",
@@ -120,18 +120,16 @@ const mockFinesData = [
       type: "car",
       color: "red",
       make: "Kia",
-      model: "Rio"
+      model: "Rio",
     },
     fine: 100000,
     status: "pending",
     camera: {
       id: "CAM-005",
-      type: "surveillance"
+      type: "surveillance",
     },
-    images: [
-      "https://example.com/fine5-image1.jpg"
-    ]
-  }
+    images: ["https://example.com/fine5-image1.jpg"],
+  },
 ];
 
 // Fine type definitions with display names and icons
@@ -139,28 +137,28 @@ const fineTypes = {
   speeding: {
     name: "Speeding",
     description: "Exceeding the speed limit",
-    icon: "speed"
+    icon: "speed",
   },
   red_light: {
     name: "Red Light",
     description: "Running a red light",
-    icon: "traffic_light"
+    icon: "traffic_light",
   },
   no_seatbelt: {
     name: "No Seatbelt",
     description: "Driving without a seatbelt",
-    icon: "seatbelt"
+    icon: "seatbelt",
   },
   wrong_lane: {
     name: "Wrong Lane",
     description: "Driving in the wrong lane",
-    icon: "lane"
+    icon: "lane",
   },
   parking: {
     name: "Illegal Parking",
     description: "Parking in a prohibited area",
-    icon: "parking"
-  }
+    icon: "parking",
+  },
 };
 
 /**
@@ -178,37 +176,18 @@ export const useFines = () => {
       red_light: true,
       no_seatbelt: true,
       wrong_lane: true,
-      parking: true
+      parking: true,
     },
     timeRange: {
       start: new Date(Date.now() - 1000 * 60 * 60 * 24), // Last 24 hours
-      end: new Date()
+      end: new Date(),
     },
     status: {
       pending: true,
       paid: true,
-      appealed: true
-    }
+      appealed: true,
+    },
   });
-
-  // Fetch fines data
-  const fetchFinesData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // In a real app, this would be an API call
-      // For now, we'll use the mock data with a delay to simulate network request
-      setTimeout(() => {
-        setFinesData(mockFinesData);
-        setIsLoading(false);
-      }, 800);
-    } catch (err) {
-      console.error("Error fetching fines data:", err);
-      setError("Failed to fetch fines data");
-      setIsLoading(false);
-    }
-  }, []);
 
   // Clear fines data
   const clearFinesData = useCallback(() => {
@@ -228,55 +207,59 @@ export const useFines = () => {
 
   // Update filters
   const updateFilters = useCallback((newFilters) => {
-    setFilters(prevFilters => ({
+    setFilters((prevFilters) => ({
       ...prevFilters,
-      ...newFilters
+      ...newFilters,
     }));
   }, []);
 
   // Toggle a specific type filter
   const toggleTypeFilter = useCallback((fineType) => {
-    setFilters(prevFilters => ({
+    setFilters((prevFilters) => ({
       ...prevFilters,
       types: {
         ...prevFilters.types,
-        [fineType]: !prevFilters.types[fineType]
-      }
+        [fineType]: !prevFilters.types[fineType],
+      },
     }));
   }, []);
 
   // Toggle a specific status filter
   const toggleStatusFilter = useCallback((status) => {
-    setFilters(prevFilters => ({
+    setFilters((prevFilters) => ({
       ...prevFilters,
       status: {
         ...prevFilters.status,
-        [status]: !prevFilters.status[status]
-      }
+        [status]: !prevFilters.status[status],
+      },
     }));
   }, []);
 
   // Set time range filter
   const setTimeRangeFilter = useCallback((start, end) => {
-    setFilters(prevFilters => ({
+    setFilters((prevFilters) => ({
       ...prevFilters,
-      timeRange: { start, end }
+      timeRange: { start, end },
     }));
   }, []);
 
   // Get filtered fines based on current filters
   const getFilteredFines = useCallback(() => {
-    return finesData.filter(fine => {
+    return finesData.filter((fine) => {
       // Filter by type
       if (!filters.types[fine.type]) return false;
-      
+
       // Filter by status
       if (!filters.status[fine.status]) return false;
-      
+
       // Filter by time range
       const fineTime = new Date(fine.timestamp);
-      if (fineTime < filters.timeRange.start || fineTime > filters.timeRange.end) return false;
-      
+      if (
+        fineTime < filters.timeRange.start ||
+        fineTime > filters.timeRange.end
+      )
+        return false;
+
       return true;
     });
   }, [finesData, filters]);
@@ -296,6 +279,6 @@ export const useFines = () => {
     toggleTypeFilter,
     toggleStatusFilter,
     setTimeRangeFilter,
-    getFilteredFines
+    getFilteredFines,
   };
 };

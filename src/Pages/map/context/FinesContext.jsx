@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 
+import { getFineLastData } from "../../../api/api.handlers";
 import login from "../../../Auth";
 import { useMapContext } from "./MapContext";
 
@@ -13,12 +14,36 @@ import { useMapContext } from "./MapContext";
 const FinesContext = createContext();
 
 export const FinesProvider = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [fines, setFines] = useState([]);
   const [showFinesPanel, setShowFinesPanel] = useState(false);
   const [selectedFine, setSelectedFine] = useState(null);
   const [socketStatus, setSocketStatus] = useState("disconnected"); // 'connecting', 'connected', 'error', 'disconnected'
   const { map } = useMapContext();
 
+  // Fetch fines data
+  const fetchFinesData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // In a real app, this would be an API call
+      const response = await getFineLastData();
+
+      setFines(
+        response.slice(0, 15).map((v) => ({
+          ...v,
+          location: JSON.parse(v.crossroad.location),
+        }))
+      );
+      setIsLoading(false);
+    } catch (err) {
+      console.error("Error fetching fines data:", err);
+      setError("Failed to fetch fines data");
+      setIsLoading(false);
+    }
+  }, []);
   // WebSocket connection for real-time fines
   useEffect(() => {
     if (!map) return;
@@ -75,53 +100,20 @@ export const FinesProvider = ({ children }) => {
           const data = JSON.parse(event.data);
           console.log("Received fine data:", data);
 
-          // Extract location from crossroad
-          let location = [69.2, 41.3]; // Default location if parsing fails
-          try {
-            if (data.crossroad && data.crossroad.location) {
-              const locationObj = JSON.parse(data.crossroad.location);
-              location = [
-                parseFloat(locationObj.lng),
-                parseFloat(locationObj.lat),
-              ];
-            }
-          } catch (err) {
-            console.error("Error parsing location:", err);
-          }
-
-          // Create fine object from WebSocket data
+          // Process fine object from WebSocket data
           const newFine = {
             ...data,
-            id: Date.now().toString(),
-            location: location,
-            timestamp: data.created_at || new Date().toISOString(),
-            type: data.violation_type,
-            vehicleInfo: {
-              plate: data.carnum || "Unknown",
-              model: "Unknown",
-              color: "Unknown",
-            },
-            crossroad: data.crossroad || { name: "Unknown" },
-            speed: data.speed || "0",
-            photos: data.photos || [],
-            // Use the first photo if available, otherwise use sample image
-            imagePath:
-              data.photos && data.photos.length > 0 && data.photos[0].link
-                ? data.photos[0].link
-                : "/src/assets/images/sampleFine.png",
+            location: data.crossroad
+              ? JSON.parse(data.crossroad.location)
+              : null,
           };
 
           setFines((prevFines) => {
-            if (prevFines.length >= 15) {
-              // Replace a random fine when we have 15 or more
-              const randomIndex = Math.floor(Math.random() * prevFines.length);
-              const updatedFines = [...prevFines];
-              updatedFines[randomIndex] = newFine;
-              return updatedFines;
-            } else {
-              // Add new fine if we have less than 15
-              return [...prevFines, newFine];
-            }
+            // Replace a random fine when we have 15 or more
+            const randomIndex = Math.floor(Math.random() * prevFines.length);
+            const updatedFines = [...prevFines];
+            updatedFines[randomIndex] = newFine;
+            return updatedFines;
           });
         } catch (error) {
           console.error("Error processing WebSocket message:", error);
@@ -164,7 +156,6 @@ export const FinesProvider = ({ children }) => {
   const flyToFine = useCallback(
     (fine) => {
       if (!map || !fine) return;
-      console.log(fine);
       map.flyTo({
         center: fine.location,
         zoom: 16,
@@ -187,6 +178,7 @@ export const FinesProvider = ({ children }) => {
         fines,
         showFinesPanel,
         setFines,
+        fetchFinesData,
         selectedFine,
         socketStatus,
         flyToFine,
