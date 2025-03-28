@@ -15,9 +15,9 @@ export const ModuleProvider = ({ children }) => {
     { id: "fuel", name: "Yoqilg'i stansiyalari" },
     { id: "fines", name: "Jarimalar" },
     { id: "public_transport", name: "Jamoat transporti" },
-    { id: "road_signs", name: "Road signs" },
+    { id: "road_signs", name: "Yo'l belgilari" },
     { id: "weather", name: "Ob-havo" },
-    { id: "parking", name: "Parking Lots" },
+    { id: "parking", name: "Avtoturargohlar" },
   ];
 
   // Initialize state from localStorage or use default
