@@ -98,7 +98,6 @@ export const FinesProvider = ({ children }) => {
       if (map.getZoom() > 10) {
         try {
           const data = JSON.parse(event.data);
-          console.log("Received fine data:", data);
 
           // Process fine object from WebSocket data
           const newFine = {

@@ -75,7 +75,7 @@ const MapLibreContainer = () => {
       pitch: 40,
       maxPitch: 70,
       maxZoom: 20,
-      minZoom: 5,
+      minZoom: 0,
       canvasContextAttributes: { antialias: true },
     });
 
