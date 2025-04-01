@@ -1,12 +1,22 @@
+import "./styles.css";
+
+import {
+  FaBuilding,
+  FaClock,
+  FaMapMarkerAlt,
+  FaParking,
+  FaPhone,
+} from "react-icons/fa";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { FaParking } from "react-icons/fa";
 import PropTypes from "prop-types";
 import { getParkingLots } from "../../../../api/api.handlers";
 import maplibregl from "maplibre-gl";
 import { renderToString } from "react-dom/server";
+import { useTranslation } from "react-i18next";
 
 const ParkingMarkers = ({ map }) => {
+  const { t } = useTranslation();
   const markersRef = useRef({});
   const [parkingLots, setParkingLots] = useState([]);
   // Helper function to clean up markers
@@ -53,7 +63,7 @@ const ParkingMarkers = ({ map }) => {
 
             // Convert coordinates from [lat, lng] to [lng, lat] format
             locationCenter = [locationCenter[1], locationCenter[0]];
-            locationArea = locationArea.map(point => [point[1], point[0]]);
+            locationArea = locationArea.map((point) => [point[1], point[0]]);
           } catch (error) {
             console.warn(
               `Invalid location data for parking lot ${lot.id}:`,
@@ -67,9 +77,16 @@ const ParkingMarkers = ({ map }) => {
             name: lot.name,
             type: lot.location_type === "polyline" ? "line" : "area",
             coordinates: locationCenter,
-            capacity: lot.space_max,
-            available: lot.sapce_free, // Note: API has a typo in 'sapce_free'
-            area: lot.floors,
+            space_max: lot.space_max,
+            space_busy: lot.space_busy,
+            space_free: lot.space_free,
+            today_count: lot.today_count,
+            floors: lot.floors,
+            organization: lot.tashkilot,
+            working_hours: lot.ish_vaqti,
+            phone: lot.telefon,
+            region_name: lot.region_name,
+            district_name: lot.district_name,
             geometry: {
               type: lot.location_type === "polyline" ? "LineString" : "Polygon",
               coordinates:
@@ -77,7 +94,7 @@ const ParkingMarkers = ({ map }) => {
                   ? locationArea
                   : [locationArea],
             },
-            load: lot.status,
+            load: lot.load,
           };
         });
 
@@ -171,9 +188,16 @@ const ParkingMarkers = ({ map }) => {
               properties: {
                 id: lot.id,
                 name: lot.name,
-                capacity: lot.capacity,
-                available: lot.available,
-                area: lot.area,
+                space_max: lot.space_max,
+                space_busy: lot.space_busy,
+                space_free: lot.space_free,
+                today_count: lot.today_count,
+                floors: lot.floors,
+                organization: lot.organization,
+                working_hours: lot.working_hours,
+                phone: lot.phone,
+                region_name: lot.region_name,
+                district_name: lot.district_name,
                 load: lot.load,
               },
             })),
@@ -192,10 +216,18 @@ const ParkingMarkers = ({ map }) => {
               properties: {
                 id: lot.id,
                 name: lot.name,
-                capacity: lot.capacity,
-                available: lot.available,
-                length: lot.length,
+                space_max: lot.space_max,
+                space_busy: lot.space_busy,
+                space_free: lot.space_free,
+                today_count: lot.today_count,
+                floors: lot.floors,
+                organization: lot.organization,
+                working_hours: lot.working_hours,
+                phone: lot.phone,
+                region_name: lot.region_name,
+                district_name: lot.district_name,
                 load: lot.load,
+                img: lot.img_link,
               },
             })),
         },
@@ -290,7 +322,6 @@ const ParkingMarkers = ({ map }) => {
         },
       });
 
-
       map.on("mousemove", "parking-areas-fill", handleHover);
       map.on("mouseleave", "parking-areas-fill", handleMouseLeave);
       map.on("mousemove", "parking-lines-line", handleHover);
@@ -330,9 +361,9 @@ const ParkingMarkers = ({ map }) => {
       layout: {
         "text-field": [
           "format",
-          ["get", "length"],
+          ["get", "name"],
           { "font-scale": 1.2, "font-weight": 600 },
-          " m",
+          "",
           { "font-scale": 0.9, "text-color": "#ffffff" },
         ],
         "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
@@ -365,25 +396,22 @@ const ParkingMarkers = ({ map }) => {
           case 4:
             return "#ef4444"; // Red - critical
           default:
-            return "#ef4444"; // Default red
+            return "#2563eb"; // Default red
         }
       };
 
       const loadColor = getLoadColor(lot.load);
-      const occupancyRate = (
-        ((lot.capacity - lot.available) / lot.capacity) *
-        100
-      ).toFixed(0);
+      const occupancyRate = ((lot.space_busy / lot.space_max) * 100).toFixed(0);
 
       // Create marker element
       const el = document.createElement("div");
       el.className = "parking-marker group";
       el.innerHTML = renderToString(
         <div
-          className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-lg transition-transform hover:scale-110"
-          style={{ border: `2px solid ${loadColor}` }}
+          className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-md shadow-lg transition-transform hover:scale-110"
+          style={{ border: `2px solid #2563eb` }}
         >
-          <FaParking className="text-lg" style={{ color: loadColor }} />
+          <FaParking className="text-lg" style={{ color: "#2563eb" }} />
         </div>
       );
 
@@ -394,49 +422,105 @@ const ParkingMarkers = ({ map }) => {
         maxWidth: "300px",
         className: "parking-popup",
       }).setHTML(`
-          <div class="p-4 text-sm bg-white rounded-lg shadow-lg">
+          <div class="p-4 text-sm rounded-xl shadow-xl !bg-gradient-to-br from-blue-950/95 to-gray-900/95 backdrop-blur-lg border border-blue-800/20">
             <div class="flex items-center gap-2 mb-3">
-              <div class="p-2 rounded-full" style="background-color: ${loadColor}">
-                ${renderToString(<FaParking className="w-4 h-4 text-white" />)}
-              </div>
-              <h3 class="font-bold text-lg text-gray-900">${lot.name}</h3>
+              <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${loadColor}"></div>
+              <h3 class="text-base font-bold text-white tracking-tight">${
+                lot.name
+              }</h3>
             </div>
-            <div class="space-y-3">
-              <div class="flex justify-between items-center">
-                <span class="text-gray-600">Status:</span>
-                <span class="font-medium px-2 py-1 rounded text-white text-xs" style="background-color: ${loadColor}">
-                  ${
-                    lot.load === 1
-                      ? "Normal"
-                      : lot.load === 2
-                      ? "Medium Load"
-                      : lot.load === 3
-                      ? "High Load"
-                      : "Critical"
-                  }
+            
+            <div class="grid gap-2 text-gray-300 mb-3">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-blue-400">${renderToString(
+                  <FaBuilding className="w-3.5 h-3.5" />
+                )}</span>
+                <span class="text-gray-300 text-sm">${lot.organization}</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-blue-400">${renderToString(
+                  <FaPhone className="w-3.5 h-3.5" />
+                )}</span>
+                <span class="text-gray-300 text-sm">${lot.phone}</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-blue-400">${renderToString(
+                  <FaMapMarkerAlt className="w-3.5 h-3.5" />
+                )}</span>
+                <span class="text-gray-300 text-sm">${lot.region_name}, ${
+        lot.district_name
+      }</span>
+              </div>
+            </div>
+            
+            <div class="p-2.5 bg-blue-950/50 rounded-lg border border-blue-900/30 backdrop-blur-sm">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color: ${loadColor}"></span>
+                  <span class="text-blue-300 text-xs font-medium">${t(
+                    "current_status"
+                  )}</span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-white text-xs font-bold" style="background: ${loadColor}">
+                  ${occupancyRate}% ${t("full")}
                 </span>
               </div>
-              <div class="flex justify-between items-center">
-                <span class="text-gray-600">Occupancy:</span>
-                <span class="font-medium">${occupancyRate}%</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-gray-600">Available:</span>
-                <span class="font-medium text-gray-900">${lot.available}/${
-        lot.capacity
-      } spots</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-gray-600">${
-                  lot.type === "area" ? "Area:" : "Length:"
-                }</span>
-                <span class="font-medium text-gray-900">${
-                  lot.type === "area" ? `${lot.area}m²` : `${lot.length}m`
-                }</span>
+              
+              <div class="grid grid-cols-2 gap-2">
+                <div class="p-2 bg-blue-900/20 rounded-md">
+                  <div class="flex justify-between">
+                    <span class="text-[10px] text-blue-300 font-medium">${t(
+                      "total"
+                    )}</span>
+                    <span class="text-sm font-bold text-white">${
+                      lot.space_max
+                    }</span>
+                  </div>
+                </div>
+                <div class="p-2 bg-blue-900/20 rounded-md">
+                  <div class="flex justify-between">
+                    <span class="text-[10px] text-blue-300 font-medium">${t(
+                      "busy"
+                    )}</span>
+                    <span class="text-sm font-bold text-white">${
+                      lot.space_busy
+                    }</span>
+                  </div>
+                </div>
+                <div class="p-2 bg-blue-900/20 rounded-md">
+                  <div class="flex justify-between">
+                    <span class="text-[10px] text-blue-300 font-medium">${t(
+                      "free"
+                    )}</span>
+                    <span class="text-sm font-bold text-white">${
+                      lot.space_free
+                    }</span>
+                  </div>
+                </div>
+                <div class="p-2 bg-blue-900/20 rounded-md">
+                  <div class="flex justify-between">
+                    <span class="text-[10px] text-blue-300 font-medium">
+                    ${t("today")}</span>
+                    <span class="text-sm font-bold text-white">
+                    ${lot.today_count}</span>
+                  </div>
+                </div>
               </div>
             </div>
+            
+            <div class="flex items-center gap-2 mt-3 text-xs">
+              <span class="text-blue-400">${renderToString(
+                <FaClock className="w-3.5 h-3.5" />
+              )}</span>
+              <span class="text-gray-300">${lot.working_hours}</span>
+            </div>
+            
+            <img 
+              src="${lot.img}"
+              alt="Parking Preview" 
+              class="w-full h-24 object-cover rounded-lg mt-3 opacity-90 shadow-lg"/>
           </div>
-        `);
+      `);
 
       // Create and store marker
       const marker = new maplibregl.Marker({ element: el })

@@ -96,6 +96,8 @@ const getFineMarkers = async () => getData(import.meta.env.VITE_FINE_MARKERS);
 const getFineLastData = async () =>
   getData(import.meta.env.VITE_FINE_LAST_DATA);
 const getParkingLots = async () => getData(import.meta.env.VITE_PARKING_LOTS);
+const getParkingWidgets = async () =>
+  getData(import.meta.env.VITE_PARKING_WIDGETS);
 
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
@@ -235,6 +237,7 @@ export {
   getFineMarkers,
   getFineLastData,
   getParkingLots,
+  getParkingWidgets,
   listUsers,
   markerHandler,
   recoverUser,

@@ -2,16 +2,6 @@
   cursor: pointer;
   width: 32px;
   height: 32px;
-  transition: transform 0.2s;
-}
-
-.parking-marker:hover {
-  transform: scale(1.1);
-}
-
-.parking-marker {
-  cursor: pointer;
-  transition: transform 0.2s;
 }
 
 .parking-marker:hover {
@@ -22,7 +12,8 @@
   padding: 0 !important;
   border-radius: 0.75rem !important;
   overflow: hidden;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
 }
 
 .maplibregl-popup-tip {
@@ -40,4 +31,7 @@
 
 .parking-popup {
   font-family: system-ui, -apple-system, sans-serif;
+}
+.parking-popup .maplibregl-popup-content {
+  background: transparent !important;
 }

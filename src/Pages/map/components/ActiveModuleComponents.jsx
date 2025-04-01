@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
+
 // Markers
 import FineMarkers from "./FineMarkers";
-import ParkingMarkers from "./parkingMarkers";
 // Panels
 import FinesPanel from "./FinesPanel";
 import FinesStats from "./fines/FinesStats";
@@ -9,6 +10,10 @@ import FuelStationMarkers from "./fuelStationMarkers";
 import FuelStationsModule from "./TrafficMonitoringPanel/components/modules/FuelStationsModule";
 import HeatmapControl from "./controls/heatmapControl";
 import ITSModule from "./TrafficMonitoringPanel/components/modules/ITSModule";
+import ParkingLotsModule from "./TrafficMonitoringPanel/components/modules/ParkingLotsModule";
+import ParkingMarkers from "./parkingMarkers";
+import ParkingModule from "./TrafficMonitoringPanel/components/modules/ParkingModule";
+import PropTypes from "prop-types";
 import PulsingMarkers from "./PulsingMarkers/PulsingMarkers";
 import RegionDistrictFilter from "./RegionDistrictFilter";
 // Panels
@@ -17,10 +22,7 @@ import TrafficLightContainer from "./trafficLightMarkers/managementLights";
 import TransportMarkers from "./transportMarkers";
 import WeatherMarkers from "./weatherMarkers";
 import WeatherModule from "./TrafficMonitoringPanel/components/modules/WeatherModule";
-import ParkingLotsModule from "./TrafficMonitoringPanel/components/modules/ParkingLotsModule";
-import { useEffect, useState } from "react";
 import { useModuleContext } from "../context/ModuleContext";
-import PropTypes from 'prop-types';
 
 /**
  * Component that renders module-specific components based on the active module
@@ -30,7 +32,7 @@ const ActiveModuleComponents = ({ map }) => {
   const { activeModule } = useModuleContext();
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [currentZoom, setCurrentZoom] = useState(13);
-  
+
   useEffect(() => {
     const mapState = localStorage.getItem("mapState");
     const zoom = mapState ? JSON.parse(mapState).zoom : 13;
@@ -113,7 +115,7 @@ const ActiveModuleComponents = ({ map }) => {
           {/* Parking markers */}
           <ParkingMarkers map={map} />
           {/* Parking panel */}
-          <ParkingLotsModule />
+          <ParkingModule />
         </>
       );
 
@@ -129,8 +131,8 @@ ActiveModuleComponents.propTypes = {
     getLayer: PropTypes.func,
     removeLayer: PropTypes.func,
     getSource: PropTypes.func,
-    removeSource: PropTypes.func
-  })
+    removeSource: PropTypes.func,
+  }),
 };
 
 export default ActiveModuleComponents;

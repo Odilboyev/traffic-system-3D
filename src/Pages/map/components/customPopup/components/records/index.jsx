@@ -28,7 +28,7 @@ const RecordsContent = ({ videos, name, isLoading }) => {
               key={index}
               style={{
                 width: "100%",
-                height: "180px",
+                height: "15vh",
                 position: "relative",
                 overflow: "hidden",
               }}

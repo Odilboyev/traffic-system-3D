@@ -63,7 +63,6 @@ const MapLibreContainer = () => {
       }
     } catch (error) {
       console.warn("Error parsing mapState from localStorage:", error);
-      // Remove invalid mapState from localStorage
       localStorage.removeItem("mapState");
     }
 
@@ -77,12 +76,16 @@ const MapLibreContainer = () => {
       maxZoom: 20,
       minZoom: 0,
       canvasContextAttributes: { antialias: true },
+      projection: { name: "mercator" },
+      preserveDrawingBuffer: true,
     });
 
+    // Set up map event listeners
     newMap.on("load", () => {
       console.log("Map loaded");
       setMap(newMap);
       setContextMap(newMap);
+      getDataHandler(); // Call this after map is loaded
     });
 
     newMap.on("moveend", () => {
@@ -97,8 +100,7 @@ const MapLibreContainer = () => {
       }
     });
 
-    getDataHandler();
-
+    // Cleanup function
     return () => {
       newMap.remove();
       setMap(null);
@@ -108,7 +110,24 @@ const MapLibreContainer = () => {
 
   useEffect(() => {
     if (!map) return;
-    map.setStyle(theme === "dark" ? darkLayer : lightLayer);
+
+    // Store current map state
+    const currentZoom = map.getZoom();
+    const currentCenter = map.getCenter();
+    const currentPitch = map.getPitch();
+    const currentBearing = map.getBearing();
+
+    // Listen for style load completion
+    const styleLoadListener = () => {
+      map.setZoom(currentZoom);
+      map.setCenter(currentCenter);
+      map.setPitch(currentPitch);
+      map.setBearing(currentBearing);
+      map.off('styledata', styleLoadListener);
+    };
+
+    map.on('styledata', styleLoadListener);
+    map.setStyle(theme === "dark" ? darkLayer : lightLayer, { diff: false });
   }, [theme, map]);
 
   // Fetch markers when activeModuleType changes to 'monitoring'

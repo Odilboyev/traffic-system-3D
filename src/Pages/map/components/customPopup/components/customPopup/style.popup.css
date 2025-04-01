@@ -1,9 +1,6 @@
-.custom-popup-no-tip .leaflet-popup-content-wrapper {
-  border-radius: 8px; /* Adjust as needed */
-}
-
-.custom-popup-no-tip .leaflet-popup-tip {
-  display: none; /* Completely removes the tip */
+/* Hide MapLibre popup tip */
+.maplibre-custom-popup .maplibregl-popup-tip {
+  display: none !important;
 }
 
 /* Styles for MapLibre custom popups */

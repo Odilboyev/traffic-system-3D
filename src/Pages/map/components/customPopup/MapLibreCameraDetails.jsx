@@ -1,7 +1,7 @@
 import "./popup.style.css";
 
 import { FaMinus, FaPlus, FaVideo } from "react-icons/fa6";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState, useCallback } from "react";
 
 import { FiExternalLink } from "react-icons/fi";
 import MapLibrePopup from "./components/customPopup/MapLibrePopup";
@@ -26,32 +26,29 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [PTZModalOpen, setPTZModalOpen] = useState(false);
 
-  const handleCollapseToggle = () => {
+  const handleCollapseToggle = useCallback(() => {
     setIsCollapsed((prev) => !prev);
-  };
+  }, []);
 
   // Store the latest traffic light seconds in a ref
   const trafficLightSecondsRef = useRef(null);
 
   // Close popup when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      // More efficient event handling
+  const handleClickOutside = useCallback(
+    (e) => {
       if (!popupRef.current) return;
-
       const isClickOutside = !popupRef.current.contains(e.target);
-
       if (isClickOutside && !isCollapsed) {
         setIsCollapsed(true);
       }
-    };
+    },
+    [isCollapsed]
+  );
 
+  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isCollapsed]);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [handleClickOutside]);
 
   // Manage WebSocket connection based on marker type
   useEffect(() => {
@@ -106,15 +103,15 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
     }
   }, [marker.svetofor_id, marker.type, marker.link_id, marker.vendor_id, marker.vendor, dispatch]);
 
-  const handleOpenLink = () => {
+  const handleOpenLink = useCallback(() => {
     const { ip, http_port } = marker.cameraData;
     const url = `http://${ip}:${http_port}`;
     window.open(url, "_blank");
-  };
+  }, [marker.cameraData]);
 
   const [isModalOpen, setModalOpen] = useState(false);
-  const openModal = () => setModalOpen(true);
-  const closeModal = () => setModalOpen(false);
+  const openModal = useCallback(() => setModalOpen(true), []);
+  const closeModal = useCallback(() => setModalOpen(false), []);
 
   return (
     <>
@@ -175,7 +172,7 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
                 <div
                   style={{
                     width: "100%",
-                    maxWidth: "15vw",
+                    maxWidth: "12vw",
                     overflow: "hidden",
                   }}
                 >
@@ -185,7 +182,7 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
                     isLoading={isLoading}
                   />
                 </div>
-                <div className="flex items-center justify-between bg-gray-800/30 backdrop-blur-md p-2">
+                {/* <div className="flex items-center justify-between bg-gray-800/30 backdrop-blur-md p-2">
                   <div className="w-1/3 flex items-center gap-2">
                     <button className="text-white p-1">
                       <FaVideo />
@@ -205,7 +202,7 @@ const MapLibreCameraDetails = memo(function MapLibreCameraDetails({
                       <TrafficLightCounter channelId={marker.link_id} />
                     </div>
                   )}
-                </div>
+                </div> */}
               </div>
             )}
           </>
