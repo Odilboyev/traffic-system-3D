@@ -1,22 +1,26 @@
 import { useEffect, useState } from "react";
 
+import { IoRefreshOutline } from "react-icons/io5";
 import { getFineStats } from "../../../../api/api.handlers";
 import { useMapContext } from "../../context/MapContext";
 
 const FinesStats = () => {
   const [stats, setStats] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+
   const { map } = useMapContext();
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const data = await getFineStats();
-        setStats(data);
-      } catch (error) {
-        console.error("Error fetching fine stats:", error);
-      }
-    };
+  const fetchStats = async () => {
+    try {
+      const data = await getFineStats();
+      setStats(data);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error("Error fetching fine stats:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchStats();
     // Refresh every 5 minutes
     const interval = setInterval(fetchStats, 5 * 60 * 1000);
@@ -36,6 +40,16 @@ const FinesStats = () => {
 
   return (
     <div className="absolute left-4 top-[12%] w-[25vw] z-50 backdrop-blur-[2px] bg-gradient-to-r from-black/20 to-black/0">
+      <div className="absolute right-0 -bottom-14 rounded-lg backdrop-blur-[2px] bg-gradient-to-r from-black/30 to-black/10 pl-2  flex items-center gap-2 text-xs text-teal-400 font-semibold">
+        <span> Сўнгги янгиланиш: {lastUpdate.toLocaleTimeString()}</span>
+        <button
+          onClick={fetchStats}
+          className="p-1.5 text-teal-300 hover:text-teal-200 transition-all rounded-full hover:bg-black/30 bg-black/20 backdrop-blur-[2px]"
+          title="Янгилаш"
+        >
+          <IoRefreshOutline className="w-4 h-4" />
+        </button>
+      </div>
       {/* Today's Total Violations */}
       <div className="my-4">
         <div className="relative mb-4 flex items-center gap-2">

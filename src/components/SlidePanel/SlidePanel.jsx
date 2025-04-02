@@ -29,11 +29,13 @@ const SlidePanel = ({
     },
     left: {
       left: isOpen ? "16px" : "-100%",
-      top: "10%",
+      top: "50%",
+      transform: "translateY(-50%)",
     },
     right: {
       right: isOpen ? "16px" : "-100%",
-      top: "10%",
+      top: "50%",
+      transform: "translateY(-50%)",
     },
   };
 
