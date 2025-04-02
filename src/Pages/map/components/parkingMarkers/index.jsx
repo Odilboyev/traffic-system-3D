@@ -422,7 +422,7 @@ const ParkingMarkers = ({ map }) => {
         maxWidth: "300px",
         className: "parking-popup",
       }).setHTML(`
-          <div class="p-4 text-sm rounded-xl shadow-xl !bg-gradient-to-br from-blue-950/95 to-gray-900/95 backdrop-blur-lg border border-blue-800/20">
+          <div class="p-4 text-sm rounded-xl shadow-xl !bg-gradient-to-br from-blue-900/20 to-gray-900/20 backdrop-blur-lg border border-blue-800/20">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${loadColor}"></div>
               <h3 class="text-base font-bold text-white tracking-tight">${
@@ -452,9 +452,10 @@ const ParkingMarkers = ({ map }) => {
       }</span>
               </div>
             </div>
+        <div class="h-[1px] mb-3 flex-1 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent"></div>
             
-            <div class="p-2.5 bg-blue-950/50 rounded-lg border border-blue-900/30 backdrop-blur-sm">
-              <div class="flex justify-between items-center mb-2">
+            <div class="">
+              <div class="flex justify-between items-center mb-2 px-1">
                 <div class="flex items-center gap-1.5">
                   <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color: ${loadColor}"></span>
                   <span class="text-blue-300 text-xs font-medium">${t(
@@ -507,13 +508,15 @@ const ParkingMarkers = ({ map }) => {
                 </div>
               </div>
             </div>
+        <div class="h-[1px] my-3 flex-1 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent"></div>
             
-            <div class="flex items-center gap-2 mt-3 text-xs">
+            <div class="flex items-center gap-2 mt-3 text-xs px-1">
               <span class="text-blue-400">${renderToString(
                 <FaClock className="w-3.5 h-3.5" />
               )}</span>
               <span class="text-gray-300">${lot.working_hours}</span>
             </div>
+        <div class="h-[1px] my-3 flex-1 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent"></div>
             
             <img 
               src="${lot.img}"

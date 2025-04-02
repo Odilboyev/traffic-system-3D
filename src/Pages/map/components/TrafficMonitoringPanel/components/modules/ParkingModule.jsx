@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import { useZoomPanel } from "../../../../context/ZoomPanelContext";
 
 const ParkingWidget = ({ title, data, t }) => {
-  console.log(data, "data in parkingwidget");
   if (!data) return null;
 
   return (
@@ -147,11 +146,6 @@ const LeftSidePanelContent = ({ parkingData, t, map }) => {
             key={parking.id}
             className="flex items-center justify-between gap-3 text-sm p-3 bg-black/30 border border-cyan-500/20 hover:bg-cyan-950/30 transition-colors rounded-lg group backdrop-blur-sm cursor-pointer"
             onClick={() => {
-              console.log(parking.location_center, "clicked");
-              console.log(
-                JSON.parse(parking.location_center),
-                "clicked with json"
-              );
               map.flyTo({
                 center: [
                   JSON.parse(parking.location_center)[1],
@@ -174,11 +168,15 @@ const LeftSidePanelContent = ({ parkingData, t, map }) => {
             <div className="flex items-center gap-3 text-cyan-300">
               <div
                 className="flex items-center gap-2 bg-red-500/10 px-3 py-1.5 rounded-lg"
-                title={`${t("occupancy")}: ${parking.space_busy} / ${parking.space_max}`}
+                title={`${t("occupancy")}: ${parking.space_busy} / ${
+                  parking.space_max
+                }`}
               >
                 <FaUsers className="text-cyan-400 text-sm" />
                 <span className="font-medium">{parking.space_busy}</span>
-                <span className="text-xs text-cyan-500/70">/ {parking.space_max}</span>
+                <span className="text-xs text-cyan-500/70">
+                  / {parking.space_max}
+                </span>
               </div>
               <div
                 className="flex items-center gap-2 bg-green-500/10 px-3 py-1.5 rounded-lg"
