@@ -95,6 +95,7 @@ const ParkingMarkers = ({ map }) => {
                   : [locationArea],
             },
             load: lot.load,
+            img: lot.img_link,
           };
         });
 
@@ -173,7 +174,6 @@ const ParkingMarkers = ({ map }) => {
     const handleMouseLeave = () => {
       map.setFilter(hoverStateId, ["==", "id", ""]);
     };
-    console.log(parkingLots, "lol in map");
     try {
       // Add sources and layers for both area and line parking lots
       map.addSource("parking-areas", {

@@ -32,7 +32,7 @@ const ParkingWidget = ({ title, data, t }) => {
             <div className="flex items-center gap-2">
               <MdLocalParking className="text-cyan-400 text-lg" />
               <div className="text-sm text-cyan-500/70">
-                {t("parking.total_parkings")}
+                {t("parkings_count")}
               </div>
             </div>
             <div className="text-2xl font-bold text-cyan-200 mt-1">
@@ -43,7 +43,7 @@ const ParkingWidget = ({ title, data, t }) => {
             <div className="flex items-center gap-2">
               <IoCarSport className="text-cyan-400 text-lg" />
               <div className="text-sm text-cyan-500/70">
-                {t("parking.total_spaces")}
+                {t("space_max_sum")}
               </div>
             </div>
             <div className="text-2xl font-bold text-cyan-200 mt-1">
@@ -61,13 +61,13 @@ const ParkingWidget = ({ title, data, t }) => {
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-red-400"></div>
                   <span className="text-sm text-cyan-500/70">
-                    {t("parking.occupied")}
+                    {t("space_busy_sum")}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-green-400"></div>
                   <span className="text-sm text-cyan-500/70">
-                    {t("parking.free")}
+                    {t("space_free_sum")}
                   </span>
                 </div>
               </div>
@@ -101,7 +101,7 @@ const RightSidePanelContent = ({ parkingData, t }) => {
   if (!parkingData) return null;
 
   return (
-    <div className="relative w-[25vw] space-y-6 max-h-[90vh] overflow-y-auto scrollbar-hide">
+    <div className="relative w-[25vw] mt-[5%] space-y-6 max-h-[90vh] overflow-y-auto scrollbar-hide">
       {parkingData.widget_1?.data && (
         <ParkingWidget
           title={parkingData.widget_1.name}
@@ -171,17 +171,18 @@ const LeftSidePanelContent = ({ parkingData, t, map }) => {
                 {parking.name}
               </span>
             </div>
-            <div className="flex items-center gap-4 text-cyan-300">
+            <div className="flex items-center gap-3 text-cyan-300">
               <div
-                className="flex items-center gap-2 bg-cyan-500/10 px-3 py-1.5 rounded-lg"
-                title={`${t("parking.occupancy")}: ${parking.load_percent}%`}
+                className="flex items-center gap-2 bg-red-500/10 px-3 py-1.5 rounded-lg"
+                title={`${t("occupancy")}: ${parking.space_busy} / ${parking.space_max}`}
               >
                 <FaUsers className="text-cyan-400 text-sm" />
-                <span className="font-medium">{parking.load_percent}%</span>
+                <span className="font-medium">{parking.space_busy}</span>
+                <span className="text-xs text-cyan-500/70">/ {parking.space_max}</span>
               </div>
               <div
-                className="flex items-center gap-2 bg-cyan-500/10 px-3 py-1.5 rounded-lg"
-                title={`${t("parking.free")}: ${parking.space_free}`}
+                className="flex items-center gap-2 bg-green-500/10 px-3 py-1.5 rounded-lg"
+                title={`${t("space_free")}: ${parking.space_free}`}
               >
                 <IoCarSport className="text-cyan-400 text-sm" />
                 <span className="font-medium">{parking.space_free}</span>
