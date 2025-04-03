@@ -1,35 +1,71 @@
-import { FaArrowDown, FaArrowUp, FaCompass, FaUndo } from "react-icons/fa";
+import "./styles.css";
+
+import { FaArrowDown, FaArrowUp, FaCompass } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
+
+import PropTypes from "prop-types";
 
 const NavigationControl = ({ map }) => {
   const [bearing, setBearing] = useState(0);
-  const [pitch, setPitch] = useState(0);
 
   useEffect(() => {
     if (!map) return;
 
     const updateRotation = () => {
       setBearing(Math.round(map.getBearing()));
-      setPitch(Math.round(map.getPitch()));
     };
 
     map.on("rotate", updateRotation);
-    map.on("pitch", updateRotation);
 
     // Initial values
     updateRotation();
 
     return () => {
       map.off("rotate", updateRotation);
-      map.off("pitch", updateRotation);
     };
   }, [map]);
+
+  const handleMouseDown = (e) => {
+    const container = e.currentTarget;
+    const rect = container.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Calculate initial angle
+    const initialAngle =
+      Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
+    const initialBearing = map.getBearing();
+
+    const updateAngle = (moveEvent) => {
+      const currentAngle =
+        Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) *
+        (180 / Math.PI);
+      const deltaAngle = currentAngle - initialAngle;
+      const newBearing = initialBearing + deltaAngle;
+      setBearing(newBearing);
+      map.setBearing(newBearing);
+    };
+
+    const handleMouseMove = (moveEvent) => {
+      moveEvent.preventDefault();
+      updateAngle(moveEvent);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      container.classList.remove("grabbing");
+    };
+
+    e.currentTarget.classList.add("grabbing");
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
 
   const resetNorth = () => {
     if (!map) return;
     map.easeTo({
       bearing: 0,
-      pitch: 0,
       duration: 500,
     });
   };
@@ -44,45 +80,37 @@ const NavigationControl = ({ map }) => {
   };
 
   return (
-    <div className="flex items-center gap-4">
-      {/* <div className="flex flex-col items-center gap-1.5">
-        <button
-          onClick={() => adjustPitch(10)}
-          className="p-1.5 text-white/80 hover:text-blue-400 hover:bg-white/10 rounded-lg transition-all"
-          title="Tilt up"
-        >
-          <FaArrowUp className="text-sm" />
-        </button>
-        <button
-          onClick={() => adjustPitch(-10)}
-          className="p-1.5 text-white/80 hover:text-blue-400 hover:bg-white/10 rounded-lg transition-all"
-          title="Tilt down"
-        >
-          <FaArrowDown className="text-sm" />
-        </button>
-      </div> */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={resetNorth}
-          className={`p-2 rounded-xl hover:bg-white/10 transition-all duration-300 ${
-            bearing !== 0 || pitch !== 0
-              ? "text-blue-400"
-              : "text-white/80 hover:text-blue-400"
-          }`}
-          title="Reset bearing and pitch"
-          style={{
-            transform: `rotate(${-bearing - 45}deg)`,
-            transition: "transform 0.3s ease-out",
-          }}
-        >
-          <FaCompass className="text-xl" />
-        </button>
-        <span className="text-white/80 text-xs font-medium tabular-nums tracking-wide min-w-[2rem] text-center">
-          {Math.abs(bearing)}°
-        </span>
-      </div>
+    <div className="nav-container">
+      <div
+        className="nav-ring"
+        onMouseDown={handleMouseDown}
+        title="Drag to rotate map"
+        style={{ transform: `rotate(${bearing}deg)` }}
+      />
+      <button
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  text-white hover:bg-white hover:text-blue-500 border-none hover:border-none rounded-full p-0"
+        onClick={resetNorth}
+      >
+        <FaCompass
+          className="w-6 h-6"
+          title={Math.abs(bearing) + "°"}
+          style={{ transform: `rotate(${bearing - 45}deg)` }}
+        />
+      </button>
     </div>
   );
+};
+
+NavigationControl.propTypes = {
+  map: PropTypes.shape({
+    getBearing: PropTypes.func,
+    setPitch: PropTypes.func,
+    getPitch: PropTypes.func,
+    setBearing: PropTypes.func,
+    easeTo: PropTypes.func,
+    on: PropTypes.func,
+    off: PropTypes.func,
+  }),
 };
 
 export default NavigationControl;

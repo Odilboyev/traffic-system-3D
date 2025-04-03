@@ -45,6 +45,8 @@ const MapLibreContainer = () => {
     let savedMapState = {
       center: [69.254643, 41.321151],
       zoom: 14,
+      pitch: 0,
+      bearing: 0
     };
 
     try {
@@ -56,7 +58,9 @@ const MapLibreContainer = () => {
           parsedState &&
           Array.isArray(parsedState.center) &&
           parsedState.center.length === 2 &&
-          typeof parsedState.zoom === "number"
+          typeof parsedState.zoom === "number" &&
+          typeof parsedState.pitch === "number" &&
+          typeof parsedState.bearing === "number"
         ) {
           savedMapState = parsedState;
         }
@@ -71,7 +75,8 @@ const MapLibreContainer = () => {
       style: theme === "dark" ? darkLayer : lightLayer,
       zoom: savedMapState.zoom,
       center: savedMapState.center,
-      pitch: 40,
+      pitch: savedMapState.pitch,
+      bearing: savedMapState.bearing,
       maxPitch: 70,
       maxZoom: 20,
       minZoom: 0,
@@ -91,9 +96,16 @@ const MapLibreContainer = () => {
     newMap.on("moveend", () => {
       const center = newMap.getCenter();
       const zoom = newMap.getZoom();
+      const pitch = newMap.getPitch();
+      const bearing = newMap.getBearing();
       setCurrentZoom(zoom);
       try {
-        const mapState = { center: [center.lng, center.lat], zoom };
+        const mapState = { 
+          center: [center.lng, center.lat], 
+          zoom,
+          pitch,
+          bearing
+        };
         localStorage.setItem("mapState", JSON.stringify(mapState));
       } catch (error) {
         console.warn("Error saving mapState to localStorage:", error);

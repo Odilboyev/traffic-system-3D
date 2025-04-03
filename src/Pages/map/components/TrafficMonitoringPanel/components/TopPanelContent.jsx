@@ -81,7 +81,7 @@ const TopPanelContent = () => {
   }, [activeSlideIndex, setActiveModule]);
 
   return (
-    <div className="bg-gradient-to-b from-black/60 via-black/40 to-black/5 pt-5">
+    <div className="bg-gradient-to-b select-none from-black/60 via-black/40 to-black/5 pt-5">
       <div className="relative mx-auto h-16 px-6 transition-all duration-300">
         {/* Main container with modern glassmorphism */}
         <div className="h-full flex items-center justify-between gap-4">

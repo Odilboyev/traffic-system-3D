@@ -1,0 +1,99 @@
+/* Compass Control */
+.compass-control {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  cursor: grab;
+  background: rgba(0, 0, 0, 0.2);
+  transition: border-color 0.2s;
+  user-select: none;
+}
+
+.compass-control:active {
+  cursor: grabbing;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.compass-control:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.compass-arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 24px;
+  background: linear-gradient(to bottom, #fff 50%, #f00 50%);
+  transform-origin: center 12px;
+  margin: -12px 0 0 -1px;
+  transition: transform 0.1s ease-out;
+}
+
+.compass-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Range Input Styling */
+.map-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 120px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  transition: background 0.2s;
+}
+
+.map-range.vertical {
+  width: 4px;
+  height: 60px;
+  writing-mode: bt-rl;
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+}
+
+.map-range:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.map-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.map-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s;
+}
+
+.map-range::-webkit-slider-thumb:hover,
+.map-range::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+
+.map-range::-moz-range-thumb:hover,
+.map-range::-moz-range-thumb:active {
+  transform: scale(1.2);
+}

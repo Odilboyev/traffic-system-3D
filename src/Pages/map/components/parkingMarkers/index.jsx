@@ -99,7 +99,6 @@ const ParkingMarkers = ({ map }) => {
           };
         });
 
-        console.log(formattedData, "lol");
         setParkingLots(formattedData.filter(Boolean));
       } catch (error) {
         console.error("Error fetching parking data:", error);
@@ -232,7 +231,7 @@ const ParkingMarkers = ({ map }) => {
             })),
         },
       });
-      console.log(parkingLots, "parking lines");
+
       // Add layers in correct order
       safeAddLayer({
         id: "parking-areas-fill",

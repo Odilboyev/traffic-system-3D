@@ -1,0 +1,79 @@
+.nav-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  user-select: none;
+}
+
+.nav-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 12px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  cursor: grab;
+  transition: border-color 0.2s;
+}
+
+.nav-ring:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.nav-ring.grabbing {
+  cursor: grabbing;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.nav-ring::after {
+  content: "";
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 1;
+}
+
+.nav-center:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+/* 
+.nav-center .compass {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  transition: transform 0.3s ease-out;
+} */
+
+.nav-center:hover .compass {
+  color: white;
+}
+
+.bearing {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
