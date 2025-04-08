@@ -86,7 +86,8 @@ const modifyPTZCamera = async (data) =>
 const modifySvetofor = async (data, id) =>
   postData(import.meta.env.VITE_TRAFFIC_LIGHTS_UPDATE + "/" + id, data);
 const getFuelStations = async () => getData(import.meta.env.VITE_FUEL_STATIONS);
-
+const getFuelStationWidgets = async () =>
+  getData(import.meta.env.VITE_FUEL_STATION_WIDGETS);
 const getTrafficStatsData = async (id, params) =>
   getDataWithParams(import.meta.env.VITE_TRAFFIC_STATS + "/" + id, params);
 const getTrafficJamLines = async () =>
@@ -98,6 +99,34 @@ const getFineLastData = async () =>
 const getParkingLots = async () => getData(import.meta.env.VITE_PARKING_LOTS);
 const getParkingWidgets = async () =>
   getData(import.meta.env.VITE_PARKING_WIDGETS);
+const getBusLines = async () =>
+  getData(import.meta.env.VITE_PUBLIC_TRANSPORT_BUS_LINES);
+const getBusWidgets = async () =>
+  getData(import.meta.env.VITE_PUBLIC_TRANSPORT_BUS_WIDGETS);
+const getBusRealtimeLocations = async (body) =>
+  postData(import.meta.env.VITE_PUBLIC_TRANSPORT_BUS_REALTIME_LOCATIONS, body);
+// 2GIS viewport-based bus location API
+const getBusLocationsInViewport = async (viewport) => {
+  const res = await axios.post(
+    `https://eta.api.2gis.ru/v2/points/viewport`,
+    {
+      immersive: false,
+      type: "online5",
+      viewport: viewport,
+    },
+    {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Origin: "https://2gis.uz",
+        Referer: "https://2gis.uz/",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "cross-site",
+      },
+    }
+  );
+  return handleResponse(res);
+};
 
 // **New Dynamic API Caller**
 const fetchDataForManagement = async (method, type, options = {}) => {
@@ -204,7 +233,6 @@ const subscribeToCurrentAlarms = (onDataReceived) => {
 
 // Export functions
 export {
-  getFuelStations,
   addUser,
   deleteUser,
   fetchDataForManagement,
@@ -217,6 +245,8 @@ export {
   getCrossRoadStats,
   getCurrentAlarms,
   getDevices,
+  getFuelStations,
+  getFuelStationWidgets,
   getDistricts,
   getErrorHistory,
   getInfoAboutCurrentUser,
@@ -238,6 +268,10 @@ export {
   getFineLastData,
   getParkingLots,
   getParkingWidgets,
+  getBusLines,
+  getBusWidgets,
+  getBusLocationsInViewport,
+  getBusRealtimeLocations,
   listUsers,
   markerHandler,
   recoverUser,

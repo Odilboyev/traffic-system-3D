@@ -1,10 +1,20 @@
-import React from "react";
-import { FaBus, FaSubway, FaTram, FaRegClock, FaMapMarkerAlt, FaUsers, FaTachometerAlt } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
+import "./styles.css";
 
-const getTransportIcon = (type, size = "1.5em") => {
+import { FaBus, FaSubway, FaTram } from "react-icons/fa";
+import { FaMapMarkerAlt, FaRegClock, FaRoute } from "react-icons/fa";
+
+import { IoClose } from "react-icons/io5";
+import PropTypes from "prop-types";
+import React from "react";
+
+export const transportTypes = [
+  { id: "bus", label: "Bus", Icon: FaBus },
+  { id: "metro", label: "Metro", Icon: FaSubway },
+  { id: "tram", label: "Tram", Icon: FaTram },
+];
+export const getTransportIcon = (type, size = "1.5em") => {
   let Icon;
-  switch (type) {
+  switch (type?.toLowerCase()) {
     case "bus":
       Icon = FaBus;
       break;
@@ -17,108 +27,57 @@ const getTransportIcon = (type, size = "1.5em") => {
     default:
       Icon = FaBus;
   }
-  
   return <Icon size={size} />;
 };
-
-const getOccupancyColor = (occupancy) => {
-  switch (occupancy) {
-    case "low":
-      return "#10b981"; // green
-    case "medium":
-      return "#f59e0b"; // amber
-    case "high":
-      return "#ef4444"; // red
-    default:
-      return "#10b981";
-  }
-};
-
-const getOccupancyText = (occupancy) => {
-  switch (occupancy) {
-    case "low":
-      return "Low occupancy";
-    case "medium":
-      return "Medium occupancy";
-    case "high":
-      return "High occupancy";
-    default:
-      return "Unknown occupancy";
-  }
-};
-
-const TransportPopup = ({ vehicle, route, onClose }) => {
-  const occupancyColor = getOccupancyColor(vehicle.occupancy);
-  
+function TransportPopup({ route, onClose }) {
   return (
-    <div className="transport-popup-content">
-      <div className="transport-popup-header" style={{ background: `linear-gradient(to right, ${route.color}40, transparent)` }}>
+    <div className="transport-popup">
+      <div
+        className="transport-popup-header"
+        style={{ backgroundColor: route.color || "#4A90E2" }}
+      >
         <div className="transport-popup-title">
-          <div className="transport-popup-icon" style={{ color: route.color }}>
-            {getTransportIcon(vehicle.type)}
+          <div className="transport-popup-icon">
+            {getTransportIcon(route.type)}
           </div>
-          <h3>{route.name}</h3>
+          <h3>Route {route.name}</h3>
         </div>
         <button className="transport-popup-close" onClick={onClose}>
           <IoClose />
         </button>
       </div>
-      
-      <div className="transport-popup-body">
-        <div className="transport-popup-info-row">
-          <div className="transport-popup-info-icon">
-            <FaMapMarkerAlt />
+
+      <div className="transport-popup-content">
+        <div className="transport-popup-info">
+          <div className="transport-popup-info-row">
+            <FaRoute className="transport-popup-row-icon" />
+            <span>Route Type: {route.type || "Bus"}</span>
           </div>
-          <div className="transport-popup-info-text">
-            <div className="transport-popup-info-label">Next stop</div>
-            <div className="transport-popup-info-value">{vehicle.nextStop}</div>
+
+          <div className="transport-popup-info-row">
+            <FaRegClock className="transport-popup-row-icon" />
+            <span>Schedule: 06:00 - 23:00</span>
           </div>
-        </div>
-        
-        <div className="transport-popup-info-row">
-          <div className="transport-popup-info-icon" style={{ color: vehicle.onTime ? "#10b981" : "#ef4444" }}>
-            <FaRegClock />
+
+          <div className="transport-popup-info-row">
+            <FaMapMarkerAlt className="transport-popup-row-icon" />
+            <span>Length: {(route.path.length / 10).toFixed(1)} km</span>
           </div>
-          <div className="transport-popup-info-text">
-            <div className="transport-popup-info-label">Status</div>
-            <div className="transport-popup-info-value" style={{ color: vehicle.onTime ? "#10b981" : "#ef4444" }}>
-              {vehicle.onTime ? "On time" : `Delayed by ${vehicle.delayMinutes} min`}
-            </div>
-          </div>
-        </div>
-        
-        <div className="transport-popup-info-row">
-          <div className="transport-popup-info-icon" style={{ color: occupancyColor }}>
-            <FaUsers />
-          </div>
-          <div className="transport-popup-info-text">
-            <div className="transport-popup-info-label">Occupancy</div>
-            <div className="transport-popup-info-value" style={{ color: occupancyColor }}>
-              {getOccupancyText(vehicle.occupancy)}
-            </div>
-          </div>
-        </div>
-        
-        <div className="transport-popup-info-row">
-          <div className="transport-popup-info-icon">
-            <FaTachometerAlt />
-          </div>
-          <div className="transport-popup-info-text">
-            <div className="transport-popup-info-label">Speed</div>
-            <div className="transport-popup-info-value">
-              {vehicle.speed} km/h
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div className="transport-popup-footer">
-        <div className="transport-popup-route-info">
-          View full route details
         </div>
       </div>
     </div>
   );
+}
+
+TransportPopup.propTypes = {
+  route: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    type: PropTypes.string,
+    color: PropTypes.string,
+    path: PropTypes.array,
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
-export default TransportPopup;
+const MemoizedTransportPopup = React.memo(TransportPopup);
+export default MemoizedTransportPopup;

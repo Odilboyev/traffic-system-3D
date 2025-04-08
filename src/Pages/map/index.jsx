@@ -19,7 +19,7 @@ import { useMapMarkers } from "./hooks/useMapMarkers.jsx";
 
 const MapComponent = memo(({ t }) => {
   const { map } = useMapContext();
-  const { markers, getDataHandler } = useMapMarkers();
+  const {  getDataHandler } = useMapMarkers();
 
   const [crossroadModal, setCrossroadModal] = useState({
     isOpen: false,
@@ -35,32 +35,10 @@ const MapComponent = memo(({ t }) => {
   });
   const [isBoxLoading] = useState(false);
   const [isLightsLoading] = useState(false);
-  const [changedMarker, setChangedMarker] = useState(null);
-  // const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-  // const [activeSidePanel, setActiveSidePanel] = useState(null);
-
-  // const { show3DLayer } = useTheme();
-
   // Fetch markers on mount
   useEffect(() => {
     getDataHandler();
   }, [getDataHandler]);
-
-  // const handleMarkerClick = useCallback((marker) => {
-  //   switch (marker.type) {
-  //     case "crossroad":
-  //       setCrossroadModal({ isOpen: true, marker });
-  //       break;
-  //     case "device":
-  //       setDeviceModal({ isOpen: true, marker });
-  //       break;
-  //     case "trafficLights":
-  //       setTrafficLightsModal({ isOpen: true, marker });
-  //       break;
-  //     default:
-  //       console.warn("Unknown marker type:", marker.type);
-  //   }
-  // }, []);
 
   return (
     <div className="map-page w-screen h-screen relative overflow-hidden">
@@ -88,7 +66,6 @@ const MapComponent = memo(({ t }) => {
               }}
               isBoxLoading={isBoxLoading}
               isLightsLoading={isLightsLoading}
-              changedMarker={changedMarker}
               t={t}
             />
             <ToastContainer {...toaster} />

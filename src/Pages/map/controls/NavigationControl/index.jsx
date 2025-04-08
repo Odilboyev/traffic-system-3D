@@ -88,14 +88,17 @@ const NavigationControl = ({ map }) => {
         style={{ transform: `rotate(${bearing}deg)` }}
       />
       <button
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  text-white hover:bg-white hover:text-blue-500 border-none hover:border-none rounded-full p-0"
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white hover:bg-white hover:text-blue-500 border-none hover:border-none rounded-full p-2 group"
         onClick={resetNorth}
+        title="Click to reset rotation"
       >
         <FaCompass
-          className="w-6 h-6"
-          title={Math.abs(bearing) + "°"}
+          className="w-5 h-5"
           style={{ transform: `rotate(${bearing - 45}deg)` }}
-        />
+        />{" "}
+        <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-white/80 text-xs font-bold bg-white/20 backdrop-blur-md rounded-full px-1">
+          {Math.abs(Math.round(bearing))}°
+        </span>
       </button>
     </div>
   );

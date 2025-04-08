@@ -111,7 +111,7 @@ const MapControlsPanel = ({ map }) => {
                 max="60"
                 value={currentPitch}
                 onChange={(e) => map.setPitch(parseFloat(e.target.value))}
-                className="map-range vertical max-w-full"
+                className="map-range vertical max-w-full rounded-full"
                 title={`Tilt: ${Math.round(currentPitch)}°`}
               />
             </div>

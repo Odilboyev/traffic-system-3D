@@ -20,6 +20,8 @@ import RegionDistrictFilter from "./RegionDistrictFilter";
 import RoadSignsMarkers from "./roadSignsMarkers";
 import TrafficLightContainer from "./trafficLightMarkers/managementLights";
 import TransportMarkers from "./transportMarkers";
+import TransportModule from "./TrafficMonitoringPanel/components/modules/TransportModule";
+import { TransportProvider } from "../context/TransportContext";
 import WeatherMarkers from "./weatherMarkers";
 import WeatherModule from "./TrafficMonitoringPanel/components/modules/WeatherModule";
 import { useModuleContext } from "../context/ModuleContext";
@@ -86,9 +88,12 @@ const ActiveModuleComponents = ({ map }) => {
     case "public_transport":
       return (
         <>
-          {/* Public transport markers */}
-          <TransportMarkers map={map} />
-          {/* Add transport panel component here when available */}
+          <TransportProvider>
+            {/* Public transport markers */}
+            <TransportModule />
+            {/* Public transport panel */}
+            <TransportMarkers map={map} />
+          </TransportProvider>
         </>
       );
     case "road_signs":

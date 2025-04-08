@@ -1,186 +1,159 @@
-import { FaFilter, FaGasPump, FaMapMarkerAlt, FaSearch } from "react-icons/fa";
-import React, { useState } from "react";
+import { FaFilter, FaGasPump, FaSearch } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
 import { RiGasStationFill, RiOilFill } from "react-icons/ri";
 
 import SlidePanel from "../../../../../../components/SlidePanel/SlidePanel";
+import { getFuelStationWidgets } from "../../../../../../api/api.handlers";
 import { useZoomPanel } from "../../../../context/ZoomPanelContext";
 
 const FuelStationsModule = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [fuelType, setFuelType] = useState("all");
+  const [widgetData, setWidgetData] = useState({
+    widget_1: { name: "", data: [] },
+    widget_2: { name: "", data: [] },
+  });
   const conditionMet = useZoomPanel();
-  // Sample fuel station data
-  const fuelStations = [
-    {
-      id: 1,
-      name: "Uzbekneftgaz #12",
-      address: "Toshkent, Chilonzor tumani",
-      types: ["AI-80", "AI-92", "AI-95", "Dizel"],
-      status: "open",
-      distance: "1.2 km",
-    },
-    {
-      id: 2,
-      name: "UzGaz Station",
-      address: "Toshkent, Yunusobod tumani",
-      types: ["Metan", "Propan"],
-      status: "open",
-      distance: "2.5 km",
-    },
-    {
-      id: 3,
-      name: "Lukoil",
-      address: "Toshkent, Mirzo Ulug'bek tumani",
-      types: ["AI-92", "AI-95", "Premium"],
-      status: "open",
-      distance: "3.7 km",
-    },
-    {
-      id: 4,
-      name: "Uzbekneftgaz #8",
-      address: "Toshkent, Sergeli tumani",
-      types: ["AI-80", "AI-92", "Dizel"],
-      status: "closed",
-      distance: "5.1 km",
-    },
-    {
-      id: 5,
-      name: "EcoGas",
-      address: "Toshkent, Bektemir tumani",
-      types: ["Metan", "Propan"],
-      status: "open",
-      distance: "6.3 km",
-    },
-  ];
+
+  useEffect(() => {
+    const fetchWidgetData = async () => {
+      try {
+        const data = await getFuelStationWidgets();
+        setWidgetData(data);
+      } catch (error) {
+        console.error("Error fetching fuel station widgets:", error);
+      }
+    };
+    fetchWidgetData();
+  }, []);
+
+  // Convert widget_1 data to fuelPrices format
+  const fuelTypeData = widgetData.widget_1.data || [];
+
+  // Process regional data from widget_2
+  const regionalData = widgetData.widget_2.data || [];
+
+  // Transform regional data into fuel stations list
+  const fuelStations = regionalData.map((region) => ({
+    id: region.region_id,
+    name: region.region_name,
+    stations: region.stations.map((station) => ({
+      type: station.name,
+      count: station.count_station,
+    })),
+  }));
 
   // Filter stations based on search term and fuel type
   const filteredStations = fuelStations.filter((station) => {
-    const matchesSearch =
-      station.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      station.address.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFuelType =
-      fuelType === "all" ||
-      station.types.some((type) => {
-        if (fuelType === "benzin")
-          return ["AI-80", "AI-92", "AI-95", "Premium"].includes(type);
-        if (fuelType === "gaz") return ["Metan", "Propan"].includes(type);
-        if (fuelType === "dizel") return type === "Dizel";
-        return false;
-      });
+    // First check if the station name matches the search term
+    const matchesSearch = station.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
 
-    return matchesSearch && matchesFuelType;
+    // If no search match, exclude immediately
+    if (!matchesSearch) return false;
+
+    // If showing all types, include the station
+    if (fuelType === "all") return true;
+
+    // Find the specific station type we're filtering for
+    const targetType = {
+      benzin: "petrol",
+      gaz: "gas",
+      elektro: "electro",
+    }[fuelType];
+
+    // Find the station data for the selected type
+    const stationOfType = station.stations.find((s) => s.type === targetType);
+
+    // Include the station if it has the selected type AND has a count greater than 0
+    return stationOfType && stationOfType.count > 0;
   });
 
-  // Fuel price data
+  // Process widget data for display
+  const getTotalByType = (type) => {
+    const item = fuelTypeData.find((item) => item.name === type);
+    return item ? item.count_station : 0;
+  };
+
   const fuelPrices = [
-    { type: "AI-80", price: "4,800" },
-    { type: "AI-92", price: "5,300" },
-    { type: "AI-95", price: "5,800" },
-    { type: "Premium", price: "6,500" },
-    { type: "Dizel", price: "5,200" },
-    { type: "Metan", price: "3,200" },
-    { type: "Propan", price: "3,800" },
+    { type: "Benzin", count: getTotalByType("petrol") },
+    { type: "Gaz", count: getTotalByType("gas") },
+    { type: "Elektro", count: getTotalByType("electro") },
   ];
   const content = (
-    <div className="fuel-stations-module left-side-panels h-full max-h-full overflow-y-auto max-w-[30vw] scrollbar-hide space-y-4">
+    <div className="fuel-stations-module left-side-panels h-full max-h-full overflow-y-auto max-w-[30vw] scrollbar-hide space-y-4 text-[#E2E8F0] font-sans">
       {/* Fuel Prices */}
-      <div className="p-4 bg-gray-800/50 backdrop-blur-sm rounded-lg">
-        <h3 className="text-lg font-semibold text-cyan-100 mb-3 flex items-center">
-          <RiOilFill className="mr-2 text-cyan-400" />
-          Yoqilg'i Narxlari
+      <div className="p-4 bg-[#1a1f2e]/90 backdrop-blur-md rounded-lg border border-cyan-500/20 shadow-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent pointer-events-none" />
+        <h3 className="text-xl font-bold text-cyan-400 mb-4 flex items-center">
+          <RiOilFill className="mr-2 text-cyan-500" />
+          {widgetData.widget_1.name}
         </h3>
         <div className="grid grid-cols-2 gap-3">
           {fuelPrices.map((fuel, index) => (
             <div
               key={index}
-              className="p-3 rounded-md bg-gray-700/50 flex items-center justify-between"
+              className="p-3 rounded-md bg-[#2a3441]/80 border border-cyan-500/10 flex items-center justify-between hover:bg-[#2a3441] transition-all duration-300"
             >
-              <span className="text-sm text-gray-300">{fuel.type}</span>
-              <span className="text-md font-bold text-cyan-300">
-                {fuel.price} so'm
-              </span>
+              <span className="text-sm text-cyan-100">{fuel.type}</span>
+              <div className="flex items-center">
+                <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-cyan-200 bg-clip-text text-transparent">
+                  {fuel.count}
+                </span>
+                <span className="ml-1 text-xs text-cyan-300">ta</span>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Fuel Stations */}
-      <div className="p-4 bg-gray-800/50 backdrop-blur-sm rounded-lg">
-        <h3 className="text-lg font-semibold text-cyan-100 mb-3 flex items-center">
-          <RiGasStationFill className="mr-2 text-cyan-400" />
-          Yoqilg'i Stansiyalari
+      <div className="p-4 bg-[#1a1f2e]/90 backdrop-blur-md rounded-lg border border-cyan-500/20 shadow-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent pointer-events-none" />
+        <h3 className="text-xl font-bold text-cyan-400 mb-4 flex items-center">
+          <RiGasStationFill className="mr-2 text-cyan-500" />
+          {widgetData.widget_2.name}
         </h3>
 
-        {/* Search and Filter */}
-        <div className="flex space-x-2 mb-3">
-          <div className="relative flex-grow">
-            <input
-              type="text"
-              placeholder="Qidirish..."
-              className="w-full bg-gray-700/70 text-gray-200 px-3 py-2 pl-9 rounded-md focus:outline-none focus:ring-1 focus:ring-cyan-400"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          </div>
-          <select
-            className="bg-gray-700/70 text-gray-200 px-3 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-cyan-400"
-            value={fuelType}
-            onChange={(e) => setFuelType(e.target.value)}
-          >
-            <option value="all">Barchasi</option>
-            <option value="benzin">Benzin</option>
-            <option value="gaz">Gaz</option>
-            <option value="dizel">Dizel</option>
-          </select>
-        </div>
-
         {/* Stations List */}
-        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
           {filteredStations.length > 0 ? (
             filteredStations.map((station) => (
               <div
                 key={station.id}
-                className="p-3 rounded-md bg-gray-700/50 hover:bg-gray-700/80 transition-colors cursor-pointer"
+                className="group p-4 rounded-md bg-[#2a3441]/80 border border-cyan-500/10 hover:bg-[#2a3441] transition-all duration-300 cursor-pointer relative overflow-hidden"
               >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="text-md font-medium text-cyan-100">
-                      {station.name}
-                    </h4>
-                    <p className="text-xs text-gray-400 flex items-center mt-1">
-                      <FaMapMarkerAlt className="mr-1" /> {station.address}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      station.status === "open"
-                        ? "bg-green-900/50 text-green-300"
-                        : "bg-red-900/50 text-red-300"
-                    }`}
-                  >
-                    {station.status === "open" ? "Ochiq" : "Yopiq"}
-                  </span>
-                </div>
-                <div className="mt-2 flex justify-between items-center">
-                  <div className="flex flex-wrap gap-1">
-                    {station.types.map((type, idx) => (
-                      <span
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative">
+                  <h4 className="text-lg font-semibold text-cyan-100 mb-3">
+                    {station.name}
+                  </h4>
+                  <div className="space-y-2">
+                    {station.stations.map((stationType, idx) => (
+                      <div
                         key={idx}
-                        className="text-xs px-2 py-0.5 bg-gray-600/50 rounded-full text-gray-300"
+                        className="flex justify-between items-center py-1"
                       >
-                        {type}
-                      </span>
+                        <span className="text-sm text-cyan-200">
+                          {stationType.type === "petrol" && "Benzin"}
+                          {stationType.type === "gas" && "Gaz"}
+                          {stationType.type === "electro" && "Elektro"}
+                        </span>
+                        <div className="flex items-center">
+                          <span className="text-md font-bold bg-gradient-to-r from-cyan-400 to-cyan-200 bg-clip-text text-transparent">
+                            {stationType.count}
+                          </span>
+                          <span className="ml-1 text-xs text-cyan-300">ta</span>
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  <span className="text-xs text-gray-400">
-                    {station.distance}
-                  </span>
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-center py-4 text-gray-400">
+            <div className="text-center py-6 text-cyan-300/60">
               Yoqilg'i stansiyalari topilmadi
             </div>
           )}

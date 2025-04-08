@@ -166,7 +166,7 @@ const RegionDistrictFilter = ({ map, t }) => {
     if (!Array.isArray(stations) || stations.length === 0) {
       fetchStations();
     }
-  }, []);
+  }, [fetchStations, stations, setStations]);
 
   const handleRegionChange = (regionId) => {
     const region = regions.find((r) => r.id === parseInt(regionId));
@@ -180,7 +180,7 @@ const RegionDistrictFilter = ({ map, t }) => {
 
         console.log(location, "the location before flyto");
 
-        map.flyTo([location.lng, location.lat], 12);
+        map.flyTo({ center: [location.lng, location.lat], zoom: 12 });
       } catch (error) {
         console.error("Error parsing region location:", error);
       }
@@ -200,7 +200,7 @@ const RegionDistrictFilter = ({ map, t }) => {
           typeof location.lng === "number" &&
           typeof location.lat === "number"
         ) {
-          map.flyTo([location.lng, location.lat], 14);
+          map.flyTo({ center: [location.lng, location.lat], zoom: 14 });
         }
       } catch (error) {
         console.error("Error parsing district location:", error);
@@ -246,10 +246,10 @@ const RegionDistrictFilter = ({ map, t }) => {
           x: clientX - rect.left,
           y: clientY - rect.top,
         };
-        
+
         // Also update the state for React (less critical for performance)
         setDragOffset(dragOffsetRef.current);
-        
+
         // Update both the ref and state for dragging status
         isDraggingRef.current = true;
         setIsDragging(true);
@@ -279,29 +279,29 @@ const RegionDistrictFilter = ({ map, t }) => {
   useEffect(() => {
     // Use requestAnimationFrame for smoother performance
     let animationFrameId = null;
-    
+
     const handleMove = (e) => {
       // Cancel any pending animation frame
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
-      
+
       // Schedule the position update on the next animation frame
       animationFrameId = requestAnimationFrame(() => {
         if (isDraggingRef.current) {
           const clientX = e.clientX || (e.touches && e.touches[0].clientX);
           const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-          
+
           if (clientX && clientY) {
             const newX = clientX - dragOffsetRef.current.x;
             const newY = clientY - dragOffsetRef.current.y;
-            
+
             // Update the DOM directly for smoother dragging
             if (filterRef.current) {
               filterRef.current.style.left = `${newX}px`;
               filterRef.current.style.top = `${newY}px`;
             }
-            
+
             // Store the current position for when dragging ends
             positionRef.current = { x: newX, y: newY };
           }
@@ -313,7 +313,7 @@ const RegionDistrictFilter = ({ map, t }) => {
       // On drag end, update the React state with the final position
       setPosition(positionRef.current);
       setIsDragging(false);
-      
+
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
@@ -338,7 +338,7 @@ const RegionDistrictFilter = ({ map, t }) => {
       document.removeEventListener("touchmove", handleMove);
       document.removeEventListener("touchend", handleEnd);
       document.removeEventListener("touchcancel", handleEnd);
-      
+
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
@@ -353,7 +353,7 @@ const RegionDistrictFilter = ({ map, t }) => {
         left: `${position.x}px`,
         top: `${position.y}px`,
         cursor: isDragging ? "grabbing" : "auto",
-        transition: isDragging ? 'none' : 'box-shadow 0.2s ease',
+        transition: isDragging ? "none" : "box-shadow 0.2s ease",
       }}
     >
       <div className="flex flex-col gap-3">
