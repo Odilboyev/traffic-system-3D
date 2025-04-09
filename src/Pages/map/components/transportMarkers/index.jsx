@@ -53,15 +53,14 @@ const TransportMarkerComponent = ({ vehicle, showNumber, showDot }) => {
 
   return (
     <div
-      className="transport-marker p-1"
+      className="transport-marker"
       style={{
-        backgroundColor: "#3b82f680",
-        transform: `rotate(${vehicle.azimuth || 0}deg)`,
+        transform: `rotate(-${vehicle.azimuth || 0}deg)`,
         transformOrigin: "center",
       }}
     >
-      <div className="transport-marker-icon" style={{ color: "#3b82f6" }}>
-        <Icon className="transport-marker-icon" />
+      <div className="transport-marker-icon">
+        <Icon />
       </div>
       {showNumber && (
         <div className="transport-marker-name">{vehicle.bus_name || ""}</div>
@@ -102,37 +101,90 @@ function TransportMarkers({ map }) {
     currentViewport,
     getFilteredRoutes,
     updateViewport,
+    getBusSample,
   } = usePublicTransport();
-
-  useEffect(() => {
-    console.log(transportData, "vehicles changed");
-  }, [transportData]);
-
-  // Handle map movement and update viewport
+  // Initial load of markers
   useEffect(() => {
     if (!map) return;
+    const center = map.getCenter();
+    getBusSample(center.lat, center.lng);
+  }, [map]);
 
+  // Handle marker updates
+  useEffect(() => {
+    if (!map || !transportData?.viewportVehicles) return;
+
+    const zoom = map.getZoom();
+    const currentMarkers = new Set(Object.keys(markersRef.current));
+
+    transportData.viewportVehicles.forEach((vehicle) => {
+      if (!vehicle.locations || !vehicle.locations[0]) return;
+
+      const markerId = vehicle.bus_name;
+      const [longitude, latitude] = vehicle.locations[0];
+      currentMarkers.delete(markerId);
+
+      if (markersRef.current[markerId]) {
+        // Update existing marker
+        const marker = markersRef.current[markerId];
+        marker.setLngLat([longitude, latitude]);
+
+        // Update content without recreating the element
+        const markerElement = marker.getElement();
+        const root = markerElement._reactRoot;
+        if (root) {
+          const showNumber = zoom >= 13;
+          const showDot = zoom < 11;
+          root.render(
+            <TransportMarkerComponent
+              vehicle={vehicle}
+              showNumber={showNumber}
+              showDot={showDot}
+            />
+          );
+        }
+      } else {
+        // Create new marker only if it doesn't exist
+        const markerElement = document.createElement('div');
+        markerElement.className = 'transport-marker-container';
+        const root = createRoot(markerElement);
+        markerElement._reactRoot = root;
+
+        const showNumber = zoom >= 13;
+        const showDot = zoom < 11;
+        root.render(
+          <TransportMarkerComponent
+            vehicle={vehicle}
+            showNumber={showNumber}
+            showDot={showDot}
+          />
+        );
+
+        const marker = new maplibregl.Marker({
+          element: markerElement,
+          anchor: 'center',
+        })
+          .setLngLat([longitude, latitude])
+          .addTo(map);
+
+        markersRef.current[markerId] = marker;
+      }
+    });
+
+    // Remove markers that are no longer in the viewport
+    currentMarkers.forEach((markerId) => {
+      if (markersRef.current[markerId]) {
+        markersRef.current[markerId].remove();
+        delete markersRef.current[markerId];
+      }
+    });
+  }, [map, transportData]);
+  useEffect(() => {
     const handleMapMove = () => {
-      const bounds = map.getBounds();
-      const zoom = map.getZoom();
-
-      updateViewport({
-        topLeft: {
-          x: bounds.getWest(),
-          y: bounds.getNorth(),
-        },
-        bottomRight: {
-          x: bounds.getEast(),
-          y: bounds.getSouth(),
-        },
-        zoom: Math.round(zoom),
-      });
+      const center = map.getCenter();
+      getBusSample(center.lat, center.lng);
     };
 
-    // Update viewport on initial load
-    handleMapMove();
-
-    // Listen for map movement events
     map.on("moveend", handleMapMove);
     map.on("zoomend", handleMapMove);
 
@@ -140,20 +192,49 @@ function TransportMarkers({ map }) {
       map.off("moveend", handleMapMove);
       map.off("zoomend", handleMapMove);
     };
-  }, [map, updateViewport]);
+  }, [map, getBusSample]);
+  // Handle map movement and update viewport
+  // useEffect(() => {
+  //   if (!map) return;
+
+  //   const handleMapMove = () => {
+  //     const bounds = map.getBounds();
+  //     const zoom = map.getZoom();
+
+  //     updateViewport({
+  //       topLeft: {
+  //         x: bounds.getWest(),
+  //         y: bounds.getNorth(),
+  //       },
+  //       bottomRight: {
+  //         x: bounds.getEast(),
+  //         y: bounds.getSouth(),
+  //       },
+  //       zoom: Math.round(zoom),
+  //     });
+  //   };
+
+  //   // Update viewport on initial load
+  //   handleMapMove();
+
+  //   // Listen for map movement events
+  //   map.on("moveend", handleMapMove);
+  //   map.on("zoomend", handleMapMove);
+
+  //   return () => {
+  //     map.off("moveend", handleMapMove);
+  //     map.off("zoomend", handleMapMove);
+  //   };
+  // }, [map, updateViewport]);
 
   useEffect(() => {
     // Fetch transport data when component mounts or visualization type changes
     fetchTransportData();
-
+    const center = map.getCenter();
     // Set up interval for fetching data every 4 seconds
     updateIntervalRef.current = setInterval(() => {
-      fetchRealtimeVehicles({
-        viewport: currentViewport,
-        type: "online5",
-        immersive: false,
-      });
-    }, 4000);
+      getBusSample(center.lat, center.lng);
+    }, 3000);
 
     // Clean up when component unmounts
     return () => {
@@ -172,35 +253,35 @@ function TransportMarkers({ map }) {
   }, [fetchTransportData, clearTransportData, map]);
 
   // Handle zoom changes
-  useEffect(() => {
-    if (!map) return;
+  // useEffect(() => {
+  //   if (!map) return;
 
-    const handleZoomEnd = () => {
-      // Force markers update on zoom/drag change
-      const bounds = map.getBounds();
-      const zoom = map.getZoom();
+  //   const handleZoomEnd = () => {
+  //     // Force markers update on zoom/drag change
+  //     const bounds = map.getBounds();
+  //     const zoom = map.getZoom();
 
-      updateViewport({
-        topLeft: {
-          x: bounds.getWest(),
-          y: bounds.getNorth(),
-        },
-        bottomRight: {
-          x: bounds.getEast(),
-          y: bounds.getSouth(),
-        },
-        zoom: Math.round(zoom),
-      });
-    };
+  //     updateViewport({
+  //       topLeft: {
+  //         x: bounds.getWest(),
+  //         y: bounds.getNorth(),
+  //       },
+  //       bottomRight: {
+  //         x: bounds.getEast(),
+  //         y: bounds.getSouth(),
+  //       },
+  //       zoom: Math.round(zoom),
+  //     });
+  //   };
 
-    map.on("zoomend", handleZoomEnd);
-    map.on("dragend", handleZoomEnd);
+  //   map.on("zoomend", handleZoomEnd);
+  //   map.on("dragend", handleZoomEnd);
 
-    return () => {
-      map.off("zoomend", handleZoomEnd);
-      map.off("dragend", handleZoomEnd);
-    };
-  }, [map, updateViewport]);
+  //   return () => {
+  //     map.off("zoomend", handleZoomEnd);
+  //     map.off("dragend", handleZoomEnd);
+  //   };
+  // }, [map, updateViewport]);
 
   // Add real-time vehicle markers to the map
   useEffect(() => {

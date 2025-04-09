@@ -4,6 +4,8 @@ import {
 } from "../../../api/api.handlers";
 import { useCallback, useEffect, useState } from "react";
 
+import axios from "axios";
+
 // Transport types
 const transportTypes = {
   BUS: "bus",
@@ -115,6 +117,39 @@ export const usePublicTransport = () => {
   const clearSelectedVehicle = useCallback(() => {
     setSelectedVehicle(null);
   }, []);
+  const busFetcher = async (lat, lng) => {
+    const response = await axios.post(
+      "http://localhost:3000/api/buses/nearby",
+      {
+        lat: lat,
+        lng: lng,
+      }
+    );
+    return response.data;
+  };
+  const getBusSample = async (lat, lng) => {
+    try {
+      const locations = await busFetcher(lat, lng);
+      
+      if (!Array.isArray(locations)) {
+        console.error("Expected array of locations but got:", locations);
+        return;
+      }
+
+      setTransportData((prev) => {
+        // Always use the new locations array directly
+        // This ensures we're always showing the latest data
+        return {
+          ...prev,
+          viewportVehicles: locations,
+        };
+      });
+
+      return locations;
+    } catch (err) {
+      console.error("Error updating viewport vehicles:", err);
+    }
+  };
 
   // Update viewport and fetch bus locations
   const updateViewport = useCallback(async (viewport) => {
@@ -263,5 +298,6 @@ export const usePublicTransport = () => {
     updateViewport,
     fetchRealtimeVehicles,
     currentViewport,
+    getBusSample,
   };
 };
